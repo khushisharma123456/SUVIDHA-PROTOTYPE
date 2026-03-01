@@ -1,0 +1,717 @@
+<div class="main-content">
+    <!-- Insights Header with Stats -->
+    <div class="insights-header">
+        <div class="header-content">
+            <h1>Insights</h1>
+            <p>Understanding your household patterns, trends, and civic context.</p>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card success">
+            <div class="stat-icon-box green">📉</div>
+            <div class="stat-content">
+                <span class="stat-value">{{vm.stats.efficiency}}%</span>
+                <span class="stat-label">Energy Efficiency</span>
+            </div>
+            <div class="stat-trend up">
+                <span>Improving</span>
+            </div>
+        </div>
+        <div class="stat-card primary">
+            <div class="stat-icon-box blue">📅</div>
+            <div class="stat-content">
+                <span class="stat-value">{{vm.stats.analysisMonths}} Months</span>
+                <span class="stat-label">Analysis Period</span>
+            </div>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-icon-box orange">🏅</div>
+            <div class="stat-content">
+                <span class="stat-value">Top {{vm.stats.wardRank}}%</span>
+                <span class="stat-label">Ward Ranking</span>
+            </div>
+            <div class="stat-trend up">
+                <span>Great standing</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Tabs for Insights Sections -->
+    <div class="tabs-container enhanced">
+        <div class="tabs">
+            <button class="insight-tab" ng-class="{active: vm.activeSection === 'profile'}"
+                ng-click="vm.switchSection('profile')">
+                <i data-lucide="user"></i>
+                <span>Profile</span>
+            </button>
+            <button class="insight-tab" ng-class="{active: vm.activeSection === 'trends'}"
+                ng-click="vm.switchSection('trends')">
+                <i data-lucide="trending-up"></i>
+                <span>Trends</span>
+            </button>
+            <button class="insight-tab" ng-class="{active: vm.activeSection === 'recommendations'}"
+                ng-click="vm.switchSection('recommendations')">
+                <i data-lucide="lightbulb"></i>
+                <span>Recommendations</span>
+            </button>
+            <button class="insight-tab" ng-class="{active: vm.activeSection === 'comparison'}"
+                ng-click="vm.switchSection('comparison')">
+                <i data-lucide="bar-chart-2"></i>
+                <span>Comparison</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div ng-show="vm.activeSection === 'profile'" class="insight-section">
+        <div class="section-header-enhanced">
+            <h2>Your Utility Profile</h2>
+            <button class="action-btn" ng-click="vm.viewDataDisclaimer()">
+                <i data-lucide="info"></i>
+                <span>Data Disclaimer</span>
+            </button>
+        </div>
+
+        <div class="content-grid enhanced three-column">
+            <div class="card enhanced">
+                <div class="card-header">
+                    <div class="header-left">
+                        <div class="header-icon"
+                            style="color: var(--status-success); background: rgba(16, 185, 129, 0.1);">
+                            <i data-lucide="zap"></i>
+                        </div>
+                        <div>
+                            <h3><span class="icon">⚡</span> Electricity Efficiency</h3>
+                            <p class="card-subtitle">Based on 12 months data</p>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <span class="badge"
+                            ng-class="{'success': vm.getEfficiencyLabel('electricity') === 'efficient', 'warning': vm.getEfficiencyLabel('electricity') === 'average', 'error': vm.getEfficiencyLabel('electricity') === 'high'}">{{vm.getEfficiencyLabel('electricity')
+                            | uppercase}}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="profile-metric">
+                        <div class="metric-value">{{vm.profile.electricity.score}}<span class="metric-unit">/10</span>
+                        </div>
+                        <p class="metric-desc">You consume less than average</p>
+                    </div>
+                    <div class="profile-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Avg Monthly</span>
+                            <span class="detail-value">{{vm.profile.electricity.avgMonthly || 0}} kWh</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">vs Ward Avg</span>
+                            <span class="detail-value"
+                                ng-class="{'trend-down': vm.getWardComparison('electricity').indexOf('-') === 0, 'trend-up': vm.getWardComparison('electricity').indexOf('+') === 0}">{{vm.getWardComparison('electricity')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="confidence-tag high">High Confidence</span>
+                </div>
+            </div>
+
+            <div class="card enhanced">
+                <div class="card-header">
+                    <div class="header-left">
+                        <div class="header-icon"
+                            style="color: var(--status-warning); background: rgba(245, 158, 11, 0.1);">
+                            <i data-lucide="droplet"></i>
+                        </div>
+                        <div>
+                            <h3><span class="icon">💧</span> Water Usage Category</h3>
+                            <p class="card-subtitle">Based on 6 months data</p>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <span class="badge"
+                            ng-class="{'success': vm.getEfficiencyLabel('water') === 'efficient', 'warning': vm.getEfficiencyLabel('water') === 'average', 'error': vm.getEfficiencyLabel('water') === 'high'}">{{vm.getEfficiencyLabel('water')
+                            | uppercase}}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="profile-metric">
+                        <div class="metric-value">{{vm.profile.water.score}}<span class="metric-unit">/10</span></div>
+                        <p class="metric-desc">Usage peaks on weekends</p>
+                    </div>
+                    <div class="profile-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Avg Monthly</span>
+                            <span class="detail-value">{{vm.profile.water.avgMonthly || 0}} L</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">vs Ward Avg</span>
+                            <span class="detail-value"
+                                ng-class="{'trend-down': vm.getWardComparison('water').indexOf('-') === 0, 'trend-up': vm.getWardComparison('water').indexOf('+') === 0}">{{vm.getWardComparison('water')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="confidence-tag medium">Medium Confidence</span>
+                </div>
+            </div>
+
+            <div class="card enhanced">
+                <div class="card-header">
+                    <div class="header-left">
+                        <div class="header-icon"
+                            style="color: var(--primary-blue); background: rgba(29, 112, 184, 0.1);">
+                            <i data-lucide="flame"></i>
+                        </div>
+                        <div>
+                            <h3><span class="icon">🔥</span> Gas Stability Index</h3>
+                            <p class="card-subtitle">Based on 6 months data</p>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <span class="badge"
+                            ng-class="{'success': vm.getEfficiencyLabel('gas') === 'efficient', 'warning': vm.getEfficiencyLabel('gas') === 'average', 'error': vm.getEfficiencyLabel('gas') === 'high'}">{{vm.getEfficiencyLabel('gas')
+                            | uppercase}}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="profile-metric">
+                        <div class="metric-value">{{vm.profile.gas.score}}<span class="metric-unit">/10</span></div>
+                        <p class="metric-desc">Consistent usage pattern</p>
+                    </div>
+                    <div class="profile-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Avg Monthly</span>
+                            <span class="detail-value">{{vm.profile.gas.avgMonthly || 0}} m³</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">vs Ward Avg</span>
+                            <span class="detail-value"
+                                ng-class="{'trend-down': vm.getWardComparison('gas').indexOf('-') === 0, 'trend-up': vm.getWardComparison('gas').indexOf('+') === 0}">{{vm.getWardComparison('gas')}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="confidence-tag high">High Confidence</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-alert enhanced">
+            <i data-lucide="info"></i>
+            <p>Classifications derived by comparing your monthly usage data against city ward norms.</p>
+        </div>
+    </div>
+
+    <div ng-show="vm.activeSection === 'trends'" class="insight-section">
+        <div class="section-header-enhanced">
+            <h2>Your Consumption Trend</h2>
+            <button class="action-btn" ng-click="vm.exportTrendData()">
+                <i data-lucide="download"></i>
+                <span>Export Data</span>
+            </button>
+        </div>
+
+        <div class="content-grid enhanced single-column">
+            <div class="card enhanced">
+                <div class="card-header">
+                    <h3><span class="icon">📈</span> Consumption Trends Analysis</h3>
+                </div>
+                <div class="card-body">
+                    <div class="trend-items">
+                        <div class="trend-item">
+                            <div class="trend-icon" ng-class="vm.getTrendLabel('electricity')">
+                                <i data-lucide="zap"></i>
+                            </div>
+                            <div class="trend-content">
+                                <div class="trend-header">
+                                    <strong>Electricity</strong>
+                                    <span class="trend-badge"
+                                        ng-class="vm.getTrendLabel('electricity')">{{vm.getTrendBadgeText('electricity')}}
+                                        <i data-lucide="{{vm.getTrendIcon('electricity')}}"></i></span>
+                                </div>
+                                <p class="trend-desc">{{vm.getTrendDescription('electricity')}}</p>
+                                <div class="trend-chart">
+                                    <canvas id="electricityTrendChart" width="400" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="trend-item">
+                            <div class="trend-icon" ng-class="vm.getTrendLabel('water')">
+                                <i data-lucide="droplet"></i>
+                            </div>
+                            <div class="trend-content">
+                                <div class="trend-header">
+                                    <strong>Water</strong>
+                                    <span class="trend-badge"
+                                        ng-class="vm.getTrendLabel('water')">{{vm.getTrendBadgeText('water')}} <i
+                                            data-lucide="{{vm.getTrendIcon('water')}}"></i></span>
+                                </div>
+                                <p class="trend-desc">{{vm.getTrendDescription('water')}}</p>
+                                <div class="trend-chart">
+                                    <canvas id="waterTrendChart" width="400" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="trend-item">
+                            <div class="trend-icon" ng-class="vm.getTrendLabel('gas')">
+                                <i data-lucide="flame"></i>
+                            </div>
+                            <div class="trend-content">
+                                <div class="trend-header">
+                                    <strong>Gas</strong>
+                                    <span class="trend-badge"
+                                        ng-class="vm.getTrendLabel('gas')">{{vm.getTrendBadgeText('gas')}} <i
+                                            data-lucide="{{vm.getTrendIcon('gas')}}"></i></span>
+                                </div>
+                                <p class="trend-desc">{{vm.getTrendDescription('gas')}}</p>
+                                <div class="trend-chart">
+                                    <canvas id="gasTrendChart" width="400" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <i data-lucide="info"></i>
+                    <span>Trend analysis is based on officially recorded monthly meter readings.</span>
+                </div>
+            </div>
+
+            <div class="card enhanced">
+                <div class="card-header">
+                    <h3><span class="icon">🔍</span> Key Observations & Insights</h3>
+                </div>
+                <div class="card-body">
+                    <div class="observations-list">
+                        <div class="observation-item">
+                            <div class="obs-icon success">
+                                <i data-lucide="check-circle"></i>
+                            </div>
+                            <div class="obs-content">
+                                <h4>Electricity Efficiency</h4>
+                                <p>Consumption is significantly lower than ward average during peak winter months.</p>
+                            </div>
+                        </div>
+                        <div class="observation-item">
+                            <div class="obs-icon warning">
+                                <i data-lucide="alert-circle"></i>
+                            </div>
+                            <div class="obs-content">
+                                <h4>Water Usage Alert</h4>
+                                <p>Usage per capita is 15% higher than the Jal Board benchmark for this ward.</p>
+                            </div>
+                        </div>
+                        <div class="observation-item">
+                            <div class="obs-icon info">
+                                <i data-lucide="info"></i>
+                            </div>
+                            <div class="obs-content">
+                                <h4>Gas Consumption Pattern</h4>
+                                <p>Seasonal variation aligns perfectly with temperature drops; no anomalies detected.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="#" ng-click="vm.viewMethodology()" class="link-text">
+                        <i data-lucide="help-circle"></i>
+                        <span>How we infer these insights</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Section -->
+    <div ng-show="vm.activeSection === 'recommendations'" class="insight-section">
+        <div class="section-header-enhanced">
+            <h2>Recommended Actions</h2>
+            <p class="section-desc">Personalized recommendations based on your consumption patterns</p>
+        </div>
+
+        <div class="content-grid enhanced three-column">
+            <div class="card enhanced recommendation-card">
+                <div class="card-header elec-themed">
+                    <div class="header-left">
+                        <div class="header-icon">
+                            <i data-lucide="zap"></i>
+                        </div>
+                        <h3>Electricity</h3>
+                    </div>
+                    <div class="header-right">
+                        <span class="badge success">Maintain</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="recommendation-list">
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Maintain current efficient usage pattern.</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Consider 5-star rated appliances for reliable savings.</span>
+                        </li>
+                        <li>
+                            <i data-lucide="award"></i>
+                            <span>Eligible for DSM / Efficiency Programs.</span>
+                        </li>
+                    </ul>
+                    <div class="potential-savings">
+                        <span class="savings-label">Potential Annual Savings</span>
+                        <span class="savings-value">₹{{vm.recommendations.electricity.savings}}</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-secondary full-width" ng-click="vm.viewGovernmentAdvisory('electricity')">
+                        <i data-lucide="external-link"></i>
+                        <span>View Govt Advisory</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card enhanced recommendation-card">
+                <div class="card-header water-themed">
+                    <div class="header-left">
+                        <div class="header-icon">
+                            <i data-lucide="droplet"></i>
+                        </div>
+                        <h3>Water</h3>
+                    </div>
+                    <div class="header-right">
+                        <span class="badge warning">Attention</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="recommendation-list">
+                        <li>
+                            <i data-lucide="alert-circle"></i>
+                            <span>Check internal pipelines and overhead tanks for leaks.</span>
+                        </li>
+                        <li>
+                            <i data-lucide="search"></i>
+                            <span>Review household water-intensive activities.</span>
+                        </li>
+                        <li>
+                            <i data-lucide="file-text"></i>
+                            <span>Refer to Jal Board Advisory for self-checks.</span>
+                        </li>
+                    </ul>
+                    <div class="potential-savings warning">
+                        <span class="savings-label">Potential Reduction</span>
+                        <span class="savings-value">15% usage</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-primary full-width" ng-click="vm.raiseServiceRequest('water')">
+                        <i data-lucide="wrench"></i>
+                        <span>Raise Service Request</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card enhanced recommendation-card">
+                <div class="card-header gas-themed">
+                    <div class="header-left">
+                        <div class="header-icon">
+                            <i data-lucide="flame"></i>
+                        </div>
+                        <h3>Gas</h3>
+                    </div>
+                    <div class="header-right">
+                        <span class="badge info">No Action</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="recommendation-list">
+                        <li>
+                            <i data-lucide="check-circle"></i>
+                            <span>Usage is within normal variations.</span>
+                        </li>
+                        <li>
+                            <i data-lucide="shield"></i>
+                            <span>Annual safety check is recommended.</span>
+                        </li>
+                    </ul>
+                    <div class="potential-savings info">
+                        <span class="savings-label">Status</span>
+                        <span class="savings-value">Optimal</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-secondary full-width" ng-click="vm.viewSafetyGuidelines('gas')">
+                        <i data-lucide="book-open"></i>
+                        <span>Safety Guidelines</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-alert enhanced">
+            <i data-lucide="sparkles"></i>
+            <p>These recommendations are updated monthly based on your consumption patterns and government advisories.
+            </p>
+        </div>
+    </div>
+
+    <!-- Comparison Section -->
+    <div ng-show="vm.activeSection === 'comparison'" class="insight-section">
+        <div class="section-header-enhanced">
+            <h2>Comparison with Ward</h2>
+            <p class="section-desc">See how your consumption compares with similar households</p>
+        </div>
+
+        <div class="content-grid enhanced two-column">
+            <div class="card enhanced">
+                <div class="card-header">
+                    <h3>
+                        <span class="icon">🏠</span>
+                        Nearby Households
+                    </h3>
+                    <span class="tooltip-icon" title="Households within 500m radius">
+                        <i data-lucide="help-circle"></i>
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="comparison-bar-container">
+                        <div class="comparison-labels">
+                            <span>0</span>
+                            <span>Ward Average</span>
+                            <span>Max</span>
+                        </div>
+                        <div class="comparison-bar">
+                            <div class="bar-fill your-position" ng-style="{width: vm.getUserPositionPercent() + '%'}">
+                            </div>
+                            <div class="bar-marker avg-marker" style="left: 50%;">
+                                <span>Avg</span>
+                            </div>
+                        </div>
+                        <div class="comparison-result"
+                            ng-class="{'success': vm.getUserPercentile() < 50, 'warning': vm.getUserPercentile() >= 50}">
+                            <i data-lucide="trophy" ng-if="vm.getUserPercentile() < 50"></i>
+                            <i data-lucide="info" ng-if="vm.getUserPercentile() >= 50"></i>
+                            <span ng-if="vm.insightsData.comparisons.ward_avg > 0">Better than {{100 -
+                                vm.getUserPercentile()}}% of nearby households</span>
+                            <span ng-if="vm.insightsData.comparisons.ward_avg === 0">No comparison data available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card enhanced">
+                <div class="card-header">
+                    <h3>
+                        <span class="icon">👥</span>
+                        Similar Household Size (4)
+                    </h3>
+                    <span class="tooltip-icon" title="Households with 4 members">
+                        <i data-lucide="help-circle"></i>
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="comparison-bar-container">
+                        <div class="comparison-labels">
+                            <span>0</span>
+                            <span>Category Average</span>
+                            <span>Max</span>
+                        </div>
+                        <div class="comparison-bar">
+                            <div class="bar-fill your-position warning" style="width: 85%;"></div>
+                            <div class="bar-marker avg-marker" style="left: 70%;">
+                                <span>Avg</span>
+                            </div>
+                        </div>
+                        <div class="comparison-result warning">
+                            <i data-lucide="alert-triangle"></i>
+                            <span>Above average consumption for household size</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid enhanced single-column">
+            <div class="card enhanced">
+                <div class="card-header">
+                    <h3><span class="icon">🌍</span> Ward & City Context</h3>
+                </div>
+                <div class="card-body">
+                    <div class="context-items">
+                        <div class="context-item">
+                            <div class="context-icon">
+                                <i data-lucide="map-pin"></i>
+                            </div>
+                            <div class="context-content">
+                                <h4>Ward Trend ({{vm.wardName}})</h4>
+                                <p ng-if="vm.insightsData.comparisons.ward_avg > 0">The ward has consumption data based
+                                    on available records.</p>
+                                <p ng-if="vm.insightsData.comparisons.ward_avg === 0">No ward consumption data available
+                                    yet.</p>
+                                <div class="context-stats">
+                                    <span class="stat-chip" ng-if="vm.insightsData.comparisons.ward_avg > 0">Ward Avg:
+                                        {{vm.insightsData.comparisons.ward_avg}} kWh</span>
+                                    <span class="stat-chip" ng-if="vm.insightsData.comparisons.ward_avg === 0">Awaiting
+                                        data</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="context-icon warning">
+                                <i data-lucide="bell"></i>
+                            </div>
+                            <div class="context-content">
+                                <h4>Civic Advisory</h4>
+                                <p>Citizens are advised to use water judiciously due to pipeline maintenance in South
+                                    Zone.</p>
+                                <div class="context-meta">
+                                    <span><i data-lucide="calendar"></i> Valid until: 15 Feb 2026</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <i data-lucide="database"></i>
+                    <span>Source: Ward-level aggregated official data from DJB & BRPL</span>
+                </div>
+            </div>
+
+            <div class="card enhanced">
+                <div class="card-header">
+                    <h3>
+                        <span class="icon">🏳️</span>
+                        Related Government Programmes
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="programme-grid">
+                        <a href="#" class="programme-card" ng-click="vm.viewProgramme('ujala')">
+                            <div class="programme-icon">
+                                <i data-lucide="lightbulb"></i>
+                            </div>
+                            <div class="programme-info">
+                                <h4>UJALA</h4>
+                                <p>Energy Efficiency Programme</p>
+                            </div>
+                            <i data-lucide="arrow-right"></i>
+                        </a>
+                        <a href="#" class="programme-card" ng-click="vm.viewProgramme('jal-shakti')">
+                            <div class="programme-icon">
+                                <i data-lucide="droplet"></i>
+                            </div>
+                            <div class="programme-info">
+                                <h4>Jal Shakti</h4>
+                                <p>Water Conservation Mission</p>
+                            </div>
+                            <i data-lucide="arrow-right"></i>
+                        </a>
+                        <a href="#" class="programme-card" ng-click="vm.viewProgramme('solar')">
+                            <div class="programme-icon">
+                                <i data-lucide="sun"></i>
+                            </div>
+                            <div class="programme-info">
+                                <h4>Rooftop Solar</h4>
+                                <p>MNRE Solar Programme</p>
+                            </div>
+                            <i data-lucide="arrow-right"></i>
+                        </a>
+                        <a href="#" class="programme-card" ng-click="vm.viewProgramme('dsm')">
+                            <div class="programme-icon">
+                                <i data-lucide="activity"></i>
+                            </div>
+                            <div class="programme-info">
+                                <h4>BSES DSM</h4>
+                                <p>Demand Side Management</p>
+                            </div>
+                            <i data-lucide="arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <i data-lucide="check-circle"></i>
+                    <span>You're eligible for 3 out of 4 programmes based on your current usage</span>
+                </div>
+            </div>
+
+            <div class="card enhanced confidence-card">
+                <div class="card-header">
+                    <h3>
+                        <span class="icon">🛡️</span>
+                        Data Confidence & Coverage
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="confidence-grid">
+                        <div class="confidence-item">
+                            <div class="conf-icon">
+                                <i data-lucide="calendar-range"></i>
+                            </div>
+                            <div class="conf-details">
+                                <span class="conf-label">Data Availability</span>
+                                <strong class="conf-value">Last 8 Months</strong>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 67%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="confidence-item">
+                            <div class="conf-icon">
+                                <i data-lucide="plug"></i>
+                            </div>
+                            <div class="conf-details">
+                                <span class="conf-label">Vendors Connected</span>
+                                <strong class="conf-value">BRPL / DJB / IGL</strong>
+                                <div class="vendor-badges">
+                                    <span class="vendor-badge">BRPL</span>
+                                    <span class="vendor-badge">DJB</span>
+                                    <span class="vendor-badge">IGL</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="confidence-item">
+                            <div class="conf-icon success">
+                                <i data-lucide="check-circle"></i>
+                            </div>
+                            <div class="conf-details">
+                                <span class="conf-label">Confidence Level</span>
+                                <strong class="conf-value success">High</strong>
+                                <p class="conf-note">Based on sufficient historical data</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <i data-lucide="info"></i>
+                    <span>Insights are generated using validated billing data and ward-level benchmarks</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="quick-navigation">
+        <h3><span class="icon">🧭</span> Continue Exploring</h3>
+        <div class="nav-grid">
+            <a href="#!/utilities" class="nav-card">
+                <i data-lucide="activity"></i>
+                <span>Go to Utilities</span>
+            </a>
+            <a href="#!/simulator" class="nav-card">
+                <i data-lucide="sliders"></i>
+                <span>Try "What If?" Simulator</span>
+            </a>
+            <a href="#!/services" class="nav-card">
+                <i data-lucide="wrench"></i>
+                <span>Raise Service Request</span>
+            </a>
+            <a href="#!/records" class="nav-card">
+                <i data-lucide="download"></i>
+                <span>Download Records</span>
+            </a>
+        </div>
+    </div>
+</div> <!-- /.main-content -->

@@ -1,0 +1,501 @@
+<div class="main-content">
+    <div class="dashboard-container">
+        <section class="page-header utilities-header" style="text-align:center;">
+            <div class="header-content">
+                <h1>
+                    <span class="icon">⚡</span>
+                    Utilities
+                </h1>
+                <p>Manage your utility bills and consumption in one place</p>
+            </div>
+        </section>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-icon-box blue">📊</div>
+                <div class="stat-content">
+                    <span class="stat-value">{{vm.totalConsumption}} Units</span>
+                    <span class="stat-label">Total Consumption</span>
+                </div>
+                <div class="stat-trend up">
+                    <span>This period</span>
+                </div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-icon-box blue">📅</div>
+                <div class="stat-content">
+                    <span class="stat-value">{{vm.currentMonth}}</span>
+                    <span class="stat-label">This Month</span>
+                </div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-icon-box orange">⚠️</div>
+                <div class="stat-content">
+                    <span class="stat-value">{{vm.pendingBills}}</span>
+                    <span class="stat-label">Pending Bills</span>
+                </div>
+                <div class="stat-trend down" ng-if="vm.pendingBills > 0">
+                    <span>Pay soon</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Utility Selector Tabs -->
+        <div class="tabs-container enhanced">
+            <div class="tabs">
+                <button class="tab-btn utility-tab" ng-class="{active: vm.activeTab === 'electricity'}"
+                    ng-click="vm.switchTab('electricity')">
+                    <i data-lucide="zap"></i>
+                    <span class="tab-label">Electricity</span>
+                    <span class="tab-badge" ng-if="vm.activeTab === 'electricity'">Active</span>
+                </button>
+                <button class="tab-btn utility-tab" ng-class="{active: vm.activeTab === 'gas'}"
+                    ng-click="vm.switchTab('gas')">
+                    <i data-lucide="flame"></i>
+                    <span class="tab-label">Gas</span>
+                    <span class="tab-badge" ng-if="vm.activeTab === 'gas'">Active</span>
+                </button>
+                <button class="tab-btn utility-tab" ng-class="{active: vm.activeTab === 'water'}"
+                    ng-click="vm.switchTab('water')">
+                    <i data-lucide="droplet"></i>
+                    <span class="tab-label">Water</span>
+                    <span class="tab-badge" ng-if="vm.activeTab === 'water'">Active</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ELECTRICITY CONTENT -->
+        <div id="electricity" class="tab-content utility-content" ng-class="{active: vm.activeTab === 'electricity'}">
+            <!-- Quick Actions Bar -->
+            <div class="utility-actions">
+                <button class="action-btn primary" ng-click="vm.payBill('electricity')">
+                    <i data-lucide="credit-card"></i>
+                    Pay Bill (₹{{vm.getCurrentBill('electricity') || 0}})
+                </button>
+                <button class="action-btn" ng-click="vm.downloadBill('electricity')">
+                    <i data-lucide="download"></i>
+                    Download Bill
+                </button>
+                <button class="action-btn" ng-click="vm.viewHistory('electricity')">
+                    <i data-lucide="clock"></i>
+                    View History
+                </button>
+                <button class="action-btn" ng-click="vm.raiseRequest('electricity')">
+                    <i data-lucide="alert-triangle"></i>
+                    Report Issue
+                </button>
+            </div>
+
+            <div class="content-grid two-column enhanced">
+                <!-- Consumption Chart with Enhanced Card -->
+                <div class="card chart-card enhanced">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <i data-lucide="bar-chart-2" class="header-icon"></i>
+                            <div>
+                                <h3><span class="icon">📊</span> Monthly Consumption (Last 12 Months)</h3>
+                                <p class="card-subtitle">Trend analysis for the past year</p>
+                            </div>
+                        </div>
+                        <div class="header-right">
+                            <span class="badge success">AVG: {{vm.getAverage('electricity') || 0}} kWh</span>
+                            <button class="icon-btn" ng-click="vm.toggleChartType('electricity')">
+                                <i data-lucide="more-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="elecChart"></canvas>
+                    </div>
+                    <div class="chart-insights">
+                        <div class="insight-item">
+                            <span class="insight-label">Peak Month:</span>
+                            <span class="insight-value">July (350 kWh)</span>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-label">Lowest:</span>
+                            <span class="insight-value">Dec (180 kWh)</span>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-label">Change:</span>
+                            <span class="insight-value trend-up">+36% from last month</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <i data-lucide="info"></i>
+                        <p class="source-note">Data Source: BRPL Official Meter Readings</p>
+                    </div>
+                </div>
+
+                <!-- Enhanced Info & Rate Plan Card -->
+                <div class="card info-card enhanced">
+                    <div class="card-header">
+                        <i data-lucide="layers" class="header-icon"></i>
+                        <h3><span class="icon">💳</span> Current Rate Plan</h3>
+                    </div>
+                    <div class="provider-info">
+                        <div class="provider-logo">
+                            <i data-lucide="building"></i>
+                        </div>
+                        <div class="provider-details">
+                            <h4>{{vm.utilitiesData.electricity.provider || 'Not Set'}}</h4>
+                            <p>Connection ID: {{vm.connectionId || 'Not Available'}}</p>
+                        </div>
+                    </div>
+                    <div class="tariff-slabs rate-plan-slabs">
+                        <div class="slab-item">
+                            <div class="slab-header">
+                                <span class="slab-title">Slab 1 (0-200 units)</span>
+                                <span class="slab-badge subsidy">Subsidized</span>
+                            </div>
+                            <div class="slab-rate">₹3.00 per unit</div>
+                        </div>
+                        <div class="slab-item active">
+                            <div class="slab-header">
+                                <span class="slab-title">Slab 2 (201-400 units)</span>
+                                <span class="slab-badge current">Your Current</span>
+                            </div>
+                            <div class="slab-rate">₹4.50 per unit</div>
+                        </div>
+                        <div class="slab-item">
+                            <div class="slab-header">
+                                <span class="slab-title">Slab 3 (401+ units)</span>
+                            </div>
+                            <div class="slab-rate">₹6.50 per unit</div>
+                        </div>
+                    </div>
+                    <div class="info-alert enhanced">
+                        <i data-lucide="info"></i>
+                        <p>Your current usage places you in <strong>Slab 2</strong>. Save 45 units to get subsidized
+                            rates!</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="#!/services" class="btn-primary full-width">
+                            <i data-lucide="credit-card"></i>
+                            Pay Bill (₹ {{vm.getCurrentBill('electricity') || 0}})
+                        </a>
+                        <button class="btn-secondary full-width" ng-click="vm.viewRatePlanDetails()">
+                            <i data-lucide="file-text"></i>
+                            View Complete Rate Plan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAS CONTENT -->
+        <div id="gas" class="tab-content utility-content" ng-class="{active: vm.activeTab === 'gas'}">
+            <!-- Quick Actions Bar -->
+            <div class="utility-actions">
+                <button class="action-btn primary" ng-click="vm.bookCylinder()">
+                    <i data-lucide="shopping-cart"></i>
+                    Book Cylinder
+                </button>
+                <button class="action-btn" ng-click="vm.downloadBill('gas')">
+                    <i data-lucide="download"></i>
+                    Download Bill
+                </button>
+                <button class="action-btn" ng-click="vm.viewHistory('gas')">
+                    <i data-lucide="clock"></i>
+                    View History
+                </button>
+                <button class="action-btn" ng-click="vm.raiseRequest('gas')">
+                    <i data-lucide="alert-triangle"></i>
+                    Report Issue
+                </button>
+            </div>
+
+            <div class="content-grid two-column enhanced">
+                <div class="card chart-card enhanced">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <i data-lucide="activity" class="header-icon"></i>
+                            <div>
+                                <h3><span class="icon">🔥</span> Gas Usage Trend</h3>
+                                <p class="card-subtitle">Your monthly gas consumption</p>
+                            </div>
+                        </div>
+                        <div class="header-right">
+                            <span class="badge warning">AVG: {{vm.getAverage('gas') || 0}} SCM</span>
+                            <button class="icon-btn" ng-click="vm.toggleChartType('gas')">
+                                <i data-lucide="more-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="gasChart"></canvas>
+                    </div>
+                    <div class="chart-insights">
+                        <div class="insight-item">
+                            <span class="insight-label">Peak Usage:</span>
+                            <span class="insight-value">Feb (25 SCM)</span>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-label">Lowest:</span>
+                            <span class="insight-value">Jul (10 SCM)</span>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-label">Change:</span>
+                            <span class="insight-value trend-down">-25% from last month</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <i data-lucide="info"></i>
+                        <p class="source-note">Data Source: IGL Meter Readings</p>
+                    </div>
+                </div>
+
+                <div class="card info-card enhanced">
+                    <div class="card-header">
+                        <i data-lucide="shield" class="header-icon"></i>
+                        <h3><span class="icon">🛡️</span> Safety & Efficiency</h3>
+                    </div>
+                    <div class="provider-info">
+                        <div class="provider-logo">
+                            <i data-lucide="building"></i>
+                        </div>
+                        <div class="provider-details">
+                            <h4>{{vm.utilitiesData.gas.provider || 'Not Set'}}</h4>
+                            <p>Connection ID: {{vm.connectionId || 'Not Available'}}</p>
+                        </div>
+                    </div>
+                    <div class="safety-checks">
+                        <div class="check-item completed">
+                            <i data-lucide="check-circle"></i>
+                            <div class="check-details">
+                                <h4>Burner Check</h4>
+                                <p>Last done: 6 months ago</p>
+                            </div>
+                            <span class="check-status">Completed</span>
+                        </div>
+                        <div class="check-item active">
+                            <i data-lucide="shield-check"></i>
+                            <div class="check-details">
+                                <h4>Leak Detection</h4>
+                                <p>Monitoring: Active</p>
+                            </div>
+                            <span class="check-status success">Enabled</span>
+                        </div>
+                        <div class="check-item pending">
+                            <i data-lucide="alert-circle"></i>
+                            <div class="check-details">
+                                <h4>Safety Inspection</h4>
+                                <p>Due in 2 months</p>
+                            </div>
+                            <span class="check-status">Upcoming</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <a href="#!/services" class="btn-primary full-width">
+                            <i data-lucide="wrench"></i>
+                            Schedule Safety Check
+                        </a>
+                        <button class="btn-secondary full-width" ng-click="vm.viewSafetyTips()">
+                            <i data-lucide="book-open"></i>
+                            Gas Safety Tips
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WATER CONTENT -->
+        <div id="water" class="tab-content utility-content" ng-class="{active: vm.activeTab === 'water'}">
+            <!-- Quick Actions Bar -->
+            <div class="utility-actions">
+                <button class="action-btn primary" ng-click="vm.payBill('water')">
+                    <i data-lucide="credit-card"></i>
+                    Pay Bill
+                </button>
+                <button class="action-btn" ng-click="vm.downloadBill('water')">
+                    <i data-lucide="download"></i>
+                    Download Bill
+                </button>
+                <button class="action-btn" ng-click="vm.viewHistory('water')">
+                    <i data-lucide="clock"></i>
+                    View History
+                </button>
+                <button class="action-btn" ng-click="vm.reportLeakage()">
+                    <i data-lucide="droplet"></i>
+                    Report Leakage
+                </button>
+            </div>
+
+            <div class="content-grid two-column enhanced">
+                <div class="card chart-card enhanced">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <i data-lucide="bar-chart" class="header-icon"></i>
+                            <div>
+                                <h3><span class="icon">💧</span> Water Consumption</h3>
+                                <p class="card-subtitle">Track your water usage</p>
+                            </div>
+                        </div>
+                        <div class="header-right">
+                            <span class="badge info">AVG: {{vm.getAverage('water') || 0}} kL</span>
+                            <button class="icon-btn" ng-click="vm.toggleChartType('water')">
+                                <i data-lucide="more-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="waterChart"></canvas>
+                    </div>
+                    <div class="chart-insights">
+                        <div class="insight-item">
+                            <span class="insight-label">Peak Usage:</span>
+                            <span class="insight-value">Jul (25 KL)</span>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-label">Lowest:</span>
+                            <span class="insight-value">Feb (18 KL)</span>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-label">Change:</span>
+                            <span class="insight-value trend-up">+22% from last month</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <i data-lucide="info"></i>
+                        <p class="source-note">Data Source: Delhi Jal Board</p>
+                    </div>
+                </div>
+
+                <div class="card info-card enhanced">
+                    <div class="card-header">
+                        <i data-lucide="droplet" class="header-icon"></i>
+                        <h3><span class="icon">💧</span> Water Quality in Your Ward</h3>
+                    </div>
+                    <div class="provider-info">
+                        <div class="provider-logo">
+                            <i data-lucide="building"></i>
+                        </div>
+                        <div class="provider-details">
+                            <h4>{{vm.utilitiesData.water.provider || 'Not Set'}}</h4>
+                            <p>Connection ID: {{vm.connectionId || 'Not Available'}}</p>
+                        </div>
+                    </div>
+                    <div class="quality-score-card">
+                        <div class="score-circle">
+                            <svg width="100" height="100">
+                                <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" stroke-width="8" />
+                                <circle cx="50" cy="50" r="42" fill="none" stroke="#00A86B" stroke-width="8"
+                                    stroke-dasharray="264" stroke-dashoffset="27" transform="rotate(-90 50 50)" />
+                            </svg>
+                            <div class="score-text">
+                                <span class="score-number">9.2</span>
+                                <span class="score-max">/10</span>
+                            </div>
+                        </div>
+                        <div class="quality-details">
+                            <h4>Excellent Water Quality</h4>
+                            <p>Ward Quality Score: Above Average</p>
+                        </div>
+                    </div>
+                    <div class="supply-info">
+                        <div class="supply-item">
+                            <i data-lucide="clock"></i>
+                            <div>
+                                <h5>Supply Hours</h5>
+                                <p>6:00 AM - 9:00 AM</p>
+                            </div>
+                        </div>
+                        <div class="supply-item">
+                            <i data-lucide="droplet"></i>
+                            <div>
+                                <h5>Pressure Status</h5>
+                                <p class="status-good">Normal (Good)</p>
+                            </div>
+                        </div>
+                        <div class="supply-item">
+                            <i data-lucide="check-circle"></i>
+                            <div>
+                                <h5>Last Quality Check</h5>
+                                <p>2 weeks ago</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <a href="#!/services" class="btn-primary full-width">
+                            <i data-lucide="alert-circle"></i>
+                            Report Leakage
+                        </a>
+                        <button class="btn-secondary full-width" ng-click="vm.viewQualityReport()">
+                            <i data-lucide="file-text"></i>
+                            View Quality Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rate Plan Details Modal -->
+        <div class="modal-overlay" ng-show="vm.showRatePlanModal" ng-click="vm.closeRatePlanModal()"></div>
+        <div class="utility-modal" ng-show="vm.showRatePlanModal" ng-class="{'active': vm.showRatePlanModal}">
+            <div class="modal-content" style="max-width: 620px;">
+                <div class="modal-header">
+                    <h2 class="modal-title">
+                        <i data-lucide="file-text"></i>
+                        Complete Rate Plan — {{vm.activeTab | uppercase}}
+                    </h2>
+                    <button class="modal-close" ng-click="vm.closeRatePlanModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <div class="rate-plan-provider"
+                        style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; padding:0.75rem 1rem; background:#f9fafb; border-radius:12px;">
+                        <i data-lucide="building" style="color: var(--accent-saffron);"></i>
+                        <div>
+                            <strong style="font-size:0.95rem;">{{vm.ratePlanData[vm.activeTab].provider}}</strong>
+                            <p style="font-size:0.78rem; color:#6b7280; margin:0;">Last updated:
+                                {{vm.ratePlanData[vm.activeTab].lastUpdated}}</p>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:0.75rem; color:#374151;">Usage Slabs
+                    </h4>
+                    <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1.25rem;">
+                        <div ng-repeat="slab in vm.ratePlanData[vm.activeTab].slabs"
+                            style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; border-radius:10px; border:1px solid;"
+                            ng-style="{'background': slab.highlight ? '#fffbeb' : '#fff', 'border-color': slab.highlight ? '#f59e0b' : '#e5e7eb'}">
+                            <div>
+                                <span style="font-weight:600; font-size:0.88rem;">{{slab.range}}</span>
+                                <span ng-if="slab.highlight"
+                                    style="display:inline-block; margin-left:0.5rem; font-size:0.7rem; padding:2px 8px; background:#f59e0b; color:white; border-radius:20px; font-weight:500;">Your
+                                    Slab</span>
+                                <p style="font-size:0.75rem; color:#6b7280; margin:0.15rem 0 0;">{{slab.type}}</p>
+                            </div>
+                            <strong style="font-size:1rem; color:#111827;">{{slab.rate}}</strong>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display:flex; flex-direction:column; gap:0.5rem; padding:1rem; background:#f0fdf4; border-radius:10px; border:1px solid #dcfce7;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span style="font-size:0.85rem; color:#374151;">Fixed Monthly Charge</span>
+                            <strong style="font-size:0.85rem;">{{vm.ratePlanData[vm.activeTab].fixedCharge}}</strong>
+                        </div>
+                        <div ng-if="vm.ratePlanData[vm.activeTab].surcharge"
+                            style="display:flex; justify-content:space-between;">
+                            <span style="font-size:0.85rem; color:#374151;">Surcharge</span>
+                            <strong style="font-size:0.85rem;">{{vm.ratePlanData[vm.activeTab].surcharge}}</strong>
+                        </div>
+                    </div>
+
+                    <p style="font-size:0.75rem; color:#9ca3af; margin-top:1rem; text-align:center;">
+                        <i data-lucide="info" style="width:12px; height:12px; display:inline;"></i>
+                        Rates are as per the latest government gazette notification. Subject to revision.
+                    </p>
+                </div>
+                <div class="modal-footer"
+                    style="padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb; display:flex; gap:0.75rem;">
+                    <button class="btn-primary" style="flex:1;" ng-click="vm.closeRatePlanModal()">
+                        <i data-lucide="check"></i> Got it
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> <!-- /.main-content -->

@@ -1,0 +1,338 @@
+<div class="main-content">
+    <!-- Simulator Page Header -->
+    <div class="simulator-header">
+        <div class="simulator-title-row">
+            <div>
+                <h1>Bill Simulator</h1>
+                <p>Estimate utility bills and explore scenarios</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card primary">
+            <div class="stat-icon-box blue">🧮</div>
+            <div class="stat-content">
+                <span class="stat-value">{{vm.totalSimulations}}</span>
+                <span class="stat-label">Simulations</span>
+            </div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-icon-box green">💸</div>
+            <div class="stat-content">
+                <span class="stat-value">Up to 30%</span>
+                <span class="stat-label">Potential Savings</span>
+            </div>
+            <div class="stat-trend up">
+                <span>Explore scenarios</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Utility Selector Tabs -->
+    <div class="utility-selector-tabs">
+        <button class="utility-tab" ng-class="{active: vm.utilityType === 'electricity'}"
+            ng-click="vm.selectUtility('electricity')">
+            <i data-lucide="zap"></i>
+            <span>Electricity</span>
+        </button>
+        <button class="utility-tab" ng-class="{active: vm.utilityType === 'water'}"
+            ng-click="vm.selectUtility('water')">
+            <i data-lucide="droplet"></i>
+            <span>Water</span>
+        </button>
+        <button class="utility-tab" ng-class="{active: vm.utilityType === 'gas'}" ng-click="vm.selectUtility('gas')">
+            <i data-lucide="flame"></i>
+            <span>Gas</span>
+        </button>
+    </div>
+
+    <div class="simulator-layout">
+        <!-- Input Panel -->
+        <div class="enhanced-card simulator-input-panel">
+            <div class="panel-header">
+                <h3>
+                    <span class="icon">🎛️</span>
+                    Consumption Parameters
+                </h3>
+            </div>
+
+            <form ng-submit="vm.calculateBill()">
+                <!-- Service Provider -->
+                <div class="form-group enhanced">
+                    <label class="form-label">
+                        <i data-lucide="building"></i>
+                        Service Provider
+                    </label>
+                    <select class="form-control enhanced" ng-model="vm.vendor" ng-change="vm.updateTariff()">
+                        <option value="brpl">BSES Rajdhani (BRPL)</option>
+                        <option value="bypl">BSES Yamuna (BYPL)</option>
+                        <option value="tpddl">Tata Power DDL</option>
+                        <option value="djb" ng-if="vm.utilityType === 'water'">Delhi Jal Board (DJB)</option>
+                        <option value="igl" ng-if="vm.utilityType === 'gas'">Indraprastha Gas (IGL)</option>
+                    </select>
+                </div>
+
+                <!-- Monthly Consumption -->
+                <div class="form-group enhanced">
+                    <label class="form-label">
+                        <i data-lucide="gauge"></i>
+                        Monthly Consumption
+                    </label>
+                    <div class="input-with-unit">
+                        <input type="number" class="form-control enhanced" ng-model="vm.consumption"
+                            ng-change="vm.calculateBill()" placeholder="{{vm.placeholderText}}" min="0" step="1">
+                        <span class="input-unit" ng-bind="vm.unitLabel"></span>
+                    </div>
+                    <small class="form-hint">Enter your average monthly consumption</small>
+                </div>
+
+                <!-- Consumption Slider -->
+                <div class="form-group enhanced">
+                    <label class="form-label">Adjust Consumption</label>
+                    <input type="range" class="range-slider" ng-model="vm.consumption" ng-change="vm.calculateBill()"
+                        min="0" max="{{vm.maxConsumption}}" step="{{vm.sliderStep}}">
+                    <div class="range-labels">
+                        <span>0</span>
+                        <span ng-bind="vm.maxConsumption + ' ' + vm.unitLabel"></span>
+                    </div>
+                </div>
+
+                <!-- Household Size (for better estimation) -->
+                <div class="form-group enhanced">
+                    <label class="form-label">
+                        <i data-lucide="users"></i>
+                        Household Size
+                    </label>
+                    <div class="household-selector">
+                        <button type="button" class="household-btn" ng-class="{active: vm.householdSize === 1}"
+                            ng-click="vm.setHouseholdSize(1)">1</button>
+                        <button type="button" class="household-btn" ng-class="{active: vm.householdSize === 2}"
+                            ng-click="vm.setHouseholdSize(2)">2-3</button>
+                        <button type="button" class="household-btn" ng-class="{active: vm.householdSize === 3}"
+                            ng-click="vm.setHouseholdSize(3)">4-5</button>
+                        <button type="button" class="household-btn" ng-class="{active: vm.householdSize === 4}"
+                            ng-click="vm.setHouseholdSize(4)">6+</button>
+                    </div>
+                </div>
+
+                <!-- Apply Subsidy Toggle -->
+                <div class="form-group enhanced" ng-if="vm.hasSubsidy">
+                    <label class="toggle-label">
+                        <input type="checkbox" ng-model="vm.applySubsidy" ng-change="vm.calculateBill()">
+                        <span class="toggle-switch"></span>
+                        <span class="toggle-text">
+                            <i data-lucide="badge-percent"></i>
+                            Apply Government Subsidy
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Calculate Button -->
+                <button type="submit" class="btn btn-primary btn-lg full-width">
+                    <i data-lucide="calculator"></i>
+                    Calculate Estimated Bill
+                </button>
+            </form>
+
+            <!-- Quick Presets -->
+            <div class="quick-presets">
+                <span class="presets-label">Quick Presets:</span>
+                <button type="button" class="preset-btn" ng-click="vm.applyPreset('low')">
+                    <i data-lucide="home"></i>
+                    Low
+                </button>
+                <button type="button" class="preset-btn" ng-click="vm.applyPreset('average')">
+                    <i data-lucide="building"></i>
+                    Average
+                </button>
+                <button type="button" class="preset-btn" ng-click="vm.applyPreset('high')">
+                    <i data-lucide="factory"></i>
+                    High
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="simulator-results-panel">
+            <!-- Bill Amount Card -->
+            <div class="enhanced-card bill-result-card" ng-class="{calculated: vm.hasCalculated}">
+                <div class="result-header">
+                    <h3><span class="icon">💰</span> Estimated Bill</h3>
+                    <span class="calculation-date" ng-if="vm.hasCalculated">
+                        <i data-lucide="calendar"></i>
+                        {{vm.calculationDate}}
+                    </span>
+                </div>
+
+                <div class="result-amount-display">
+                    <div class="amount-icon">
+                        <i data-lucide="indian-rupee"></i>
+                    </div>
+                    <div class="amount-value">
+                        <span class="currency">₹</span>
+                        <span class="value" ng-bind="vm.totalBill | number:0"></span>
+                    </div>
+                    <p class="amount-period">Per Month</p>
+                </div>
+
+                <!-- Comparison with Average -->
+                <div class="comparison-badge" ng-if="vm.hasCalculated">
+                    <div class="badge" ng-class="vm.comparisonClass">
+                        <i ng-attr-data-lucide="{{vm.comparisonIcon}}"></i>
+                        <span ng-bind="vm.comparisonText"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breakdown Card -->
+            <div class="enhanced-card breakdown-card" ng-if="vm.hasCalculated">
+                <h3>
+                    <span class="icon">📋</span>
+                    Bill Breakdown
+                </h3>
+                <div class="breakdown-list">
+                    <div class="breakdown-item">
+                        <div class="item-label">
+                            <i data-lucide="zap"></i>
+                            <span>{{vm.chargeLabel}}</span>
+                        </div>
+                        <span class="item-value">₹{{vm.energyCharge | number:0}}</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="item-label">
+                            <i data-lucide="file-text"></i>
+                            <span>Fixed Charges</span>
+                        </div>
+                        <span class="item-value">₹{{vm.fixedCharge | number:0}}</span>
+                    </div>
+                    <div class="breakdown-item" ng-if="vm.subsidy > 0">
+                        <div class="item-label">
+                            <i data-lucide="badge-percent"></i>
+                            <span>Subsidy</span>
+                        </div>
+                        <span class="item-value success">-₹{{vm.subsidy | number:0}}</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="item-label">
+                            <i data-lucide="receipt"></i>
+                            <span>Taxes & GST</span>
+                        </div>
+                        <span class="item-value">₹{{vm.tax | number:0}}</span>
+                    </div>
+                    <div class="breakdown-item total">
+                        <div class="item-label">
+                            <strong>Total Amount</strong>
+                        </div>
+                        <span class="item-value"><strong>₹{{vm.totalBill | number:0}}</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Savings Tips Card -->
+            <div class="enhanced-card tips-card" ng-if="vm.hasCalculated">
+                <h3>
+                    <span class="icon">💡</span>
+                    Savings Tips
+                </h3>
+                <div class="tips-list">
+                    <div class="tip-item" ng-repeat="tip in vm.savingsTips">
+                        <div class="tip-icon">
+                            <i ng-attr-data-lucide="{{tip.icon}}"></i>
+                        </div>
+                        <div class="tip-content">
+                            <strong ng-bind="tip.title"></strong>
+                            <p ng-bind="tip.description"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Alert -->
+            <div class="info-alert" ng-if="vm.hasCalculated && vm.subsidyInfo">
+                <i data-lucide="info"></i>
+                <p ng-bind="vm.subsidyInfo"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tariff Structure Section -->
+    <div class="enhanced-card tariff-section">
+        <div class="section-header">
+            <h3>
+                <span class="icon">📊</span>
+                Current Tariff Structure
+            </h3>
+            <button class="btn-text" ng-click="vm.showTariffDetails()">
+                View Detailed Tariff
+                <i data-lucide="external-link"></i>
+            </button>
+        </div>
+
+        <div class="tariff-slabs-grid">
+            <div class="tariff-slab-card" ng-repeat="slab in vm.tariffSlabs">
+                <div class="slab-header" ng-class="slab.class">
+                    <i ng-attr-data-lucide="{{slab.icon}}"></i>
+                    <h4 ng-bind="slab.name"></h4>
+                </div>
+                <div class="slab-body">
+                    <div class="slab-range" ng-bind="slab.range"></div>
+                    <div class="slab-rate">
+                        <span class="rate-value" ng-bind="slab.rate"></span>
+                        <span class="rate-unit">/ {{vm.unitLabel}}</span>
+                    </div>
+                    <p class="slab-note" ng-bind="slab.note"></p>
+                </div>
+                <div class="slab-indicator" ng-if="vm.consumption >= slab.min && vm.consumption <= slab.max">
+                    <i data-lucide="check-circle"></i>
+                    Your Consumption
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Chart -->
+    <div class="enhanced-card comparison-chart" ng-if="vm.hasCalculated">
+        <h3>
+            <span class="icon">📊</span>
+            Consumption Comparison
+        </h3>
+        <div class="comparison-bars">
+            <div class="comparison-bar-item">
+                <div class="bar-label">Your Consumption</div>
+                <div class="bar-container">
+                    <div class="bar-fill" ng-class="vm.consumptionLevel"
+                        ng-style="{width: vm.yourConsumptionPercent + '%'}">
+                        {{vm.consumption}} {{vm.unitLabel}}
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-bar-item">
+                <div class="bar-label">Ward Average</div>
+                <div class="bar-container">
+                    <div class="bar-fill average" ng-style="{width: vm.wardAveragePercent + '%'}">
+                        {{vm.wardAverage}} {{vm.unitLabel}}
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-bar-item">
+                <div class="bar-label">Efficient Usage</div>
+                <div class="bar-container">
+                    <div class="bar-fill efficient" ng-style="{width: vm.efficientPercent + '%'}">
+                        {{vm.efficientUsage}} {{vm.unitLabel}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        if (typeof lucide !== 'undefined') {
+            setTimeout(function () {
+                lucide.createIcons();
+            }, 100);
+        }
+    </script>
+</div> <!-- /.main-content -->

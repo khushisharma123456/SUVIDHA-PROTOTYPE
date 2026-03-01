@@ -1,0 +1,688 @@
+<div class="main-content">
+    <div class="dashboard-container">
+        <!-- Utility Modal -->
+        <div class="utility-modal" ng-show="vm.showUtilityModal">
+            <div class="modal-overlay" ng-click="vm.closeModal()"></div>
+            <div class="modal-content utility-detail-modal">
+                <div class="modal-header" ng-class="'modal-header-' + vm.modalData.type">
+                    <div class="modal-header-left">
+                        <div class="modal-header-icon" ng-class="'icon-' + vm.modalData.type">
+                            <i data-lucide="{{vm.modalData.icon}}"></i>
+                        </div>
+                        <h2 class="modal-title">{{vm.modalData.title}}</h2>
+                    </div>
+                    <button class="modal-close" ng-click="vm.closeModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-bill-highlight">
+                        <span class="bill-amount">{{vm.modalData.currentBill}}</span>
+                        <span class="bill-period">Current Month&rsquo;s Bill</span>
+                    </div>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Last Month</span>
+                            <span class="detail-value">{{vm.modalData.lastMonth}}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Usage</span>
+                            <span class="detail-value">{{vm.modalData.units}}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Status</span>
+                            <span class="detail-value status-badge-inline"
+                                ng-class="'status-' + vm.modalData.type">{{vm.modalData.status}}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Due Date</span>
+                            <span class="detail-value">{{vm.modalData.dueDate}}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Trend</span>
+                            <span class="detail-value trend-value">
+                                <i data-lucide="trending-up" style="width:14px;height:14px;"></i>
+                                {{vm.modalData.trend}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" ng-click="vm.navigateToUtility()">
+                        <i data-lucide="external-link" style="width:16px;height:16px;"></i>
+                        View Full Details
+                    </button>
+                    <button class="btn-secondary" ng-click="vm.closeModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title-group">
+                <h1 class="page-title">
+                    <i data-lucide="layout-dashboard"></i>
+                    Dashboard
+                </h1>
+                <p class="page-subtitle">Your Personalized Hub</p>
+            </div>
+        </div>
+
+        <!-- Stats Grid - Admin Pattern -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-icon-box blue">
+                    <i data-lucide="zap"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Electricity Used</div>
+                    <div class="stat-value">{{vm.userData.consumption.electricity.current || 0}}</div>
+                    <span class="stat-trend neutral">{{vm.userData.consumption.electricity.unit}}</span>
+                </div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-icon-box blue">
+                    <i data-lucide="droplet"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Water Used</div>
+                    <div class="stat-value">{{vm.userData.consumption.water.current || 0}}</div>
+                    <span class="stat-trend neutral">{{vm.userData.consumption.water.unit}}</span>
+                </div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-icon-box orange">
+                    <i data-lucide="flame"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Gas Used</div>
+                    <div class="stat-value">{{vm.userData.consumption.gas.current || 0}}</div>
+                    <span class="stat-trend neutral">{{vm.userData.consumption.gas.unit}}</span>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-icon-box green">
+                    <i data-lucide="file-text"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Reports</div>
+                    <div class="stat-value">{{vm.userData.reports.total || 0}}</div>
+                    <span class="stat-trend up" ng-if="vm.userData.community.points > 0">
+                        <i data-lucide="award"></i> {{vm.userData.community.points}} pts
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DNA Helix Utility Visualization -->
+        <div class="dna-helix-section">
+            <div class="dna-container" id="dna-container">
+                <canvas id="dna-canvas"></canvas>
+
+                <!-- Tooltip for strand info -->
+                <div class="dna-tooltip" id="dna-tooltip">
+                    <div class="tooltip-header">
+                        <i class="tooltip-icon"></i>
+                        <span class="tooltip-title"></span>
+                    </div>
+                    <div class="tooltip-content"></div>
+                </div>
+            </div>
+
+            <!-- Legend with clickable/hoverable items -->
+            <div class="dna-legend">
+                <div class="dna-legend-item" data-utility="electricity">
+                    <div class="dna-color-box electricity"></div>
+                    <span>Electricity Services</span>
+                    <i data-lucide="zap" class="legend-icon electricity-icon"></i>
+                </div>
+                <div class="dna-legend-item" data-utility="gas">
+                    <div class="dna-color-box gas"></div>
+                    <span>Gas Services</span>
+                    <i data-lucide="flame" class="legend-icon gas-icon"></i>
+                </div>
+                <div class="dna-legend-item" data-utility="water">
+                    <div class="dna-color-box water"></div>
+                    <span>Water Services</span>
+                    <i data-lucide="droplet" class="legend-icon water-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Access Policies -->
+        <div class="policy-banner-grid" style="position:relative; z-index:2;">
+            <div class="policy-card policy-electricity">
+                <div class="policy-card-image">
+                    <img src="/static/images/electricty.png" alt="Electricity Services" class="card-background-image">
+                </div>
+                <div class="policy-card-body">
+                    <div class="policy-icon">
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <div class="policy-content">
+                        <h3>Electricity Services</h3>
+                        <p>Current Bill: <strong>₹{{vm.userData.consumption.electricity.current_bill || '—'}}</strong></p>
+                        <p style="font-size:0.75rem; opacity:0.85; margin-top:0.15rem;">Due: {{vm.userData.consumption.electricity.due_date || 'N/A'}} · {{vm.userData.consumption.electricity.current || 0}} {{vm.userData.consumption.electricity.unit || 'kWh'}} used</p>
+                    </div>
+                    <a href="#!/utilities" class="policy-btn-primary">Pay Bills →</a>
+                </div>
+            </div>
+
+            <div class="policy-card policy-water">
+                <div class="policy-card-image">
+                    <img src="/static/images/water.png" alt="Water Services" class="card-background-image">
+                </div>
+                <div class="policy-card-body">
+                    <div class="policy-icon">
+                        <i data-lucide="droplet"></i>
+                    </div>
+                    <div class="policy-content">
+                        <h3>Water Services</h3>
+                        <p>Usage: <strong>{{vm.userData.consumption.water.current || 0}} {{vm.userData.consumption.water.unit || 'kL'}}</strong> this month</p>
+                        <p style="font-size:0.75rem; opacity:0.85; margin-top:0.15rem;">Bill: ₹{{vm.userData.consumption.water.current_bill || '—'}} · Status: {{vm.userData.consumption.water.status || 'N/A'}}</p>
+                    </div>
+                    <a href="#!/utilities" class="policy-btn-primary">View Usage →</a>
+                </div>
+            </div>
+
+            <div class="policy-card policy-gas">
+                <div class="policy-card-image">
+                    <img src="/static/images/gas.png" alt="Gas Services" class="card-background-image">
+                </div>
+                <div class="policy-card-body">
+                    <div class="policy-icon">
+                        <i data-lucide="flame"></i>
+                    </div>
+                    <div class="policy-content">
+                        <h3>Gas Services</h3>
+                        <p>Check rates, refill status & connections</p>
+                    </div>
+                    <a href="#!/utilities" class="policy-btn-primary">View Rates →</a>
+                </div>
+            </div>
+
+            <div class="policy-card policy-service">
+                <div class="policy-card-image">
+                    <img src="/static/images/service.png" alt="Services" class="card-background-image">
+                </div>
+                <div class="policy-card-body">
+                    <div class="policy-icon">
+                        <i data-lucide="wrench"></i>
+                    </div>
+                    <div class="policy-content">
+                        <h3>Services</h3>
+                        <p>Submit complaints & track resolutions</p>
+                    </div>
+                    <a href="#!/services" class="policy-btn-primary">Submit Request →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Know Your Vendor Section -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon">🏢</span>
+                    Know Your Vendor
+                </h2>
+                <p class="section-subtitle">Information about your utility providers</p>
+            </div>
+
+            <div class="vendor-grid">
+                <!-- Electricity Vendor -->
+                <div class="vendor-card vendor-electricity">
+                    <div class="vendor-header">
+                        <div class="vendor-icon">
+                            <i data-lucide="zap"></i>
+                        </div>
+                        <div class="vendor-title-group">
+                            <h3>Electricity Board</h3>
+                            <span class="vendor-badge">Active</span>
+                        </div>
+                    </div>
+                    <div class="vendor-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Service Provider:</span>
+                            <span class="detail-value">State Electricity Board</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Customer ID:</span>
+                            <span class="detail-value">{{vm.userData.username || 'Not assigned'}}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Connection Type:</span>
+                            <span class="detail-value">Domestic</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Contact:</span>
+                            <span class="detail-value">1800-XXX-XXXX</span>
+                        </div>
+                    </div>
+                    <div class="vendor-actions">
+                        <a href="#!/utilities" class="btn-outline-small">
+                            <i data-lucide="external-link"></i>
+                            View Details
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Water Vendor -->
+                <div class="vendor-card vendor-water">
+                    <div class="vendor-header">
+                        <div class="vendor-icon">
+                            <i data-lucide="droplet"></i>
+                        </div>
+                        <div class="vendor-title-group">
+                            <h3>Water Board</h3>
+                            <span class="vendor-badge">Active</span>
+                        </div>
+                    </div>
+                    <div class="vendor-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Service Provider:</span>
+                            <span class="detail-value">Municipal Water Works</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Customer ID:</span>
+                            <span class="detail-value">{{vm.userData.username || 'Not assigned'}}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Connection Type:</span>
+                            <span class="detail-value">Metered</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Contact:</span>
+                            <span class="detail-value">1800-XXX-YYYY</span>
+                        </div>
+                    </div>
+                    <div class="vendor-actions">
+                        <a href="#!/utilities" class="btn-outline-small">
+                            <i data-lucide="external-link"></i>
+                            View Details
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Gas Vendor -->
+                <div class="vendor-card vendor-gas">
+                    <div class="vendor-header">
+                        <div class="vendor-icon">
+                            <i data-lucide="flame"></i>
+                        </div>
+                        <div class="vendor-title-group">
+                            <h3>Gas Services</h3>
+                            <span class="vendor-badge">Active</span>
+                        </div>
+                    </div>
+                    <div class="vendor-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Service Provider:</span>
+                            <span class="detail-value">City Gas Distribution</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Customer ID:</span>
+                            <span class="detail-value">{{vm.userData.username || 'Not assigned'}}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Connection Type:</span>
+                            <span class="detail-value">PNG Domestic</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Contact:</span>
+                            <span class="detail-value">1800-XXX-ZZZZ</span>
+                        </div>
+                    </div>
+                    <div class="vendor-actions">
+                        <a href="#!/utilities" class="btn-outline-small">
+                            <i data-lucide="external-link"></i>
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions Cards -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon">⚡</span>
+                    Quick Actions
+                </h2>
+                <p class="section-subtitle">Manage your utilities efficiently</p>
+            </div>
+
+            <div class="utility-cards-grid">
+                <!-- Current Bill Card -->
+                <div class="utility-card card-electricity">
+                    <div class="utility-card-header">
+                        <div class="utility-icon">
+                            <i data-lucide="file-text"></i>
+                        </div>
+                        <h3>Current Bill</h3>
+                    </div>
+                    <div class="utility-card-body">
+                        <div class="bill-content-wrapper">
+                            <div class="bill-main-info">
+                                <div class="bill-amount">
+                                    <span class="currency">₹</span>
+                                    <span class="amount">{{vm.userData.consumption.electricity.current_bill ||
+                                        0}}</span>
+                                </div>
+                                <p class="bill-period">Billing Period:
+                                    {{vm.userData.consumption.electricity.billing_period || 'N/A'}}</p>
+                                <div class="bill-details">
+                                    <div class="detail-item">
+                                        <span class="label">Due Date:</span>
+                                        <span class="value text-warning">{{vm.userData.consumption.electricity.due_date
+                                            || 'N/A'}}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Status:</span>
+                                        <span class="value badge-warning">{{vm.userData.consumption.electricity.status
+                                            || 'none'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bill-cycle-chart">
+                                <canvas id="billingCycleChart" width="80" height="80"></canvas>
+                                <div class="cycle-info">
+                                    <span class="cycle-label">Billing Cycle:</span>
+                                    <span class="cycle-value">18/30 days</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="utility-card-footer">
+                        <a href="#!/utilities" class="btn-primary-small">
+                            <i data-lucide="credit-card"></i>
+                            Pay Bill
+                        </a>
+                        <a href="#!/utilities" class="btn-outline-small">
+                            <i data-lucide="download"></i>
+                            Download
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Consumption Card -->
+                <div class="utility-card card-water">
+                    <div class="utility-card-header">
+                        <div class="utility-icon">
+                            <i data-lucide="trending-up"></i>
+                        </div>
+                        <h3>This Month</h3>
+                    </div>
+                    <div class="utility-card-body">
+                        <div class="consumption-stat">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i data-lucide="zap"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-value">{{vm.userData.consumption.electricity.current || 0}}</span>
+                                    <span class="stat-label">{{vm.userData.consumption.electricity.unit ||
+                                        'kWh'}}</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i data-lucide="droplet"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-value">{{vm.userData.consumption.water.current || 0}}</span>
+                                    <span class="stat-label">{{vm.userData.consumption.water.unit || 'kL'}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comparison-bar">
+                            <div class="comparison-label">vs Last Month</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                            <div class="comparison-value text-success">
+                                <i data-lucide="arrow-down"></i>
+                                15% lower
+                            </div>
+                        </div>
+                    </div>
+                    <div class="utility-card-footer">
+                        <a href="#!/insights" class="btn-primary-small">
+                            <i data-lucide="bar-chart-2"></i>
+                            View Insights
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service Requests Card -->
+                <div class="utility-card card-service">
+                    <div class="utility-card-header">
+                        <div class="utility-icon">
+                            <i data-lucide="wrench"></i>
+                        </div>
+                        <h3>Service Requests</h3>
+                    </div>
+                    <div class="utility-card-body">
+                        <div class="request-summary">
+                            <div class="summary-item">
+                                <span class="summary-count">{{(vm.userData.reports.open || 0) +
+                                    (vm.userData.reports.in_progress || 0)}}</span>
+                                <span class="summary-label">Active</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-count">{{vm.userData.reports.resolved || 0}}</span>
+                                <span class="summary-label">Completed</span>
+                            </div>
+                        </div>
+                        <div class="recent-request" ng-if="vm.userData.reports.total > 0">
+                            <div class="request-info">
+                                <span class="request-id">#SR-2026-001</span>
+                                <span class="request-status badge-warning">In Progress</span>
+                            </div>
+                            <p class="request-title">Street light repair - Sector 12</p>
+                            <p class="request-date">Filed: 8 Jan 2026 • ETA: 3 days</p>
+                        </div>
+                        <div class="recent-request" ng-if="vm.userData.reports.total === 0">
+                            <p class="request-title">No service requests yet</p>
+                            <p class="request-date">Submit your first request</p>
+                        </div>
+                    </div>
+                    <div class="utility-card-footer">
+                        <a href="#!/services" class="btn-primary-small">
+                            <i data-lucide="plus"></i>
+                            New Request
+                        </a>
+                        <a href="#!/services" class="btn-outline-small">
+                            <i data-lucide="list"></i>
+                            View All
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Notifications Card -->
+                <div class="utility-card card-notification">
+                    <div class="utility-card-header">
+                        <div class="utility-icon">
+                            <i data-lucide="bell"></i>
+                        </div>
+                        <h3>Notifications</h3>
+                    </div>
+                    <div class="utility-card-body">
+                        <div class="notification-list">
+                            <div class="notification-item notification-warning"
+                                ng-if="vm.userData.consumption.electricity.status === 'pending' || vm.userData.consumption.electricity.status === 'overdue'">
+                                <div class="notification-icon">
+                                    <i data-lucide="alert-triangle"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <p class="notification-text">Electricity bill
+                                        ₹{{vm.userData.consumption.electricity.current_bill}}
+                                        {{vm.userData.consumption.electricity.status === 'overdue' ? 'overdue' : 'due'}}
+                                        by {{vm.userData.consumption.electricity.due_date}}</p>
+                                    <span class="notification-time">Action needed</span>
+                                </div>
+                            </div>
+                            <div class="notification-item notification-warning"
+                                ng-if="vm.userData.consumption.gas.status === 'pending' || vm.userData.consumption.gas.status === 'overdue'">
+                                <div class="notification-icon">
+                                    <i data-lucide="flame"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <p class="notification-text">Gas bill ₹{{vm.userData.consumption.gas.current_bill}}
+                                        due by {{vm.userData.consumption.gas.due_date}}</p>
+                                    <span class="notification-time">Pay soon</span>
+                                </div>
+                            </div>
+                            <div class="notification-item notification-success"
+                                ng-if="vm.userData.reports.resolved > 0">
+                                <div class="notification-icon">
+                                    <i data-lucide="check-circle"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <p class="notification-text">{{vm.userData.reports.resolved}} service request(s)
+                                        resolved</p>
+                                    <span class="notification-time">Recent</span>
+                                </div>
+                            </div>
+                            <div class="notification-item notification-info"
+                                ng-if="vm.userData.consumption.water.status === 'paid'">
+                                <div class="notification-icon">
+                                    <i data-lucide="check-circle"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <p class="notification-text">Water bill
+                                        ₹{{vm.userData.consumption.water.current_bill}} paid successfully</p>
+                                    <span class="notification-time">Completed</span>
+                                </div>
+                            </div>
+                            <div class="notification-item notification-info"
+                                ng-if="vm.userData.consumption.electricity.current > 0">
+                                <div class="notification-icon">
+                                    <i data-lucide="trending-up"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <p class="notification-text">Your electricity usage is
+                                        {{vm.userData.consumption.electricity.current}}
+                                        {{vm.userData.consumption.electricity.unit}} this month</p>
+                                    <span class="notification-time">View insights</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="utility-card-footer">
+                        <a href="#" class="btn-outline-small">
+                            <i data-lucide="inbox"></i>
+                            View All
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Insights Preview -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon">📊</span>
+                    Usage Insights
+                </h2>
+                <p class="section-subtitle">Track your consumption patterns</p>
+            </div>
+
+            <div class="insights-preview-grid">
+                <!-- Consumption Trend Chart -->
+                <div class="gov-card">
+                    <div class="card-header">
+                        <h3><span class="icon">📈</span> {{vm.chartPeriod === '1Y' ? '12-Month' : '6-Month'}}
+                            Consumption Trend</h3>
+                        <div class="period-toggle">
+                            <button class="toggle-btn" ng-class="{active: vm.chartPeriod === '6M'}"
+                                ng-click="vm.switchChartPeriod('6M')">6M</button>
+                            <button class="toggle-btn" ng-class="{active: vm.chartPeriod === '1Y'}"
+                                ng-click="vm.switchChartPeriod('1Y')">1Y</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="trendChart" width="400" height="200"></canvas>
+                        <div class="insight-legend">
+                            <span class="legend-item legend-electricity">
+                                <i data-lucide="zap"></i>
+                                <span>Electricity</span>
+                            </span>
+                            <span class="legend-item legend-water">
+                                <i data-lucide="droplet"></i>
+                                <span>Water</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cost Breakdown -->
+                <div class="gov-card">
+                    <div class="card-header">
+                        <h3><span class="icon">💰</span> Monthly Cost Breakdown</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="cost-breakdown-list">
+                            <div class="cost-item">
+                                <div class="cost-item-left">
+                                    <i data-lucide="zap" class="cost-icon cost-icon-electricity"></i>
+                                    <div class="cost-details">
+                                        <span class="cost-label">Electricity</span>
+                                        <span class="cost-amount">₹{{vm.userData.consumption.electricity.current_bill ||
+                                            0}}</span>
+                                        <span class="cost-percentage"
+                                            ng-if="vm.userData.consumption.electricity.current_bill > 0">{{vm.getPercentage('electricity')}}%</span>
+                                    </div>
+                                </div>
+                                <span class="cost-time">Current</span>
+                            </div>
+                            <div class="cost-item">
+                                <div class="cost-item-left">
+                                    <i data-lucide="droplet" class="cost-icon cost-icon-water"></i>
+                                    <div class="cost-details">
+                                        <span class="cost-label">Water</span>
+                                        <span class="cost-amount">₹{{vm.userData.consumption.water.current_bill ||
+                                            0}}</span>
+                                        <span class="cost-percentage"
+                                            ng-if="vm.userData.consumption.water.current_bill > 0">{{vm.getPercentage('water')}}%</span>
+                                    </div>
+                                </div>
+                                <span class="cost-time">Current</span>
+                            </div>
+                            <div class="cost-item">
+                                <div class="cost-item-left">
+                                    <i data-lucide="flame" class="cost-icon cost-icon-gas"></i>
+                                    <div class="cost-details">
+                                        <span class="cost-label">Gas</span>
+                                        <span class="cost-amount">₹{{vm.userData.consumption.gas.current_bill ||
+                                            0}}</span>
+                                        <span class="cost-percentage"
+                                            ng-if="vm.userData.consumption.gas.current_bill > 0">{{vm.getPercentage('gas')}}%</span>
+                                    </div>
+                                </div>
+                                <span class="cost-time">Current</span>
+                            </div>
+                        </div>
+                        <div class="cost-total">
+                            <span class="total-label">Total Monthly Cost</span>
+                            <span class="total-amount">₹{{vm.getTotalCost()}}</span>
+                        </div>
+                        <div class="insight-footer">
+                            <a href="#!/insights" class="insight-link">
+                                View Detailed Insights
+                                <i data-lucide="arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</div> <!-- /.main-content -->

@@ -1,0 +1,303 @@
+<div class="main-content">
+
+    <!-- Profile Hero Header -->
+    <div class="profile-hero">
+        <div class="profile-avatar">
+            {{vm.user.fullName.charAt(0).toUpperCase()}}
+        </div>
+        <div class="profile-hero-info">
+            <h2>{{vm.user.fullName || 'Citizen'}}</h2>
+            <p>{{vm.user.email || 'No email on file'}}</p>
+            <span class="profile-hero-badge" ng-if="vm.user.ward">
+                📍 Ward {{vm.user.ward}}
+            </span>
+        </div>
+    </div>
+
+    <!-- Settings Tabs Navigation -->
+    <div class="settings-nav-tabs">
+        <button class="settings-tab-btn" ng-class="{active: vm.settingsTab === 'profile'}"
+            ng-click="vm.settingsTab = 'profile'">
+            <span class="icon">👤</span>
+            <span>Profile</span>
+        </button>
+        <button class="settings-tab-btn" ng-class="{active: vm.settingsTab === 'preferences'}"
+            ng-click="vm.settingsTab = 'preferences'">
+            <span class="icon">🎛️</span>
+            <span>Preferences</span>
+        </button>
+        <button class="settings-tab-btn" ng-class="{active: vm.settingsTab === 'notifications'}"
+            ng-click="vm.settingsTab = 'notifications'">
+            <span class="icon">🔔</span>
+            <span>Notifications</span>
+        </button>
+        <button class="settings-tab-btn" ng-class="{active: vm.settingsTab === 'privacy'}"
+            ng-click="vm.settingsTab = 'privacy'">
+            <span class="icon">🔒</span>
+            <span>Privacy</span>
+        </button>
+    </div>
+
+    <!-- Settings Content Area -->
+    <div class="settings-content-area">
+
+        <!-- ═══════════════════════════ PROFILE TAB ═══════════════════════════ -->
+        <div ng-show="vm.settingsTab === 'profile'">
+            <h2 class="settings-section-title"><span class="icon">👤</span> Personal Information</h2>
+            <p class="settings-section-desc">Your profile details are sourced from your registered account</p>
+
+            <div class="form-display-grid">
+                <div class="form-display-row">
+                    <div class="form-display-label">Full Name</div>
+                    <div class="form-display-value" ng-class="{'empty': !vm.user.fullName}">
+                        {{vm.user.fullName || 'Not provided'}}
+                    </div>
+                </div>
+                <div class="form-display-row">
+                    <div class="form-display-label">Phone Number</div>
+                    <div class="form-display-value" ng-class="{'empty': !vm.user.phone}">
+                        {{vm.user.phone || 'Not provided'}}
+                    </div>
+                </div>
+                <div class="form-display-row">
+                    <div class="form-display-label">Email Address</div>
+                    <div class="form-display-value" ng-class="{'empty': !vm.user.email}">
+                        {{vm.user.email || 'Not provided'}}
+                    </div>
+                </div>
+                <div class="form-display-row">
+                    <div class="form-display-label">Ward / Area</div>
+                    <div class="form-display-value" ng-class="{'empty': !vm.user.ward}">
+                        {{vm.user.ward || 'Not assigned'}}
+                    </div>
+                </div>
+                <div class="form-display-row full-width">
+                    <div class="form-display-label">Address</div>
+                    <div class="form-display-value" ng-class="{'empty': !vm.user.address}">
+                        {{vm.user.address || 'No address on file'}}
+                    </div>
+                    <div class="form-display-hint">
+                        ℹ️ Managed from your official registration. Contact support to update.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connection Details -->
+            <hr class="settings-divider">
+            <h2 class="settings-section-title"><span class="icon">🔗</span> Utility Connections</h2>
+            <p class="settings-section-desc">Your linked utility service accounts</p>
+
+            <div class="connection-grid">
+                <div class="connection-card" ng-repeat="connection in vm.connections">
+                    <div class="connection-icon" ng-class="connection.utility.toLowerCase()">
+                        <span ng-if="connection.utility === 'Electricity'">⚡</span>
+                        <span ng-if="connection.utility === 'Water'">💧</span>
+                        <span ng-if="connection.utility === 'Gas'">🔥</span>
+                    </div>
+                    <div class="connection-details">
+                        <div class="conn-label">{{connection.utility}} {{connection.label}}</div>
+                        <div class="conn-number">{{connection.number}}</div>
+                    </div>
+                    <span class="connection-status-pill">{{connection.status}}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════ PREFERENCES TAB ═══════════════════════════ -->
+        <div ng-show="vm.settingsTab === 'preferences'">
+            <h2 class="settings-section-title"><span class="icon">🎛️</span> Display & Accessibility</h2>
+            <p class="settings-section-desc">Customize your experience</p>
+
+            <!-- Language Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <span class="icon">🌐</span> Language
+                </div>
+                <div class="settings-card-body" style="padding: 1.25rem;">
+                    <div class="form-group">
+                        <label>Preferred Language</label>
+                        <select class="form-control" ng-model="vm.preferences.language">
+                            <option value="en">English</option>
+                            <option value="hi">Hindi (हिंदी)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accessibility Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <span class="icon">♿</span> Accessibility
+                </div>
+                <div class="settings-card-body">
+                    <div class="setting-item">
+                        <div class="setting-item-text">
+                            <div class="setting-label">High Contrast Mode</div>
+                            <div class="setting-desc">Increases contrast for better readability</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ng-model="vm.preferences.highContrast">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-item-text">
+                            <div class="setting-label">Large Text</div>
+                            <div class="setting-desc">Increases font size across the portal</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ng-model="vm.preferences.largeText">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button class="gov-btn primary" ng-click="vm.savePreferences()">Save Preferences</button>
+                <button class="gov-btn outline" ng-click="vm.resetPreferences()">Reset to Default</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════ NOTIFICATIONS TAB ═══════════════════════════ -->
+        <div ng-show="vm.settingsTab === 'notifications'">
+            <h2 class="settings-section-title"><span class="icon">🔔</span> Alert Preferences</h2>
+            <p class="settings-section-desc">Choose how you want to receive updates</p>
+
+            <!-- SMS Alerts Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <span class="icon">📱</span> SMS Alerts
+                </div>
+                <div class="settings-card-body">
+                    <div class="setting-item">
+                        <div class="setting-item-text">
+                            <div class="setting-label">Bill Generation SMS</div>
+                            <div class="setting-desc">Get notified when new bills are generated</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ng-model="vm.preferences.billSms">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-item-text">
+                            <div class="setting-label">Payment Confirmation SMS</div>
+                            <div class="setting-desc">Receive confirmation on successful payments</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ng-model="vm.preferences.paymentSms">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Alerts Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <span class="icon">📧</span> Email Alerts
+                </div>
+                <div class="settings-card-body">
+                    <div class="setting-item">
+                        <div class="setting-item-text">
+                            <div class="setting-label">Usage Spikes Email</div>
+                            <div class="setting-desc">Get alerted when consumption exceeds usual patterns</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ng-model="vm.preferences.usageEmail">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-item-text">
+                            <div class="setting-label">Government Advisory Emails</div>
+                            <div class="setting-desc">Receive ward-level civic advisories</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ng-model="vm.preferences.advisoryEmail">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button class="gov-btn primary" ng-click="vm.savePreferences()">Save Notification Settings</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════ PRIVACY TAB ═══════════════════════════ -->
+        <div ng-show="vm.settingsTab === 'privacy'">
+            <h2 class="settings-section-title"><span class="icon">🔒</span> Data Privacy</h2>
+            <p class="settings-section-desc">How your data is handled and protected</p>
+
+            <!-- Data Retention Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <span class="icon">🛡️</span> Data Retention Policy
+                </div>
+                <div class="settings-card-body" style="padding: 1.25rem;">
+                    <p
+                        style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+                        We do not store meter readings beyond official retention policies (12 months). All data is
+                        sourced
+                        from verified government utility providers.
+                    </p>
+                    <div class="info-banner">
+                        <div class="banner-icon">🔐</div>
+                        <div class="banner-text">
+                            Your consumption data is encrypted at rest and in transit. We comply with all applicable
+                            data
+                            protection regulations.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Access Log Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <span class="icon">📋</span> Data Access Log
+                </div>
+                <div class="settings-card-body" style="padding: 1.25rem;">
+                    <p class="settings-section-desc" style="margin-bottom: 1rem;">Recent access to your data:</p>
+                    <div class="privacy-timeline">
+                        <div class="timeline-entry">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Bill Generation</strong>
+                                <p>BRPL System Read</p>
+                            </div>
+                            <span class="timeline-time">2 days ago</span>
+                        </div>
+                        <div class="timeline-entry">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Ward Comparison</strong>
+                                <p>Anonymous aggregation</p>
+                            </div>
+                            <span class="timeline-time">5 days ago</span>
+                        </div>
+                        <div class="timeline-entry">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Monthly Report</strong>
+                                <p>Consumption summary generated</p>
+                            </div>
+                            <span class="timeline-time">1 week ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button class="gov-btn outline" ng-click="vm.downloadMyData()">
+                    📥 Download My Data
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</div> <!-- /.main-content -->

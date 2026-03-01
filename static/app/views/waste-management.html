@@ -1,0 +1,563 @@
+<div class="main-content">
+    <div class="dashboard-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title-group">
+                <h1 class="page-title">
+                    <span class="icon">♻️</span>
+                    Waste Management
+                </h1>
+                <p class="page-subtitle">Track collection, report issues & stay clean</p>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-spinner" ng-show="vm.loading">
+            <div class="spinner"></div>
+            <p>Loading waste data...</p>
+        </div>
+
+        <!-- Main Content -->
+        <div ng-hide="vm.loading">
+            <!-- Today's Waste Status Section -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span class="icon">📆</span> Today's Waste Status</h2>
+                    <span class="status-badge success">✓ On Schedule</span>
+                </div>
+
+                <div class="stats-grid">
+                    <!-- Last Pickup Card -->
+                    <div class="stat-card success">
+                        <div class="stat-icon-box green">✅</div>
+                        <div class="stat-content">
+                            <span class="stat-value">{{vm.wasteStatus.lastPickup}}</span>
+                            <span class="stat-label">Last Pickup</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <span>Completed</span>
+                        </div>
+                    </div>
+
+                    <!-- Waste Type Card -->
+                    <div class="stat-card info">
+                        <div class="stat-icon-box blue">♻️</div>
+                        <div class="stat-content">
+                            <span class="stat-value">{{vm.wasteStatus.wasteType}}</span>
+                            <span class="stat-label">Waste Type</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <span>Segregated</span>
+                        </div>
+                    </div>
+
+                    <!-- Points Earned Card -->
+                    <div class="stat-card warning">
+                        <div class="stat-icon-box orange">⭐</div>
+                        <div class="stat-content">
+                            <span class="stat-value">+{{vm.wasteStatus.pointsEarned}}</span>
+                            <span class="stat-label">Points Earned</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <span>Earned Today</span>
+                        </div>
+                    </div>
+
+                    <!-- Next Pickup Card -->
+                    <div class="stat-card primary">
+                        <div class="stat-icon-box blue">📅</div>
+                        <div class="stat-content">
+                            <span class="stat-value">{{vm.wasteStatus.nextScheduledPickup}}</span>
+                            <span class="stat-label">Next Pickup</span>
+                        </div>
+                        <div class="stat-trend neutral">
+                            <span>Tomorrow</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions Section -->
+            <section class="dashboard-section">
+                <div class="policy-banner-grid">
+                    <!-- Report Issue Card -->
+                    <div class="policy-card policy-report" ng-click="vm.showReportForm = !vm.showReportForm">
+                        <div class="policy-card-body">
+                            <div class="policy-icon alert">
+                                <i data-lucide="alert-circle"></i>
+                            </div>
+                            <div class="policy-content">
+                                <h3><span class="icon">🚨</span> Report an Issue</h3>
+                                <p>Missed pickup or overflow bin?</p>
+                            </div>
+                            <div class="policy-btn-primary">Report Now →</div>
+                        </div>
+                    </div>
+
+                    <!-- Live Tracking Card -->
+                    <div class="policy-card policy-track" ng-click="vm.openLiveService()">
+                        <div class="policy-card-body">
+                            <div class="policy-icon live">
+                                <i data-lucide="map-pin"></i>
+                            </div>
+                            <div class="policy-content">
+                                <h3><span class="icon">📍</span> Live Tracking</h3>
+                                <p>Track your waste truck now</p>
+                            </div>
+                            <div class="policy-btn-primary">Track →</div>
+                        </div>
+                    </div>
+
+                    <!-- Ask AI About Waste Card -->
+                    <div class="policy-card policy-ai" ng-click="vm.showAiWasteHelper = !vm.showAiWasteHelper">
+                        <div class="policy-card-body">
+                            <div class="policy-icon ai">
+                                <i data-lucide="brain"></i>
+                            </div>
+                            <div class="policy-content">
+                                <h3><span class="icon">🤖</span> Ask AI Waste Helper</h3>
+                                <p>Identify waste type with photo</p>
+                            </div>
+                            <div class="policy-btn-primary">Ask AI →</div>
+                        </div>
+                    </div>
+
+                    <!-- Waste Guide Card -->
+                    <div class="policy-card policy-guide" ng-click="vm.showWasteGuide = true">
+                        <div class="policy-card-body">
+                            <div class="policy-icon guide">
+                                <i data-lucide="lightbulb"></i>
+                            </div>
+                            <div class="policy-content">
+                                <h3><span class="icon">💡</span> Waste Guide</h3>
+                                <p>Learn proper segregation</p>
+                            </div>
+                            <div class="policy-btn-primary">Learn →</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Waste Guide Modal -->
+            <div class="modal-overlay" ng-show="vm.showWasteGuide" ng-click="vm.showWasteGuide = false"></div>
+            <div class="waste-guide-modal" ng-show="vm.showWasteGuide">
+                <div class="waste-guide-content" style="max-width:780px;">
+                    <div class="waste-guide-header">
+                        <h2>📖 Waste Segregation Guide</h2>
+                        <button ng-click="vm.showWasteGuide = false">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <div class="waste-guide-body">
+                        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem;">
+                            <!-- Organic Card -->
+                            <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius:16px; padding:1.5rem; border:1px solid rgba(22,163,74,0.12); text-align:center;">
+                                <div style="width:56px; height:56px; border-radius:50%; background:rgba(22,163,74,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 0.75rem; font-size:1.75rem;">🌱</div>
+                                <h3 style="font-size:1.05rem; font-weight:700; margin:0 0 0.25rem; color:#15803d;">Organic Waste</h3>
+                                <span style="display:inline-block; font-size:0.65rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:20px; background:rgba(22,163,74,0.15); color:#16a34a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.75rem;">Green Bin</span>
+                                <div style="display:flex; flex-wrap:wrap; gap:0.35rem; justify-content:center;">
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Food scraps</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Plant leaves</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Flowers</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Paper napkins</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Tea/coffee</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Fruit peels</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Egg shells</span>
+                                </div>
+                                <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid rgba(22,163,74,0.12); font-size:0.75rem; color:#15803d;">
+                                    <strong>💡 Tip:</strong> Drain liquids before disposal
+                                </div>
+                            </div>
+                            <!-- Dry Waste Card -->
+                            <div style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius:16px; padding:1.5rem; border:1px solid rgba(37,99,235,0.12); text-align:center;">
+                                <div style="width:56px; height:56px; border-radius:50%; background:rgba(37,99,235,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 0.75rem; font-size:1.75rem;">📦</div>
+                                <h3 style="font-size:1.05rem; font-weight:700; margin:0 0 0.25rem; color:#1d4ed8;">Dry Waste</h3>
+                                <span style="display:inline-block; font-size:0.65rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:20px; background:rgba(37,99,235,0.15); color:#2563eb; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.75rem;">Blue Bin</span>
+                                <div style="display:flex; flex-wrap:wrap; gap:0.35rem; justify-content:center;">
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Plastic bottles</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Cardboard</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Metal cans</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Newspapers</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Glass jars</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Foil</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Packaging</span>
+                                </div>
+                                <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid rgba(37,99,235,0.12); font-size:0.75rem; color:#1d4ed8;">
+                                    <strong>💡 Tip:</strong> Rinse containers before recycling
+                                </div>
+                            </div>
+                            <!-- Hazardous Card -->
+                            <div style="background:linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius:16px; padding:1.5rem; border:1px solid rgba(220,38,38,0.12); text-align:center;">
+                                <div style="width:56px; height:56px; border-radius:50%; background:rgba(220,38,38,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 0.75rem; font-size:1.75rem;">⚠️</div>
+                                <h3 style="font-size:1.05rem; font-weight:700; margin:0 0 0.25rem; color:#dc2626;">Hazardous Waste</h3>
+                                <span style="display:inline-block; font-size:0.65rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:20px; background:rgba(220,38,38,0.15); color:#dc2626; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.75rem;">Red Bin</span>
+                                <div style="display:flex; flex-wrap:wrap; gap:0.35rem; justify-content:center;">
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Batteries</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Electronics</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Medicines</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Chemicals</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Paint cans</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Light bulbs</span>
+                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Syringes</span>
+                                </div>
+                                <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid rgba(220,38,38,0.12); font-size:0.75rem; color:#dc2626;">
+                                    <strong>💡 Tip:</strong> Never mix with regular waste
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="waste-guide-footer">
+                        <i data-lucide="star"></i>
+                        <p>Proper segregation earns you green points and helps keep our community clean!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Waste Helper Modal -->
+            <div class="modal-overlay" ng-show="vm.showAiWasteHelper" ng-click="vm.showAiWasteHelper = false"></div>
+
+            <div class="waste-guide-modal" ng-show="vm.showAiWasteHelper" style="z-index:1001;">
+                <div class="waste-guide-content" style="max-width:640px;">
+                    <div class="waste-guide-header" style="background:linear-gradient(135deg, #1D70B8, #3B8FD8); color:white;">
+                        <h2 style="color:white;">
+                            <i data-lucide="brain"></i>
+                            AI Waste Type Identifier
+                        </h2>
+                        <button ng-click="vm.showAiWasteHelper = false" style="color:white;">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <div class="waste-guide-body">
+                        <!-- Upload Photo Section -->
+                        <div class="ai-section" ng-hide="vm.aiResult && !vm.aiAnalyzing">
+                            <h3 class="ai-section-title" style="justify-content:center;">
+                                <i data-lucide="camera" style="width:18px; height:18px; color:var(--primary-blue);"></i>
+                                Upload a photo of your waste
+                            </h3>
+                            <div class="ai-upload-area" style="min-height:200px; border-radius:16px; position:relative;">
+                                <input type="file" id="aiPhoto" ng-model="vm.aiPhoto" accept="image/*"
+                                    class="ai-file-input" ng-change="vm.analyzeWastePhoto()">
+                                <label for="aiPhoto" class="ai-file-label" ng-show="!vm.aiAnalyzing" style="padding:2rem;">
+                                    <div style="width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg, rgba(29,112,184,0.1), rgba(14,165,233,0.1)); display:flex; align-items:center; justify-content:center; margin-bottom:0.5rem;">
+                                        <i data-lucide="upload-cloud" style="width:36px; height:36px; color:var(--primary-blue); opacity:0.8;"></i>
+                                    </div>
+                                    <span style="font-size:0.95rem; font-weight:600; color:var(--text-primary);">Click to upload or drag image here</span>
+                                    <span style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;">JPG, PNG up to 10MB</span>
+                                </label>
+
+                                <!-- Analyzing State -->
+                                <div class="ai-analyzing" ng-show="vm.aiAnalyzing">
+                                    <div class="ai-spinner"></div>
+                                    <p>Analyzing waste type...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Result State -->
+                        <div ng-show="vm.aiResult && !vm.aiAnalyzing" style="text-align:center; padding:0.5rem 0;">
+                            <div class="result-icon" ng-class="vm.aiResult.category" style="width:72px; height:72px; margin:0 auto 1rem;">
+                                <i data-lucide="{{vm.aiResult.icon}}" style="width:32px; height:32px;"></i>
+                            </div>
+                            <h4 style="font-size:1.35rem; margin-bottom:0.25rem;">{{vm.aiResult.wasteType}}</h4>
+                            <div style="margin-bottom:1rem;">
+                                <span style="display:inline-block; padding:0.3rem 0.8rem; border-radius:20px; font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;"
+                                    ng-class="{'organic': 'background:rgba(22,163,74,0.15); color:#16a34a;', 'dry': 'background:rgba(37,99,235,0.15); color:#2563eb;', 'hazardous': 'background:rgba(220,38,38,0.15); color:#dc2626;'}[vm.aiResult.category]"
+                                    ng-style="vm.aiResult.category === 'organic' ? {'background': 'rgba(22,163,74,0.15)', 'color': '#16a34a'} : vm.aiResult.category === 'dry' ? {'background': 'rgba(37,99,235,0.15)', 'color': '#2563eb'} : {'background': 'rgba(220,38,38,0.15)', 'color': '#dc2626'}">
+                                    {{vm.aiResult.category}} waste
+                                </span>
+                            </div>
+                            <div class="result-details" style="border-radius:14px; margin-bottom:1rem;">
+                                <p><strong>Segregation Tips:</strong></p>
+                                <ul>
+                                    <li ng-repeat="tip in vm.aiResult.tips">{{tip}}</li>
+                                </ul>
+                            </div>
+                            <div class="result-points" style="border-radius:12px; margin-bottom:1.25rem;">
+                                <i data-lucide="star"></i>
+                                You'll earn <strong>{{vm.aiResult.points}}</strong> points for proper disposal
+                            </div>
+                            <div style="display:flex; gap:0.75rem; justify-content:center;">
+                                <button class="btn btn-secondary" ng-click="vm.aiResult = null;" style="padding:0.6rem 1.5rem; border-radius:10px;">
+                                    <i data-lucide="refresh-cw" style="width:16px; height:16px;"></i>
+                                    Try Another
+                                </button>
+                                <button class="btn btn-primary" ng-click="vm.showAiWasteHelper = false" style="padding:0.6rem 1.5rem; border-radius:10px;">
+                                    Got it!
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Waste Categories Info - always visible -->
+                        <div class="ai-section" style="margin-top:1.5rem;">
+                            <h3 class="ai-section-title" style="justify-content:center;">Waste Categories</h3>
+                            <div class="categories-grid">
+                                <div class="category-card organic">
+                                    <div class="cat-icon">🌱</div>
+                                    <h4>Organic</h4>
+                                    <p>Food scraps, leaves, paper</p>
+                                </div>
+                                <div class="category-card dry">
+                                    <div class="cat-icon">📦</div>
+                                    <h4>Dry Waste</h4>
+                                    <p>Plastic, paper, metal, glass</p>
+                                </div>
+                                <div class="category-card hazardous">
+                                    <div class="cat-icon">⚠️</div>
+                                    <h4>Hazardous</h4>
+                                    <p>Electronics, batteries, medicine</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Issue Form Modal -->
+            <div class="modal-overlay" ng-show="vm.showReportForm" ng-click="vm.showReportForm = false"></div>
+
+            <div class="utility-modal" ng-show="vm.showReportForm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">
+                            <i data-lucide="alert-circle"></i>
+                            Report Waste Issue
+                        </h2>
+                        <button class="modal-close" ng-click="vm.showReportForm = false">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form name="wasteForm" ng-submit="vm.submitIssue()" novalidate>
+                            <!-- Issue Type -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <span>What's the problem?</span>
+                                    <span class="required">*</span>
+                                </label>
+                                <select ng-model="vm.issue.type" class="form-control" required>
+                                    <option value="">-- Select an issue type --</option>
+                                    <option value="missed">Missed garbage pickup</option>
+                                    <option value="mixed">Mixed waste collected incorrectly</option>
+                                    <option value="overflow">Overflowing bin</option>
+                                    <option value="damaged">Damaged or broken bin</option>
+                                    <option value="smell">Bad odor or pest issue</option>
+                                    <option value="other">Other issue</option>
+                                </select>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="form-group">
+                                <label class="form-label">Your Address</label>
+                                <input type="text" ng-model="vm.issue.address" class="form-control" readonly>
+                                <small class="form-hint">Auto-filled from your profile</small>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <span>Additional Details</span>
+                                    <span class="optional">(Optional)</span>
+                                </label>
+                                <textarea ng-model="vm.issue.description" class="form-control textarea-control"
+                                    placeholder="Provide any additional information..." rows="4"></textarea>
+                            </div>
+
+                            <!-- Photo Upload -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <span>Upload Photo</span>
+                                    <span class="optional">(Optional)</span>
+                                </label>
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="issuePhoto" ng-model="vm.issue.photo" accept="image/*"
+                                        class="file-input">
+                                    <label for="issuePhoto" class="file-label">
+                                        <i data-lucide="camera"></i>
+                                        <span>Click to upload image</span>
+                                    </label>
+                                </div>
+                                <small class="form-hint">JPG, PNG up to 5MB</small>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary"
+                                    ng-disabled="!wasteForm.$valid || vm.isSubmitting">
+                                    <i data-lucide="send" ng-hide="vm.isSubmitting"></i>
+                                    <span ng-if="!vm.isSubmitting">Submit Issue</span>
+                                    <span ng-if="vm.isSubmitting">Submitting...</span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Success Message -->
+                        <div class="success-alert" ng-show="vm.showSuccess">
+                            <i data-lucide="check-circle"></i>
+                            <div class="alert-text">
+                                <h4>Success!</h4>
+                                <p>{{vm.successMessage}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Service Modal -->
+            <div class="modal-overlay" ng-show="vm.showLiveService" ng-click="vm.closeLiveService()"></div>
+
+            <div class="utility-modal" ng-show="vm.showLiveService">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">
+                            <i data-lucide="map-pin"></i>
+                            Live Waste Service Tracking
+                        </h2>
+                        <button class="modal-close" ng-click="vm.closeLiveService()">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Map Container -->
+                        <div class="map-section">
+                            <div class="map-container">
+                                <div class="map-grid"></div>
+                                <div class="map-marker truck">
+                                    <span class="marker-label">🚛 Truck {{vm.liveServiceData.truckId}}</span>
+                                    <span class="marker-icon">🚗</span>
+                                </div>
+                                <div class="map-marker user">
+                                    <span class="marker-label">📍 Your Location</span>
+                                    <span class="marker-icon">📍</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Truck Info -->
+                        <div class="truck-info-card">
+                            <div class="truck-header">
+                                <div class="truck-details">
+                                    <h3>Truck {{vm.liveServiceData.truckId}}</h3>
+                                    <p>Municipal Waste Collection Service</p>
+                                </div>
+                                <span class="status-badge pulse">{{vm.liveServiceData.truckStatus}}</span>
+                            </div>
+
+                            <div class="truck-metrics">
+                                <div class="metric">
+                                    <span class="metric-label">Distance</span>
+                                    <span class="metric-value">{{vm.liveServiceData.distance}}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">ETA</span>
+                                    <span class="metric-value">{{vm.liveServiceData.eta}}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Capacity</span>
+                                    <span class="metric-value">{{vm.liveServiceData.capacity}}</span>
+                                </div>
+                            </div>
+
+                            <div class="truck-details-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Driver</span>
+                                    <span class="detail-value">{{vm.liveServiceData.driverName}}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Waste Type</span>
+                                    <span class="detail-value">{{vm.liveServiceData.wasteType}}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Next Stop</span>
+                                    <span class="detail-value">{{vm.liveServiceData.nextStop}}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Areas Completed</span>
+                                    <span class="detail-value">{{vm.liveServiceData.areasCompleted}}</span>
+                                </div>
+                            </div>
+
+                            <button class="btn-primary" ng-click="vm.refreshLocation()" ng-disabled="vm.isRefreshing"
+                                style="width: 100%; margin-top: 1.5rem;">
+                                <i data-lucide="refresh-cw" ng-hide="vm.isRefreshing"></i>
+                                <span ng-if="!vm.isRefreshing">Refresh Location</span>
+                                <span ng-if="vm.isRefreshing">Updating...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Waste Guidelines Section -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span class="icon">📖</span> Waste Segregation Guidelines</h2>
+                </div>
+
+                <div class="policy-banner-grid">
+                    <div class="guideline-card organic">
+                        <div class="guideline-icon">🌱</div>
+                        <h3>Organic Waste</h3>
+                        <ul>
+                            <li>Food scraps</li>
+                            <li>Plant leaves</li>
+                            <li>Paper napkins</li>
+                            <li>Tea/coffee grounds</li>
+                        </ul>
+                    </div>
+
+                    <div class="guideline-card dry">
+                        <div class="guideline-icon">📦</div>
+                        <h3>Dry Waste</h3>
+                        <ul>
+                            <li>Plastic bottles</li>
+                            <li>Cardboard boxes</li>
+                            <li>Newspapers</li>
+                            <li>Metal cans</li>
+                        </ul>
+                    </div>
+
+                    <div class="guideline-card hazardous">
+                        <div class="guideline-icon">⚠️</div>
+                        <h3>Hazardous Waste</h3>
+                        <ul>
+                            <li>Medicine bottles</li>
+                            <li>Glass bottles</li>
+                            <li>Electronics</li>
+                            <li>Batteries</li>
+                        </ul>
+                    </div>
+
+                    <div class="guideline-card tips">
+                        <div class="guideline-icon">✅</div>
+                        <h3>Best Practices</h3>
+                        <ul>
+                            <li>Don't mix wet & dry</li>
+                            <li>Keep hazardous separate</li>
+                            <li>Use proper bins</li>
+                            <li>Label waste clearly</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span class="icon">❓</span> Frequently Asked Questions</h2>
+                </div>
+
+                <div class="faq-container">
+                    <div class="faq-item" ng-repeat="item in vm.faqItems">
+                        <button class="faq-question" ng-click="item.open = !item.open">
+                            <span>{{item.question}}</span>
+                            <i data-lucide="chevron-down" ng-class="{'rotate': item.open}"></i>
+                        </button>
+                        <div class="faq-answer" ng-show="item.open">
+                            <p>{{item.answer}}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div> <!-- /.main-content -->

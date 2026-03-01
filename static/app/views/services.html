@@ -1,0 +1,650 @@
+<div class="main-content">
+    <div class="dashboard-container">
+        <!-- Services Header with Stats -->
+        <div class="services-header" style="text-align:center;">
+            <div class="header-content">
+                <h1>Services & Grievances</h1>
+                <p>Single window for complaints and service requests</p>
+            </div>
+        </div>
+
+        <!-- Stats Grid - Admin Pattern -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-icon-box blue">
+                    <i data-lucide="ticket"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Active Requests</div>
+                    <div class="stat-value">{{vm.stats.activeRequests}}</div>
+                    <span class="stat-trend neutral">Open tickets</span>
+                </div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-icon-box orange">
+                    <i data-lucide="clock"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Avg Resolution</div>
+                    <div class="stat-value">{{vm.stats.avgResolution}}</div>
+                    <span class="stat-trend neutral">Days</span>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-icon-box green">
+                    <i data-lucide="check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Resolved (12mo)</div>
+                    <div class="stat-value">{{vm.stats.resolvedCount}}</div>
+                    <span class="stat-trend up">
+                        <i data-lucide="trending-up"></i> Completed
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Report Buttons -->
+        <div class="card enhanced quick-actions-card">
+            <div class="card-header">
+                <div class="header-left">
+                    <div class="header-icon">
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <div>
+                        <h3><span class="icon">⚡</span> Quick Report</h3>
+                        <p class="card-subtitle">Fast track for common issues</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="quick-actions-grid">
+                    <button class="quick-action-card alert" ng-click="vm.quickReport('power_theft')">
+                        <div class="action-icon">
+                            <i data-lucide="alert-triangle"></i>
+                        </div>
+                        <span>Report Power Theft</span>
+                    </button>
+                    <button class="quick-action-card warning" ng-click="vm.quickReport('power_outage')">
+                        <div class="action-icon">
+                            <i data-lucide="zap-off"></i>
+                        </div>
+                        <span>Power Outage</span>
+                    </button>
+                    <button class="quick-action-card" ng-click="vm.quickReport('street_light')">
+                        <div class="action-icon">
+                            <i data-lucide="lightbulb"></i>
+                        </div>
+                        <span>Street Light</span>
+                    </button>
+                    <button class="quick-action-card" ng-click="vm.quickReport('water_supply')">
+                        <div class="action-icon">
+                            <i data-lucide="droplet"></i>
+                        </div>
+                        <span>Water Supply</span>
+                    </button>
+                    <button class="quick-action-card" ng-click="vm.quickReport('gas_leakage')">
+                        <div class="action-icon">
+                            <i data-lucide="flame"></i>
+                        </div>
+                        <span>Gas Leakage</span>
+                    </button>
+                    <button class="quick-action-card" ng-click="vm.quickReport('bill_issue')">
+                        <div class="action-icon">
+                            <i data-lucide="file-text"></i>
+                        </div>
+                        <span>Bill Issue</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Mode Toggle -->
+        <div class="tabs-container enhanced">
+            <div class="tabs">
+                <button class="service-tab" ng-class="{active: vm.serviceMode === 'complaint'}"
+                    ng-click="vm.toggleServiceMode('complaint')">
+                    <i data-lucide="alert-circle"></i>
+                    <span>Raise a Complaint</span>
+                </button>
+                <button class="service-tab" ng-class="{active: vm.serviceMode === 'service'}"
+                    ng-click="vm.toggleServiceMode('service')">
+                    <i data-lucide="clipboard-check"></i>
+                    <span>Apply for Service</span>
+                </button>
+                <button class="service-tab" ng-class="{active: vm.serviceMode === 'track'}"
+                    ng-click="vm.toggleServiceMode('track')">
+                    <i data-lucide="search"></i>
+                    <span>Track Requests</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Complaint Section -->
+        <div ng-show="vm.serviceMode === 'complaint'" class="service-section">
+            <div class="content-grid enhanced two-column">
+                <div class="card enhanced form-card">
+                    <div class="card-header">
+                        <h3><span class="icon">📝</span> Lodge a Grievance</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="complaintForm" ng-submit="vm.submitComplaint()">
+                            <div class="form-group enhanced">
+                                <label class="form-label">
+                                    <i data-lucide="zap"></i>
+                                    Select Utility & Vendor
+                                </label>
+                                <select class="form-control enhanced" ng-model="vm.selectedUtility"
+                                    ng-change="vm.updateCategories()">
+                                    <option value="">-- Select Utility --</option>
+                                    <option value="electricity">Electricity (BRPL / BYPL / TPDDL)</option>
+                                    <option value="water">Water (Delhi Jal Board)</option>
+                                    <option value="gas">Gas (IGL / PNG)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group enhanced" ng-show="vm.selectedUtility">
+                                <label class="form-label">
+                                    <i data-lucide="hash"></i>
+                                    {{vm.identifierLabel}}
+                                </label>
+                                <input type="text" class="form-control enhanced" ng-model="vm.identifier"
+                                    placeholder="Enter ID found on bill">
+                            </div>
+
+                            <div class="form-group enhanced">
+                                <label class="form-label">
+                                    <i data-lucide="tag"></i>
+                                    Complaint Category
+                                </label>
+                                <select class="form-control enhanced" ng-model="vm.category"
+                                    ng-disabled="!vm.selectedUtility">
+                                    <option ng-if="!vm.selectedUtility">Select Utility First</option>
+                                    <option ng-repeat="cat in vm.categories" value="{{cat}}">{{cat}}</option>
+                                </select>
+                            </div>
+
+                            <div ng-show="vm.category">
+                                <div class="form-row">
+                                    <div class="form-group enhanced">
+                                        <label class="form-label">
+                                            <i data-lucide="calendar"></i>
+                                            Since when?
+                                        </label>
+                                        <input type="datetime-local" class="form-control enhanced"
+                                            ng-model="vm.incidentDate">
+                                    </div>
+                                    <div class="form-group enhanced">
+                                        <label class="form-label">
+                                            <i data-lucide="map-pin"></i>
+                                            Impact Scope
+                                        </label>
+                                        <select class="form-control enhanced" ng-model="vm.impactScope">
+                                            <option>Individual House</option>
+                                            <option>Entire Building</option>
+                                            <option>Entire Street</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group enhanced">
+                                    <label class="form-label">
+                                        <i data-lucide="message-square"></i>
+                                        Description
+                                    </label>
+                                    <textarea class="form-control enhanced" rows="4" ng-model="vm.description"
+                                        placeholder="Describe your complaint in detail..."></textarea>
+                                </div>
+
+                                <div class="form-group enhanced">
+                                    <label class="form-label">
+                                        <i data-lucide="image"></i>
+                                        Upload Photo (Optional)
+                                    </label>
+                                    <div class="file-upload-area">
+                                        <input type="file" id="photoUpload" class="file-input" accept="image/*">
+                                        <label for="photoUpload" class="file-upload-label">
+                                            <i data-lucide="upload"></i>
+                                            <span>Click to upload or drag and drop</span>
+                                            <small>PNG, JPG up to 5MB</small>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="sla-alert">
+                                    <div class="sla-icon">
+                                        <i data-lucide="clock"></i>
+                                    </div>
+                                    <div class="sla-content">
+                                        <strong>Expected Resolution Time</strong>
+                                        <p>{{vm.slaTime}}</p>
+                                        <small>Subject to field conditions</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary full-width" ng-disabled="!vm.category">
+                                    <i data-lucide="send"></i>
+                                    <span>Submit Complaint</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer">
+                        <i data-lucide="shield"></i>
+                        <span>Data shared only with concerned utility vendor. For emergencies, call helpline.</span>
+                    </div>
+                </div>
+
+                <!-- Outage Information Card -->
+                <div class="card enhanced outage-card">
+                    <div class="card-header">
+                        <h3><span class="icon">⚠️</span> Outage & Maintenance Info</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="outage-items">
+                            <div class="outage-item planned">
+                                <div class="outage-badge planned">
+                                    <i data-lucide="calendar"></i>
+                                    <span>Planned</span>
+                                </div>
+                                <h4>Maintenance - Kalkaji Area</h4>
+                                <p class="outage-time">
+                                    <i data-lucide="clock"></i>
+                                    15th Jan, 10:00 AM - 2:00 PM
+                                </p>
+                                <p class="outage-desc">Power cut expected during maintenance work.</p>
+                            </div>
+                            <div class="outage-item resolved">
+                                <div class="outage-badge resolved">
+                                    <i data-lucide="check-circle"></i>
+                                    <span>No Outages</span>
+                                </div>
+                                <h4>All Clear</h4>
+                                <p class="outage-desc">No unplanned outages reported in your sector currently.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" ng-click="vm.viewAllOutages()" class="link-text">
+                            <i data-lucide="external-link"></i>
+                            <span>View All Outages</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Apply for Service Section -->
+        <div ng-show="vm.serviceMode === 'service'" class="service-section">
+            <div class="card enhanced">
+                <div class="card-header">
+                    <h3><span class="icon">📋</span> Apply for New Service</h3>
+                </div>
+                <div class="card-body">
+                    <div class="service-filter-tabs">
+                        <button class="filter-tab" ng-class="{active: vm.serviceFilter === 'elec'}"
+                            ng-click="vm.filterServices('elec')">
+                            <i data-lucide="zap"></i>
+                            <span>Electricity</span>
+                        </button>
+                        <button class="filter-tab" ng-class="{active: vm.serviceFilter === 'water'}"
+                            ng-click="vm.filterServices('water')">
+                            <i data-lucide="droplet"></i>
+                            <span>Water</span>
+                        </button>
+                        <button class="filter-tab" ng-class="{active: vm.serviceFilter === 'gas'}"
+                            ng-click="vm.filterServices('gas')">
+                            <i data-lucide="flame"></i>
+                            <span>Gas</span>
+                        </button>
+                    </div>
+
+                    <div class="services-grid">
+                        <div ng-repeat="service in vm.filteredServices" class="service-option-card">
+                            <div class="service-card-badge" ng-if="service.badge" ng-class="service.badgeClass">
+                                {{service.badge}}</div>
+                            <div class="service-card-top">
+                                <div class="service-card-icon">
+                                    <i data-lucide="{{service.icon}}"></i>
+                                </div>
+                                <div class="service-card-fee">
+                                    <span class="fee-amount">{{service.fee}}</span>
+                                    <span class="fee-label">{{service.feeLabel}}</span>
+                                </div>
+                            </div>
+                            <h4>{{service.name}}</h4>
+                            <p>{{service.description}}</p>
+                            <div class="service-card-details">
+                                <div class="detail-row">
+                                    <i data-lucide="building-2"></i>
+                                    <span>Provider: <strong>{{service.provider}}</strong></span>
+                                </div>
+                                <div class="detail-row">
+                                    <i data-lucide="user-check"></i>
+                                    <span>{{service.eligibility}}</span>
+                                </div>
+                            </div>
+                            <div class="service-meta">
+                                <span class="meta-item">
+                                    <i data-lucide="clock"></i>
+                                    {{service.processingTime}}
+                                </span>
+                                <span class="meta-item">
+                                    <i data-lucide="file-text"></i>
+                                    {{service.documentsRequired}} docs required
+                                </span>
+                            </div>
+                            <button class="btn-primary full-width" ng-click="vm.applyForService(service)">
+                                <i data-lucide="arrow-right"></i>
+                                <span>Apply Now</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <i data-lucide="info"></i>
+                    <span>Service requests are forwarded directly to the respective utility authority portal.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track Requests Section -->
+        <div ng-show="vm.serviceMode === 'track'" class="service-section">
+            <div class="content-grid enhanced two-column">
+                <!-- Active Tickets -->
+                <div class="card enhanced">
+                    <div class="card-header">
+                        <h3><span class="icon">🔄</span> Active Requests</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="tickets-list">
+                            <div ng-repeat="ticket in vm.activeTickets" class="ticket-card">
+                                <div class="ticket-header-row">
+                                    <div class="ticket-info">
+                                        <span class="ticket-id">{{ticket.id}}</span>
+                                        <span class="ticket-badge"
+                                            ng-class="ticket.statusClass">{{ticket.status}}</span>
+                                    </div>
+                                    <button class="ticket-menu-btn" ng-click="vm.toggleTicketMenu(ticket)">
+                                        <i data-lucide="more-vertical"></i>
+                                    </button>
+                                </div>
+                                <h4 class="ticket-title">{{ticket.title}}</h4>
+                                <p class="ticket-desc">{{ticket.category}} • {{ticket.utility}}</p>
+
+                                <div class="ticket-timeline">
+                                    <div ng-repeat="step in ticket.timeline" class="timeline-step"
+                                        ng-class="step.state">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-content">
+                                            <strong>{{step.label}}</strong>
+                                            <small ng-if="step.date">{{step.date}}</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="vendor-remarks-box" ng-if="ticket.remarks">
+                                    <div class="remarks-icon">
+                                        <i data-lucide="message-circle"></i>
+                                    </div>
+                                    <div class="remarks-content">
+                                        <strong>Vendor Update</strong>
+                                        <p>{{ticket.remarks}}</p>
+                                    </div>
+                                </div>
+
+                                <div class="ticket-actions">
+                                    <button class="btn-secondary" ng-click="vm.viewTicketDetails(ticket)">
+                                        <i data-lucide="eye"></i>
+                                        <span>View Details</span>
+                                    </button>
+                                    <button class="btn-text-danger" ng-click="vm.escalateTicket(ticket)">
+                                        <i data-lucide="alert-triangle"></i>
+                                        <span>Escalate</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div ng-if="vm.activeTickets.length === 0" class="empty-state">
+                                <i data-lucide="inbox"></i>
+                                <p>No active requests</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History & Analytics -->
+                <div>
+                    <div class="card enhanced">
+                        <div class="card-header">
+                            <h3><span class="icon">📊</span> Your Statistics</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-icon">
+                                        <i data-lucide="file-text"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <span class="stat-value">{{vm.complaintsCount}}</span>
+                                        <span class="stat-label">Total Complaints</span>
+                                        <span class="stat-period">Last 12 months</span>
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon success">
+                                        <i data-lucide="check-circle"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <span class="stat-value">{{vm.resolvedCount}}</span>
+                                        <span class="stat-label">Resolved</span>
+                                        <span class="stat-period">Success rate: {{vm.successRate}}%</span>
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon warning">
+                                        <i data-lucide="clock"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <span class="stat-value">{{vm.avgResolutionTime}}</span>
+                                        <span class="stat-label">Avg Resolution</span>
+                                        <span class="stat-period">Days to resolve</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="insight-box" ng-if="vm.historyInsight">
+                                <div class="insight-icon">
+                                    <i data-lucide="lightbulb"></i>
+                                </div>
+                                <div class="insight-content">
+                                    <strong>Insight</strong>
+                                    <p>{{vm.historyInsight}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card enhanced">
+                        <div class="card-header">
+                            <h3><span class="icon">❓</span> Need Help?</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="help-items">
+                                <a href="#" class="help-item" ng-click="vm.viewFAQ()">
+                                    <div class="help-icon">
+                                        <i data-lucide="book-open"></i>
+                                    </div>
+                                    <div class="help-content">
+                                        <strong>FAQ</strong>
+                                        <p>Common questions answered</p>
+                                    </div>
+                                    <i data-lucide="chevron-right"></i>
+                                </a>
+                                <a href="#" class="help-item" ng-click="vm.viewGrievanceCell()">
+                                    <div class="help-icon">
+                                        <i data-lucide="phone"></i>
+                                    </div>
+                                    <div class="help-content">
+                                        <strong>Grievance Cell</strong>
+                                        <p>Escalation contact details</p>
+                                    </div>
+                                    <i data-lucide="chevron-right"></i>
+                                </a>
+                                <a href="#" class="help-item" ng-click="vm.downloadGuide()">
+                                    <div class="help-icon">
+                                        <i data-lucide="download"></i>
+                                    </div>
+                                    <div class="help-content">
+                                        <strong>User Guide</strong>
+                                        <p>How to file complaints</p>
+                                    </div>
+                                    <i data-lucide="chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket Details Modal -->
+        <div class="modal-overlay" ng-show="vm.showTicketModal" ng-click="vm.closeTicketModal()"></div>
+        <div class="utility-modal" ng-show="vm.showTicketModal" ng-class="{'active': vm.showTicketModal}">
+            <div class="modal-content" style="max-width: 520px;">
+                <div class="modal-header">
+                    <h2 class="modal-title">
+                        <i data-lucide="file-text"></i>
+                        Ticket {{vm.selectedTicket.id}}
+                    </h2>
+                    <button class="modal-close" ng-click="vm.closeTicketModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;" ng-if="vm.selectedTicket">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+                        <span class="ticket-badge" ng-class="vm.selectedTicket.statusClass"
+                            style="font-size: 0.85rem; padding: 4px 12px;">{{vm.selectedTicket.status}}</span>
+                        <span style="font-size: 0.8rem; color: #6b7280;">{{vm.selectedTicket.utility}}</span>
+                    </div>
+                    <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem;">{{vm.selectedTicket.title}}
+                    </h3>
+
+                    <div class="details-grid"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+                        <div style="padding: 0.75rem; background: #f9fafb; border-radius: 10px;">
+                            <span style="font-size: 0.75rem; color: #6b7280; display: block;">Category</span>
+                            <strong style="font-size: 0.88rem;">{{vm.selectedTicket.category}}</strong>
+                        </div>
+                        <div style="padding: 0.75rem; background: #f9fafb; border-radius: 10px;">
+                            <span style="font-size: 0.75rem; color: #6b7280; display: block;">Utility</span>
+                            <strong style="font-size: 0.88rem;">{{vm.selectedTicket.utility}}</strong>
+                        </div>
+                    </div>
+
+                    <div ng-if="vm.selectedTicket.remarks"
+                        style="padding: 1rem; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; margin-bottom: 1rem;">
+                        <strong
+                            style="font-size: 0.82rem; color: #92400e; display: block; margin-bottom: 0.25rem;">Vendor
+                            Remarks</strong>
+                        <p style="font-size: 0.85rem; color: #78350f; margin: 0;">{{vm.selectedTicket.remarks}}</p>
+                    </div>
+
+                    <div ng-if="vm.selectedTicket.timeline" style="margin-top: 1rem;">
+                        <h4 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;">Progress Timeline</h4>
+                        <div ng-repeat="step in vm.selectedTicket.timeline" class="timeline-step" ng-class="step.state"
+                            style="display:flex; align-items:flex-start; gap:0.75rem; padding-bottom:0.75rem;">
+                            <div class="timeline-dot"
+                                style="width:10px; height:10px; border-radius:50%; margin-top:4px; flex-shrink:0;">
+                            </div>
+                            <div>
+                                <strong style="font-size:0.82rem;">{{step.label}}</strong>
+                                <small ng-if="step.date"
+                                    style="display:block; color:#6b7280; font-size:0.75rem;">{{step.date}}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"
+                    style="padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb; display:flex; gap:0.75rem;">
+                    <button class="btn-primary" style="flex:1;" ng-click="vm.closeTicketModal()">Close</button>
+                    <button class="btn-text-danger"
+                        ng-click="vm.escalateTicket(vm.selectedTicket); vm.closeTicketModal();">
+                        <i data-lucide="alert-triangle"></i> Escalate
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Apply for Service Modal -->
+        <div class="modal-overlay" ng-show="vm.showApplyModal" ng-click="vm.closeApplyModal()"></div>
+        <div class="utility-modal" ng-show="vm.showApplyModal" ng-class="{'active': vm.showApplyModal}">
+            <div class="modal-content" style="max-width: 520px;">
+                <div class="modal-header">
+                    <h2 class="modal-title">
+                        <i data-lucide="clipboard-check"></i>
+                        Apply for Service
+                    </h2>
+                    <button class="modal-close" ng-click="vm.closeApplyModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;" ng-if="vm.selectedService">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <div
+                            style="width:60px; height:60px; border-radius:16px; background: linear-gradient(135deg, #f59e0b, #f97316); display:flex; align-items:center; justify-content:center; margin: 0 auto 0.75rem;">
+                            <i data-lucide="{{vm.selectedService.icon}}"
+                                style="color: white; width:28px; height:28px;"></i>
+                        </div>
+                        <h3 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.25rem;">
+                            {{vm.selectedService.name}}</h3>
+                        <p style="font-size: 0.85rem; color: #6b7280;">{{vm.selectedService.description}}</p>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:0.75rem; margin-bottom: 1.5rem;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
+                            <span
+                                style="font-size:0.85rem; color:#374151; display:flex; align-items:center; gap:0.5rem;">
+                                <i data-lucide="clock" style="width:14px; height:14px;"></i> Processing Time
+                            </span>
+                            <strong style="font-size:0.88rem;">{{vm.selectedService.processingTime}}</strong>
+                        </div>
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
+                            <span
+                                style="font-size:0.85rem; color:#374151; display:flex; align-items:center; gap:0.5rem;">
+                                <i data-lucide="file-text" style="width:14px; height:14px;"></i> Documents Required
+                            </span>
+                            <strong style="font-size:0.88rem;">{{vm.selectedService.documentsRequired}} docs</strong>
+                        </div>
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; background:#f0fdf4; border-radius:10px; border:1px solid #dcfce7;">
+                            <span
+                                style="font-size:0.85rem; color:#374151; display:flex; align-items:center; gap:0.5rem;">
+                                <i data-lucide="indian-rupee" style="width:14px; height:14px;"></i> Fee
+                            </span>
+                            <strong style="font-size:0.88rem; color:#16a34a;">Free / As applicable</strong>
+                        </div>
+                    </div>
+
+                    <div
+                        style="padding:0.85rem 1rem; background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; font-size:0.8rem; color:#1e40af;">
+                        <i data-lucide="info"
+                            style="width:14px; height:14px; display:inline; vertical-align:middle;"></i>
+                        Your request will be forwarded to the respective utility authority. You'll receive a
+                        confirmation SMS with your application ID.
+                    </div>
+                </div>
+                <div class="modal-footer"
+                    style="padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb; display:flex; gap:0.75rem;">
+                    <button class="btn-secondary" style="flex:1;" ng-click="vm.closeApplyModal()">Cancel</button>
+                    <button class="btn-primary" style="flex:1;" ng-click="vm.confirmApplyService()">
+                        <i data-lucide="check"></i> Confirm & Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> <!-- /.main-content -->

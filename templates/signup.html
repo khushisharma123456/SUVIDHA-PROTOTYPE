@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suvidha - Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #00703C;
+            --primary-green-light: #00A651;
+            --primary-blue: #1D70B8;
+            --primary-blue-dark: #0055A4;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { font-size: 16px; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: var(--gray-900);
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.78)),
+                url('/static/images/backdrop.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .signup-page {
+            width: 100%;
+            max-width: 600px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Logo */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .logo-row img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+
+        .logo-fallback {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00A651, #00703C);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+        }
+
+        .logo-text {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        /* Card */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem 2.25rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-subtitle {
+            font-size: 0.95rem;
+            color: var(--gray-500);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .step-dot {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--gray-200);
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: linear-gradient(135deg, #00A651, #00703C);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 112, 60, 0.3);
+        }
+
+        .step-dot.completed {
+            background: #00A651;
+            color: white;
+        }
+
+        .step-connector {
+            width: 40px;
+            height: 3px;
+            background: var(--gray-200);
+            transition: background 0.3s ease;
+        }
+
+        .step-connector.done {
+            background: #00A651;
+        }
+
+        .step-label {
+            position: absolute;
+            top: 40px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--gray-400);
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .step-dot.active .step-label { color: var(--primary-green); }
+        .step-dot.completed .step-label { color: #00A651; }
+
+        /* Form Sections */
+        .form-section {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .section-desc {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            margin-bottom: 1.25rem;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.35rem;
+        }
+
+        .form-group label .required { color: #ef4444; }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 0.9rem;
+        }
+
+        .input-wrap input,
+        .input-wrap select,
+        .input-wrap textarea {
+            width: 100%;
+            padding: 0.75rem 0.75rem 0.75rem 2.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-family: var(--font-primary);
+            color: var(--gray-900);
+            background: white;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+
+        .input-wrap textarea {
+            resize: vertical;
+            min-height: 70px;
+            padding-top: 0.75rem;
+        }
+
+        .input-wrap input:focus,
+        .input-wrap select:focus,
+        .input-wrap textarea:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(0, 112, 60, 0.1);
+        }
+
+        .input-wrap input::placeholder,
+        .input-wrap textarea::placeholder {
+            color: var(--gray-400);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .form-helper {
+            font-size: 0.72rem;
+            color: var(--gray-400);
+            margin-top: 0.2rem;
+        }
+
+        /* Radio / Checkbox groups */
+        .radio-group, .checkbox-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.25rem;
+        }
+
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+        }
+
+        .radio-option input, .checkbox-option input {
+            accent-color: var(--primary-green);
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Role Cards for Step 1 */
+        .role-select-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-select-card {
+            border-radius: 14px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2.5px solid transparent;
+            position: relative;
+        }
+
+        .role-select-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .role-select-card.selected {
+            box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+        }
+
+        .role-select-card i.role-icon { font-size: 1.75rem; margin-bottom: 0.4rem; display: block; }
+        .role-select-card .role-name { font-weight: 700; font-size: 0.82rem; }
+        .role-select-card .role-desc { font-size: 0.68rem; opacity: 0.75; margin-top: 0.15rem; }
+
+        .role-select-card .check-mark {
+            position: absolute; top: 6px; right: 6px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: white; display: none; align-items: center;
+            justify-content: center; font-size: 0.6rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .role-select-card.selected .check-mark { display: flex; }
+
+        .rc-citizen { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); }
+        .rc-citizen i.role-icon { color: #43a047; }
+        .rc-citizen .role-name { color: #2e7d32; }
+        .rc-citizen .role-desc { color: #4a7c59; }
+        .rc-citizen.selected { border-color: #43a047; }
+        .rc-citizen .check-mark { color: #43a047; }
+
+        .rc-senior { background: linear-gradient(135deg, #fce4ec, #f8bbd0); }
+        .rc-senior i.role-icon { color: #e91e63; }
+        .rc-senior .role-name { color: #c2185b; }
+        .rc-senior .role-desc { color: #8e3a5e; }
+        .rc-senior.selected { border-color: #e91e63; }
+        .rc-senior .check-mark { color: #e91e63; }
+
+        .rc-agent { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+        .rc-agent i.role-icon { color: #ff9800; }
+        .rc-agent .role-name { color: #e65100; }
+        .rc-agent .role-desc { color: #8d5e00; }
+        .rc-agent.selected { border-color: #ff9800; }
+        .rc-agent .check-mark { color: #ff9800; }
+
+        .rc-official { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+        .rc-official i.role-icon { color: #1e88e5; }
+        .rc-official .role-name { color: #0d47a1; }
+        .rc-official .role-desc { color: #2a5da8; }
+        .rc-official.selected { border-color: #1e88e5; }
+        .rc-official .check-mark { color: #1e88e5; }
+
+        /* File upload */
+        .file-upload {
+            position: relative;
+        }
+
+        .file-upload input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            background: var(--gray-50);
+            color: var(--gray-600);
+            transition: all 0.25s ease;
+        }
+
+        .file-upload input[type="file"]:hover {
+            border-color: var(--primary-green);
+            background: #f0fff4;
+        }
+
+        /* Toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .toggle-row span { font-size: 0.9rem; color: var(--gray-700); }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--gray-300);
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider { background: #00A651; }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .btn-primary, .btn-secondary {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: var(--font-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00A651, #00703C);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00b85c, #008048);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 112, 60, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 2px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--gray-300);
+            background: var(--gray-50);
+        }
+
+        /* Links */
+        .links {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.85rem;
+        }
+
+        .links a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            text-align: center;
+            margin-top: 1.25rem;
+        }
+
+        .back-home a {
+            color: var(--gray-500);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .back-home a:hover { color: var(--primary-green); }
+
+        /* Error / Success */
+        .msg-box {
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .msg-box.error { background: #fef2f2; color: #dc2626; }
+        .msg-box.success { background: #f0fdf4; color: #16a34a; }
+        .msg-box.show { display: flex; }
+
+        /* Conditional fields */
+        .conditional-fields {
+            display: none;
+        }
+
+        .conditional-fields.visible {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .card { padding: 1.5rem 1.25rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .role-select-grid { gap: 0.5rem; }
+            .role-select-card { padding: 0.75rem; }
+            .role-select-card i.role-icon { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signup-page">
+        <!-- Logo -->
+        <div class="logo-section">
+            <div class="logo-row">
+                <img src="/static/images/suvidha logo.jpg" alt="Suvidha" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="logo-fallback" style="display:none;"><i class="fas fa-city"></i></div>
+                <span class="logo-text">Suvidha</span>
+            </div>
+        </div>
+
+        <!-- Signup Card -->
+        <div class="card">
+            <h1 class="card-title">Create Your Account</h1>
+            <p class="card-subtitle">Join Suvidha — Smart city services at your fingertips</p>
+
+            <!-- Progress -->
+            <div class="progress-bar" id="progressBar">
+                <div class="step-dot active" id="dot-1">1<span class="step-label">Role</span></div>
+                <div class="step-connector" id="conn-1"></div>
+                <div class="step-dot" id="dot-2">2<span class="step-label">Personal</span></div>
+                <div class="step-connector" id="conn-2"></div>
+                <div class="step-dot" id="dot-3">3<span class="step-label">Contact</span></div>
+                <div class="step-connector" id="conn-3"></div>
+                <div class="step-dot" id="dot-4">4<span class="step-label">Details</span></div>
+                <div class="step-connector" id="conn-4"></div>
+                <div class="step-dot" id="dot-5">5<span class="step-label">Security</span></div>
+            </div>
+
+            <div class="msg-box error" id="errorMsg">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText"></span>
+            </div>
+            <div class="msg-box success" id="successMsg">
+                <i class="fas fa-check-circle"></i>
+                <span id="successText"></span>
+            </div>
+
+            <form id="signupForm" onsubmit="handleSignup(event)">
+
+                <!-- STEP 1: Role Selection -->
+                <div class="form-section active" id="step-1">
+                    <h2 class="section-title">Select Your Role</h2>
+                    <p class="section-desc">Choose how you'll use Suvidha</p>
+
+                    <div class="role-select-grid">
+                        <div class="role-select-card rc-citizen" onclick="pickRole('citizen')" id="rc-citizen">
+                            <span class="check-mark"><i class="fas fa-check"></i></span>
+                            <i class="fas fa-user role-icon"></i>
+                            <div class="role-name">General Citizen</div>
+                            <div class="role-desc">Bills, services & community</div>
+                        </div>
+                        <div class="role-select-card rc-senior" onclick="pickRole('senior')" id="rc-senior">
+                            <span class="check-mark"><i class="fas fa-check"></i></span>
+                            <i class="fas fa-hands-helping role-icon"></i>
+                            <div class="role-name">Senior Citizen</div>
+                            <div class="role-desc">Simplified, accessible tools</div>
+                        </div>
+                        <div class="role-select-card rc-agent" onclick="pickRole('agent')" id="rc-agent">
+                            <span class="check-mark"><i class="fas fa-check"></i></span>
+                            <i class="fas fa-hard-hat role-icon"></i>
+                            <div class="role-name">Field Agent</div>
+                            <div class="role-desc">Operations & meter reading</div>
+                        </div>
+                        <div class="role-select-card rc-official" onclick="pickRole('official')" id="rc-official">
+                            <span class="check-mark"><i class="fas fa-check"></i></span>
+                            <i class="fas fa-landmark role-icon"></i>
+                            <div class="role-name">Govt. Official</div>
+                            <div class="role-desc">Admin & grievance mgmt</div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <div></div>
+                        <button type="button" class="btn-primary" onclick="nextStep(1)" id="step1Next" disabled>Continue</button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Personal Information -->
+                <div class="form-section" id="step-2">
+                    <h2 class="section-title">Personal Information</h2>
+                    <p class="section-desc">Tell us about yourself</p>
+
+                    <div class="form-group">
+                        <label>Full Name <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="fullName" placeholder="Enter your full name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of Birth <span class="required">*</span></label>
+                            <div class="input-wrap">
+                                <i class="fas fa-calendar"></i>
+                                <input type="date" id="dob" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender <span class="required">*</span></label>
+                            <div class="radio-group" style="margin-top:0.5rem;">
+                                <label class="radio-option">
+                                    <input type="radio" name="gender" value="Male" required> Male
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="gender" value="Female"> Female
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="gender" value="Other"> Other
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preferred Language</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-globe"></i>
+                            <select id="language">
+                                <option value="en">English</option>
+                                <option value="hi">हिंदी (Hindi)</option>
+                                <option value="ta">தமிழ் (Tamil)</option>
+                                <option value="te">తెలుగు (Telugu)</option>
+                                <option value="bn">বাংলা (Bengali)</option>
+                                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                                <option value="mr">मराठी (Marathi)</option>
+                                <option value="gu">ગુજરાતી (Gujarati)</option>
+                                <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Field Agent / Official specific -->
+                    <div class="conditional-fields" id="empFields">
+                        <div class="form-group">
+                            <label>Employee ID <span class="required">*</span></label>
+                            <div class="input-wrap">
+                                <i class="fas fa-id-badge"></i>
+                                <input type="text" id="employeeId" placeholder="Enter your Employee ID">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Department <span class="required">*</span></label>
+                                <div class="input-wrap">
+                                    <i class="fas fa-building"></i>
+                                    <select id="department">
+                                        <option value="">-- Select --</option>
+                                        <option value="water">Water Supply</option>
+                                        <option value="electricity">Electricity</option>
+                                        <option value="waste">Waste Management</option>
+                                        <option value="roads">Roads & Infrastructure</option>
+                                        <option value="health">Public Health</option>
+                                        <option value="revenue">Revenue & Tax</option>
+                                        <option value="grievance">Grievance Cell</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Designation</label>
+                                <div class="input-wrap">
+                                    <i class="fas fa-briefcase"></i>
+                                    <input type="text" id="designation" placeholder="e.g. Junior Engineer">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button type="button" class="btn-secondary" onclick="prevStep(2)">Back</button>
+                        <button type="button" class="btn-primary" onclick="nextStep(2)">Continue</button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Contact Information -->
+                <div class="form-section" id="step-3">
+                    <h2 class="section-title">Contact Information</h2>
+                    <p class="section-desc">We'll use this for verification & communication</p>
+
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" placeholder="Enter your email address" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="phone" placeholder="Enter your phone number (with country code)" required>
+                        </div>
+                        <p class="form-helper">We'll send an OTP for verification</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <i class="fas fa-map-marker-alt" style="top:22px;transform:none;"></i>
+                            <textarea id="address" placeholder="Enter your full address"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>State <span class="required">*</span></label>
+                            <div class="input-wrap">
+                                <i class="fas fa-map"></i>
+                                <select id="state" required>
+                                    <option value="">-- Select State --</option>
+                                    <option value="delhi">Delhi</option>
+                                    <option value="maharashtra">Maharashtra</option>
+                                    <option value="karnataka">Karnataka</option>
+                                    <option value="tamilnadu">Tamil Nadu</option>
+                                    <option value="telangana">Telangana</option>
+                                    <option value="westbengal">West Bengal</option>
+                                    <option value="gujarat">Gujarat</option>
+                                    <option value="rajasthan">Rajasthan</option>
+                                    <option value="up">Uttar Pradesh</option>
+                                    <option value="kerala">Kerala</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>City <span class="required">*</span></label>
+                            <div class="input-wrap">
+                                <i class="fas fa-city"></i>
+                                <select id="city" required>
+                                    <option value="">-- Select City --</option>
+                                    <option value="delhi">New Delhi</option>
+                                    <option value="mumbai">Mumbai</option>
+                                    <option value="bangalore">Bangalore</option>
+                                    <option value="chennai">Chennai</option>
+                                    <option value="hyderabad">Hyderabad</option>
+                                    <option value="kolkata">Kolkata</option>
+                                    <option value="pune">Pune</option>
+                                    <option value="ahmedabad">Ahmedabad</option>
+                                    <option value="jaipur">Jaipur</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ward <span class="required">*</span></label>
+                            <div class="input-wrap">
+                                <i class="fas fa-map-pin"></i>
+                                <select id="ward" required>
+                                    <option value="">-- Select Ward --</option>
+                                    <option value="ward-1">Ward 1</option>
+                                    <option value="ward-2">Ward 2</option>
+                                    <option value="ward-3">Ward 3</option>
+                                    <option value="ward-4">Ward 4</option>
+                                    <option value="ward-5">Ward 5</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Locality / Block <span class="required">*</span></label>
+                            <div class="input-wrap">
+                                <i class="fas fa-home"></i>
+                                <input type="text" id="locality" placeholder="Enter locality or block" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button type="button" class="btn-secondary" onclick="prevStep(3)">Back</button>
+                        <button type="button" class="btn-primary" onclick="nextStep(3)">Continue</button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Government ID & Service Providers -->
+                <div class="form-section" id="step-4">
+                    <h2 class="section-title">Government ID & Services</h2>
+                    <p class="section-desc">Link your identity and utility providers</p>
+
+                    <div class="form-group">
+                        <label>Aadhaar Number (Optional)</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-id-card"></i>
+                            <input type="text" id="aadhaar" placeholder="XXXX-XXXX-XXXX" maxlength="14" oninput="formatAadhaar(this)">
+                        </div>
+                        <p class="form-helper">Helps securely link utility services. This is optional.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-option" style="font-size:0.85rem;">
+                            <input type="checkbox" id="aadhaarConsent"> I consent to use Aadhaar for service verification
+                        </label>
+                    </div>
+
+                    <!-- Utility providers - only for citizen / senior -->
+                    <div id="utilityFields">
+                        <div class="form-group">
+                            <label>Electricity Provider</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-bolt"></i>
+                                <select id="electricityProvider">
+                                    <option value="">-- Select Provider --</option>
+                                    <option value="bses">BSES Yamuna Power Ltd</option>
+                                    <option value="tata">Tata Power Delhi</option>
+                                    <option value="cesc">CESC Limited</option>
+                                    <option value="torrent">Torrent Power</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Water Provider</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-tint"></i>
+                                <select id="waterProvider">
+                                    <option value="">-- Select Provider --</option>
+                                    <option value="djb">Delhi Jal Board</option>
+                                    <option value="bmc">Brihanmumbai Municipal Corporation</option>
+                                    <option value="bwssb">Bangalore Water Supply & Sewerage Board</option>
+                                    <option value="cmwssb">Chennai Metropolitan Water Supply</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gas Service</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-fire"></i>
+                                <select id="gasProvider">
+                                    <option value="">-- Select Provider --</option>
+                                    <option value="indane">Indane (Cylinder)</option>
+                                    <option value="hp">HP Gas (Cylinder)</option>
+                                    <option value="png">PNG (Pipeline Natural Gas)</option>
+                                    <option value="bharat">Bharat Gas</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Photograph (Optional)</label>
+                        <div class="file-upload">
+                            <input type="file" id="photo" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button type="button" class="btn-secondary" onclick="prevStep(4)">Back</button>
+                        <button type="button" class="btn-primary" onclick="nextStep(4)">Continue</button>
+                    </div>
+                </div>
+
+                <!-- STEP 5: Security / Password -->
+                <div class="form-section" id="step-5">
+                    <h2 class="section-title">Security Setup</h2>
+                    <p class="section-desc">Create a secure password for your account</p>
+
+                    <div class="form-group">
+                        <label>Password <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="Create a password (min 8 characters)" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirmPassword" placeholder="Re-enter your password" required>
+                        </div>
+                    </div>
+
+                    <div class="toggle-row">
+                        <span>Enable SMS / App Alerts</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="alertsEnabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="btn-row">
+                        <button type="button" class="btn-secondary" onclick="prevStep(5)">Back</button>
+                        <button type="submit" class="btn-primary" id="submitBtn">Create My Account</button>
+                    </div>
+                </div>
+
+            </form>
+
+            <div class="links">
+                Already have an account? <a href="/login">Log In</a>
+            </div>
+        </div>
+
+        <div class="back-home">
+            <a href="/"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedRole = null;
+        const totalSteps = 5;
+
+        // Role selection
+        function pickRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-select-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('rc-' + role).classList.add('selected');
+            document.getElementById('step1Next').disabled = false;
+
+            // Show/hide role-specific fields
+            const empFields = document.getElementById('empFields');
+            const utilityFields = document.getElementById('utilityFields');
+            if (role === 'agent' || role === 'official') {
+                empFields.classList.add('visible');
+                utilityFields.style.display = 'none';
+            } else {
+                empFields.classList.remove('visible');
+                utilityFields.style.display = 'block';
+            }
+        }
+
+        // Step navigation
+        function nextStep(from) {
+            if (!validateStep(from)) return;
+            if (from < totalSteps) {
+                goToStep(from + 1);
+            }
+        }
+
+        function prevStep(from) {
+            if (from > 1) {
+                goToStep(from - 1);
+            }
+        }
+
+        function goToStep(step) {
+            // Hide all sections
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById('step-' + i).classList.remove('active');
+                const dot = document.getElementById('dot-' + i);
+                dot.classList.remove('active');
+                if (i < step) {
+                    dot.classList.add('completed');
+                } else {
+                    dot.classList.remove('completed');
+                }
+                if (i < totalSteps) {
+                    const conn = document.getElementById('conn-' + i);
+                    conn.classList.toggle('done', i < step);
+                }
+            }
+            document.getElementById('step-' + step).classList.add('active');
+            document.getElementById('dot-' + step).classList.add('active');
+            currentStep = step;
+            hideMessages();
+        }
+
+        // Validation
+        function validateStep(step) {
+            hideMessages();
+            switch (step) {
+                case 1:
+                    if (!selectedRole) {
+                        showError('Please select a role to continue.');
+                        return false;
+                    }
+                    return true;
+                case 2:
+                    const fullName = document.getElementById('fullName').value.trim();
+                    const dob = document.getElementById('dob').value;
+                    const gender = document.querySelector('input[name="gender"]:checked');
+                    if (!fullName) { showError('Please enter your full name.'); return false; }
+                    if (!dob) { showError('Please select your date of birth.'); return false; }
+                    if (!gender) { showError('Please select your gender.'); return false; }
+                    if ((selectedRole === 'agent' || selectedRole === 'official') && !document.getElementById('employeeId').value.trim()) {
+                        showError('Please enter your Employee ID.');
+                        return false;
+                    }
+                    if ((selectedRole === 'agent' || selectedRole === 'official') && !document.getElementById('department').value) {
+                        showError('Please select your department.');
+                        return false;
+                    }
+                    return true;
+                case 3:
+                    const email = document.getElementById('email').value.trim();
+                    const phone = document.getElementById('phone').value.trim();
+                    const state = document.getElementById('state').value;
+                    const city = document.getElementById('city').value;
+                    const ward = document.getElementById('ward').value;
+                    const locality = document.getElementById('locality').value.trim();
+                    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Please enter a valid email address.'); return false; }
+                    if (!phone) { showError('Please enter your phone number.'); return false; }
+                    if (!state) { showError('Please select your state.'); return false; }
+                    if (!city) { showError('Please select your city.'); return false; }
+                    if (!ward) { showError('Please select your ward.'); return false; }
+                    if (!locality) { showError('Please enter your locality.'); return false; }
+                    return true;
+                case 4:
+                    return true; // All optional
+                case 5:
+                    return true; // Handled in submit
+            }
+        }
+
+        // Aadhaar formatting
+        function formatAadhaar(el) {
+            let val = el.value.replace(/\D/g, '');
+            if (val.length > 0) { val = val.match(/.{1,4}/g).join('-'); }
+            el.value = val.substring(0, 14);
+        }
+
+        // Form submission
+        function handleSignup(e) {
+            e.preventDefault();
+
+            const pw = document.getElementById('password').value;
+            const cpw = document.getElementById('confirmPassword').value;
+
+            if (pw.length < 8) { showError('Password must be at least 8 characters.'); return; }
+            if (pw !== cpw) { showError('Passwords do not match.'); return; }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creating Account...';
+
+            const payload = {
+                fullName: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                password: pw,
+                language: document.getElementById('language').value,
+                state: document.getElementById('state').value,
+                city: document.getElementById('city').value,
+                ward: document.getElementById('ward').value,
+                locality: document.getElementById('locality').value.trim(),
+                aadhaar: document.getElementById('aadhaar').value,
+                consent: document.getElementById('aadhaarConsent').checked,
+                electricityProvider: document.getElementById('electricityProvider')?.value || '',
+                waterProvider: document.getElementById('waterProvider')?.value || '',
+                gasProvider: document.getElementById('gasProvider')?.value || '',
+                alertsEnabled: document.getElementById('alertsEnabled').checked,
+                role: selectedRole,
+                dob: document.getElementById('dob').value,
+                gender: document.querySelector('input[name="gender"]:checked')?.value || '',
+                address: document.getElementById('address').value.trim(),
+                employeeId: document.getElementById('employeeId')?.value?.trim() || '',
+                department: document.getElementById('department')?.value || '',
+                designation: document.getElementById('designation')?.value?.trim() || ''
+            };
+
+            fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.textContent = 'Create My Account';
+
+                if (data.success) {
+                    localStorage.setItem('suvidhaUser', JSON.stringify(data.user));
+                    localStorage.setItem('user_id', data.user_id);
+
+                    // Store portal-specific auth keys
+                    if (selectedRole === 'official') {
+                        localStorage.setItem('currentOfficial', JSON.stringify(data.user));
+                        localStorage.setItem('adminToken', data.token || '');
+                    }
+4
+                    showSuccess('Account created successfully! Redirecting...');
+                    setTimeout(() => {
+                        switch (selectedRole) {
+                            case 'citizen':
+                                window.location.href = '/app#!/dashboard';
+                                break;
+                            case 'senior':
+                                window.location.href = '/SeniorCitizen/app/views/dashboard.html';
+                                break;
+                            case 'agent':
+                                window.location.href = '/GovOfficial-Worker/app/views/dashboard.html';
+                                break;
+                            case 'official':
+                                window.location.href = '/GovOfficials-Admin/app/views/dashboard.html';
+                                break;
+                            default:
+                                window.location.href = '/app#!/dashboard';
+                        }
+                    }, 1500);
+                } else {
+                    showError(data.message || 'Account creation failed. Please try again.');
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.textContent = 'Create My Account';
+                showError('Something went wrong. Please try again.');
+            });
+        }
+
+        function showError(msg) {
+            document.getElementById('successMsg').classList.remove('show');
+            const el = document.getElementById('errorMsg');
+            document.getElementById('errorText').textContent = msg;
+            el.classList.add('show');
+        }
+
+        function showSuccess(msg) {
+            document.getElementById('errorMsg').classList.remove('show');
+            const el = document.getElementById('successMsg');
+            document.getElementById('successText').textContent = msg;
+            el.classList.add('show');
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMsg').classList.remove('show');
+            document.getElementById('successMsg').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

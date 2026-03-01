@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="landingApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suvidha - Smart City Services</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-blue: #1D70B8;
+            --primary-blue-dark: #0055A4;
+            --success-green: #00703C;
+            --success-green-light: #00A651;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        /* Reset */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: var(--gray-900);
+            background: linear-gradient(135deg, rgba(26, 54, 93, 0.05) 0%, rgba(44, 82, 130, 0.03) 100%),
+                url('../../images/backdrop.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        [ng-cloak] { display: none !important; }
+
+        /* Landing Page Styles */
+        .landing-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+        }
+
+        .landing-content {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem 1.5rem;
+            text-align: center;
+        }
+
+        /* Logo Section */
+        .landing-header { margin-bottom: 1rem; }
+
+        .landing-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .landing-logo .logo-img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .landing-logo .logo-fallback {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00A651, #00703C);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .landing-logo .logo-text {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00703C;
+            letter-spacing: 0.5px;
+        }
+
+        /* Welcome Section */
+        .landing-welcome { margin-bottom: 1.5rem; }
+
+        .welcome-title {
+            font-family: var(--font-heading);
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-tagline {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+        }
+
+        .welcome-description {
+            font-size: 1rem;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        /* Auth Buttons */
+        .landing-auth-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .auth-btn {
+            padding: 0.875rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            min-width: 140px;
+        }
+
+        .auth-btn.login-btn {
+            background: white;
+            color: #00703C;
+            border-color: #00703C;
+        }
+
+        .auth-btn.login-btn:hover {
+            background: #f0fff4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 112, 60, 0.2);
+        }
+
+        .auth-btn.signup-btn {
+            background: linear-gradient(135deg, #00A651, #00703C);
+            color: white;
+            border-color: transparent;
+        }
+
+        .auth-btn.signup-btn:hover {
+            background: linear-gradient(135deg, #00b85c, #008048);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 112, 60, 0.3);
+        }
+
+        /* Utility Cards */
+        .utility-cards {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .utility-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 1rem;
+            width: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .utility-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .utility-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .utility-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .utility-icon i { font-size: 2rem; }
+
+        .utility-icon.waste { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); }
+        .utility-icon.waste i { color: #43a047; }
+
+        .utility-icon.water { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+        .utility-icon.water i { color: #1e88e5; }
+
+        .utility-icon.electricity { background: linear-gradient(135deg, #fffde7, #fff9c4); }
+        .utility-icon.electricity i { color: #fbc02d; }
+
+        .utility-icon.gas { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+        .utility-icon.gas i { color: #fb8c00; }
+
+        .utility-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        /* Trust Section */
+        .trust-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #00703C;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .trust-badge i { font-size: 1.25rem; }
+
+        .trust-text {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .trust-text strong { color: var(--gray-800); }
+
+        /* Role Cards */
+        .role-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 250, 255, 0.95) 100%);
+            border-radius: 16px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary-blue);
+        }
+
+        .role-header {
+            background: linear-gradient(135deg, #e3f2fd, #f5f5f5);
+            color: var(--gray-700);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .role-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .role-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .role-image i { font-size: 2.5rem; }
+
+        .role-image.citizens { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); }
+        .role-image.citizens i { color: #43a047; }
+
+        .role-image.seniors { background: linear-gradient(135deg, #fce4ec, #f8bbd9); }
+        .role-image.seniors i { color: #e91e63; }
+
+        .role-image.officials { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+        .role-image.officials i { color: #1e88e5; }
+
+        .role-image.kiosk { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+        .role-image.kiosk i { color: #ff9800; }
+
+        .role-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .role-description {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* Footer */
+        .landing-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .footer-link {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover { color: var(--primary-blue); }
+
+        .footer-divider {
+            color: var(--gray-400);
+            font-size: 0.8rem;
+        }
+
+        /* Language Selector */
+        .language-selector-floating {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+        }
+
+        .language-selector-floating .lang-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            color: var(--gray-600);
+        }
+
+        .language-selector-floating .lang-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .language-selector-floating .lang-btn:hover:not(.active) {
+            background: var(--gray-100);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-title { font-size: 1.75rem; }
+            .welcome-tagline { font-size: 1.1rem; }
+            .role-cards { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .role-image { width: 65px; height: 65px; }
+            .utility-card { width: 90px; padding: 0.75rem; }
+            .utility-icon { width: 55px; height: 55px; }
+        }
+
+        @media (max-width: 480px) {
+            .landing-logo .logo-text { font-size: 1.5rem; }
+            .welcome-title { font-size: 1.5rem; }
+            .utility-card { width: 75px; padding: 0.5rem; }
+            .utility-icon { width: 45px; height: 45px; }
+            .role-image { width: 55px; height: 55px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-page" ng-controller="LandingController" ng-cloak>
+        <!-- Main Content -->
+        <div class="landing-content">
+            <!-- Logo & Title Section -->
+            <div class="landing-header">
+                <div class="landing-logo">
+                    <img src="../../images/suvidha logo.jpg" alt="Suvidha" class="logo-img">
+                    <span class="logo-text">Suvidha</span>
+                </div>
+            </div>
+
+            <!-- Welcome Section -->
+            <div class="landing-welcome">
+                <h1 class="welcome-title">Welcome to Suvidha</h1>
+                <p class="welcome-tagline">Smart Cities, Efficiently Managed.</p>
+                <p class="welcome-description">
+                    Integrated platform for real-time management of waste,<br>
+                    water, electricity, gas, and civic services.
+                </p>
+            </div>
+
+            <!-- Auth Buttons -->
+            <div class="landing-auth-buttons">
+                <button class="auth-btn login-btn" ng-click="goToLogin()">
+                    Log In
+                </button>
+                <button class="auth-btn signup-btn" ng-click="goToSignup()">
+                    Sign Up
+                </button>
+            </div>
+
+            <!-- Utility Cards -->
+            <div class="utility-cards">
+                <div class="utility-card">
+                    <div class="utility-icon waste">
+                        <img src="../../images/waste.jpg" alt="Waste">
+                    </div>
+                    <span class="utility-label">Waste</span>
+                </div>
+                <div class="utility-card">
+                    <div class="utility-icon water">
+                        <img src="../../images/waterlanding.jpg" alt="Water">
+                    </div>
+                    <span class="utility-label">Water</span>
+                </div>
+                <div class="utility-card">
+                    <div class="utility-icon electricity">
+                        <img src="../../images/electricity.jpg" alt="Electricity">
+                    </div>
+                    <span class="utility-label">Electricity</span>
+                </div>
+                <div class="utility-card">
+                    <div class="utility-icon gas">
+                        <img src="../../images/gaslanding.jpg" alt="Gas">
+                    </div>
+                    <span class="utility-label">Gas</span>
+                </div>
+            </div>
+
+            <!-- Trust Badge -->
+            <div class="trust-section">
+                <div class="trust-badge">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Secure & Verified</span>
+                </div>
+                <p class="trust-text">Trusted by over <strong>150,000+</strong> users</p>
+            </div>
+
+            <!-- Role Selection Cards -->
+            <div class="role-cards">
+                <div class="role-card" ng-click="selectRole('citizen')">
+                    <div class="role-header">Citizens</div>
+                    <div class="role-image citizens">
+                        <img src="../../images/citizens.jpg" alt="Citizens">
+                    </div>
+                    <div class="role-title">Citizens</div>
+                    <div class="role-description">Convenient access<br>to city services</div>
+                </div>
+                <div class="role-card" ng-click="selectRole('senior')">
+                    <div class="role-header">Senior Citizens</div>
+                    <div class="role-image seniors">
+                        <img src="../../images/seniorcitizen.jpg" alt="Senior Citizens">
+                    </div>
+                    <div class="role-title">Senior Citizens</div>
+                    <div class="role-description">Simplified, accessible<br>tools for seniors</div>
+                </div>
+                <div class="role-card" ng-click="selectRole('official')">
+                    <div class="role-header">Government Officials</div>
+                    <div class="role-image officials">
+                        <img src="../../images/govOfficials.jpg" alt="Government Officials">
+                    </div>
+                    <div class="role-title">Government Officials</div>
+                    <div class="role-description">Real-time monitoring<br>for city management</div>
+                </div>
+                <div class="role-card" ng-click="selectRole('kiosk')">
+                    <div class="role-header">Kiosk Mode</div>
+                    <div class="role-image kiosk">
+                        <img src="../../images/kioskMode.jpg" alt="Kiosk Mode">
+                    </div>
+                    <div class="role-title">Kiosk Mode</div>
+                    <div class="role-description">Public kiosks for<br>quick service updates</div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="landing-footer">
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy</a>
+                    <span class="footer-divider">|</span>
+                    <a href="#" class="footer-link">Terms</a>
+                    <span class="footer-divider">|</span>
+                    <a href="#" class="footer-link">About Us</a>
+                </div>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Contact</a>
+                    <span class="footer-divider">|</span>
+                    <a href="#" class="footer-link">Support</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Language Selector -->
+        <div class="language-selector-floating">
+            <button class="lang-btn" ng-class="{active: currentLang === 'en'}" ng-click="setLanguage('en')">EN</button>
+            <button class="lang-btn" ng-class="{active: currentLang === 'hi'}" ng-click="setLanguage('hi')">हिंदी</button>
+        </div>
+    </div>
+
+    <script>
+        // AngularJS App for Landing Page
+        angular.module('landingApp', [])
+            .controller('LandingController', ['$scope', '$window', function($scope, $window) {
+                $scope.currentLang = 'en';
+
+                $scope.goToLogin = function() {
+                    // Navigate to auth page with login mode
+                    $window.location.href = '../../../templates/index.html#!/auth?mode=login';
+                };
+
+                $scope.goToSignup = function() {
+                    // Navigate to auth page with signup mode
+                    $window.location.href = '../../../templates/index.html#!/auth?mode=signup';
+                };
+
+                $scope.selectRole = function(role) {
+                    switch(role) {
+                        case 'citizen':
+                            $window.location.href = '../../../templates/index.html#!/dashboard';
+                            break;
+                        case 'senior':
+                            $window.location.href = '../../../SeniorCitizen/app/views/dashboard.html';
+                            break;
+                        case 'official':
+                            $window.location.href = '../../../GovOfficials-Admin/app/views/dashboard.html';
+                            break;
+                        case 'kiosk':
+                            $window.location.href = '../../../templates/index.html#!/dashboard?mode=kiosk';
+                            break;
+                    }
+                };
+
+                $scope.setLanguage = function(lang) {
+                    $scope.currentLang = lang;
+                    // You can add translation logic here
+                };
+            }]);
+    </script>
+</body>
+</html>
+iv>
+</div>
