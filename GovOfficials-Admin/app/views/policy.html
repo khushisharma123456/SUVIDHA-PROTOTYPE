@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="adminApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Policy Insights - Suvidha City Control Room</title>
+    <link rel="stylesheet" href="../../css/gov-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .policy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--gov-gray-200);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        .policy-recommendations {
+            grid-column: span 2;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--gov-gray-200);
+        }
+
+        .recommendation-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .recommendation-card {
+            padding: 1rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+            border-left: 4px solid transparent;
+        }
+
+        .recommendation-card.high {
+            border-left-color: var(--gov-danger);
+        }
+
+        .recommendation-card.medium {
+            border-left-color: var(--gov-warning);
+        }
+
+        .recommendation-card.low {
+            border-left-color: var(--gov-info);
+        }
+
+        .rec-priority {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .rec-priority.high {
+            color: var(--gov-danger);
+        }
+
+        .rec-priority.medium {
+            color: var(--gov-warning);
+        }
+
+        .rec-priority.low {
+            color: var(--gov-info);
+        }
+
+        .rec-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .rec-description {
+            font-size: 0.85rem;
+            color: var(--gov-gray-600);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .rec-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: auto;
+        }
+
+        .rec-action-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .rec-action-btn.primary {
+            background: var(--gov-primary);
+            color: white;
+        }
+
+        .rec-action-btn.primary:hover {
+            background: var(--gov-primary-dark);
+        }
+
+        .rec-action-btn.secondary {
+            background: var(--gov-gray-100);
+            color: var(--gov-gray-700);
+        }
+
+        .rec-action-btn.secondary:hover {
+            background: var(--gov-gray-200);
+        }
+
+        .recommendation-card {
+            padding: 1.25rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+            border-left: 4px solid transparent;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .rec-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .rec-icon {
+            font-size: 1.25rem;
+        }
+
+        .policy-recommendations {
+            grid-column: span 2;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 2rem;
+            border: 1px solid var(--gov-gray-200);
+            margin-top: 1rem;
+        }
+
+        .policy-recommendations h3 {
+            margin-bottom: 1.25rem;
+        }
+
+        .section-header {
+            margin-bottom: 1rem;
+        }
+
+        .section-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gov-gray-800);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--gov-gray-200);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gov-primary), var(--gov-success));
+        }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 0.75rem;
+            background: linear-gradient(135deg, var(--gov-gray-100), white);
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gov-primary);
+            line-height: 1.2;
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: var(--gov-gray-500);
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .kpi-trend {
+            font-size: 0.8rem;
+            margin-top: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .kpi-trend.up {
+            color: var(--gov-success);
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .kpi-trend.down {
+            color: var(--gov-danger);
+            background: rgba(220, 53, 69, 0.1);
+        }
+    </style>
+</head>
+
+<body ng-controller="PolicyController">
+    <!-- Sidebar -->
+    <aside class="gov-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='🏛️'">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1><span>CITY CONTROL ROOM</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span
+                    class="nav-text">Dashboard</span></a>
+            <a href="grievance.html" class="nav-item"><span class="nav-icon">📢</span><span class="nav-text">Grievance
+                    Command</span></a>
+            <a href="meter.html" class="nav-item"><span class="nav-icon">⚡</span><span class="nav-text">Meter
+                    Integrity</span></a>
+            <a href="rwa.html" class="nav-item"><span class="nav-icon">🏗️</span><span class="nav-text">RWA
+                    Oversight</span></a>
+            <a href="participation.html" class="nav-item"><span class="nav-icon">⭐</span><span
+                    class="nav-text">Participation & Incentives</span></a>
+            <a href="policy.html" class="nav-item active"><span class="nav-icon">📊</span><span class="nav-text">Policy
+                    Insights</span></a>
+            <a href="audit.html" class="nav-item"><span class="nav-icon">🔐</span><span class="nav-text">Audit
+                    Vault</span></a>
+            <a href="field-operations.html" class="nav-item"><span class="nav-icon">👷</span><span
+                    class="nav-text">Field Operations</span></a>
+            <a href="waste-management.html" class="nav-item"><span class="nav-icon">♻️</span><span
+                    class="nav-text">Waste Management</span></a>
+            <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span><span
+                    class="nav-text">Settings</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p>{{user.role}}</p>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()"><span>🚪</span><span>Logout</span></button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="gov-main">
+        <header class="gov-topbar">
+            <div class="topbar-left">
+                <h2>Policy Insights</h2>
+                <p>{{currentDate}}</p>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" title="Accessibility">♿</button>
+                <button class="topbar-btn notification-btn">🔔<span
+                        class="notification-badge">{{notifications}}</span></button>
+            </div>
+        </header>
+
+        <div class="gov-content">
+            <!-- KPI Grid -->
+            <div class="section-header">
+                <h3><span class="icon">📊</span> Key Performance Indicators</h3>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card" ng-repeat="kpi in kpis">
+                    <div class="kpi-icon">{{kpi.icon}}</div>
+                    <div class="kpi-value">{{kpi.value}}</div>
+                    <div class="kpi-label">{{kpi.label}}</div>
+                    <div class="kpi-trend" ng-class="kpi.trendClass">{{kpi.trend}}</div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="policy-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">📈 Grievance Trends</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="grievanceChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">🎯 Service Distribution</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="serviceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Recommendations -->
+            <div class="policy-recommendations">
+                <h3><span class="icon">🤖</span> AI Policy Recommendations</h3>
+                <div class="recommendation-list">
+                    <div class="recommendation-card" ng-repeat="rec in recommendations" ng-class="rec.priority">
+                        <div class="rec-header">
+                            <span class="rec-icon">{{rec.icon}}</span>
+                            <div class="rec-priority" ng-class="rec.priority">{{rec.priority}} Priority</div>
+                        </div>
+                        <div class="rec-title">{{rec.title}}</div>
+                        <div class="rec-description">{{rec.description}}</div>
+                        <div class="rec-actions">
+                            <button class="rec-action-btn secondary" ng-click="viewDetails(rec)">View Details</button>
+                            <button class="rec-action-btn primary" ng-click="takeAction(rec)">Take Action</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        var app = angular.module('adminApp', []);
+
+        app.controller('PolicyController', ['$scope', '$timeout', function ($scope, $timeout) {
+            $scope.user = { name: 'Rajesh Kumar', initials: 'RK', role: 'Government Official' };
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            $scope.notifications = 5;
+
+            $scope.kpis = [
+                { icon: '✅', value: '94%', label: 'SLA Compliance', trend: '↑ 3% from last month', trendClass: 'up' },
+                { icon: '⏱️', value: '2.4h', label: 'Avg Resolution Time', trend: '↓ 0.5h improvement', trendClass: 'up' },
+                { icon: '😊', value: '87%', label: 'Citizen Satisfaction', trend: '↑ 5% increase', trendClass: 'up' },
+                { icon: '💰', value: '₹12.4L', label: 'Collection Efficiency', trend: '↑ 8% growth', trendClass: 'up' }
+            ];
+
+            $scope.recommendations = [
+                { icon: '👷', priority: 'high', title: 'Increase Staff in Ward 22', description: 'Gas complaints have increased 40% in the last week. Consider deploying additional field agents.' },
+                { icon: '💧', priority: 'medium', title: 'Optimize Water Distribution', description: 'Pattern analysis suggests peak demand hours. Consider adjusting supply schedules.' },
+                { icon: '🔧', priority: 'low', title: 'Preventive Maintenance', description: 'Schedule preventive maintenance for electricity infrastructure in Ward 15 next month.' }
+            ];
+
+            $scope.viewDetails = function(rec) {
+                alert('Viewing details for: ' + rec.title);
+            };
+
+            $scope.takeAction = function(rec) {
+                alert('Taking action on: ' + rec.title);
+            };
+
+            // Initialize charts after DOM load
+            $timeout(function () {
+                // Grievance Trends Chart
+                var ctx1 = document.getElementById('grievanceChart');
+                if (ctx1) {
+                    new Chart(ctx1, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Complaints',
+                                data: [450, 520, 380, 410, 390, 340],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }, {
+                                label: 'Resolved',
+                                data: [420, 490, 360, 400, 380, 330],
+                                borderColor: '#38a169',
+                                backgroundColor: 'rgba(56, 161, 105, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+
+                // Service Distribution Chart
+                var ctx2 = document.getElementById('serviceChart');
+                if (ctx2) {
+                    new Chart(ctx2, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Electricity', 'Water', 'Gas', 'Sanitation', 'Others'],
+                            datasets: [{
+                                data: [35, 28, 18, 12, 7],
+                                backgroundColor: ['#667eea', '#38a169', '#dd6b20', '#3182ce', '#718096']
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+            }, 100);
+
+            $scope.logout = function () { if (confirm('Are you sure you want to logout?')) alert('Logged out successfully'); };
+        }]);
+    </script>
+</body>
+
+</html>

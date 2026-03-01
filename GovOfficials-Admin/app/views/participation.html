@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="adminApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participation & Incentives - Suvidha City Control Room</title>
+    <link rel="stylesheet" href="../../css/gov-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        .participation-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gov-gray-200);
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--gov-gray-700);
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gov-gray-300);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            background: white;
+            min-width: 150px;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--gov-primary);
+        }
+
+        .leaderboard {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--gov-gray-200);
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gov-gray-200);
+            background: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--gov-primary);
+        }
+
+        .tab-btn.active {
+            background: var(--gov-primary);
+            color: white;
+            border-color: var(--gov-primary);
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .leaderboard-item:hover {
+            background: var(--gov-gray-100);
+            transform: translateX(5px);
+        }
+
+        .leaderboard-item.gold {
+            background: linear-gradient(135deg, #fff7e6 0%, #fffbe6 100%);
+            border: 1px solid #ffc107;
+        }
+
+        .leaderboard-item.silver {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #c0c0c0;
+        }
+
+        .leaderboard-item.bronze {
+            background: linear-gradient(135deg, #fff4e6 0%, #ffe4d6 100%);
+            border: 1px solid #cd7f32;
+        }
+
+        .rank {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .rank.gold {
+            background: #ffc107;
+            color: white;
+        }
+
+        .rank.silver {
+            background: #c0c0c0;
+            color: white;
+        }
+
+        .rank.bronze {
+            background: #cd7f32;
+            color: white;
+        }
+
+        .rank.default {
+            background: var(--gov-gray-300);
+            color: white;
+        }
+
+        .participant-info {
+            flex: 1;
+        }
+
+        .participant-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .participant-ward {
+            font-size: 0.8rem;
+            color: var(--gov-gray-500);
+        }
+
+        .participant-score {
+            text-align: right;
+        }
+
+        .score-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gov-primary);
+        }
+
+        .score-label {
+            font-size: 0.7rem;
+            color: var(--gov-gray-500);
+            text-transform: uppercase;
+        }
+
+        .award-btn {
+            padding: 0.4rem 0.75rem;
+            background: var(--gov-success);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .award-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .incentives-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .incentive-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--gov-gray-200);
+        }
+
+        .incentive-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .incentive-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .incentive-icon.green {
+            background: var(--gov-success-light);
+        }
+
+        .incentive-icon.blue {
+            background: var(--gov-info-light);
+        }
+
+        .incentive-icon.orange {
+            background: var(--gov-warning-light);
+        }
+
+        .incentive-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .incentive-subtitle {
+            font-size: 0.8rem;
+            color: var(--gov-gray-500);
+        }
+
+        .incentive-stat {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+            margin: 0.5rem 0;
+        }
+
+        .incentive-change {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .incentive-change.up {
+            color: var(--gov-success);
+        }
+
+        .incentive-change.down {
+            color: var(--gov-danger);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gov-gray-200);
+            background: var(--gov-gray-50);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            cursor: pointer;
+            color: var(--gov-gray-400);
+            line-height: 1;
+            padding: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--gov-gray-700);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gov-gray-200);
+            background: var(--gov-gray-50);
+        }
+
+        .participant-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--gov-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .profile-details {
+            color: var(--gov-gray-500);
+            font-size: 0.9rem;
+        }
+
+        .profile-points {
+            text-align: right;
+        }
+
+        .profile-points .points-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gov-primary);
+        }
+
+        .profile-points .points-label {
+            font-size: 0.75rem;
+            color: var(--gov-gray-500);
+        }
+
+        .activity-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-section h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--gov-gray-200);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-sm);
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .activity-icon.green { background: var(--gov-success-light); }
+        .activity-icon.blue { background: var(--gov-info-light); }
+        .activity-icon.orange { background: var(--gov-warning-light); }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .activity-date {
+            font-size: 0.75rem;
+            color: var(--gov-gray-500);
+        }
+
+        .activity-points {
+            font-weight: 600;
+            color: var(--gov-success);
+        }
+
+        .award-section {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .award-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .award-points-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--gov-success);
+            margin: 1rem 0;
+        }
+
+        .award-note {
+            font-size: 0.85rem;
+            color: var(--gov-gray-600);
+            margin-bottom: 1rem;
+        }
+
+        .points-selection {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .points-box {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--gov-gray-300);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .points-box:hover {
+            border-color: var(--gov-success);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+        }
+
+        .points-box.selected {
+            border-color: var(--gov-success);
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+        }
+
+        .points-box .points-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gov-success);
+        }
+
+        .points-box .points-label {
+            font-size: 0.7rem;
+            color: var(--gov-gray-500);
+            text-transform: uppercase;
+        }
+
+        .selected-points-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gov-success);
+            margin: 0.5rem 0;
+        }
+
+        .gov-btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .gov-btn-primary {
+            background: var(--gov-primary);
+            color: white;
+        }
+
+        .gov-btn-primary:hover {
+            background: var(--gov-primary-dark);
+        }
+
+        .gov-btn-outline {
+            background: white;
+            border: 1px solid var(--gov-gray-300);
+            color: var(--gov-gray-700);
+        }
+
+        .gov-btn-outline:hover {
+            background: var(--gov-gray-50);
+        }
+
+        .gov-btn-success {
+            background: var(--gov-success);
+            color: white;
+        }
+
+        .gov-btn-success:hover {
+            opacity: 0.9;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .pagination button {
+            padding: 0.4rem 0.75rem;
+            border: 1px solid var(--gov-gray-300);
+            background: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .pagination button:hover {
+            border-color: var(--gov-primary);
+        }
+
+        .pagination button.active {
+            background: var(--gov-primary);
+            color: white;
+            border-color: var(--gov-primary);
+        }
+
+        @media (max-width: 1024px) {
+            .participation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body ng-controller="ParticipationController" ng-click="closeAllDropdowns()">
+    <!-- Sidebar -->
+    <aside class="gov-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='🏛️'">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1><span>CITY CONTROL ROOM</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span
+                    class="nav-text">Dashboard</span></a>
+            <a href="grievance.html" class="nav-item"><span class="nav-icon">📢</span><span class="nav-text">Grievance
+                    Command</span></a>
+            <a href="meter.html" class="nav-item"><span class="nav-icon">⚡</span><span class="nav-text">Meter
+                    Integrity</span></a>
+            <a href="rwa.html" class="nav-item"><span class="nav-icon">🏗️</span><span class="nav-text">RWA
+                    Oversight</span></a>
+            <a href="participation.html" class="nav-item active"><span class="nav-icon">⭐</span><span
+                    class="nav-text">Participation & Incentives</span></a>
+            <a href="policy.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Policy
+                    Insights</span></a>
+            <a href="audit.html" class="nav-item"><span class="nav-icon">🔐</span><span class="nav-text">Audit
+                    Vault</span></a>
+            <a href="field-operations.html" class="nav-item"><span class="nav-icon">👷</span><span
+                    class="nav-text">Field Operations</span></a>
+            <a href="waste-management.html" class="nav-item"><span class="nav-icon">♻️</span><span
+                    class="nav-text">Waste Management</span></a>
+            <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span><span
+                    class="nav-text">Settings</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p>{{user.role}}</p>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()"><span>🚪</span><span>Logout</span></button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="gov-main">
+        <header class="gov-topbar">
+            <div class="topbar-left">
+                <h2>Participation & Incentives</h2>
+                <p>{{currentDate}}</p>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" title="Accessibility">♿</button>
+                <div class="lang-dropdown" ng-click="$event.stopPropagation()">
+                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)">🌐 <span>{{selectedLang}}</span> ▼</button>
+                    <div class="lang-dropdown-menu" ng-show="showLangMenu">
+                        <a href="#" class="lang-option" ng-repeat="lang in languages"
+                            ng-class="{active: selectedLang === lang.code}"
+                            ng-click="selectLang(lang, $event)">{{lang.name}}</a>
+                    </div>
+                </div>
+                <button class="topbar-btn notification-btn">🔔<span
+                        class="notification-badge">{{notifications}}</span></button>
+            </div>
+        </header>
+
+        <div class="gov-content">
+            <!-- Stats Row -->
+            <div class="section-header">
+                <h3><span class="icon">⭐</span> Participation Overview</h3>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card success">
+                    <div class="stat-icon-box green"><span>👥</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.activeUsers | number}}</div>
+                        <div class="stat-label">Active Participants</div>
+                        <small class="stat-context">This month</small>
+                    </div>
+                </div>
+                <div class="stat-card primary">
+                    <div class="stat-icon-box blue"><span>🏆</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.rewardsDistributed | number}}</div>
+                        <div class="stat-label">Rewards Distributed</div>
+                        <small class="stat-context">Total this month</small>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon-box orange"><span>📈</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.engagementRate}}%</div>
+                        <div class="stat-label">Engagement Rate</div>
+                        <small class="stat-context">+5% from last month</small>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon-box blue"><span>💰</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">₹{{stats.incentivesPaid | number}}</div>
+                        <div class="stat-label">Incentives Paid</div>
+                        <small class="stat-context">This month</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <span class="filter-label">🔍 Filter by:</span>
+                <select class="filter-select" ng-model="filters.state" ng-change="applyFilters()">
+                    <option value="">All States</option>
+                    <option ng-repeat="state in states" value="{{state}}">{{state}}</option>
+                </select>
+                <select class="filter-select" ng-model="filters.city" ng-change="applyFilters()">
+                    <option value="">All Cities</option>
+                    <option ng-repeat="city in getCities()" value="{{city}}">{{city}}</option>
+                </select>
+                <select class="filter-select" ng-model="filters.ward" ng-change="applyFilters()">
+                    <option value="">All Wards</option>
+                    <option ng-repeat="ward in getWards()" value="{{ward}}">{{ward}}</option>
+                </select>
+                <button class="gov-btn gov-btn-outline" ng-click="resetFilters()" style="margin-left: auto;">Reset Filters</button>
+            </div>
+
+            <!-- Participation Grid -->
+            <div class="participation-grid">
+                <!-- Leaderboard -->
+                <div class="leaderboard">
+                    <div class="leaderboard-header">
+                        <h3><span class="icon">🏆</span> Top Performers</h3>
+                        <div class="leaderboard-tabs">
+                            <button class="tab-btn" ng-class="{active: leaderboardTab === 'weekly'}"
+                                ng-click="setTab('weekly')">Weekly</button>
+                            <button class="tab-btn" ng-class="{active: leaderboardTab === 'monthly'}"
+                                ng-click="setTab('monthly')">Monthly</button>
+                            <button class="tab-btn" ng-class="{active: leaderboardTab === 'all'}"
+                                ng-click="setTab('all')">All Time</button>
+                        </div>
+                    </div>
+                    <div class="leaderboard-list">
+                        <div class="leaderboard-item" ng-repeat="participant in paginatedLeaderboard()"
+                            ng-class="getLeaderboardClass($index)" ng-click="viewParticipant(participant)">
+                            <div class="rank" ng-class="getRankClass($index)">{{($index + 1) + (currentPage - 1) * itemsPerPage}}</div>
+                            <div class="participant-info">
+                                <div class="participant-name">{{participant.name}}</div>
+                                <div class="participant-ward">{{participant.ward}}, {{participant.city}}</div>
+                            </div>
+                            <div class="participant-score">
+                                <div class="score-value">{{getTabPoints(participant) | number}}</div>
+                                <div class="score-label">Points</div>
+                            </div>
+                            <button class="award-btn" ng-click="openAwardModal(participant, $event)">🎁 Award</button>
+                        </div>
+                    </div>
+                    <div class="pagination" ng-if="getTotalPages() > 1">
+                        <button ng-click="prevPage()" ng-disabled="currentPage === 1">← Prev</button>
+                        <button ng-repeat="page in getPageNumbers()" ng-click="goToPage(page)" ng-class="{active: currentPage === page}">{{page}}</button>
+                        <button ng-click="nextPage()" ng-disabled="currentPage === getTotalPages()">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Incentives Panel -->
+                <div class="incentives-panel">
+                    <div class="incentive-card">
+                        <div class="incentive-header">
+                            <div class="incentive-icon green">🎁</div>
+                            <div>
+                                <div class="incentive-title">Rewards Claimed</div>
+                                <div class="incentive-subtitle">This week</div>
+                            </div>
+                        </div>
+                        <div class="incentive-stat">{{incentives.rewardsClaimed}}</div>
+                        <div class="incentive-change up">↑ 12% from last week</div>
+                    </div>
+                    <div class="incentive-card">
+                        <div class="incentive-header">
+                            <div class="incentive-icon blue">📊</div>
+                            <div>
+                                <div class="incentive-title">Avg Points/User</div>
+                                <div class="incentive-subtitle">Active users</div>
+                            </div>
+                        </div>
+                        <div class="incentive-stat">{{incentives.avgPoints}}</div>
+                        <div class="incentive-change up">↑ 8% improvement</div>
+                    </div>
+                    <div class="incentive-card">
+                        <div class="incentive-header">
+                            <div class="incentive-icon orange">🎯</div>
+                            <div>
+                                <div class="incentive-title">Target Achievement</div>
+                                <div class="incentive-subtitle">Monthly goal</div>
+                            </div>
+                        </div>
+                        <div class="incentive-stat">{{incentives.targetAchievement}}%</div>
+                        <div class="incentive-change up">On track</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participant Details Modal -->
+        <div class="modal-overlay" ng-show="showParticipantModal" ng-click="closeParticipantModal()">
+            <div class="modal-content" ng-click="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h2 style="margin: 0; font-size: 1.25rem; font-weight: 600;">Participant Details</h2>
+                    <button class="modal-close" ng-click="closeParticipantModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="participant-profile">
+                        <div class="profile-avatar">{{getInitials(selectedParticipant.name)}}</div>
+                        <div class="profile-info">
+                            <div class="profile-name">{{selectedParticipant.name}}</div>
+                            <div class="profile-details">{{selectedParticipant.ward}}, {{selectedParticipant.city}}, {{selectedParticipant.state}}</div>
+                        </div>
+                        <div class="profile-points">
+                            <div class="points-value">{{getTabPoints(selectedParticipant) | number}}</div>
+                            <div class="points-label">Total Points</div>
+                        </div>
+                    </div>
+
+                    <div class="activity-section">
+                        <h3>📋 Recent Activities</h3>
+                        <div class="activity-list">
+                            <div class="activity-item" ng-repeat="activity in selectedParticipant.activities">
+                                <div class="activity-icon" ng-class="activity.iconClass">{{activity.icon}}</div>
+                                <div class="activity-details">
+                                    <div class="activity-title">{{activity.title}}</div>
+                                    <div class="activity-date">{{activity.date}}</div>
+                                </div>
+                                <div class="activity-points">+{{activity.points}} pts</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="activity-section">
+                        <h3>📊 Points Breakdown</h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+                            <div style="padding: 1rem; background: var(--gov-gray-50); border-radius: var(--radius-md);">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--gov-success);">{{selectedParticipant.weeklyPoints | number}}</div>
+                                <div style="font-size: 0.75rem; color: var(--gov-gray-500);">This Week</div>
+                            </div>
+                            <div style="padding: 1rem; background: var(--gov-gray-50); border-radius: var(--radius-md);">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--gov-primary);">{{selectedParticipant.monthlyPoints | number}}</div>
+                                <div style="font-size: 0.75rem; color: var(--gov-gray-500);">This Month</div>
+                            </div>
+                            <div style="padding: 1rem; background: var(--gov-gray-50); border-radius: var(--radius-md);">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--gov-warning);">{{selectedParticipant.totalPoints | number}}</div>
+                                <div style="font-size: 0.75rem; color: var(--gov-gray-500);">All Time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="gov-btn gov-btn-outline" ng-click="closeParticipantModal()">Close</button>
+                    <button class="gov-btn gov-btn-success" ng-click="openAwardFromDetails()">🎁 Award Points</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Award Points Modal -->
+        <div class="modal-overlay" ng-show="showAwardModal" ng-click="closeAwardModal()">
+            <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 450px;">
+                <div class="modal-header">
+                    <h2 style="margin: 0; font-size: 1.25rem; font-weight: 600;">Award Points</h2>
+                    <button class="modal-close" ng-click="closeAwardModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="participant-profile" style="margin-bottom: 1.5rem;">
+                        <div class="profile-avatar">{{getInitials(awardTarget.name)}}</div>
+                        <div class="profile-info">
+                            <div class="profile-name">{{awardTarget.name}}</div>
+                            <div class="profile-details">{{awardTarget.ward}}, {{awardTarget.city}}</div>
+                        </div>
+                    </div>
+
+                    <div class="award-section">
+                        <div class="award-title">🎁 Select Points to Award</div>
+                        <div class="points-selection">
+                            <div class="points-box" ng-class="{'selected': selectedAwardPoints === 10}" ng-click="selectedAwardPoints = 10">
+                                <span class="points-value">10</span>
+                                <span class="points-label">Points</span>
+                            </div>
+                            <div class="points-box" ng-class="{'selected': selectedAwardPoints === 20}" ng-click="selectedAwardPoints = 20">
+                                <span class="points-value">20</span>
+                                <span class="points-label">Points</span>
+                            </div>
+                            <div class="points-box" ng-class="{'selected': selectedAwardPoints === 50}" ng-click="selectedAwardPoints = 50">
+                                <span class="points-value">50</span>
+                                <span class="points-label">Points</span>
+                            </div>
+                            <div class="points-box" ng-class="{'selected': selectedAwardPoints === 100}" ng-click="selectedAwardPoints = 100">
+                                <span class="points-value">100</span>
+                                <span class="points-label">Points</span>
+                            </div>
+                        </div>
+                        <div class="selected-points-display">+{{selectedAwardPoints}}</div>
+                        <div class="award-note">Reward this participant for their excellent contribution to community programs.</div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem;">
+                        <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">Reason for Award (Optional)</label>
+                        <textarea style="width: 100%; padding: 0.75rem; border: 1px solid var(--gov-gray-300); border-radius: var(--radius-sm); font-size: 0.9rem; resize: vertical; min-height: 80px; font-family: inherit;" ng-model="awardReason" placeholder="Enter reason for awarding points..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="gov-btn gov-btn-outline" ng-click="closeAwardModal()">Cancel</button>
+                    <button class="gov-btn gov-btn-success" ng-click="confirmAward()">✓ Confirm Award</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        var app = angular.module('adminApp', []);
+
+        app.controller('ParticipationController', ['$scope', function ($scope) {
+            $scope.user = { name: 'Rajesh Kumar', initials: 'RK', role: 'Government Official' };
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            $scope.notifications = 5;
+            $scope.leaderboardTab = 'weekly';
+            $scope.currentPage = 1;
+            $scope.itemsPerPage = 10;
+
+            // Language dropdown
+            $scope.selectedLang = 'EN';
+            $scope.showLangMenu = false;
+            $scope.languages = [{ code: 'EN', name: 'English' }, { code: 'HI', name: 'हिन्दी' }, { code: 'TA', name: 'தமிழ்' }, { code: 'TE', name: 'తెలుగు' }, { code: 'BN', name: 'বাংলা' }, { code: 'MR', name: 'मराठी' }];
+
+            $scope.toggleLangMenu = function($event) { $event.stopPropagation(); $scope.showLangMenu = !$scope.showLangMenu; };
+            $scope.selectLang = function(lang, $event) { $event.preventDefault(); $scope.selectedLang = lang.code; $scope.showLangMenu = false; };
+            $scope.closeAllDropdowns = function() { $scope.showLangMenu = false; };
+
+            // Filter data
+            $scope.states = ['Delhi', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'Gujarat', 'Rajasthan', 'Uttar Pradesh', 'West Bengal'];
+            $scope.cityData = {
+                'Delhi': ['New Delhi', 'North Delhi', 'South Delhi', 'East Delhi', 'West Delhi'],
+                'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Nashik'],
+                'Karnataka': ['Bangalore', 'Mysore', 'Mangalore'],
+                'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai'],
+                'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara'],
+                'Rajasthan': ['Jaipur', 'Jodhpur', 'Udaipur'],
+                'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Noida', 'Ghaziabad'],
+                'West Bengal': ['Kolkata', 'Howrah', 'Durgapur']
+            };
+            $scope.wardList = ['Ward 1', 'Ward 2', 'Ward 3', 'Ward 4', 'Ward 5', 'Ward 6', 'Ward 7', 'Ward 8', 'Ward 9', 'Ward 10', 'Ward 11', 'Ward 12', 'Ward 15', 'Ward 18', 'Ward 22', 'Ward 25'];
+
+            $scope.filters = { state: '', city: '', ward: '' };
+
+            $scope.getCities = function() {
+                if ($scope.filters.state && $scope.cityData[$scope.filters.state]) {
+                    return $scope.cityData[$scope.filters.state];
+                }
+                var allCities = [];
+                for (var state in $scope.cityData) {
+                    allCities = allCities.concat($scope.cityData[state]);
+                }
+                return allCities;
+            };
+
+            $scope.getWards = function() { return $scope.wardList; };
+
+            $scope.applyFilters = function() { $scope.currentPage = 1; };
+            $scope.resetFilters = function() { $scope.filters = { state: '', city: '', ward: '' }; $scope.currentPage = 1; };
+
+            $scope.stats = { activeUsers: 8520, rewardsDistributed: 1234, engagementRate: 78, incentivesPaid: 245000 };
+            $scope.incentives = { rewardsClaimed: 456, avgPoints: 1250, targetAchievement: 85 };
+
+            // Generate 50 participants
+            var names = ['Priya Sharma', 'Amit Patel', 'Sunita Devi', 'Rajesh Kumar', 'Meena Gupta', 'Vikram Singh', 'Kavita Joshi', 'Suresh Yadav', 'Anita Verma', 'Ramesh Chandra', 'Neha Kapoor', 'Anil Saxena', 'Pooja Mehta', 'Sanjay Tiwari', 'Rekha Mishra', 'Deepak Agarwal', 'Shweta Bajaj', 'Manoj Pandey', 'Geeta Rani', 'Ashok Dubey'];
+            var activities = [
+                { title: 'Participated in cleanliness drive', icon: '🧹', iconClass: 'green', points: 50 },
+                { title: 'Reported illegal dumping', icon: '📢', iconClass: 'orange', points: 30 },
+                { title: 'Attended community meeting', icon: '👥', iconClass: 'blue', points: 25 },
+                { title: 'Segregated waste correctly', icon: '♻️', iconClass: 'green', points: 20 },
+                { title: 'Submitted feedback survey', icon: '📝', iconClass: 'blue', points: 15 },
+                { title: 'Referred new participant', icon: '🤝', iconClass: 'green', points: 40 },
+                { title: 'Composted kitchen waste', icon: '🌱', iconClass: 'green', points: 35 }
+            ];
+
+            $scope.allParticipants = [];
+            for (var i = 0; i < 50; i++) {
+                var state = $scope.states[i % $scope.states.length];
+                var cities = $scope.cityData[state];
+                var city = cities[i % cities.length];
+                var ward = $scope.wardList[i % $scope.wardList.length];
+
+                var weeklyPts = Math.floor(Math.random() * 2000) + 500;
+                var monthlyPts = weeklyPts + Math.floor(Math.random() * 5000) + 1000;
+                var totalPts = monthlyPts + Math.floor(Math.random() * 10000) + 2000;
+
+                var participantActivities = [];
+                var numActivities = Math.floor(Math.random() * 4) + 2;
+                for (var j = 0; j < numActivities; j++) {
+                    var act = activities[Math.floor(Math.random() * activities.length)];
+                    participantActivities.push({
+                        title: act.title,
+                        icon: act.icon,
+                        iconClass: act.iconClass,
+                        points: act.points,
+                        date: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toLocaleDateString('en-IN')
+                    });
+                }
+
+                $scope.allParticipants.push({
+                    id: i + 1,
+                    name: names[i % names.length],
+                    state: state,
+                    city: city,
+                    ward: ward,
+                    weeklyPoints: weeklyPts,
+                    monthlyPoints: monthlyPts,
+                    totalPoints: totalPts,
+                    activities: participantActivities
+                });
+            }
+
+            // Sort by total points initially
+            $scope.allParticipants.sort(function(a, b) { return b.totalPoints - a.totalPoints; });
+
+            $scope.filteredParticipants = function() {
+                var filtered = $scope.allParticipants.filter(function(p) {
+                    if ($scope.filters.state && p.state !== $scope.filters.state) return false;
+                    if ($scope.filters.city && p.city !== $scope.filters.city) return false;
+                    if ($scope.filters.ward && p.ward !== $scope.filters.ward) return false;
+                    return true;
+                });
+
+                // Sort by current tab
+                var sortKey = $scope.leaderboardTab === 'weekly' ? 'weeklyPoints' :
+                              $scope.leaderboardTab === 'monthly' ? 'monthlyPoints' : 'totalPoints';
+                filtered.sort(function(a, b) { return b[sortKey] - a[sortKey]; });
+
+                return filtered;
+            };
+
+            $scope.paginatedLeaderboard = function() {
+                var filtered = $scope.filteredParticipants();
+                var start = ($scope.currentPage - 1) * $scope.itemsPerPage;
+                return filtered.slice(start, start + $scope.itemsPerPage);
+            };
+
+            $scope.setTab = function(tab) { $scope.leaderboardTab = tab; $scope.currentPage = 1; };
+
+            $scope.getTabPoints = function(participant) {
+                if (!participant) return 0;
+                if ($scope.leaderboardTab === 'weekly') return participant.weeklyPoints;
+                if ($scope.leaderboardTab === 'monthly') return participant.monthlyPoints;
+                return participant.totalPoints;
+            };
+
+            $scope.getTotalPages = function() { return Math.ceil($scope.filteredParticipants().length / $scope.itemsPerPage); };
+            $scope.getPageNumbers = function() {
+                var pages = [], total = Math.min($scope.getTotalPages(), 5);
+                for (var i = 1; i <= total; i++) pages.push(i);
+                return pages;
+            };
+            $scope.goToPage = function(page) { if (page >= 1 && page <= $scope.getTotalPages()) $scope.currentPage = page; };
+            $scope.nextPage = function() { if ($scope.currentPage < $scope.getTotalPages()) $scope.currentPage++; };
+            $scope.prevPage = function() { if ($scope.currentPage > 1) $scope.currentPage--; };
+
+            $scope.getLeaderboardClass = function(index) {
+                var actualIndex = index + ($scope.currentPage - 1) * $scope.itemsPerPage;
+                if (actualIndex === 0) return 'gold';
+                if (actualIndex === 1) return 'silver';
+                if (actualIndex === 2) return 'bronze';
+                return '';
+            };
+
+            $scope.getRankClass = function(index) {
+                var actualIndex = index + ($scope.currentPage - 1) * $scope.itemsPerPage;
+                if (actualIndex === 0) return 'gold';
+                if (actualIndex === 1) return 'silver';
+                if (actualIndex === 2) return 'bronze';
+                return 'default';
+            };
+
+            // Modal states
+            $scope.showParticipantModal = false;
+            $scope.showAwardModal = false;
+            $scope.selectedParticipant = {};
+            $scope.awardTarget = {};
+            $scope.awardReason = '';
+
+            $scope.viewParticipant = function(participant) {
+                $scope.selectedParticipant = participant;
+                $scope.showParticipantModal = true;
+            };
+
+            $scope.closeParticipantModal = function() {
+                $scope.showParticipantModal = false;
+            };
+
+            $scope.openAwardModal = function(participant, $event) {
+                if ($event) $event.stopPropagation();
+                $scope.awardTarget = participant;
+                $scope.awardReason = '';
+                $scope.showAwardModal = true;
+            };
+
+            $scope.selectedAwardPoints = 50; // Default selection
+
+            $scope.closeAwardModal = function() {
+                $scope.showAwardModal = false;
+                $scope.awardReason = '';
+                $scope.selectedAwardPoints = 50; // Reset to default
+            };
+
+            $scope.openAwardFromDetails = function() {
+                $scope.awardTarget = $scope.selectedParticipant;
+                $scope.showParticipantModal = false;
+                $scope.showAwardModal = true;
+            };
+
+            $scope.confirmAward = function() {
+                if ($scope.awardTarget && $scope.selectedAwardPoints) {
+                    var points = $scope.selectedAwardPoints;
+                    $scope.awardTarget.weeklyPoints += points;
+                    $scope.awardTarget.monthlyPoints += points;
+                    $scope.awardTarget.totalPoints += points;
+                    $scope.stats.rewardsDistributed++;
+                    alert('Successfully awarded ' + points + ' points to ' + $scope.awardTarget.name + '!');
+                    $scope.closeAwardModal();
+                }
+            };
+
+            $scope.getInitials = function(name) {
+                if (!name) return 'NA';
+                return name.split(' ').map(function(n) { return n[0]; }).join('').toUpperCase();
+            };
+
+            $scope.logout = function () { if (confirm('Are you sure you want to logout?')) alert('Logged out successfully'); };
+        }]);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="workerApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Households - Field Agent | Suvidha</title>
+    <link rel="stylesheet" href="../../css/worker-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        /* Full-Width Layout */
+        .search-page-container {
+            width: 100%;
+            max-width: none;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            font-size: 1.25rem;
+            color: var(--gov-gray-400);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--gov-gray-200);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gov-primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.08);
+        }
+
+        .search-hints {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .search-hint {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--gov-gray-500);
+        }
+
+        .search-hint-icon {
+            font-size: 0.9rem;
+        }
+
+        .search-hint.privacy {
+            color: var(--gov-success);
+            font-weight: 500;
+        }
+
+        /* Status Summary Bar */
+        .status-summary {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gov-gray-200);
+            flex-wrap: wrap;
+        }
+
+        .status-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .status-chip:hover {
+            transform: translateY(-1px);
+        }
+
+        .status-chip.pending {
+            background: var(--gov-warning-light);
+            color: var(--gov-warning);
+        }
+
+        .status-chip.pending.active {
+            border-color: var(--gov-warning);
+        }
+
+        .status-chip.skipped {
+            background: var(--gov-danger-light);
+            color: var(--gov-danger);
+        }
+
+        .status-chip.skipped.active {
+            border-color: var(--gov-danger);
+        }
+
+        .status-chip.completed {
+            background: var(--gov-success-light);
+            color: var(--gov-success);
+        }
+
+        .status-chip.completed.active {
+            border-color: var(--gov-success);
+        }
+
+        .status-count {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        /* Household List Container */
+        .household-list-container {
+            width: 100%;
+        }
+
+        /* Group Headers */
+        .group-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid;
+        }
+
+        .group-header.pending {
+            border-color: var(--gov-warning);
+        }
+
+        .group-header.skipped {
+            border-color: var(--gov-danger);
+        }
+
+        .group-header.completed {
+            border-color: var(--gov-success);
+        }
+
+        .group-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .group-header.pending .group-icon {
+            background: var(--gov-warning-light);
+        }
+
+        .group-header.skipped .group-icon {
+            background: var(--gov-danger-light);
+        }
+
+        .group-header.completed .group-icon {
+            background: var(--gov-success-light);
+        }
+
+        .group-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .group-header.pending .group-title {
+            color: var(--gov-warning);
+        }
+
+        .group-header.skipped .group-title {
+            color: var(--gov-danger);
+        }
+
+        .group-header.completed .group-title {
+            color: var(--gov-success);
+        }
+
+        .group-count {
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .group-header.pending .group-count {
+            background: var(--gov-warning-light);
+            color: var(--gov-warning);
+        }
+
+        .group-header.skipped .group-count {
+            background: var(--gov-danger-light);
+            color: var(--gov-danger);
+        }
+
+        .group-header.completed .group-count {
+            background: var(--gov-success-light);
+            color: var(--gov-success);
+        }
+
+        /* Household Group */
+        .household-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .household-group-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        /* Full-Width Household Card (90% opacity) */
+        .household-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.90);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .household-card:hover {
+            background: rgba(255, 255, 255, 0.98);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .household-card.completed {
+            opacity: 0.85;
+        }
+
+        .household-card.completed:hover {
+            opacity: 1;
+        }
+
+        .household-card.skipped {
+            border-left: 4px solid var(--gov-danger);
+        }
+
+        /* Card Slide Animation (Innovation 1) */
+        .household-card.moving {
+            animation: slideToSection 0.5s ease-out;
+        }
+
+        @keyframes slideToSection {
+            0% {
+                opacity: 0.5;
+                transform: translateX(-20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .household-card.just-completed {
+            animation: completedPulse 0.6s ease-out;
+        }
+
+        @keyframes completedPulse {
+            0% {
+                background: rgba(56, 161, 105, 0.2);
+                transform: scale(1.02);
+            }
+
+            100% {
+                background: rgba(255, 255, 255, 0.90);
+                transform: scale(1);
+            }
+        }
+
+        /* LEFT Section */
+        .card-left {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-name-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.35rem;
+        }
+
+        .house-icon {
+            font-size: 1.2rem;
+        }
+
+        .house-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--gov-gray-800);
+        }
+
+        /* Quality Indicator (Innovation 2) */
+        .quality-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .quality-dot.good {
+            background: var(--gov-success);
+            box-shadow: 0 0 6px var(--gov-success);
+        }
+
+        .quality-dot.review {
+            background: var(--gov-warning);
+            box-shadow: 0 0 6px var(--gov-warning);
+        }
+
+        .quality-dot.low {
+            background: var(--gov-danger);
+            box-shadow: 0 0 6px var(--gov-danger);
+        }
+
+        .card-address {
+            font-size: 0.85rem;
+            color: var(--gov-gray-500);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Utility Icons */
+        .utility-icons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .utility-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .utility-icon.active {
+            background: var(--gov-info-light);
+        }
+
+        .utility-icon.inactive {
+            background: var(--gov-gray-100);
+            opacity: 0.4;
+        }
+
+        /* CENTER Section */
+        .card-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            min-width: 120px;
+        }
+
+        .status-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .status-pill.pending {
+            background: var(--gov-warning-light);
+            color: var(--gov-warning);
+        }
+
+        .status-pill.completed {
+            background: var(--gov-success-light);
+            color: var(--gov-success);
+        }
+
+        .status-pill.skipped {
+            background: var(--gov-danger-light);
+            color: var(--gov-danger);
+        }
+
+        .last-action {
+            font-size: 0.75rem;
+            color: var(--gov-gray-500);
+        }
+
+        .skip-reason {
+            font-size: 0.7rem;
+            color: var(--gov-danger);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* RIGHT Section */
+        .card-right {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .card-action-btn {
+            padding: 0.6rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .card-action-btn.primary {
+            background: linear-gradient(135deg, var(--gov-success) 0%, #2f855a 100%);
+            color: white;
+            box-shadow: 0 3px 10px rgba(56, 161, 105, 0.3);
+        }
+
+        .card-action-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(56, 161, 105, 0.4);
+        }
+
+        .card-action-btn.secondary {
+            background: var(--gov-info-light);
+            color: var(--gov-info);
+        }
+
+        .card-action-btn.secondary:hover {
+            background: var(--gov-info);
+            color: white;
+        }
+
+        .card-action-btn.warning {
+            background: var(--gov-warning-light);
+            color: var(--gov-warning);
+        }
+
+        .card-action-btn.warning:hover {
+            background: var(--gov-warning);
+            color: white;
+        }
+
+        .card-action-btn.small {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        /* Government Sync Footer */
+        .gov-sync-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            background: rgba(26, 54, 93, 0.05);
+            border-radius: var(--radius-lg);
+            font-size: 0.8rem;
+            color: var(--gov-gray-600);
+        }
+
+        .gov-sync-icon {
+            color: var(--gov-primary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(255, 255, 255, 0.90);
+            border-radius: var(--radius-lg);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gov-gray-700);
+            margin-bottom: 0.35rem;
+        }
+
+        .empty-state-text {
+            font-size: 0.9rem;
+            color: var(--gov-gray-500);
+        }
+
+        /* Issue Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gov-gray-200);
+        }
+
+        .modal-header-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gov-warning-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .modal-header-text h3 {
+            font-size: 1.1rem;
+            color: var(--gov-gray-800);
+            margin-bottom: 0.15rem;
+        }
+
+        .modal-header-text p {
+            font-size: 0.8rem;
+            color: var(--gov-gray-500);
+        }
+
+        .issue-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .issue-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            border: 2px solid var(--gov-gray-200);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .issue-option:hover {
+            background: var(--gov-gray-50);
+            border-color: var(--gov-gray-300);
+        }
+
+        .issue-option.selected {
+            background: var(--gov-warning-light);
+            border-color: var(--gov-warning);
+        }
+
+        .issue-option-icon {
+            font-size: 1.25rem;
+        }
+
+        .issue-option-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--gov-gray-700);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 0.875rem;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.cancel {
+            background: var(--gov-gray-100);
+            border: 1px solid var(--gov-gray-200);
+            color: var(--gov-gray-700);
+        }
+
+        .modal-btn.submit {
+            background: var(--gov-warning);
+            border: none;
+            color: white;
+        }
+
+        .modal-btn.submit:disabled {
+            background: var(--gov-gray-300);
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .household-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .card-center {
+                flex-direction: row;
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .card-right {
+                width: 100%;
+            }
+
+            .card-action-btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .status-summary {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body ng-controller="SearchController">
+    <!-- Sidebar -->
+    <aside class="worker-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha Logo" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1>
+                    <span class="brand-subtitle">FIELD AGENT</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Status Indicator -->
+        <div class="agent-status-card">
+            <div class="status-indicator" ng-class="{'online': agentStatus === 'online', 'busy': agentStatus === 'on_task', 'offline': agentStatus === 'offline'}">
+                <span class="status-dot"></span>
+                <span class="status-text">{{agentStatus === 'online' ? 'Available' : agentStatus === 'on_task' ? 'On Task' : 'Offline'}}</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon-wrapper"><span class="nav-icon">📊</span></span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="search.html" class="nav-item active">
+                <span class="nav-icon-wrapper"><span class="nav-icon">🏠</span></span>
+                <span class="nav-text">Households</span>
+            </a>
+            <a href="report.html" class="nav-item">
+                <span class="nav-icon-wrapper"><span class="nav-icon">⚠️</span></span>
+                <span class="nav-text">Report Issue</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <span class="nav-icon-wrapper"><span class="nav-icon">⚙️</span></span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p class="user-category">{{user.category || 'Field Agent'}}</p>
+                    <p class="user-ward">{{area.ward}}</p>
+                </div>
+            </div>
+            
+            <!-- GPS/Offline indicator -->
+            <div class="gps-offline-indicator" style="display: flex; justify-content: center; gap: 1rem; padding: 0.75rem; margin: 0.75rem 0; background: var(--gov-gray-50); border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem;" ng-class="{'color: var(--gov-success)': gpsEnabled, 'color: var(--gov-danger)': !gpsEnabled}">
+                    <span>📍</span>
+                    <span style="font-weight: 500;">GPS {{gpsEnabled ? 'Active' : 'Off'}}</span>
+                </div>
+                <div style="width: 1px; background: var(--gov-gray-300);"></div>
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--gov-gray-600);">
+                    <span>📶</span>
+                    <span style="font-weight: 500;">{{networkStatus || 'Online'}}</span>
+                </div>
+            </div>
+            
+            <button class="logout-btn" ng-click="logout()">
+                <span>🚪</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="worker-main-content">
+        <header class="worker-header">
+            <div class="header-left">
+                <h2>Search Households</h2>
+                <p>Find assigned households by name, house number, or meter ID</p>
+            </div>
+            <div class="header-right">
+                <button class="topbar-btn sync-btn" ng-click="syncNow()" title="Refresh Data">
+                    🔄
+                </button>
+                
+                <!-- Improved Language Dropdown -->
+                <div class="lang-dropdown" style="position: relative;">
+                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-weight: 500;">
+                        🌐 <span>{{selectedLang}}</span> 
+                        <span style="font-size: 0.7rem; transition: transform 0.2s;" ng-style="{'transform': showLangMenu ? 'rotate(180deg)' : 'rotate(0deg)'}">▼</span>
+                    </button>
+                    <div class="lang-dropdown-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()" style="position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border: 1px solid var(--gov-gray-200); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); min-width: 180px; max-height: 300px; overflow-y: auto; z-index: 1000;">
+                        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gov-gray-100); font-size: 0.75rem; font-weight: 600; color: var(--gov-gray-500); text-transform: uppercase;">Select Language</div>
+                        <a href="#" class="lang-option" ng-repeat="lang in languages"
+                            ng-class="{active: selectedLang === lang.code}"
+                            ng-click="selectLang(lang, $event)"
+                            style="display: flex; align-items: center; padding: 0.75rem 1rem; text-decoration: none; color: var(--gov-gray-700); transition: all 0.15s; border-bottom: 1px solid var(--gov-gray-50);"
+                            ng-style="{'background': selectedLang === lang.code ? 'var(--gov-info-light)' : 'transparent', 'font-weight': selectedLang === lang.code ? '600' : '400'}">
+                            <span style="margin-right: 0.5rem;" ng-if="selectedLang === lang.code">✓</span>
+                            {{lang.name}}
+                        </a>
+                    </div>
+                </div>
+                
+                <button class="topbar-btn notification-btn" title="Notifications" ng-click="toggleNotifications()" style="position: relative; padding: 0.5rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-size: 1.25rem;">
+                    🔔<span class="notification-badge" ng-if="notifications > 0" style="position: absolute; top: -5px; right: -5px; background: var(--gov-danger); color: white; font-size: 0.7rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">{{notifications}}</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="worker-content">
+            <div class="search-page-container">
+                <!-- Search Section -->
+                <div class="search-section">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input"
+                            placeholder="Search by name, house number, meter ID, or Aadhaar (last 4 digits)..."
+                            ng-model="searchQuery" ng-change="filterHouseholds()">
+                    </div>
+                    <div class="search-hints">
+                        <span class="search-hint">
+                            <span class="search-hint-icon">📋</span>
+                            Showing only assigned households
+                        </span>
+                        <span class="search-hint privacy">
+                            <span class="search-hint-icon">🔒</span>
+                            Aadhaar search limited to last 4 digits for privacy
+                        </span>
+                    </div>
+
+                    <!-- Status Summary -->
+                    <div class="status-summary">
+                        <div class="status-chip pending" ng-class="{active: filterStatus === 'pending'}"
+                            ng-click="toggleFilter('pending')">
+                            ⏳ Pending
+                            <span class="status-count">{{counts.pending}}</span>
+                        </div>
+                        <div class="status-chip skipped" ng-class="{active: filterStatus === 'skipped'}"
+                            ng-click="toggleFilter('skipped')">
+                            ⚠️ Skipped
+                            <span class="status-count">{{counts.skipped}}</span>
+                        </div>
+                        <div class="status-chip completed" ng-class="{active: filterStatus === 'completed'}"
+                            ng-click="toggleFilter('completed')">
+                            ✓ Completed
+                            <span class="status-count">{{counts.completed}}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Household List with Smart Grouping -->
+                <div class="household-list-container">
+                    <!-- PENDING GROUP -->
+                    <div class="household-group" ng-if="groupedHouseholds.pending.length > 0">
+                        <div class="group-header pending">
+                            <div class="group-icon">⏳</div>
+                            <span class="group-title">Pending</span>
+                            <span class="group-count">{{groupedHouseholds.pending.length}}</span>
+                        </div>
+                        <div class="household-group-list">
+                            <div class="household-card" ng-repeat="house in groupedHouseholds.pending track by house.id"
+                                ng-class="{'moving': house.isMoving}">
+                                <!-- LEFT -->
+                                <div class="card-left">
+                                    <div class="card-name-row">
+                                        <span class="house-icon">🏠</span>
+                                        <span class="house-name">House {{house.houseNo}} - {{house.name}}</span>
+                                    </div>
+                                    <div class="card-address">📍 {{house.address}}</div>
+                                    <div class="utility-icons">
+                                        <span class="utility-icon"
+                                            ng-class="house.utilities.electricity ? 'active' : 'inactive'"
+                                            title="Electricity">⚡</span>
+                                        <span class="utility-icon"
+                                            ng-class="house.utilities.water ? 'active' : 'inactive'"
+                                            title="Water">💧</span>
+                                        <span class="utility-icon"
+                                            ng-class="house.utilities.gas ? 'active' : 'inactive'" title="Gas">🔥</span>
+                                    </div>
+                                </div>
+                                <!-- CENTER -->
+                                <div class="card-center">
+                                    <span class="status-pill pending">⏳ Pending</span>
+                                    <span class="last-action">Awaiting reading</span>
+                                </div>
+                                <!-- RIGHT -->
+                                <div class="card-right">
+                                    <button class="card-action-btn primary" ng-click="startReading(house, $event)">
+                                        📷 Start Reading
+                                    </button>
+                                    <button class="card-action-btn warning small" ng-click="reportIssue(house, $event)"
+                                        title="Report Issue">
+                                        ⚠️
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SKIPPED GROUP -->
+                    <div class="household-group" ng-if="groupedHouseholds.skipped.length > 0">
+                        <div class="group-header skipped">
+                            <div class="group-icon">⚠️</div>
+                            <span class="group-title">Skipped</span>
+                            <span class="group-count">{{groupedHouseholds.skipped.length}}</span>
+                        </div>
+                        <div class="household-group-list">
+                            <div class="household-card skipped"
+                                ng-repeat="house in groupedHouseholds.skipped track by house.id"
+                                ng-class="{'moving': house.isMoving}">
+                                <!-- LEFT -->
+                                <div class="card-left">
+                                    <div class="card-name-row">
+                                        <span class="house-icon">🏠</span>
+                                        <span class="house-name">House {{house.houseNo}} - {{house.name}}</span>
+                                    </div>
+                                    <div class="card-address">📍 {{house.address}}</div>
+                                    <div class="utility-icons">
+                                        <span class="utility-icon"
+                                            ng-class="house.utilities.electricity ? 'active' : 'inactive'"
+                                            title="Electricity">⚡</span>
+                                        <span class="utility-icon"
+                                            ng-class="house.utilities.water ? 'active' : 'inactive'"
+                                            title="Water">💧</span>
+                                        <span class="utility-icon"
+                                            ng-class="house.utilities.gas ? 'active' : 'inactive'" title="Gas">🔥</span>
+                                    </div>
+                                </div>
+                                <!-- CENTER -->
+                                <div class="card-center">
+                                    <span class="status-pill skipped">⚠️ Skipped</span>
+                                    <span class="skip-reason">
+                                        <span>{{house.skipIcon}}</span>
+                                        <span>{{house.skipReason}}</span>
+                                    </span>
+                                </div>
+                                <!-- RIGHT -->
+                                <div class="card-right">
+                                    <button class="card-action-btn warning" ng-click="resolveSkip(house, $event)">
+                                        🔄 Resolve Skip
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COMPLETED GROUP -->
+                    <div class="household-group" ng-if="groupedHouseholds.completed.length > 0">
+                        <div class="group-header completed">
+                            <div class="group-icon">✓</div>
+                            <span class="group-title">Completed</span>
+                            <span class="group-count">{{groupedHouseholds.completed.length}}</span>
+                        </div>
+                        <div class="household-group-list">
+                            <div class="household-card completed"
+                                ng-repeat="house in groupedHouseholds.completed track by house.id"
+                                ng-class="{'just-completed': house.justCompleted, 'moving': house.isMoving}">
+                                <!-- LEFT -->
+                                <div class="card-left">
+                                    <div class="card-name-row">
+                                        <span class="house-icon">🏠</span>
+                                        <span class="house-name">House {{house.houseNo}} - {{house.name}}</span>
+                                        <!-- Quality Indicator (Innovation 2) -->
+                                        <span class="quality-dot" ng-class="house.quality"
+                                            title="Image Quality: {{house.quality}}" ng-if="house.quality"></span>
+                                    </div>
+                                    <div class="card-address">📍 {{house.address}}</div>
+                                    <div class="utility-icons">
+                                        <span class="utility-icon"
+                                            ng-class="house.utilities.electricity ? 'active' : 'inactive'"
+                                            title="Electricity">⚡</span>
+                                        <span class="utility-icon"
+                                            ng-class="house.utilities.water ? 'active' : 'inactive'"
+                                            title="Water">💧</span>
+                                        <span class="utility-icon"
+                                            ng-class="house.utilities.gas ? 'active' : 'inactive'" title="Gas">🔥</span>
+                                    </div>
+                                </div>
+                                <!-- CENTER -->
+                                <div class="card-center">
+                                    <span class="status-pill completed">✓ Completed</span>
+                                    <span class="last-action">{{house.completedTime}}</span>
+                                </div>
+                                <!-- RIGHT -->
+                                <div class="card-right">
+                                    <button class="card-action-btn secondary" ng-click="viewSubmission(house, $event)">
+                                        👁️ View Submission
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-state" ng-if="totalFiltered === 0">
+                        <div class="empty-state-icon">🔍</div>
+                        <div class="empty-state-title" ng-if="searchQuery">No households match "{{searchQuery}}"</div>
+                        <div class="empty-state-title" ng-if="!searchQuery">No households assigned</div>
+                        <div class="empty-state-text">Try adjusting your search or contact your supervisor</div>
+                    </div>
+                </div>
+
+                <!-- Government Sync Footer -->
+                <div class="gov-sync-footer">
+                    <span class="gov-sync-icon">🔄</span>
+                    <span>Status updates sync automatically with city control room.</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Issue Report Modal -->
+    <div class="modal-overlay" ng-if="showIssueModal" ng-click="closeModal()">
+        <div class="modal-content" ng-click="$event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-header-icon">⚠️</div>
+                <div class="modal-header-text">
+                    <h3>Report Issue</h3>
+                    <p>House {{selectedHouse.houseNo}} • {{selectedHouse.name}}</p>
+                </div>
+            </div>
+
+            <div class="issue-options">
+                <div class="issue-option" ng-repeat="option in issueOptions"
+                    ng-class="{selected: selectedIssue === option.id}" ng-click="selectIssue(option.id)">
+                    <span class="issue-option-icon">{{option.icon}}</span>
+                    <span class="issue-option-text">{{option.label}}</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="modal-btn cancel" ng-click="closeModal()">Cancel</button>
+                <button class="modal-btn submit" ng-click="submitIssue()" ng-disabled="!selectedIssue">
+                    Submit Issue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('workerApp', []);
+
+        app.controller('SearchController', ['$scope', '$timeout', function ($scope, $timeout) {
+            // User Info
+            $scope.user = {
+                name: 'Vikram Singh',
+                initials: 'VS',
+                category: 'Electric Meter Reader'
+            };
+
+            // Agent Status
+            $scope.agentStatus = 'on_task';
+            $scope.gpsEnabled = true;
+            $scope.performanceScore = 92;
+
+            // Date & Language
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            $scope.selectedLang = 'EN';
+            $scope.showLangMenu = false;
+            $scope.languages = [
+                { code: 'EN', name: 'English' },
+                { code: 'HI', name: 'हिन्दी' },
+                { code: 'TA', name: 'தமிழ்' },
+                { code: 'TE', name: 'తెలుగు' },
+                { code: 'BN', name: 'বাংলা' },
+                { code: 'MR', name: 'मराठी' }
+            ];
+            $scope.notifications = 3;
+
+            // Search & Filter
+            $scope.searchQuery = '';
+            $scope.filterStatus = null;
+
+            // Households Data
+            $scope.households = [
+                { id: 1, houseNo: '101', name: 'Sharma Residence', address: 'Block A, Flat 101, Saket', status: 'pending', utilities: { electricity: true, water: true, gas: true }, aadhaarLast4: '4532' },
+                { id: 2, houseNo: '102', name: 'Gupta Family', address: 'Block A, Flat 102, Saket', status: 'completed', completedTime: '45 min ago', quality: 'good', utilities: { electricity: true, water: true, gas: false }, aadhaarLast4: '8901' },
+                { id: 3, houseNo: '103', name: 'Patel House', address: 'Block A, Flat 103, Saket', status: 'completed', completedTime: '1 hr ago', quality: 'good', utilities: { electricity: true, water: true, gas: true }, aadhaarLast4: '2345' },
+                { id: 4, houseNo: '104', name: 'Singh Residence', address: 'Block A, Flat 104, Saket', status: 'pending', utilities: { electricity: true, water: false, gas: true }, aadhaarLast4: '6789' },
+                { id: 5, houseNo: '105', name: 'Kumar Family', address: 'Block A, Flat 105, Saket', status: 'skipped', skipReason: 'House locked', skipIcon: '🔒', utilities: { electricity: true, water: true, gas: true }, aadhaarLast4: '1234' },
+                { id: 6, houseNo: '106', name: 'Verma Residence', address: 'Block B, Flat 106, Saket', status: 'pending', utilities: { electricity: true, water: true, gas: false }, aadhaarLast4: '5678' },
+                { id: 7, houseNo: '107', name: 'Reddy House', address: 'Block B, Flat 107, Saket', status: 'completed', completedTime: '2 hrs ago', quality: 'review', utilities: { electricity: true, water: true, gas: true }, aadhaarLast4: '9012' },
+                { id: 8, houseNo: '108', name: 'Joshi Family', address: 'Block B, Flat 108, Saket', status: 'skipped', skipReason: 'Safety hazard', skipIcon: '⚠️', utilities: { electricity: true, water: true, gas: false }, aadhaarLast4: '3456' },
+                { id: 9, houseNo: '109', name: 'Mehta Residence', address: 'Block B, Flat 109, Saket', status: 'pending', utilities: { electricity: true, water: true, gas: true }, aadhaarLast4: '7890' },
+                { id: 10, houseNo: '110', name: 'Kapoor Family', address: 'Block C, Flat 110, Saket', status: 'completed', completedTime: '3 hrs ago', quality: 'low', utilities: { electricity: true, water: false, gas: true }, aadhaarLast4: '2468' }
+            ];
+
+            // Grouped Households
+            $scope.groupedHouseholds = {
+                pending: [],
+                skipped: [],
+                completed: []
+            };
+
+            // Counts
+            $scope.counts = {
+                pending: 0,
+                skipped: 0,
+                completed: 0
+            };
+
+            $scope.totalFiltered = 0;
+
+            // Issue Modal
+            $scope.showIssueModal = false;
+            $scope.selectedHouse = null;
+            $scope.selectedIssue = null;
+            $scope.issueOptions = [
+                { id: 'locked', icon: '🔒', label: 'House locked' },
+                { id: 'damaged', icon: '🔧', label: 'Meter damaged' },
+                { id: 'denied', icon: '🚫', label: 'Access denied' },
+                { id: 'safety', icon: '⚠️', label: 'Safety hazard' },
+                { id: 'other', icon: '📝', label: 'Other issue' }
+            ];
+
+            // Filter and Group Households
+            $scope.filterHouseholds = function () {
+                var query = $scope.searchQuery.toLowerCase().trim();
+
+                var filtered = $scope.households.filter(function (house) {
+                    // Status filter
+                    if ($scope.filterStatus && house.status !== $scope.filterStatus) {
+                        return false;
+                    }
+
+                    // Search query
+                    if (query) {
+                        var matchesName = house.name.toLowerCase().includes(query);
+                        var matchesHouseNo = house.houseNo.toLowerCase().includes(query);
+                        var matchesAddress = house.address.toLowerCase().includes(query);
+                        var matchesAadhaar = house.aadhaarLast4.includes(query);
+                        return matchesName || matchesHouseNo || matchesAddress || matchesAadhaar;
+                    }
+
+                    return true;
+                });
+
+                // Group by status (auto-sorting: Pending → Skipped → Completed)
+                $scope.groupedHouseholds = {
+                    pending: filtered.filter(function (h) { return h.status === 'pending'; }),
+                    skipped: filtered.filter(function (h) { return h.status === 'skipped'; }),
+                    completed: filtered.filter(function (h) { return h.status === 'completed'; })
+                };
+
+                $scope.totalFiltered = filtered.length;
+            };
+
+            // Calculate counts
+            function calculateCounts() {
+                $scope.counts.pending = $scope.households.filter(function (h) { return h.status === 'pending'; }).length;
+                $scope.counts.skipped = $scope.households.filter(function (h) { return h.status === 'skipped'; }).length;
+                $scope.counts.completed = $scope.households.filter(function (h) { return h.status === 'completed'; }).length;
+            }
+
+            // Toggle status filter
+            $scope.toggleFilter = function (status) {
+                if ($scope.filterStatus === status) {
+                    $scope.filterStatus = null;
+                } else {
+                    $scope.filterStatus = status;
+                }
+                $scope.filterHouseholds();
+            };
+
+            // Language functions
+            $scope.toggleLangMenu = function ($event) {
+                $event.stopPropagation();
+                $scope.showLangMenu = !$scope.showLangMenu;
+            };
+
+            $scope.selectLang = function (lang, $event) {
+                $event.preventDefault();
+                $scope.selectedLang = lang.code;
+                $scope.showLangMenu = false;
+            };
+
+            // Actions
+            $scope.startReading = function (house, $event) {
+                $event.stopPropagation();
+
+                // Simulate reading completion with animation
+                alert('Starting meter reading for:\n\nHouse ' + house.houseNo + ' - ' + house.name + '\n' +
+                    house.address + '\n\n📷 Camera ready\n📍 GPS active\n🕐 Timestamp synced');
+
+                // Mark as completed with animation
+                house.isMoving = true;
+                $timeout(function () {
+                    house.status = 'completed';
+                    house.completedTime = 'Just now';
+                    house.quality = 'good';
+                    house.justCompleted = true;
+                    house.isMoving = false;
+
+                    calculateCounts();
+                    $scope.filterHouseholds();
+
+                    // Remove animation class after a moment
+                    $timeout(function () {
+                        house.justCompleted = false;
+                    }, 600);
+                }, 300);
+            };
+
+            $scope.viewSubmission = function (house, $event) {
+                $event.stopPropagation();
+                alert('Viewing submission for:\n\nHouse ' + house.houseNo + ' - ' + house.name + '\n\n' +
+                    '✓ Reading captured\n✓ Photo uploaded\n✓ GPS verified\n\n(Read-only view)');
+            };
+
+            $scope.resolveSkip = function (house, $event) {
+                $event.stopPropagation();
+                if (confirm('Retry reading for House ' + house.houseNo + '?')) {
+                    house.isMoving = true;
+                    $timeout(function () {
+                        house.status = 'pending';
+                        delete house.skipReason;
+                        delete house.skipIcon;
+                        house.isMoving = false;
+
+                        calculateCounts();
+                        $scope.filterHouseholds();
+                    }, 300);
+                }
+            };
+
+            $scope.reportIssue = function (house, $event) {
+                $event.stopPropagation();
+                $scope.selectedHouse = house;
+                $scope.selectedIssue = null;
+                $scope.showIssueModal = true;
+            };
+
+            $scope.selectIssue = function (issueId) {
+                $scope.selectedIssue = issueId;
+            };
+
+            $scope.closeModal = function () {
+                $scope.showIssueModal = false;
+                $scope.selectedHouse = null;
+            };
+
+            $scope.submitIssue = function () {
+                if (!$scope.selectedIssue) return;
+
+                var issueOption = $scope.issueOptions.find(function (o) {
+                    return o.id === $scope.selectedIssue;
+                });
+
+                var house = $scope.households.find(function (h) {
+                    return h.id === $scope.selectedHouse.id;
+                });
+
+                if (house) {
+                    house.isMoving = true;
+                    $timeout(function () {
+                        house.status = 'skipped';
+                        house.skipReason = issueOption.label;
+                        house.skipIcon = issueOption.icon;
+                        house.isMoving = false;
+
+                        calculateCounts();
+                        $scope.filterHouseholds();
+                    }, 300);
+                }
+
+                alert('Issue reported for House ' + $scope.selectedHouse.houseNo + ':\n\n' +
+                    '• Reason: ' + issueOption.label + '\n' +
+                    '• Status: Marked as Skipped\n' +
+                    '• Synced with city control room\n' +
+                    '• Logged with timestamp and GPS');
+
+                $scope.closeModal();
+            };
+
+            $scope.logout = function () {
+                if (confirm('Are you sure you want to logout?')) {
+                    window.location.href = '/static/app/views/landing.html';
+                }
+            };
+
+            // Initialize
+            calculateCounts();
+            $scope.filterHouseholds();
+
+            // Close language menu on outside click
+            document.addEventListener('click', function () {
+                $scope.$apply(function () {
+                    $scope.showLangMenu = false;
+                });
+            });
+        }]);
+    </script>
+</body>
+
+</html>

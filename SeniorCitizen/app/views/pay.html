@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="seniorApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay Bills | Suvidha - Easy View</title>
+    <link rel="stylesheet" href="../../css/senior-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="../app.js"></script>
+    <style>
+        .sc-content {
+            padding: 2rem 2.5rem;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--gov-gray-100);
+            border: 1px solid var(--gov-gray-200);
+            border-radius: var(--radius-md);
+            color: var(--gov-gray-700);
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .comfort-message {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--gov-success-light);
+            border-radius: var(--radius-md);
+            color: var(--gov-success);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--gov-gray-100);
+            border-radius: 50px;
+            font-size: 1rem;
+            color: var(--gov-gray-500);
+        }
+
+        .step.active {
+            background: var(--gov-info);
+            color: white;
+            font-weight: 600;
+        }
+
+        .step.done {
+            background: var(--gov-success-light);
+            color: var(--gov-success);
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .payment-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 3px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .payment-card:hover {
+            border-color: var(--gov-info);
+            transform: translateY(-4px);
+        }
+
+        .payment-card.selected {
+            border-color: var(--gov-info);
+            background: var(--gov-info-light);
+        }
+
+        .payment-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+        }
+
+        .payment-desc {
+            font-size: 1rem;
+            color: var(--gov-gray-500);
+            margin-top: 0.5rem;
+        }
+
+        .amount-section {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .amount-section h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+            margin-bottom: 1.25rem;
+        }
+
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gov-gray-100);
+            font-size: 1.1rem;
+        }
+
+        .amount-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 1.35rem;
+            padding-top: 1.25rem;
+        }
+
+        .proceed-btn {
+            width: 100%;
+            padding: 1.5rem;
+            background: var(--gov-success);
+            color: white;
+            border: none;
+            border-radius: var(--radius-xl);
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .proceed-btn:hover {
+            background: #2f855a;
+            transform: translateY(-2px);
+        }
+
+        .proceed-btn:disabled {
+            background: var(--gov-gray-300);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .reassurance {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--gov-gray-500);
+            font-size: 1rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body ng-controller="PayController">
+    <aside class="sc-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><img src="/static/images/suvidha-logo.png" alt="Suvidha"
+                        onerror="this.style.display='none'; this.parentNode.innerHTML='🏠';"></div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1><span>Easy View</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span
+                    class="nav-text">Home</span></a>
+            <a href="bills.html" class="nav-item"><span class="nav-icon">💳</span><span class="nav-text">My
+                    Bills</span></a>
+            <a href="complaints.html" class="nav-item"><span class="nav-icon">📞</span><span class="nav-text">Help &
+                    Complaints</span></a>
+            <a href="updates.html" class="nav-item"><span class="nav-icon">📍</span><span class="nav-text">My Area
+                    Updates</span></a>
+            <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span><span
+                    class="nav-text">Settings</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                </div>
+            </div>
+            <button class="logout-btn"><span>↪️</span><span>Logout</span></button>
+        </div>
+    </aside>
+    <main class="sc-main-content">
+        <header class="sc-header">
+            <div class="header-left">
+                <h2>Pay Bills</h2>
+            </div>
+            <div class="header-right">
+                <div class="accessibility-controls"><button class="font-size-btn" ng-click="increaseFontSize()" ng-class="{active: currentFontSize === 'increased'}">A+</button><button
+                        class="font-size-btn" ng-click="decreaseFontSize()" ng-class="{active: currentFontSize === 'normal'}">A</button></div>
+                <div class="lang-dropdown"><button class="lang-toggle-btn">EN ▼</button></div>
+            </div>
+        </header>
+        <div class="sc-content">
+            <div class="page-header">
+                <h3 class="page-title">Pay Your Bills</h3>
+                <a href="dashboard.html" class="back-btn">← Back to Home</a>
+            </div>
+            <div class="comfort-message">💡 Nothing will be paid until you press the final button. Take your time.</div>
+            <div class="step-indicator">
+                <div class="step active"><span class="step-number">1</span> Select Method</div>
+                <div class="step"><span class="step-number">2</span> Review</div>
+                <div class="step"><span class="step-number">3</span> Confirm</div>
+            </div>
+            <h4 style="font-size: 1.35rem; font-weight: 700; color: var(--gov-gray-800); margin-bottom: 1.5rem;">How
+                would you like to pay?</h4>
+            <div class="payment-methods">
+                <div class="payment-card" ng-repeat="method in paymentMethods"
+                    ng-class="{selected: selectedMethod === method.id}" ng-click="selectMethod(method.id)">
+                    <div class="payment-icon">{{method.icon}}</div>
+                    <div class="payment-name">{{method.name}}</div>
+                    <div class="payment-desc">{{method.desc}}</div>
+                </div>
+            </div>
+            <div class="amount-section">
+                <h4>💰 Bill Summary</h4>
+                <div class="amount-row"><span>Electricity Bill</span><span>₹1,250</span></div>
+                <div class="amount-row"><span>Water Bill</span><span>₹450</span></div>
+                <div class="amount-row"><span>Total Amount</span><span>₹1,700</span></div>
+            </div>
+            <button class="proceed-btn" ng-click="proceedPayment()" ng-disabled="!selectedMethod">
+                {{selectedMethod ? '✓ Pay ₹1,700 Now' : 'Select a payment method first'}}
+            </button>
+            <div class="reassurance">🤝 You can always go back. Nothing will happen until you confirm.</div>
+        </div>
+    </main>
+    <button class="help-btn-fixed"><span class="help-icon">?</span><span>Need Help?</span></button>
+    <script>
+        var app = angular.module('seniorApp', []);
+        app.controller('PayController', ['$scope', function ($scope) {
+            // Load user from localStorage
+            var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+            var userName = 'Guest User';
+            var userInitials = 'GU';
+            
+            if (storedUser) {
+                userName = storedUser.full_name || storedUser.name || 'Guest User';
+                var nameParts = userName.split(' ');
+                userInitials = nameParts.length >= 2 
+                    ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
+                    : userName.substring(0, 2).toUpperCase();
+            }
+            
+            $scope.user = { name: userName, initials: userInitials };
+            $scope.paymentMethods = [
+                { id: 'upi', name: 'UPI Payment', icon: '📱', desc: 'Pay using Google Pay, PhonePe' },
+                { id: 'card', name: 'Debit/Credit Card', icon: '💳', desc: 'Use your bank card' },
+                { id: 'netbanking', name: 'Net Banking', icon: '🏦', desc: 'Pay through your bank' },
+                { id: 'cash', name: 'Pay at Center', icon: '🏪', desc: 'Visit nearby center' }
+            ];
+            $scope.selectedMethod = null;
+            $scope.selectMethod = function (methodId) { $scope.selectedMethod = methodId; };
+            $scope.proceedPayment = function () {
+                if (!$scope.selectedMethod) { alert('Please select how you want to pay.'); return; }
+                var method = $scope.paymentMethods.find(function (m) { return m.id === $scope.selectedMethod; });
+                if (confirm('Confirm payment of ₹1,700 using ' + method.name + '?\n\nTake your time to decide.')) {
+                    alert('✓ Payment Successful!\n\nAmount: ₹1,700\nMethod: ' + method.name + '\n\nReceipt sent to your phone.\nThank you!');
+                }
+            };
+        }]);
+    </script>
+</body>
+
+</html>

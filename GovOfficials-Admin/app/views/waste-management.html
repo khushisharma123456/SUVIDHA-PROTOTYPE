@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="adminApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste Management Control Room - Suvidha Admin</title>
+    <link rel="stylesheet" href="../../css/gov-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular-route.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        /* Control Room specific overrides */
+        .control-room-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+            margin-top: 24px;
+        }
+        
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .map-dominant {
+            min-height: 550px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .map-dominant .card-body {
+            flex: 1;
+            padding: 16px;
+            overflow: hidden;
+        }
+        
+        .map-dominant .map-container {
+            width: 100%;
+            height: 100%;
+            min-height: 450px;
+            background: 
+                linear-gradient(0deg, transparent 24%, rgba(100, 180, 220, 0.1) 25%, rgba(100, 180, 220, 0.1) 26%, transparent 27%, transparent 74%, rgba(100, 180, 220, 0.1) 75%, rgba(100, 180, 220, 0.1) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(100, 180, 220, 0.1) 25%, rgba(100, 180, 220, 0.1) 26%, transparent 27%, transparent 74%, rgba(100, 180, 220, 0.1) 75%, rgba(100, 180, 220, 0.1) 76%, transparent 77%, transparent),
+                linear-gradient(135deg, #e8f4f8 0%, #d4e8ed 100%);
+            background-size: 60px 60px, 60px 60px, 100% 100%;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            display: block;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(to right, rgba(100, 180, 220, 0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(100, 180, 220, 0.15) 1px, transparent 1px);
+            background-size: 120px 120px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .map-container::after {
+            content: 'ZONE A\AZONE B\AZONE C';
+            white-space: pre;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(26, 54, 93, 0.25);
+            line-height: 1.8;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .map-marker {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            z-index: 20;
+            font-size: 16px;
+        }
+        
+        .map-marker:hover {
+            transform: scale(1.3);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4), 0 0 0 3px rgba(255,255,255,0.8);
+            z-index: 30;
+        }
+        
+        .map-marker.active {
+            background: var(--gov-success);
+            animation: pulse 2s infinite;
+        }
+        
+        .map-marker.delayed {
+            background: var(--gov-warning);
+            animation: pulse-warning 1.5s infinite;
+        }
+        
+        .map-marker.hotspot {
+            background: var(--gov-danger);
+            animation: pulse-danger 1s infinite;
+        }
+        
+        .map-marker.inactive {
+            background: #94a3b8;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(56, 161, 105, 0); }
+        }
+        
+        @keyframes pulse-warning {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(237, 137, 54, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(237, 137, 54, 0); }
+        }
+        
+        @keyframes pulse-danger {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(229, 62, 62, 0); }
+        }
+        
+        .map-zone-overlay {
+            position: absolute;
+            border: 2px dashed rgba(26, 54, 93, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: rgba(26, 54, 93, 0.2);
+            font-size: 14px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .map-zone-a {
+            top: 10%;
+            left: 10%;
+            width: 35%;
+            height: 40%;
+        }
+        
+        .map-zone-b {
+            top: 10%;
+            right: 10%;
+            width: 35%;
+            height: 40%;
+        }
+        
+        .map-zone-c {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 35%;
+        }
+        
+        .map-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .map-controls .gov-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .map-legend {
+            position: absolute !important;
+            bottom: 16px !important;
+            left: 16px !important;
+            background: white !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            z-index: 35 !important;
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .status-dot.active {
+            background: var(--gov-success);
+        }
+        
+        .status-dot.delayed {
+            background: var(--gov-warning);
+        }
+        
+        .status-dot.danger {
+            background: var(--gov-danger);
+        }
+        
+        .vehicle-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .vehicle-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 480px;
+            max-width: 90vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .vehicle-modal-header {
+            background: linear-gradient(135deg, var(--gov-primary), #2c5282);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .vehicle-modal-body {
+            padding: 24px;
+        }
+        
+        .vehicle-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .vehicle-info-item {
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .vehicle-info-item label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .vehicle-info-item .value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gov-primary);
+            margin-top: 4px;
+        }
+        
+        .capacity-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .capacity-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .vehicle-modal-footer {
+            padding: 16px 24px;
+            background: #f8fafc;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .kpi-drawer {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            width: 480px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+            z-index: 1001;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .kpi-drawer.open {
+            right: 0;
+        }
+        
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 1000;
+        }
+        
+        .drawer-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, var(--gov-primary), #2c5282);
+            color: white;
+        }
+        
+        .drawer-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .drawer-header .subtitle {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .drawer-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .drawer-footer {
+            padding: 16px 24px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .ward-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .ward-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .ward-item:hover {
+            background: #e2e8f0;
+            transform: translateX(4px);
+        }
+        
+        .ward-item .ward-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .ward-item .ward-value {
+            font-weight: 600;
+            color: var(--gov-primary);
+        }
+        
+        .ward-item .ward-trend {
+            margin-left: 8px;
+            font-size: 12px;
+        }
+        
+        .ward-item .ward-trend.up { color: var(--gov-success); }
+        .ward-item .ward-trend.down { color: var(--gov-danger); }
+        
+        .heatmap-cell {
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .heatmap-cell.high { background: rgba(56, 161, 105, 0.2); color: #22543d; }
+        .heatmap-cell.medium { background: rgba(237, 137, 54, 0.2); color: #744210; }
+        .heatmap-cell.low { background: rgba(229, 62, 62, 0.2); color: #742a2a; }
+        
+        .ai-recommendation {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .ai-recommendation .ai-badge {
+            background: #f59e0b;
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .ai-recommendation .recommendation-text {
+            font-weight: 500;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+        
+        .ai-recommendation .impact {
+            font-size: 12px;
+            color: #78350f;
+            margin-bottom: 12px;
+        }
+        
+        .citizen-section {
+            margin-top: 24px;
+        }
+        
+        .citizen-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .citizen-section-header:hover {
+            background: rgba(255,255,255,0.95);
+        }
+        
+        .citizen-section-body {
+            padding: 16px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+        
+        .leaderboard-rank {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gov-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+        
+        .leaderboard-rank.gold { background: #f59e0b; }
+        .leaderboard-rank.silver { background: #94a3b8; }
+        .leaderboard-rank.bronze { background: #d97706; }
+        
+        .stat-card.clickable {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card.clickable:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(26, 54, 93, 0.12);
+        }
+        
+        .record-drawer {
+            position: fixed;
+            top: 0;
+            right: -600px;
+            width: 560px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+            z-index: 1001;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .record-drawer.open {
+            right: 0;
+        }
+        
+        .record-photo {
+            width: 100%;
+            height: 200px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .record-timeline {
+            padding: 16px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            padding: 12px 0;
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 32px;
+            bottom: -12px;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        
+        .timeline-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--gov-success);
+            margin-right: 16px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .timeline-dot svg {
+            width: 12px;
+            height: 12px;
+            fill: white;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .skeleton-card {
+            height: 120px;
+        }
+        
+        .skeleton-map {
+            height: 450px;
+        }
+        
+        .skeleton-row {
+            height: 48px;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #64748b;
+        }
+        
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .success-banner {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .success-banner svg {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        
+        .operations-alerts {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .alert-item-clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .alert-item-clickable:hover {
+            transform: translateX(4px);
+            background: #f8fafc;
+        }
+        
+        .trend-chart-wrapper {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .trend-chart-wrapper:hover::after {
+            content: 'Click for ward breakdown';
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: var(--gov-primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body ng-controller="WasteManagementController" ng-click="closeAllDropdowns()">
+    <!-- Sidebar -->
+    <aside class="gov-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='🏛️'">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1>
+                    <span>CITY CONTROL ROOM</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="grievance.html" class="nav-item">
+                <span class="nav-icon">📢</span>
+                <span class="nav-text">Grievance Command</span>
+            </a>
+            <a href="meter.html" class="nav-item">
+                <span class="nav-icon">⚡</span>
+                <span class="nav-text">Meter Integrity</span>
+            </a>
+            <a href="rwa.html" class="nav-item">
+                <span class="nav-icon">🏗️</span>
+                <span class="nav-text">RWA Oversight</span>
+            </a>
+            <a href="participation.html" class="nav-item">
+                <span class="nav-icon">⭐</span>
+                <span class="nav-text">Participation & Incentives</span>
+            </a>
+            <a href="policy.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Policy Insights</span>
+            </a>
+            <a href="audit.html" class="nav-item">
+                <span class="nav-icon">🔐</span>
+                <span class="nav-text">Audit Vault</span>
+            </a>
+            <a href="field-operations.html" class="nav-item">
+                <span class="nav-icon">👷</span>
+                <span class="nav-text">Field Operations</span>
+            </a>
+            <a href="waste-management.html" class="nav-item active">
+                <span class="nav-icon">♻️</span>
+                <span class="nav-text">Waste Management</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials || 'AO'}}</div>
+                <div class="user-info">
+                    <h4>{{user.name || 'Admin Officer'}}</h4>
+                    <p>{{user.role || 'Government'}}</p>
+                    <small>Last Login: {{user.lastLogin || 'Today'}}</small>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()">
+                <span>🚪</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="gov-main">
+        <!-- Top Bar -->
+        <header class="gov-topbar">
+            <div class="topbar-left">
+                <h2>Waste Management</h2>
+                <p>{{currentDate}}</p>
+                <span class="role-badge">🔒 Live Operations Control</span>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" title="Accessibility">♿</button>
+                <div class="lang-dropdown">
+                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)">
+                        🌐 <span>{{selectedLang}}</span> ▼
+                    </button>
+                    <div class="lang-dropdown-menu" ng-show="showLangMenu">
+                        <a href="#" class="lang-option" ng-repeat="lang in languages"
+                            ng-class="{active: selectedLang === lang.code}"
+                            ng-click="selectLang(lang, $event)">{{lang.name}}</a>
+                    </div>
+                </div>
+                <button class="topbar-btn notification-btn">
+                    🔔
+                    <span class="notification-badge">{{notifications.length}}</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="gov-content">
+            <!-- Success Banner (show after action) -->
+            <div class="success-banner" ng-show="successMessage">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                <span>{{successMessage}}</span>
+                <button class="gov-btn sm" ng-click="successMessage = null">Dismiss</button>
+            </div>
+
+            <!-- Geographic Filter Bar -->
+            <div class="geo-filter-bar">
+                <div class="filter-group">
+                    <select class="filter-select" ng-model="filters.district" ng-change="onDistrictChange()">
+                        <option value="">All Districts</option>
+                        <option ng-repeat="d in districts" value="{{d.id}}">{{d.name}}</option>
+                    </select>
+                    <select class="filter-select" ng-model="filters.ward" ng-change="onWardChange()">
+                        <option value="">All Wards</option>
+                        <option ng-repeat="w in wards" value="{{w.id}}">{{w.name}}</option>
+                    </select>
+                    <select class="filter-select" ng-model="filters.zone">
+                        <option value="">All Zones</option>
+                        <option ng-repeat="z in zones" value="{{z.id}}">{{z.name}}</option>
+                    </select>
+                    <button class="filter-apply-btn" ng-click="applyFilters()">Apply Filters</button>
+                </div>
+                <div class="active-filter-badge" ng-show="activeFilterLabel">
+                    {{activeFilterLabel}}
+                    <button class="clear-filter" ng-click="clearFilters()">×</button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div ng-show="isLoading">
+                <div class="stats-grid">
+                    <div class="skeleton skeleton-card" ng-repeat="i in [1,2,3,4]"></div>
+                </div>
+                <div class="skeleton skeleton-map" style="margin-top: 24px;"></div>
+            </div>
+
+            <!-- Main Content (when loaded) -->
+            <div ng-hide="isLoading">
+            <!-- KPI Stats Grid - All Clickable -->
+            <div class="stats-grid">
+                <!-- Waste Collected -->
+                <div class="stat-card clickable" ng-click="openKpiDrawer('wasteCollected')">
+                    <div class="stat-icon-box" style="background: var(--gov-success-light);">
+                        <span class="stat-icon">🗑️</span>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Waste Collected Today</span>
+                        <span class="stat-value">{{kpis.wasteCollected.value}} MT</span>
+                        <span class="stat-trend up">
+                            <span class="trend-arrow">↑</span> {{kpis.wasteCollected.trend}}% vs yesterday
+                        </span>
+                    </div>
+                    <div class="stat-action">
+                        <span class="action-hint">Click for breakdown →</span>
+                    </div>
+                </div>
+
+                <!-- Segregation Compliance -->
+                <div class="stat-card clickable" ng-click="openKpiDrawer('segregation')">
+                    <div class="stat-icon-box" style="background: var(--gov-info-light);">
+                        <span class="stat-icon">♻️</span>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Segregation Compliance</span>
+                        <span class="stat-value">{{kpis.segregation.value}}%</span>
+                        <span class="stat-trend" ng-class="kpis.segregation.trend >= 0 ? 'up' : 'down'">
+                            <span class="trend-arrow">{{kpis.segregation.trend >= 0 ? '↑' : '↓'}}</span> {{Math.abs(kpis.segregation.trend)}}% this week
+                        </span>
+                    </div>
+                    <div class="stat-action">
+                        <span class="action-hint">View heatmap →</span>
+                    </div>
+                </div>
+
+                <!-- Active Vehicles -->
+                <div class="stat-card clickable" ng-click="openKpiDrawer('vehicles')">
+                    <div class="stat-icon-box" style="background: var(--gov-warning-light);">
+                        <span class="stat-icon">🚛</span>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Active Vehicles</span>
+                        <span class="stat-value">{{kpis.vehicles.active}}/{{kpis.vehicles.total}}</span>
+                        <span class="stat-subtext">
+                            <span class="status-dot active"></span> {{kpis.vehicles.onTime}} on schedule
+                            <span class="status-dot delayed"></span> {{kpis.vehicles.delayed}} delayed
+                        </span>
+                    </div>
+                    <div class="stat-action">
+                        <span class="action-hint">Manage fleet →</span>
+                    </div>
+                </div>
+
+                <!-- Open Issues -->
+                <div class="stat-card clickable" ng-click="openKpiDrawer('issues')">
+                    <div class="stat-icon-box" style="background: var(--gov-danger-light);">
+                        <span class="stat-icon">⚠️</span>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Open Issues</span>
+                        <span class="stat-value">{{kpis.issues.total}}</span>
+                        <span class="stat-subtext">
+                            <span class="badge danger">{{kpis.issues.critical}} critical</span>
+                            <span class="badge warning">{{kpis.issues.pending}} pending</span>
+                        </span>
+                    </div>
+                    <div class="stat-action">
+                        <span class="action-hint">Review issues →</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI-Assisted Recommendations -->
+            <div class="gov-card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3>🤖 AI-Assisted Recommendations</h3>
+                    <span class="badge info">Live Analysis</span>
+                </div>
+                <div class="card-body">
+                    <div class="ai-recommendation" ng-repeat="rec in aiRecommendations">
+                        <span class="ai-badge">AI INSIGHT</span>
+                        <div class="recommendation-text">{{rec.text}}</div>
+                        <div class="impact">💡 Impact: {{rec.impact}}</div>
+                        <button class="gov-btn primary sm" ng-click="executeRecommendation(rec)">
+                            {{rec.actionLabel}}
+                        </button>
+                        <button class="gov-btn sm" ng-click="dismissRecommendation(rec)">
+                            Dismiss
+                        </button>
+                    </div>
+                    <div class="empty-state" ng-show="aiRecommendations.length === 0">
+                        <p>No recommendations at this time. System is operating optimally.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Room Layout: Map (dominant) + Side Panel -->
+            <div class="control-room-layout">
+                <!-- Live Operations Map - DOMINANT -->
+                <div class="gov-card map-dominant">
+                    <div class="card-header">
+                        <h3>🗺️ Live Operations Map</h3>
+                        <div class="map-controls">
+                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'all'}" ng-click="setMapFilter('all')">All</button>
+                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'active'}" ng-click="setMapFilter('active')">Active</button>
+                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'delayed'}" ng-click="setMapFilter('delayed')">Delayed</button>
+                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'hotspots'}" ng-click="setMapFilter('hotspots')">Hotspots</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="map-container" id="operationsMap">
+                            <!-- Zone Overlays -->
+                            <div class="map-zone-overlay map-zone-a">ZONE A</div>
+                            <div class="map-zone-overlay map-zone-b">ZONE B</div>
+                            <div class="map-zone-overlay map-zone-c">ZONE C</div>
+                            
+                            <!-- Vehicle Markers -->
+                            <div class="map-marker" 
+                                 ng-repeat="marker in mapMarkers | filter:filterMapMarkers"
+                                 ng-class="marker.type"
+                                 ng-style="{'top': marker.top + 'px', 'left': marker.left + 'px'}"
+                                 ng-click="openVehicleDetail(marker)"
+                                 title="{{marker.label}}">
+                                <span ng-if="marker.type === 'active'">🚛</span>
+                                <span ng-if="marker.type === 'delayed'">⚠️</span>
+                                <span ng-if="marker.type === 'hotspot'">🔴</span>
+                                <span ng-if="marker.type === 'inactive'">⏸️</span>
+                            </div>
+                            
+                            <!-- Map Legend -->
+                            <div class="map-legend">
+                                <div style="display: flex; gap: 16px; font-size: 12px;">
+                                    <span><span class="status-dot active"></span> Active ({{getMarkerCount('active')}})</span>
+                                    <span><span class="status-dot delayed"></span> Delayed ({{getMarkerCount('delayed')}})</span>
+                                    <span><span class="status-dot danger"></span> Hotspot ({{getMarkerCount('hotspot')}})</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side Panel -->
+                <div class="right-panel">
+                    <!-- Operational Alerts -->
+                    <div class="gov-card">
+                        <div class="card-header">
+                            <h3>🚨 Operational Alerts</h3>
+                            <span class="badge danger">{{operationalAlerts.length}} Active</span>
+                        </div>
+                        <div class="card-body operations-alerts">
+                            <div class="alert-item alert-item-clickable" 
+                                 ng-repeat="alert in operationalAlerts"
+                                 ng-click="focusAlertOnMap(alert)">
+                                <span class="alert-icon" ng-class="alert.severity">
+                                    {{alert.severity === 'critical' ? '🔴' : alert.severity === 'warning' ? '🟡' : '🔵'}}
+                                </span>
+                                <div class="alert-content">
+                                    <div class="alert-title">{{alert.title}}</div>
+                                    <div class="alert-meta">{{alert.location}} • {{alert.time}}</div>
+                                </div>
+                                <button class="gov-btn sm primary" ng-click="$event.stopPropagation(); resolveAlert(alert)">
+                                    Act
+                                </button>
+                            </div>
+                            <div class="empty-state" ng-show="operationalAlerts.length === 0">
+                                <p>✅ No active alerts</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trend Chart -->
+                    <div class="gov-card" style="margin-top: 16px;">
+                        <div class="card-header">
+                            <h3>📈 Collection Trend</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="trend-chart-wrapper" ng-click="openTrendDrilldown()">
+                                <canvas id="trendChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collection Records Table -->
+            <div class="gov-card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3>📋 Recent Collection Records</h3>
+                    <div class="quick-filters">
+                        <button class="quick-filter-btn" ng-class="{'active': recordFilter === 'all'}" ng-click="setRecordFilter('all')">All</button>
+                        <button class="quick-filter-btn" ng-class="{'active': recordFilter === 'completed'}" ng-click="setRecordFilter('completed')">Completed</button>
+                        <button class="quick-filter-btn" ng-class="{'active': recordFilter === 'pending'}" ng-click="setRecordFilter('pending')">Pending</button>
+                        <button class="quick-filter-btn" ng-class="{'active': recordFilter === 'issues'}" ng-click="setRecordFilter('issues')">With Issues</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="gov-table">
+                        <thead>
+                            <tr>
+                                <th>Route ID</th>
+                                <th>Ward</th>
+                                <th>Vehicle</th>
+                                <th>Status</th>
+                                <th>Collected</th>
+                                <th>Compliance</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="clickable-row" 
+                                ng-repeat="record in filteredRecords"
+                                ng-click="openRecordDetail(record)">
+                                <td><strong>{{record.routeId}}</strong></td>
+                                <td>{{record.ward}}</td>
+                                <td>{{record.vehicle}}</td>
+                                <td>
+                                    <span class="badge" ng-class="record.statusClass">{{record.status}}</span>
+                                </td>
+                                <td>{{record.collected}} kg</td>
+                                <td>
+                                    <div class="mini-progress">
+                                        <div class="mini-progress-bar" ng-style="{'width': record.compliance + '%'}" 
+                                             ng-class="{'success': record.compliance >= 80, 'warning': record.compliance >= 50 && record.compliance < 80, 'danger': record.compliance < 50}">
+                                        </div>
+                                    </div>
+                                    <span class="compliance-value">{{record.compliance}}%</span>
+                                </td>
+                                <td>{{record.time}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="empty-state" ng-show="filteredRecords.length === 0">
+                        <p>No records match your filter criteria.</p>
+                        <button class="gov-btn primary" ng-click="setRecordFilter('all')">Show All Records</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Citizen Participation - Collapsible -->
+            <div class="citizen-section">
+                <div class="citizen-section-header">
+                    <div ng-click="citizenSectionOpen = !citizenSectionOpen" style="cursor: pointer; flex: 1;">
+                        <h3 style="margin: 0;">👥 Citizen Participation</h3>
+                        <span style="font-size: 13px; color: #64748b;">{{citizenStats.totalParticipants}} active participants this week</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <a href="participation.html" class="view-full-btn" style="padding: 6px 12px; background: var(--gov-primary); color: white; border-radius: 6px; font-size: 12px; text-decoration: none; font-weight: 500;">
+                            View Full Page →
+                        </a>
+                        <span class="expand-icon" ng-click="citizenSectionOpen = !citizenSectionOpen" style="cursor: pointer;">{{citizenSectionOpen ? '▼' : '▶'}}</span>
+                    </div>
+                </div>
+                <div class="citizen-section-body" ng-show="citizenSectionOpen">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                        <div>
+                            <h4>🏆 Top Contributors</h4>
+                            <div class="leaderboard">
+                                <div class="leaderboard-item" ng-repeat="user in citizenLeaderboard">
+                                    <span class="leaderboard-rank" ng-class="{'gold': $index === 0, 'silver': $index === 1, 'bronze': $index === 2}">{{$index + 1}}</span>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 500;">{{user.name}}</div>
+                                        <div style="font-size: 12px; color: #64748b;">{{user.ward}}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-weight: 600; color: var(--gov-primary);">{{user.points}} pts</div>
+                                        <div style="font-size: 12px; color: #64748b;">{{user.reports}} reports</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4>📊 Participation Stats</h4>
+                            <div class="stats-mini-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div class="stat-mini-card" style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--gov-primary);">{{citizenStats.reportsThisWeek}}</div>
+                                    <div style="font-size: 12px; color: #64748b;">Reports This Week</div>
+                                </div>
+                                <div class="stat-mini-card" style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--gov-success);">{{citizenStats.resolvedByReports}}%</div>
+                                    <div style="font-size: 12px; color: #64748b;">Resolved via Reports</div>
+                                </div>
+                                <div class="stat-mini-card" style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--gov-info);">{{citizenStats.avgResponseTime}}h</div>
+                                    <div style="font-size: 12px; color: #64748b;">Avg Response Time</div>
+                                </div>
+                                <div class="stat-mini-card" style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--gov-warning);">{{citizenStats.activeRWAs}}</div>
+                                    <div style="font-size: 12px; color: #64748b;">Active RWAs</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </main>
+
+    <!-- KPI Drawer -->
+    <div class="drawer-overlay" ng-show="drawerOpen" ng-click="closeDrawer()"></div>
+    <div class="kpi-drawer" ng-class="{'open': drawerOpen}">
+        <div class="drawer-header" style="position: relative;">
+            <h3>{{drawerTitle}}</h3>
+            <div class="subtitle">{{drawerSubtitle}}</div>
+            <button class="drawer-close" ng-click="closeDrawer()">×</button>
+        </div>
+        <div class="drawer-body">
+            <!-- Waste Collected Breakdown -->
+            <div ng-show="drawerType === 'wasteCollected'">
+                <h4>Ward-wise Breakdown</h4>
+                <div class="ward-breakdown">
+                    <div class="ward-item" ng-repeat="ward in wasteBreakdown" ng-click="drillToWard(ward)">
+                        <span class="ward-name">{{ward.name}}</span>
+                        <span class="ward-value">{{ward.collected}} MT</span>
+                        <span class="ward-trend" ng-class="ward.trend > 0 ? 'up' : 'down'">
+                            {{ward.trend > 0 ? '+' : ''}}{{ward.trend}}%
+                        </span>
+                    </div>
+                </div>
+                <h4 style="margin-top: 24px;">Hourly Progress</h4>
+                <canvas id="hourlyChart" height="120"></canvas>
+            </div>
+
+            <!-- Segregation Heatmap -->
+            <div ng-show="drawerType === 'segregation'">
+                <h4>Compliance Heatmap by Zone</h4>
+                <table class="gov-table">
+                    <thead>
+                        <tr>
+                            <th>Zone</th>
+                            <th>Wet</th>
+                            <th>Dry</th>
+                            <th>Hazardous</th>
+                            <th>Overall</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="zone in segregationData">
+                            <td><strong>{{zone.name}}</strong></td>
+                            <td><span class="heatmap-cell" ng-class="getComplianceClass(zone.wet)">{{zone.wet}}%</span></td>
+                            <td><span class="heatmap-cell" ng-class="getComplianceClass(zone.dry)">{{zone.dry}}%</span></td>
+                            <td><span class="heatmap-cell" ng-class="getComplianceClass(zone.hazardous)">{{zone.hazardous}}%</span></td>
+                            <td><span class="heatmap-cell" ng-class="getComplianceClass(zone.overall)">{{zone.overall}}%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h4 style="margin-top: 24px;">Low Compliance Zones (Action Required)</h4>
+                <div class="alert-item" ng-repeat="zone in lowComplianceZones" style="margin-bottom: 8px;">
+                    <span class="alert-icon">🔴</span>
+                    <div class="alert-content">
+                        <div class="alert-title">{{zone.name}}</div>
+                        <div class="alert-meta">Compliance: {{zone.overall}}%</div>
+                    </div>
+                    <button class="gov-btn sm primary" ng-click="sendWarning(zone)">Send Warning</button>
+                </div>
+            </div>
+
+            <!-- Vehicle Fleet -->
+            <div ng-show="drawerType === 'vehicles'">
+                <div class="quick-filters" style="margin-bottom: 16px;">
+                    <button class="quick-filter-btn" ng-class="{'active': vehicleFilter === 'all'}" ng-click="vehicleFilter = 'all'">All</button>
+                    <button class="quick-filter-btn" ng-class="{'active': vehicleFilter === 'active'}" ng-click="vehicleFilter = 'active'">Active</button>
+                    <button class="quick-filter-btn" ng-class="{'active': vehicleFilter === 'delayed'}" ng-click="vehicleFilter = 'delayed'">Delayed</button>
+                    <button class="quick-filter-btn" ng-class="{'active': vehicleFilter === 'maintenance'}" ng-click="vehicleFilter = 'maintenance'">Maintenance</button>
+                </div>
+                <div class="vehicle-list">
+                    <div class="alert-item" ng-repeat="v in vehicleList | filter:filterVehicles" style="margin-bottom: 8px;">
+                        <span class="alert-icon">🚛</span>
+                        <div class="alert-content">
+                            <div class="alert-title">{{v.id}} - {{v.driver}}</div>
+                            <div class="alert-meta">{{v.route}} • {{v.status}}</div>
+                        </div>
+                        <button class="gov-btn sm" ng-click="locateVehicle(v)">Locate</button>
+                        <button class="gov-btn sm primary" ng-click="contactDriver(v)">Contact</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issues List -->
+            <div ng-show="drawerType === 'issues'">
+                <div class="quick-filters" style="margin-bottom: 16px;">
+                    <button class="quick-filter-btn" ng-class="{'active': issueFilter === 'all'}" ng-click="issueFilter = 'all'">All</button>
+                    <button class="quick-filter-btn" ng-class="{'active': issueFilter === 'critical'}" ng-click="issueFilter = 'critical'">Critical</button>
+                    <button class="quick-filter-btn" ng-class="{'active': issueFilter === 'pending'}" ng-click="issueFilter = 'pending'">Pending</button>
+                </div>
+                <div class="issues-list">
+                    <div class="alert-item" ng-repeat="issue in issuesList | filter:filterIssues" 
+                         ng-class="{'critical': issue.severity === 'critical'}"
+                         ng-style="{'margin-bottom': '8px', 'border-left': '3px solid ' + (issue.severity === 'critical' ? 'var(--gov-danger)' : issue.severity === 'warning' ? 'var(--gov-warning)' : 'var(--gov-info)')}">
+                        <span class="alert-icon">{{issue.severity === 'critical' ? '🔴' : issue.severity === 'warning' ? '🟡' : '🔵'}}</span>
+                        <div class="alert-content">
+                            <div class="alert-title">{{issue.title}}</div>
+                            <div class="alert-meta">{{issue.location}} • {{issue.reportedAt}}</div>
+                        </div>
+                        <button class="gov-btn sm primary" ng-click="assignIssue(issue)">Assign</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button class="gov-btn" ng-click="closeDrawer()">Close</button>
+            <button class="gov-btn primary" ng-click="exportDrawerData()">Export Data</button>
+        </div>
+    </div>
+
+    <!-- Vehicle Detail Modal -->
+    <div class="vehicle-modal" ng-show="vehicleModalOpen">
+        <div class="vehicle-modal-content">
+            <div class="vehicle-modal-header">
+                <div>
+                    <h3 style="margin: 0;">{{selectedVehicle.id}}</h3>
+                    <div style="opacity: 0.8; font-size: 13px;">{{selectedVehicle.type}}</div>
+                </div>
+                <span class="badge" ng-class="selectedVehicle.statusClass">{{selectedVehicle.status}}</span>
+            </div>
+            <div class="vehicle-modal-body">
+                <div class="vehicle-info-grid">
+                    <div class="vehicle-info-item">
+                        <label>Driver</label>
+                        <div class="value">{{selectedVehicle.driver}}</div>
+                    </div>
+                    <div class="vehicle-info-item">
+                        <label>Contact</label>
+                        <div class="value">{{selectedVehicle.contact}}</div>
+                    </div>
+                    <div class="vehicle-info-item">
+                        <label>Current Route</label>
+                        <div class="value">{{selectedVehicle.route}}</div>
+                    </div>
+                    <div class="vehicle-info-item">
+                        <label>ETA to Next Stop</label>
+                        <div class="value">{{selectedVehicle.eta}}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <label style="font-size: 12px; color: #64748b;">Capacity Utilization</label>
+                    <div class="capacity-bar">
+                        <div class="capacity-fill" 
+                             ng-style="{'width': selectedVehicle.capacity + '%', 'background': selectedVehicle.capacity > 80 ? 'var(--gov-danger)' : selectedVehicle.capacity > 50 ? 'var(--gov-warning)' : 'var(--gov-success)'}">
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px;">
+                        <span>{{selectedVehicle.capacity}}% full</span>
+                        <span>{{selectedVehicle.collected}} / {{selectedVehicle.maxCapacity}} kg</span>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <label style="font-size: 12px; color: #64748b;">Today's Progress</label>
+                    <div style="display: flex; gap: 12px; margin-top: 8px;">
+                        <div style="flex: 1; background: #f8fafc; padding: 12px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 20px; font-weight: 600; color: var(--gov-primary);">{{selectedVehicle.stopsCompleted}}</div>
+                            <div style="font-size: 11px; color: #64748b;">Stops Done</div>
+                        </div>
+                        <div style="flex: 1; background: #f8fafc; padding: 12px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 20px; font-weight: 600; color: var(--gov-primary);">{{selectedVehicle.stopsRemaining}}</div>
+                            <div style="font-size: 11px; color: #64748b;">Remaining</div>
+                        </div>
+                        <div style="flex: 1; background: #f8fafc; padding: 12px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 20px; font-weight: 600; color: var(--gov-primary);">{{selectedVehicle.distanceKm}}</div>
+                            <div style="font-size: 11px; color: #64748b;">km covered</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="vehicle-modal-footer">
+                <button class="gov-btn" ng-click="closeVehicleModal()">Close</button>
+                <button class="gov-btn" ng-click="trackVehicle(selectedVehicle)">Track on Map</button>
+                <button class="gov-btn primary" ng-click="contactDriver(selectedVehicle)">Contact Driver</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Detail Drawer -->
+    <div class="drawer-overlay" ng-show="recordDrawerOpen" ng-click="closeRecordDrawer()"></div>
+    <div class="record-drawer" ng-class="{'open': recordDrawerOpen}">
+        <div class="drawer-header" style="position: relative;">
+            <h3>Collection Record: {{selectedRecord.routeId}}</h3>
+            <div class="subtitle">{{selectedRecord.ward}} • {{selectedRecord.date}}</div>
+            <button class="drawer-close" ng-click="closeRecordDrawer()">×</button>
+        </div>
+        <div class="drawer-body">
+            <div class="record-photo">
+                <span>📷 Collection Photo Verification</span>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4>Collection Summary</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 20px; font-weight: 600; color: var(--gov-primary);">{{selectedRecord.collected}}</div>
+                        <div style="font-size: 11px; color: #64748b;">kg Collected</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 20px; font-weight: 600; color: var(--gov-success);">{{selectedRecord.compliance}}%</div>
+                        <div style="font-size: 11px; color: #64748b;">Segregation</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 20px; font-weight: 600; color: var(--gov-info);">{{selectedRecord.households}}</div>
+                        <div style="font-size: 11px; color: #64748b;">Households</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <h4>Collection Timeline</h4>
+                <div class="record-timeline">
+                    <div class="timeline-item" ng-repeat="event in selectedRecord.timeline">
+                        <div class="timeline-dot" ng-style="{'background': event.color}">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-weight: 500;">{{event.title}}</div>
+                            <div style="font-size: 12px; color: #64748b;">{{event.time}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <h4>Citizen Points Impact</h4>
+                <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 16px; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 32px;">🏆</span>
+                        <div>
+                            <div style="font-weight: 600; color: #065f46;">{{selectedRecord.pointsAwarded}} Points Awarded</div>
+                            <div style="font-size: 13px; color: #047857;">to {{selectedRecord.participatingCitizens}} participating citizens</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px;" ng-show="selectedRecord.issues && selectedRecord.issues.length > 0">
+                <h4>Reported Issues</h4>
+                <div class="alert-item" ng-repeat="issue in selectedRecord.issues" style="margin-bottom: 8px;">
+                    <span class="alert-icon">⚠️</span>
+                    <div class="alert-content">
+                        <div class="alert-title">{{issue.title}}</div>
+                        <div class="alert-meta">{{issue.status}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button class="gov-btn" ng-click="closeRecordDrawer()">Close</button>
+            <button class="gov-btn" ng-click="printRecord(selectedRecord)">Print Report</button>
+            <button class="gov-btn primary" ng-click="verifyRecord(selectedRecord)">Verify & Approve</button>
+        </div>
+    </div>
+
+    <!-- Trend Drilldown Modal -->
+    <div class="vehicle-modal" ng-show="trendDrilldownOpen">
+        <div class="vehicle-modal-content" style="width: 640px;">
+            <div class="vehicle-modal-header">
+                <h3 style="margin: 0;">Collection Trend Analysis</h3>
+            </div>
+            <div class="vehicle-modal-body">
+                <h4>Ward-wise Comparison (Last 7 Days)</h4>
+                <table class="gov-table" style="margin-top: 12px;">
+                    <thead>
+                        <tr>
+                            <th>Ward</th>
+                            <th>Avg Daily (MT)</th>
+                            <th>Trend</th>
+                            <th>Peak Day</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="ward in trendWardData" class="clickable-row" ng-click="selectWardTrend(ward)">
+                            <td><strong>{{ward.name}}</strong></td>
+                            <td>{{ward.avgDaily}}</td>
+                            <td>
+                                <span class="badge" ng-class="ward.trend > 0 ? 'success' : 'danger'">
+                                    {{ward.trend > 0 ? '+' : ''}}{{ward.trend}}%
+                                </span>
+                            </td>
+                            <td>{{ward.peakDay}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="vehicle-modal-footer">
+                <button class="gov-btn" ng-click="closeTrendDrilldown()">Close</button>
+                <button class="gov-btn primary" ng-click="exportTrendData()">Export Analysis</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AngularJS Application
+        var app = angular.module('adminApp', []);
+        
+        app.controller('WasteManagementController', ['$scope', '$timeout', function($scope, $timeout) {
+            // Initialize Math for template
+            $scope.Math = Math;
+            
+            // User & Language
+            $scope.currentUser = { name: 'Admin Officer' };
+            $scope.currentLang = 'English';
+            $scope.selectedLang = 'English';
+            $scope.showLangDropdown = false;
+            $scope.showLangMenu = false;
+            $scope.languages = [
+                { code: 'en', name: 'English' },
+                { code: 'hi', name: 'हिंदी' },
+                { code: 'mr', name: 'मराठी' }
+            ];
+            $scope.user = {
+                name: 'Admin Officer',
+                role: 'Government Official',
+                lastLogin: 'Today, 9:30 AM',
+                initials: 'AO'
+            };
+            
+            // Current Date
+            var today = new Date();
+            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            $scope.currentDate = today.toLocaleDateString('en-US', options);
+            
+            $scope.toggleLangMenu = function(event) {
+                event.preventDefault();
+                $scope.showLangMenu = !$scope.showLangMenu;
+            };
+            
+            $scope.selectLang = function(lang, event) {
+                event.preventDefault();
+                $scope.selectedLang = lang.name;
+                $scope.currentLang = lang.name;
+                $scope.showLangMenu = false;
+            };
+
+            $scope.closeAllDropdowns = function() {
+                $scope.showLangMenu = false;
+            };
+            
+            $scope.logout = function() {
+                $scope.successMessage = 'Logging out...';
+                $timeout(function() {
+                    // window.location.href = '/logout';
+                }, 1000);
+            };
+            
+            $scope.openNotifications = function() {
+                $scope.successMessage = 'Opening notifications...';
+                $timeout(function() { $scope.successMessage = null; }, 2000);
+            };
+            
+            // Loading State
+            $scope.isLoading = true;
+            $scope.notifications = [{id: 1}, {id: 2}, {id: 3}];
+            $timeout(function() {
+                $scope.isLoading = false;
+                initChart();
+            }, 800);
+            
+            // Success/Error Messages
+            $scope.successMessage = null;
+            
+            // Filters
+            $scope.filters = { district: '', ward: '', zone: '' };
+            $scope.activeFilterLabel = '';
+            $scope.districts = [
+                { id: 'central', name: 'Central Delhi' },
+                { id: 'north', name: 'North Delhi' },
+                { id: 'south', name: 'South Delhi' },
+                { id: 'east', name: 'East Delhi' },
+                { id: 'west', name: 'West Delhi' }
+            ];
+            $scope.wards = [
+                { id: 'w1', name: 'Ward 1 - Connaught Place' },
+                { id: 'w2', name: 'Ward 2 - Karol Bagh' },
+                { id: 'w3', name: 'Ward 3 - Rajouri Garden' },
+                { id: 'w4', name: 'Ward 4 - Dwarka' },
+                { id: 'w5', name: 'Ward 5 - Rohini' }
+            ];
+            $scope.zones = [
+                { id: 'z1', name: 'Zone A' },
+                { id: 'z2', name: 'Zone B' },
+                { id: 'z3', name: 'Zone C' }
+            ];
+            
+            // KPI Data
+            $scope.kpis = {
+                wasteCollected: { value: 847, trend: 12 },
+                segregation: { value: 78, trend: 3 },
+                vehicles: { active: 42, total: 48, onTime: 38, delayed: 4 },
+                issues: { total: 23, critical: 5, pending: 18 }
+            };
+            
+            // AI Recommendations
+            $scope.aiRecommendations = [
+                {
+                    id: 1,
+                    text: 'Route R-15 shows 23% higher collection time. Consider adding one more vehicle.',
+                    impact: 'Could reduce collection time by 18 minutes and cover 12 more households.',
+                    actionLabel: 'Reassign Vehicle'
+                },
+                {
+                    id: 2,
+                    text: 'Ward 3 segregation dropped 8% this week. Send awareness team.',
+                    impact: 'Previous campaigns improved compliance by 15% within 2 weeks.',
+                    actionLabel: 'Schedule Campaign'
+                },
+                {
+                    id: 3,
+                    text: 'Vehicle MH-12-AB-1234 due for maintenance in 2 days.',
+                    impact: 'Proactive maintenance reduces breakdown risk by 40%.',
+                    actionLabel: 'Schedule Service'
+                }
+            ];
+            
+            // Map Data
+            $scope.mapFilter = 'all';
+            $scope.mapMarkers = [
+                { id: 'v1', type: 'active', top: 120, left: 180, label: 'MH-12-AB-1234', vehicleId: 'MH-12-AB-1234' },
+                { id: 'v2', type: 'active', top: 200, left: 320, label: 'MH-12-CD-5678', vehicleId: 'MH-12-CD-5678' },
+                { id: 'v3', type: 'delayed', top: 280, left: 150, label: 'MH-12-EF-9012', vehicleId: 'MH-12-EF-9012' },
+                { id: 'v4', type: 'active', top: 150, left: 450, label: 'MH-12-GH-3456', vehicleId: 'MH-12-GH-3456' },
+                { id: 'v5', type: 'hotspot', top: 350, left: 280, label: 'Overflow - Sector 5', isHotspot: true },
+                { id: 'v6', type: 'active', top: 80, left: 380, label: 'MH-12-IJ-7890', vehicleId: 'MH-12-IJ-7890' },
+                { id: 'v7', type: 'delayed', top: 380, left: 420, label: 'MH-12-KL-2345', vehicleId: 'MH-12-KL-2345' },
+                { id: 'v8', type: 'inactive', top: 50, left: 120, label: 'MH-12-MN-6789', vehicleId: 'MH-12-MN-6789' },
+                { id: 'v9', type: 'hotspot', top: 180, left: 520, label: 'Dumping Issue - Ward 4', isHotspot: true },
+                { id: 'v10', type: 'active', top: 320, left: 80, label: 'MH-12-OP-1357', vehicleId: 'MH-12-OP-1357' }
+            ];
+            
+            // Operational Alerts
+            $scope.operationalAlerts = [
+                { id: 1, title: 'Vehicle MH-12-EF-9012 delayed by 25 mins', location: 'Ward 2, Sector 4', time: '10 min ago', severity: 'warning', markerId: 'v3' },
+                { id: 2, title: 'Overflow reported at Sector 5 bin', location: 'Ward 3, Sector 5', time: '25 min ago', severity: 'critical', markerId: 'v5' },
+                { id: 3, title: 'Illegal dumping detected', location: 'Ward 4, Main Road', time: '1 hour ago', severity: 'critical', markerId: 'v9' },
+                { id: 4, title: 'Route R-08 behind schedule', location: 'Ward 1', time: '15 min ago', severity: 'warning', markerId: 'v7' }
+            ];
+            
+            // Records
+            $scope.recordFilter = 'all';
+            $scope.records = [
+                { routeId: 'R-001', ward: 'Ward 1', vehicle: 'MH-12-AB-1234', status: 'Completed', statusClass: 'success', collected: 456, compliance: 92, time: '08:45 AM', date: 'Today', households: 145, pointsAwarded: 580, participatingCitizens: 89, timeline: [
+                    { title: 'Route Started', time: '06:00 AM', color: 'var(--gov-success)' },
+                    { title: 'Sector A Complete', time: '07:15 AM', color: 'var(--gov-success)' },
+                    { title: 'Sector B Complete', time: '08:00 AM', color: 'var(--gov-success)' },
+                    { title: 'Route Completed', time: '08:45 AM', color: 'var(--gov-success)' }
+                ], issues: [] },
+                { routeId: 'R-002', ward: 'Ward 2', vehicle: 'MH-12-CD-5678', status: 'In Progress', statusClass: 'warning', collected: 234, compliance: 85, time: '09:30 AM', date: 'Today', households: 102, pointsAwarded: 320, participatingCitizens: 56, timeline: [
+                    { title: 'Route Started', time: '06:30 AM', color: 'var(--gov-success)' },
+                    { title: 'Sector A Complete', time: '08:00 AM', color: 'var(--gov-success)' },
+                    { title: 'Sector B In Progress', time: '09:30 AM', color: 'var(--gov-warning)' }
+                ], issues: [] },
+                { routeId: 'R-003', ward: 'Ward 3', vehicle: 'MH-12-EF-9012', status: 'Delayed', statusClass: 'danger', collected: 123, compliance: 67, time: '09:45 AM', date: 'Today', households: 78, pointsAwarded: 180, participatingCitizens: 34, timeline: [
+                    { title: 'Route Started', time: '07:00 AM', color: 'var(--gov-success)' },
+                    { title: 'Delay - Traffic', time: '08:30 AM', color: 'var(--gov-danger)' }
+                ], issues: [{ title: 'Vehicle delay due to traffic', status: 'Active' }] },
+                { routeId: 'R-004', ward: 'Ward 4', vehicle: 'MH-12-GH-3456', status: 'Completed', statusClass: 'success', collected: 389, compliance: 88, time: '08:15 AM', date: 'Today', households: 134, pointsAwarded: 445, participatingCitizens: 78, timeline: [
+                    { title: 'Route Started', time: '05:30 AM', color: 'var(--gov-success)' },
+                    { title: 'All Sectors Complete', time: '08:15 AM', color: 'var(--gov-success)' }
+                ], issues: [] },
+                { routeId: 'R-005', ward: 'Ward 5', vehicle: 'MH-12-IJ-7890', status: 'With Issues', statusClass: 'warning', collected: 278, compliance: 54, time: '10:00 AM', date: 'Today', households: 95, pointsAwarded: 210, participatingCitizens: 42, timeline: [
+                    { title: 'Route Started', time: '06:15 AM', color: 'var(--gov-success)' },
+                    { title: 'Issue Reported', time: '09:00 AM', color: 'var(--gov-warning)' }
+                ], issues: [{ title: 'Low segregation compliance', status: 'Pending Action' }, { title: 'Bin overflow at Stop 12', status: 'Resolved' }] }
+            ];
+            $scope.filteredRecords = $scope.records;
+            
+            // Citizen Participation
+            $scope.citizenSectionOpen = false;
+            $scope.citizenStats = {
+                totalParticipants: 2847,
+                reportsThisWeek: 156,
+                resolvedByReports: 78,
+                avgResponseTime: 2.4,
+                activeRWAs: 34
+            };
+            $scope.citizenLeaderboard = [
+                { name: 'Rajesh Kumar', ward: 'Ward 1', points: 2450, reports: 45 },
+                { name: 'Priya Singh', ward: 'Ward 3', points: 2180, reports: 38 },
+                { name: 'Amit Sharma', ward: 'Ward 2', points: 1920, reports: 32 },
+                { name: 'Sunita Devi', ward: 'Ward 5', points: 1780, reports: 29 },
+                { name: 'Vikram Patel', ward: 'Ward 4', points: 1650, reports: 27 }
+            ];
+            
+            // Drawer State
+            $scope.drawerOpen = false;
+            $scope.drawerType = '';
+            $scope.drawerTitle = '';
+            $scope.drawerSubtitle = '';
+            
+            // Drawer Data
+            $scope.wasteBreakdown = [
+                { name: 'Ward 1 - Connaught Place', collected: 156, trend: 8 },
+                { name: 'Ward 2 - Karol Bagh', collected: 142, trend: -3 },
+                { name: 'Ward 3 - Rajouri Garden', collected: 189, trend: 12 },
+                { name: 'Ward 4 - Dwarka', collected: 203, trend: 5 },
+                { name: 'Ward 5 - Rohini', collected: 157, trend: -1 }
+            ];
+            
+            $scope.segregationData = [
+                { name: 'Zone A', wet: 85, dry: 78, hazardous: 92, overall: 85 },
+                { name: 'Zone B', wet: 72, dry: 68, hazardous: 88, overall: 76 },
+                { name: 'Zone C', wet: 65, dry: 58, hazardous: 75, overall: 66 }
+            ];
+            
+            $scope.lowComplianceZones = [
+                { name: 'Zone C - Sector 5', overall: 52 },
+                { name: 'Zone B - Sector 8', overall: 58 }
+            ];
+            
+            $scope.vehicleFilter = 'all';
+            $scope.vehicleList = [
+                { id: 'MH-12-AB-1234', driver: 'Ramesh K.', route: 'R-001', status: 'Active', type: 'active' },
+                { id: 'MH-12-CD-5678', driver: 'Suresh M.', route: 'R-002', status: 'Active', type: 'active' },
+                { id: 'MH-12-EF-9012', driver: 'Dinesh P.', route: 'R-003', status: 'Delayed', type: 'delayed' },
+                { id: 'MH-12-GH-3456', driver: 'Mahesh S.', route: 'R-004', status: 'Active', type: 'active' },
+                { id: 'MH-12-IJ-7890', driver: 'Ganesh R.', route: 'R-005', status: 'Active', type: 'active' },
+                { id: 'MH-12-MN-6789', driver: 'Nilesh T.', route: 'N/A', status: 'Maintenance', type: 'maintenance' }
+            ];
+            
+            $scope.issueFilter = 'all';
+            $scope.issuesList = [
+                { id: 1, title: 'Bin overflow at Sector 5', location: 'Ward 3', severity: 'critical', reportedAt: '25 min ago' },
+                { id: 2, title: 'Illegal dumping on Main Road', location: 'Ward 4', severity: 'critical', reportedAt: '1 hour ago' },
+                { id: 3, title: 'Vehicle breakdown risk', location: 'Route R-08', severity: 'warning', reportedAt: '2 hours ago' },
+                { id: 4, title: 'Low segregation compliance', location: 'Ward 5, Sector 3', severity: 'warning', reportedAt: '3 hours ago' },
+                { id: 5, title: 'Route delay reported', location: 'Ward 2', severity: 'info', reportedAt: '30 min ago' }
+            ];
+            
+            // Vehicle Modal
+            $scope.vehicleModalOpen = false;
+            $scope.selectedVehicle = {};
+            
+            // Record Drawer
+            $scope.recordDrawerOpen = false;
+            $scope.selectedRecord = {};
+            
+            // Trend Drilldown
+            $scope.trendDrilldownOpen = false;
+            $scope.trendWardData = [
+                { name: 'Ward 1', avgDaily: 148, trend: 5, peakDay: 'Monday' },
+                { name: 'Ward 2', avgDaily: 136, trend: -2, peakDay: 'Wednesday' },
+                { name: 'Ward 3', avgDaily: 182, trend: 8, peakDay: 'Friday' },
+                { name: 'Ward 4', avgDaily: 195, trend: 3, peakDay: 'Monday' },
+                { name: 'Ward 5', avgDaily: 152, trend: -4, peakDay: 'Thursday' }
+            ];
+            
+            // Language Functions
+            $scope.toggleLangDropdown = function() {
+                $scope.showLangDropdown = !$scope.showLangDropdown;
+            };
+            
+            $scope.setLanguage = function(lang) {
+                $scope.currentLang = lang;
+                $scope.showLangDropdown = false;
+            };
+            
+            // Filter Functions
+            $scope.onDistrictChange = function() {
+                // Could filter wards based on district
+            };
+            
+            $scope.onWardChange = function() {
+                // Could filter zones based on ward
+            };
+            
+            $scope.applyFilters = function() {
+                var labels = [];
+                if ($scope.filters.district) {
+                    var d = $scope.districts.find(function(x) { return x.id === $scope.filters.district; });
+                    if (d) labels.push(d.name);
+                }
+                if ($scope.filters.ward) {
+                    var w = $scope.wards.find(function(x) { return x.id === $scope.filters.ward; });
+                    if (w) labels.push(w.name);
+                }
+                $scope.activeFilterLabel = labels.join(' > ') || '';
+                $scope.successMessage = 'Filters applied successfully';
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            $scope.clearFilters = function() {
+                $scope.filters = { district: '', ward: '', zone: '' };
+                $scope.activeFilterLabel = '';
+            };
+            
+            // Map Functions
+            $scope.setMapFilter = function(filter) {
+                $scope.mapFilter = filter;
+            };
+            
+            $scope.filterMapMarkers = function(marker) {
+                if ($scope.mapFilter === 'all') return true;
+                if ($scope.mapFilter === 'hotspots') return marker.type === 'hotspot';
+                return marker.type === $scope.mapFilter;
+            };
+            
+            $scope.getMarkerCount = function(type) {
+                return $scope.mapMarkers.filter(function(m) { return m.type === type; }).length;
+            };
+            
+            $scope.openVehicleDetail = function(marker) {
+                if (marker.isHotspot) {
+                    // Focus on hotspot, show alert
+                    $scope.successMessage = 'Focusing on: ' + marker.label;
+                    $timeout(function() { $scope.successMessage = null; }, 3000);
+                    return;
+                }
+                
+                // Find vehicle data
+                $scope.selectedVehicle = {
+                    id: marker.vehicleId,
+                    type: 'Compactor Truck',
+                    driver: 'Driver ' + marker.vehicleId.slice(-4),
+                    contact: '+91 98765 ' + marker.vehicleId.slice(-4),
+                    route: 'Route ' + marker.vehicleId.slice(-2),
+                    eta: '12 minutes',
+                    status: marker.type === 'active' ? 'On Route' : marker.type === 'delayed' ? 'Delayed' : 'Stopped',
+                    statusClass: marker.type === 'active' ? 'success' : marker.type === 'delayed' ? 'warning' : 'info',
+                    capacity: Math.floor(Math.random() * 40) + 40,
+                    collected: Math.floor(Math.random() * 300) + 200,
+                    maxCapacity: 800,
+                    stopsCompleted: Math.floor(Math.random() * 15) + 10,
+                    stopsRemaining: Math.floor(Math.random() * 10) + 3,
+                    distanceKm: (Math.random() * 15 + 5).toFixed(1)
+                };
+                $scope.vehicleModalOpen = true;
+            };
+            
+            $scope.closeVehicleModal = function() {
+                $scope.vehicleModalOpen = false;
+            };
+            
+            $scope.trackVehicle = function(vehicle) {
+                $scope.vehicleModalOpen = false;
+                $scope.successMessage = 'Tracking ' + vehicle.id + ' on map';
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            $scope.contactDriver = function(vehicle) {
+                $scope.successMessage = 'Initiating call to ' + vehicle.driver;
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            // Alert Functions
+            $scope.focusAlertOnMap = function(alert) {
+                // Find and highlight the marker
+                var marker = $scope.mapMarkers.find(function(m) { return m.id === alert.markerId; });
+                if (marker) {
+                    $scope.successMessage = 'Focusing on: ' + alert.title;
+                    $timeout(function() { $scope.successMessage = null; }, 3000);
+                }
+            };
+            
+            $scope.resolveAlert = function(alert) {
+                var index = $scope.operationalAlerts.indexOf(alert);
+                if (index > -1) {
+                    $scope.operationalAlerts.splice(index, 1);
+                    $scope.successMessage = 'Alert resolved: ' + alert.title;
+                    $timeout(function() { $scope.successMessage = null; }, 3000);
+                }
+            };
+            
+            // KPI Drawer Functions
+            $scope.openKpiDrawer = function(type) {
+                $scope.drawerType = type;
+                switch(type) {
+                    case 'wasteCollected':
+                        $scope.drawerTitle = 'Waste Collection Breakdown';
+                        $scope.drawerSubtitle = 'Today\'s collection by ward and hour';
+                        break;
+                    case 'segregation':
+                        $scope.drawerTitle = 'Segregation Compliance';
+                        $scope.drawerSubtitle = 'Zone-wise compliance heatmap';
+                        break;
+                    case 'vehicles':
+                        $scope.drawerTitle = 'Fleet Management';
+                        $scope.drawerSubtitle = $scope.kpis.vehicles.active + ' of ' + $scope.kpis.vehicles.total + ' vehicles active';
+                        break;
+                    case 'issues':
+                        $scope.drawerTitle = 'Open Issues';
+                        $scope.drawerSubtitle = $scope.kpis.issues.critical + ' critical, ' + $scope.kpis.issues.pending + ' pending';
+                        break;
+                }
+                $scope.drawerOpen = true;
+                
+                // Initialize drawer charts
+                if (type === 'wasteCollected') {
+                    $timeout(function() {
+                        initHourlyChart();
+                    }, 100);
+                }
+            };
+            
+            $scope.closeDrawer = function() {
+                $scope.drawerOpen = false;
+            };
+            
+            $scope.drillToWard = function(ward) {
+                $scope.filters.ward = ward.name.split(' - ')[0].toLowerCase().replace('ward ', 'w');
+                $scope.applyFilters();
+                $scope.closeDrawer();
+            };
+            
+            $scope.getComplianceClass = function(value) {
+                if (value >= 80) return 'high';
+                if (value >= 60) return 'medium';
+                return 'low';
+            };
+            
+            $scope.sendWarning = function(zone) {
+                $scope.successMessage = 'Warning sent to ' + zone.name;
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            $scope.filterVehicles = function(v) {
+                if ($scope.vehicleFilter === 'all') return true;
+                return v.type === $scope.vehicleFilter;
+            };
+            
+            $scope.locateVehicle = function(v) {
+                $scope.closeDrawer();
+                $scope.successMessage = 'Locating ' + v.id + ' on map';
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            $scope.filterIssues = function(issue) {
+                if ($scope.issueFilter === 'all') return true;
+                if ($scope.issueFilter === 'critical') return issue.severity === 'critical';
+                if ($scope.issueFilter === 'pending') return issue.severity !== 'critical';
+                return true;
+            };
+            
+            $scope.assignIssue = function(issue) {
+                $scope.successMessage = 'Opening assignment dialog for: ' + issue.title;
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            $scope.exportDrawerData = function() {
+                $scope.successMessage = 'Exporting data to CSV...';
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            // Record Functions
+            $scope.setRecordFilter = function(filter) {
+                $scope.recordFilter = filter;
+                if (filter === 'all') {
+                    $scope.filteredRecords = $scope.records;
+                } else if (filter === 'completed') {
+                    $scope.filteredRecords = $scope.records.filter(function(r) { return r.status === 'Completed'; });
+                } else if (filter === 'pending') {
+                    // Show In Progress and Delayed records
+                    $scope.filteredRecords = $scope.records.filter(function(r) { 
+                        return r.status === 'In Progress' || r.status === 'Delayed'; 
+                    });
+                } else if (filter === 'issues') {
+                    // Show records with issues or With Issues status
+                    $scope.filteredRecords = $scope.records.filter(function(r) { 
+                        return (r.issues && r.issues.length > 0) || r.status === 'With Issues' || r.status === 'Delayed'; 
+                    });
+                }
+            };
+            
+            $scope.openRecordDetail = function(record) {
+                $scope.selectedRecord = record;
+                $scope.recordDrawerOpen = true;
+            };
+            
+            $scope.closeRecordDrawer = function() {
+                $scope.recordDrawerOpen = false;
+            };
+            
+            $scope.printRecord = function(record) {
+                $scope.successMessage = 'Preparing print view for ' + record.routeId;
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            $scope.verifyRecord = function(record) {
+                record.status = 'Verified';
+                record.statusClass = 'success';
+                $scope.successMessage = 'Record ' + record.routeId + ' verified and approved';
+                $scope.closeRecordDrawer();
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            // Trend Drilldown
+            $scope.openTrendDrilldown = function() {
+                $scope.trendDrilldownOpen = true;
+            };
+            
+            $scope.closeTrendDrilldown = function() {
+                $scope.trendDrilldownOpen = false;
+            };
+            
+            $scope.selectWardTrend = function(ward) {
+                $scope.closeTrendDrilldown();
+                $scope.filters.ward = ward.name.toLowerCase().replace('ward ', 'w');
+                $scope.applyFilters();
+            };
+            
+            $scope.exportTrendData = function() {
+                $scope.successMessage = 'Exporting trend analysis to CSV...';
+                $timeout(function() { $scope.successMessage = null; }, 3000);
+            };
+            
+            // AI Recommendations
+            $scope.executeRecommendation = function(rec) {
+                var index = $scope.aiRecommendations.indexOf(rec);
+                if (index > -1) {
+                    $scope.aiRecommendations.splice(index, 1);
+                    $scope.successMessage = 'Action initiated: ' + rec.actionLabel;
+                    $timeout(function() { $scope.successMessage = null; }, 3000);
+                }
+            };
+            
+            $scope.dismissRecommendation = function(rec) {
+                var index = $scope.aiRecommendations.indexOf(rec);
+                if (index > -1) {
+                    $scope.aiRecommendations.splice(index, 1);
+                }
+            };
+            
+            // Notifications
+            $scope.openNotifications = function() {
+                $scope.successMessage = 'Opening notifications panel...';
+                $timeout(function() { $scope.successMessage = null; }, 2000);
+            };
+            
+            // Chart Initialization
+            function initChart() {
+                var ctx = document.getElementById('trendChart');
+                if (ctx) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [{
+                                label: 'Waste Collected (MT)',
+                                data: [780, 820, 795, 860, 847, 720, 680],
+                                borderColor: '#1a365d',
+                                backgroundColor: 'rgba(26, 54, 93, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: { beginAtZero: false, min: 600 }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            function initHourlyChart() {
+                var ctx = document.getElementById('hourlyChart');
+                if (ctx) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['6AM', '7AM', '8AM', '9AM', '10AM', '11AM', '12PM'],
+                            datasets: [{
+                                label: 'Collected (MT)',
+                                data: [45, 120, 180, 156, 142, 108, 96],
+                                backgroundColor: 'rgba(26, 54, 93, 0.7)'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                }
+            }
+        }]);
+    </script>
+</body>
+</html>

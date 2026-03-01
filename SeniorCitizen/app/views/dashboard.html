@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="seniorApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Suvidha - Easy View</title>
+    <link rel="stylesheet" href="../../css/senior-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    <script src="../app.js"></script>
+    <style>
+        /* Senior-Friendly Overrides */
+        .sc-content {
+            padding: 2rem 2.5rem;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: var(--gov-gray-100);
+            border: 1px solid var(--gov-gray-200);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+        }
+
+        .mode-toggle span {
+            color: var(--gov-gray-600);
+        }
+
+        .mode-btn {
+            padding: 0.4rem 0.85rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: var(--gov-gray-600);
+        }
+
+        .mode-btn.active {
+            background: var(--gov-info);
+            color: white;
+        }
+
+        /* Welcome Section - Larger, Warmer */
+        .welcome-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .welcome-text h3 {
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--gov-gray-800);
+            line-height: 1.3;
+        }
+
+        .welcome-text h3 strong {
+            font-weight: 700;
+            color: var(--gov-primary);
+        }
+
+        .welcome-subtext {
+            font-size: 1.1rem;
+            color: var(--gov-gray-500);
+            margin-top: 0.5rem;
+        }
+
+        .comfort-message {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--gov-success-light);
+            border-radius: 20px;
+            color: var(--gov-success);
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+
+        /* Large Tiles Grid */
+        .tiles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tile-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px;
+        }
+
+        .tile-card:hover {
+            border-color: var(--gov-info);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(49, 130, 206, 0.15);
+        }
+
+        .tile-card.full-width {
+            grid-column: span 2;
+        }
+
+        .tile-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .tile-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gov-info-light);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .tile-icon.bills {
+            background: rgba(56, 161, 105, 0.15);
+        }
+
+        .tile-icon.pay {
+            background: rgba(49, 130, 206, 0.15);
+        }
+
+        .tile-icon.help {
+            background: rgba(221, 107, 32, 0.15);
+        }
+
+        .tile-icon.updates {
+            background: rgba(128, 90, 213, 0.15);
+        }
+
+        .tile-icon.support {
+            background: rgba(237, 100, 166, 0.15);
+        }
+
+        .tile-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .tile-subtitle {
+            font-size: 1rem;
+            color: var(--gov-gray-500);
+        }
+
+        .tile-content {
+            flex: 1;
+            margin-top: 0.5rem;
+        }
+
+        /* Bill Items in Tile */
+        .bill-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+        }
+
+        .bill-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            color: var(--gov-gray-700);
+        }
+
+        .bill-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+        }
+
+        .bill-due {
+            font-size: 0.9rem;
+            color: var(--gov-warning);
+            margin-left: 0.5rem;
+        }
+
+        /* Memory Anchors */
+        .memory-anchor {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--gov-success-light);
+            border-radius: var(--radius-md);
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: var(--gov-success);
+        }
+
+        .memory-anchor strong {
+            color: var(--gov-gray-800);
+        }
+
+        /* Action Buttons in Tiles */
+        .tile-action {
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+
+        .action-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--gov-info);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1.15rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-button:hover {
+            background: var(--gov-primary-light);
+            transform: translateY(-2px);
+        }
+
+        .action-button.success {
+            background: var(--gov-success);
+        }
+
+        .action-button.warning {
+            background: var(--gov-warning);
+        }
+
+        /* Support Options */
+        .support-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .support-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.25rem 1rem;
+            background: var(--gov-gray-50);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .support-option:hover {
+            border-color: var(--gov-info);
+            background: white;
+        }
+
+        .support-option-icon {
+            font-size: 2rem;
+        }
+
+        .support-option-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gov-gray-800);
+            text-align: center;
+        }
+
+        /* Updates List */
+        .updates-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .update-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+        }
+
+        .update-icon {
+            font-size: 1.25rem;
+        }
+
+        .update-text {
+            font-size: 1rem;
+            color: var(--gov-gray-700);
+        }
+
+        /* Micro-copy / Reassurance */
+        .reassurance {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--gov-gray-500);
+            font-size: 1rem;
+            font-style: italic;
+        }
+
+        .reassurance-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Help Button Enhanced */
+        .help-btn-fixed {
+            padding: 1rem 2rem;
+            font-size: 1.15rem;
+        }
+
+        .help-btn-fixed .help-icon {
+            width: 28px;
+            height: 28px;
+            font-size: 1rem;
+        }
+
+        /* ========================================
+           MODAL SYSTEM STYLES
+           ======================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-dialog {
+            background: white;
+            border-radius: var(--radius-xl);
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-dialog.small {
+            max-width: 400px;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .modal-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-icon {
+            font-size: 1.75rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .modal-close-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f7fafc;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            color: #718096;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close-btn:hover {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-body.centered {
+            text-align: center;
+        }
+
+        .modal-body.success-body {
+            text-align: center;
+            padding: 2.5rem 2rem;
+        }
+
+        .modal-description {
+            font-size: 1.1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-note {
+            font-size: 0.95rem;
+            color: #718096;
+            font-style: italic;
+            margin-top: 1rem;
+        }
+
+        .success-icon-large {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-body h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem 2rem;
+            border-top: 2px solid #e2e8f0;
+            justify-content: flex-end;
+        }
+
+        .modal-footer.centered {
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 0.85rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .modal-btn.primary {
+            background: var(--gov-info);
+            color: white;
+        }
+
+        .modal-btn.primary:hover {
+            background: #2b6cb0;
+        }
+
+        .modal-btn.danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .modal-btn.danger:hover {
+            background: #c53030;
+        }
+
+        /* Voice Assistant Modal Styles */
+        .voice-listening-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .voice-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .voice-listening-indicator.active .voice-circle {
+            background: var(--gov-info);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .voice-listening-indicator p {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: var(--gov-info);
+            font-weight: 600;
+        }
+
+        .voice-commands {
+            margin-top: 1.5rem;
+        }
+
+        .voice-hint {
+            font-size: 1rem;
+            color: #718096;
+            margin-bottom: 0.75rem;
+        }
+
+        .voice-command-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .voice-command-item {
+            padding: 0.75rem 1rem;
+            background: #f7fafc;
+            border-radius: var(--radius-md);
+            color: #4a5568;
+            font-size: 1rem;
+        }
+
+        /* Family Permissions Styles */
+        .family-permissions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border-radius: var(--radius-md);
+        }
+
+        .permission-item.allowed {
+            background: rgba(56, 161, 105, 0.1);
+        }
+
+        .permission-item.allowed .permission-icon {
+            color: var(--gov-success);
+            font-weight: 700;
+        }
+
+        .permission-item.denied {
+            background: rgba(229, 62, 62, 0.1);
+        }
+
+        .permission-item.denied .permission-icon {
+            color: #e53e3e;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body ng-controller="DashboardController">
+    <!-- Sidebar - Simplified -->
+    <aside class="sc-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha-logo.png" alt="Suvidha"
+                        onerror="this.style.display='none'; this.parentNode.innerHTML='🏠';">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1>
+                    <span>Easy View</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Home</span>
+            </a>
+            <a href="bills.html" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">My Bills</span>
+            </a>
+            <a href="waste-management.html" class="nav-item">
+                <span class="nav-icon">🗑️</span>
+                <span class="nav-text">Waste Collection</span>
+            </a>
+            <a href="complaints.html" class="nav-item">
+                <span class="nav-icon">📞</span>
+                <span class="nav-text">Help & Complaints</span>
+            </a>
+            <a href="updates.html" class="nav-item">
+                <span class="nav-icon">📍</span>
+                <span class="nav-text">My Area Updates</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p>Welcome back</p>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()">
+                <span>↪️</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="sc-main-content">
+        <header class="sc-header">
+            <div class="header-left">
+                <h2>Home</h2>
+            </div>
+            <div class="header-right">
+                <!-- Mode Toggle -->
+                <div class="mode-toggle">
+                    <span>View:</span>
+                    <button class="mode-btn" ng-click="setMode('standard')">Standard</button>
+                    <button class="mode-btn active" ng-click="setMode('easy')">Easy View</button>
+                </div>
+
+                <!-- Accessibility -->
+                <div class="accessibility-controls">
+                    <button class="font-size-btn" ng-click="increaseFontSize()" ng-class="{active: currentFontSize === 'increased'}">A+</button>
+                    <button class="font-size-btn" ng-click="decreaseFontSize()" ng-class="{active: currentFontSize === 'normal'}">A</button>
+                </div>
+
+                <!-- Language -->
+                <div class="lang-dropdown">
+                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)">
+                        {{selectedLang}} <span>▼</span>
+                    </button>
+                    <div class="lang-dropdown-menu" ng-show="showLangMenu">
+                        <a href="#" class="lang-option" ng-repeat="lang in languages"
+                            ng-class="{active: selectedLang === lang.code}"
+                            ng-click="selectLang(lang, $event)">{{lang.name}}</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="sc-content">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h3>Hello, <strong>{{user.name}}</strong></h3>
+                    <p class="welcome-subtext">{{currentDate}}</p>
+                    <div class="comfort-message">
+                        <span>✓</span> You're doing well. Take your time.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🔴 EMERGENCY HELP BUTTON - Always Visible -->
+            <div class="emergency-strip">
+                <div class="emergency-main">
+                    <button class="emergency-btn" ng-click="openEmergencyHelp()">
+                        <span class="emergency-icon">🆘</span>
+                        <span class="emergency-text">I Need Urgent Help</span>
+                    </button>
+                    <span class="emergency-helper">This will connect you to support or your family.</span>
+                </div>
+                <span class="emergency-note">Power cut? Water issue? Need immediate assistance?</span>
+            </div>
+
+            <!-- ⭐ TODAY'S TASKS - Priority Banner -->
+            <div class="todays-tasks-banner">
+                <div class="tasks-header">
+                    <div class="tasks-icon">📋</div>
+                    <div class="tasks-title">
+                        <h4>Today's Important Tasks</h4>
+                        <p>Here's what needs your attention</p>
+                    </div>
+                </div>
+                <div class="tasks-list">
+                    <!-- Priority Task 1 - Pending Bill -->
+                    <div class="task-item priority" ng-if="pendingBillsCount > 0">
+                        <div class="task-indicator urgent"></div>
+                        <div class="task-content">
+                            <span class="task-emoji">⚡</span>
+                            <div class="task-details">
+                                <strong>Pay Electricity Bill</strong>
+                                <span class="task-meta">Due in 2 days • ₹{{bills[0].amount}}</span>
+                            </div>
+                        </div>
+                        <a href="pay.html" class="task-action-btn">Pay Now</a>
+                    </div>
+
+                    <!-- Status Task - All Good -->
+                    <div class="task-item success" ng-if="pendingBillsCount === 0">
+                        <div class="task-indicator done"></div>
+                        <div class="task-content">
+                            <span class="task-emoji">✅</span>
+                            <div class="task-details">
+                                <strong>All bills are paid!</strong>
+                                <span class="task-meta">No pending payments</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Task - Water/Gas -->
+                    <div class="task-item info">
+                        <div class="task-indicator info"></div>
+                        <div class="task-content">
+                            <span class="task-emoji">💧</span>
+                            <div class="task-details">
+                                <strong>Water & Gas bills</strong>
+                                <span class="task-meta">No action needed right now</span>
+                            </div>
+                        </div>
+                        <span class="task-status">✓ OK</span>
+                    </div>
+
+                    <!-- Info Task - No Complaints -->
+                    <div class="task-item info" ng-if="!hasPendingComplaints">
+                        <div class="task-indicator info"></div>
+                        <div class="task-content">
+                            <span class="task-emoji">📝</span>
+                            <div class="task-details">
+                                <strong>Your complaints</strong>
+                                <span class="task-meta">No pending issues</span>
+                            </div>
+                        </div>
+                        <span class="task-status">✓ All Clear</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 💰 PRIMARY ACTION - Pay Bills (Enhanced) -->
+            <div class="primary-action-card">
+                <div class="primary-action-header">
+                    <div class="primary-icon">💰</div>
+                    <div class="primary-title">
+                        <h3>Pay My Pending Bills</h3>
+                        <p class="primary-amount">Total: <strong>₹{{totalPendingAmount}}</strong></p>
+                    </div>
+                </div>
+                <div class="primary-action-body">
+                    <div class="pending-bills-summary">
+                        <div class="bill-chip" ng-repeat="bill in bills" ng-if="bill.status === 'unpaid'">
+                            <span ng-if="bill.type === 'Electricity'">⚡</span>
+                            <span ng-if="bill.type === 'Water'">💧</span>
+                            <span ng-if="bill.type === 'Gas'">🔥</span>
+                            {{bill.type}}: ₹{{bill.amount}}
+                        </div>
+                    </div>
+                    <div class="reassurance-text">
+                        <span>🛡️</span> I will review each bill before paying. Nothing happens without my confirmation.
+                    </div>
+                </div>
+                <div class="primary-action-footer">
+                    <a href="pay.html" class="primary-pay-btn">
+                        <span>Review & Pay ₹{{totalPendingAmount}}</span>
+                        <span class="btn-arrow">→</span>
+                    </a>
+                    <span class="payment-confirm-note">🛡️ You will confirm before payment</span>
+                    <a href="bills.html" class="secondary-link">
+                        Or just view my bills first
+                    </a>
+                </div>
+            </div>
+
+            <!-- 👨‍👩‍👦 ASK FAMILY - Prominent Caregiver Option -->
+            <div class="caregiver-card">
+                <div class="caregiver-content">
+                    <span class="caregiver-icon">👨‍👩‍👧</span>
+                    <div class="caregiver-text">
+                        <strong>Need help from family?</strong>
+                        <p>Share your screen with a family member or caregiver</p>
+                    </div>
+                </div>
+                <button class="caregiver-btn" ng-click="shareWithFamily()">
+                    Ask Family to Help
+                </button>
+            </div>
+
+            <!-- 📞 QUICK SUPPORT - Simplified -->
+            <div class="quick-support-strip">
+                <a href="tel:18001234567" class="support-quick-btn call">
+                    <span>📞</span> Call: 1800-123-4567 (Free)
+                </a>
+                <button class="support-quick-btn voice" ng-click="startVoiceAssistant()">
+                    <span>🎤</span> Speak to Get Help
+                </button>
+            </div>
+
+            <!-- 📂 COLLAPSIBLE SECTIONS -->
+            <div class="more-options-section">
+                <h4 class="section-label">More Options</h4>
+
+                <!-- Help & Complaints - Collapsible -->
+                <div class="collapsible-card" ng-class="{'expanded': showComplaints}">
+                    <button class="collapsible-header" ng-click="toggleComplaints()">
+                        <div class="collapsible-title">
+                            <span class="collapsible-icon">📝</span>
+                            <span>Help & Complaints</span>
+                        </div>
+                        <span class="collapsible-status" ng-if="!hasPendingComplaints">✓ No issues</span>
+                        <span class="expand-arrow" ng-class="{'rotated': showComplaints}">▼</span>
+                    </button>
+                    <div class="collapsible-body" ng-show="showComplaints">
+                        <div class="collapsible-options">
+                            <a href="complaints.html" class="collapsible-option">
+                                <span>📝</span>
+                                <span>Report a Problem</span>
+                            </a>
+                            <a href="complaints.html#track" class="collapsible-option">
+                                <span>🔍</span>
+                                <span>Track My Complaint</span>
+                            </a>
+                        </div>
+                        <div class="memory-anchor" ng-if="!hasPendingComplaints">
+                            <span>✓</span> No pending complaints. All is well!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Area Updates - Collapsible -->
+                <div class="collapsible-card" ng-class="{'expanded': showUpdates}">
+                    <button class="collapsible-header" ng-click="toggleUpdates()">
+                        <div class="collapsible-title">
+                            <span class="collapsible-icon">📍</span>
+                            <span>My Area Updates</span>
+                        </div>
+                        <span class="collapsible-status">{{areaUpdates.length}} updates</span>
+                        <span class="expand-arrow" ng-class="{'rotated': showUpdates}">▼</span>
+                    </button>
+                    <div class="collapsible-body" ng-show="showUpdates">
+                        <div class="updates-list-compact">
+                            <div class="update-item-compact" ng-repeat="update in areaUpdates">
+                                <span class="update-icon">{{update.icon}}</span>
+                                <span class="update-text">{{update.text}}</span>
+                            </div>
+                        </div>
+                        <a href="updates.html" class="view-all-link">See all updates →</a>
+                    </div>
+                </div>
+
+                <!-- Settings - Collapsible -->
+                <div class="collapsible-card">
+                    <a href="settings.html" class="collapsible-header link">
+                        <div class="collapsible-title">
+                            <span class="collapsible-icon">⚙️</span>
+                            <span>Settings</span>
+                        </div>
+                        <span class="collapsible-status">Language, Text Size</span>
+                        <span class="expand-arrow">→</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Reassurance Message -->
+            <div class="reassurance">
+                <div class="reassurance-icon">🤝</div>
+                <p>Take your time. You can always go back. Help is one click away.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Fixed Help Button -->
+    <button class="help-btn-fixed" ng-click="openHelp()">
+        <span class="help-icon">?</span>
+        <span>Need Help?</span>
+    </button>
+
+    <!-- Help Modal Dialog -->
+    <div class="help-modal-overlay" ng-show="showHelpModal" ng-click="closeHelp()">
+        <div class="help-modal" ng-click="$event.stopPropagation()">
+            <!-- Modal Header -->
+            <div class="help-modal-header">
+                <div class="help-modal-title">
+                    <span class="help-modal-icon">🤝</span>
+                    <h2>How Can We Help You?</h2>
+                </div>
+                <button class="help-modal-close" ng-click="closeHelp()">✕</button>
+            </div>
+
+            <!-- Voice Input Section -->
+            <div class="voice-input-section">
+                <div class="voice-input-card">
+                    <div class="voice-icon-wrapper">
+                        <span class="voice-icon">🎤</span>
+                        <div class="voice-pulse"></div>
+                    </div>
+                    <div class="voice-content">
+                        <h3>Voice Input Available</h3>
+                        <p>You can speak to navigate! Try saying:</p>
+                        <div class="voice-examples">
+                            <span class="voice-example">"Show my bills"</span>
+                            <span class="voice-example">"Pay electricity bill"</span>
+                            <span class="voice-example">"File a complaint"</span>
+                        </div>
+                        <button class="voice-start-btn" ng-click="startVoiceAssistant()">
+                            <span>🎙️</span> Start Speaking
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Navigation Cards -->
+            <div class="help-section-title">
+                <span>📍</span>
+                <h3>Where Would You Like To Go?</h3>
+            </div>
+
+            <div class="help-cards-grid">
+                <!-- Home Card -->
+                <div class="help-page-card">
+                    <div class="help-card-icon home">🏠</div>
+                    <div class="help-card-content">
+                        <h4>Home</h4>
+                        <p>Your dashboard overview with bills summary, updates, and quick actions.</p>
+                        <div class="help-card-steps">
+                            <span class="step-label">What you can do:</span>
+                            <ul>
+                                <li>✓ See all pending bills at a glance</li>
+                                <li>✓ View area updates and alerts</li>
+                                <li>✓ Quick access to all features</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="dashboard.html" class="help-card-btn">
+                        <span>Go There</span> →
+                    </a>
+                </div>
+
+                <!-- My Bills Card -->
+                <div class="help-page-card">
+                    <div class="help-card-icon bills">💳</div>
+                    <div class="help-card-content">
+                        <h4>My Bills</h4>
+                        <p>View all your utility bills - electricity, water, and gas in one place.</p>
+                        <div class="help-card-steps">
+                            <span class="step-label">What you can do:</span>
+                            <ul>
+                                <li>✓ Check bill amounts and due dates</li>
+                                <li>✓ Download bill copies (PDF)</li>
+                                <li>✓ See payment history</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="bills.html" class="help-card-btn">
+                        <span>Go There</span> →
+                    </a>
+                </div>
+
+                <!-- Pay Bills Card -->
+                <div class="help-page-card">
+                    <div class="help-card-icon pay">💰</div>
+                    <div class="help-card-content">
+                        <h4>Pay Bills</h4>
+                        <p>Simple 3-step payment process. Nothing happens until you confirm.</p>
+                        <div class="help-card-steps">
+                            <span class="step-label">How to pay:</span>
+                            <ul>
+                                <li>1️⃣ Select the bill to pay</li>
+                                <li>2️⃣ Choose payment method</li>
+                                <li>3️⃣ Confirm and pay</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="pay.html" class="help-card-btn success">
+                        <span>Pay Now</span> →
+                    </a>
+                </div>
+
+                <!-- Help & Complaints Card -->
+                <div class="help-page-card">
+                    <div class="help-card-icon complaints">📞</div>
+                    <div class="help-card-content">
+                        <h4>Help & Complaints</h4>
+                        <p>Report problems or track your existing complaints easily.</p>
+                        <div class="help-card-steps">
+                            <span class="step-label">What you can do:</span>
+                            <ul>
+                                <li>✓ Report water, electricity, or gas issues</li>
+                                <li>✓ Track complaint status</li>
+                                <li>✓ Get estimated resolution time</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="complaints.html" class="help-card-btn">
+                        <span>Go There</span> →
+                    </a>
+                </div>
+
+                <!-- My Area Updates Card -->
+                <div class="help-page-card">
+                    <div class="help-card-icon updates">📍</div>
+                    <div class="help-card-content">
+                        <h4>My Area Updates</h4>
+                        <p>Stay informed about what's happening in your neighborhood.</p>
+                        <div class="help-card-steps">
+                            <span class="step-label">What you can see:</span>
+                            <ul>
+                                <li>✓ Planned maintenance schedules</li>
+                                <li>✓ Power/water outage alerts</li>
+                                <li>✓ Local government notices</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="updates.html" class="help-card-btn">
+                        <span>Go There</span> →
+                    </a>
+                </div>
+
+                <!-- Settings Card -->
+                <div class="help-page-card">
+                    <div class="help-card-icon settings">⚙️</div>
+                    <div class="help-card-content">
+                        <h4>Settings</h4>
+                        <p>Personalize your experience - language, text size, and notifications.</p>
+                        <div class="help-card-steps">
+                            <span class="step-label">What you can change:</span>
+                            <ul>
+                                <li>✓ Language preference</li>
+                                <li>✓ Text size for easy reading</li>
+                                <li>✓ Notification settings</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="settings.html" class="help-card-btn">
+                        <span>Go There</span> →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Contact Support Section -->
+            <div class="help-contact-section">
+                <div class="help-contact-card">
+                    <div class="contact-icon">📞</div>
+                    <div class="contact-info">
+                        <h4>Still Need Help?</h4>
+                        <p>Call us anytime: <strong>1800-123-4567</strong> (Free)</p>
+                        <p class="contact-hours">Available 24 hours, 7 days a week</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reassurance Footer -->
+            <div class="help-modal-footer">
+                <p>🤗 Take your time. You can always come back here by clicking "Need Help?"</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🆘 EMERGENCY HELP MODAL -->
+    <div class="emergency-modal-overlay" ng-show="showEmergencyModal" ng-click="closeEmergencyHelp()">
+        <div class="emergency-modal" ng-click="$event.stopPropagation()">
+            <div class="emergency-modal-header">
+                <div class="emergency-modal-title">
+                    <span class="emergency-modal-icon">🆘</span>
+                    <h2>Urgent Help</h2>
+                </div>
+                <button class="emergency-modal-close" ng-click="closeEmergencyHelp()">✕</button>
+            </div>
+
+            <div class="emergency-modal-body">
+                <p class="emergency-reassurance">
+                    <span>🤗</span> Don't worry. Help is on the way. Choose what you need:
+                </p>
+
+                <div class="emergency-options">
+                    <!-- Power Cut -->
+                    <a href="tel:18001234567" class="emergency-option power">
+                        <span class="emergency-option-icon">⚡</span>
+                        <div class="emergency-option-content">
+                            <strong>Power Cut / No Electricity</strong>
+                            <p>Report power outage in your area</p>
+                        </div>
+                        <span class="emergency-option-action">Call Now</span>
+                    </a>
+
+                    <!-- Water Issue -->
+                    <a href="tel:18001234568" class="emergency-option water">
+                        <span class="emergency-option-icon">💧</span>
+                        <div class="emergency-option-content">
+                            <strong>No Water Supply</strong>
+                            <p>Report water supply issues</p>
+                        </div>
+                        <span class="emergency-option-action">Call Now</span>
+                    </a>
+
+                    <!-- Gas Emergency -->
+                    <a href="tel:18001234569" class="emergency-option gas">
+                        <span class="emergency-option-icon">🔥</span>
+                        <div class="emergency-option-content">
+                            <strong>Gas Leak / Emergency</strong>
+                            <p>Immediate gas safety assistance</p>
+                        </div>
+                        <span class="emergency-option-action emergency">Call Now</span>
+                    </a>
+
+                    <!-- General Help -->
+                    <a href="tel:18001234567" class="emergency-option general">
+                        <span class="emergency-option-icon">📞</span>
+                        <div class="emergency-option-content">
+                            <strong>I Need Someone to Talk To</strong>
+                            <p>General helpline - we're here for you</p>
+                        </div>
+                        <span class="emergency-option-action">Call Now</span>
+                    </a>
+
+                    <!-- Family/Caregiver -->
+                    <button class="emergency-option family" ng-click="shareWithFamily(); closeEmergencyHelp();">
+                        <span class="emergency-option-icon">👨‍👩‍👧</span>
+                        <div class="emergency-option-content">
+                            <strong>Alert My Family</strong>
+                            <p>Send notification to your caregiver</p>
+                        </div>
+                        <span class="emergency-option-action">Notify</span>
+                    </button>
+                </div>
+
+                <div class="emergency-footer">
+                    <p>🛡️ All calls are free and available 24/7</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎤 VOICE ASSISTANT MODAL -->
+    <div class="modal-overlay" ng-show="showVoiceModal" ng-click="closeVoiceModal()">
+        <div class="modal-dialog" ng-click="$event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <span class="modal-icon">🎤</span>
+                    <h2>Voice Assistant</h2>
+                </div>
+                <button class="modal-close-btn" ng-click="closeVoiceModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="voice-listening-indicator" ng-class="{'active': voiceListening}">
+                    <div class="voice-circle"></div>
+                    <p ng-if="voiceListening">Listening...</p>
+                </div>
+                <div class="voice-commands">
+                    <p class="voice-hint">Try saying:</p>
+                    <div class="voice-command-list">
+                        <div class="voice-command-item">"Pay my electricity bill"</div>
+                        <div class="voice-command-item">"Show my water bill"</div>
+                        <div class="voice-command-item">"File a complaint"</div>
+                        <div class="voice-command-item">"Call for help"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" ng-click="closeVoiceModal()">Cancel</button>
+                <button class="modal-btn primary" ng-click="voiceListening = !voiceListening">
+                    <span ng-if="!voiceListening">🎙️ Start Listening</span>
+                    <span ng-if="voiceListening">⏹️ Stop</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👨‍👩‍👧 SHARE WITH FAMILY MODAL -->
+    <div class="modal-overlay" ng-show="showFamilyModal" ng-click="closeFamilyModal()">
+        <div class="modal-dialog" ng-click="$event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <span class="modal-icon">👨‍👩‍👧</span>
+                    <h2>Share with Family</h2>
+                </div>
+                <button class="modal-close-btn" ng-click="closeFamilyModal()">✕</button>
+            </div>
+            <div class="modal-body" ng-if="!familyShareSent">
+                <p class="modal-description">
+                    Let a trusted family member help you view your bills and updates.
+                </p>
+                <div class="family-permissions">
+                    <div class="permission-item allowed">
+                        <span class="permission-icon">✓</span>
+                        <span>Can view your bills</span>
+                    </div>
+                    <div class="permission-item allowed">
+                        <span class="permission-icon">✓</span>
+                        <span>Can see area updates</span>
+                    </div>
+                    <div class="permission-item allowed">
+                        <span class="permission-icon">✓</span>
+                        <span>Can help you navigate</span>
+                    </div>
+                    <div class="permission-item denied">
+                        <span class="permission-icon">✗</span>
+                        <span>Cannot make payments</span>
+                    </div>
+                </div>
+                <p class="modal-note">🛡️ You stay in control. You can remove access anytime.</p>
+            </div>
+            <div class="modal-body success-body" ng-if="familyShareSent">
+                <div class="success-icon-large">✅</div>
+                <h3>Link Sent Successfully!</h3>
+                <p>A sharing link has been sent to your registered family member.</p>
+                <p class="modal-note">They will need to verify their identity before accessing.</p>
+            </div>
+            <div class="modal-footer" ng-if="!familyShareSent">
+                <button class="modal-btn secondary" ng-click="closeFamilyModal()">Cancel</button>
+                <button class="modal-btn primary" ng-click="confirmFamilyShare()">🔗 Send Link to Family</button>
+            </div>
+            <div class="modal-footer" ng-if="familyShareSent">
+                <button class="modal-btn primary" ng-click="closeFamilyModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👋 LOGOUT CONFIRMATION MODAL -->
+    <div class="modal-overlay" ng-show="showLogoutModal" ng-click="cancelLogout()">
+        <div class="modal-dialog small" ng-click="$event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <span class="modal-icon">👋</span>
+                    <h2>Log Out?</h2>
+                </div>
+            </div>
+            <div class="modal-body centered">
+                <p class="modal-description">Are you sure you want to log out?</p>
+                <p class="modal-note">You can always log back in with your phone number.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" ng-click="cancelLogout()">Stay Logged In</button>
+                <button class="modal-btn danger" ng-click="confirmLogout()">Yes, Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ SUCCESS MODAL (Generic) -->
+    <div class="modal-overlay" ng-show="activeModal === 'success'" ng-click="closeModal()">
+        <div class="modal-dialog small" ng-click="$event.stopPropagation()">
+            <div class="modal-body centered success-body">
+                <div class="success-icon-large">{{modalData.icon}}</div>
+                <h3>{{modalData.title}}</h3>
+                <p>{{modalData.message}}</p>
+            </div>
+            <div class="modal-footer centered">
+                <button class="modal-btn primary" ng-click="closeModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('seniorApp', []);
+
+        app.controller('DashboardController', ['$scope', function ($scope) {
+            // User Data - Load from localStorage
+            var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+            var userName = 'Guest User';
+            var userInitials = 'GU';
+            var userPhone = 'N/A';
+            
+            if (storedUser) {
+                userName = storedUser.full_name || storedUser.name || 'Guest User';
+                userPhone = storedUser.phone || 'N/A';
+                // Generate initials from name
+                var nameParts = userName.split(' ');
+                userInitials = nameParts.length >= 2 
+                    ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
+                    : userName.substring(0, 2).toUpperCase();
+            }
+            
+            $scope.user = {
+                name: userName,
+                initials: userInitials,
+                phone: userPhone
+            };
+
+            // Current Date - Friendly format
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            // Language
+            $scope.selectedLang = 'EN';
+            $scope.showLangMenu = false;
+            $scope.languages = [
+                { code: 'EN', name: 'English' },
+                { code: 'HI', name: 'हिन्दी' },
+                { code: 'TA', name: 'தமிழ்' },
+                { code: 'TE', name: 'తెలుగు' }
+            ];
+
+            // Bills Data
+            $scope.bills = [
+                { type: 'Electricity', amount: 1250, dueDate: '15 Feb', status: 'unpaid' },
+                { type: 'Water', amount: 450, dueDate: '20 Feb', status: 'unpaid' },
+                { type: 'Gas', amount: 800, dueDate: '25 Feb', status: 'paid' }
+            ];
+
+            // Computed: Total pending amount
+            $scope.totalPendingAmount = $scope.bills
+                .filter(function (bill) { return bill.status === 'unpaid'; })
+                .reduce(function (sum, bill) { return sum + bill.amount; }, 0);
+
+            // Computed: Pending bills count
+            $scope.pendingBillsCount = $scope.bills.filter(function (bill) { return bill.status === 'unpaid'; }).length;
+
+            // Memory Anchors
+            $scope.lastBillPaid = '12 January 2026';
+            $scope.lastComplaintResolved = '5 January 2026';
+            $scope.hasPendingComplaints = false;
+
+            // Area Updates
+            $scope.areaUpdates = [
+                { icon: '💧', text: 'Water supply normal tomorrow' },
+                { icon: '⚡', text: 'No planned outages this week' },
+                { icon: '🔧', text: 'Road work on Main Street' }
+            ];
+
+            // Collapsible Sections
+            $scope.showComplaints = false;
+            $scope.showUpdates = false;
+
+            $scope.toggleComplaints = function () {
+                $scope.showComplaints = !$scope.showComplaints;
+            };
+
+            $scope.toggleUpdates = function () {
+                $scope.showUpdates = !$scope.showUpdates;
+            };
+
+            // ========================================
+            // MODAL SYSTEM - Generic Dialog Handler
+            // ========================================
+            $scope.activeModal = null;
+            $scope.modalData = {};
+
+            $scope.openModal = function (modalType, data) {
+                $scope.activeModal = modalType;
+                $scope.modalData = data || {};
+                document.body.style.overflow = 'hidden';
+            };
+
+            $scope.closeModal = function () {
+                $scope.activeModal = null;
+                $scope.modalData = {};
+                document.body.style.overflow = 'auto';
+            };
+
+            // Emergency Help Modal
+            $scope.showEmergencyModal = false;
+
+            $scope.openEmergencyHelp = function () {
+                $scope.showEmergencyModal = true;
+                document.body.style.overflow = 'hidden';
+            };
+
+            $scope.closeEmergencyHelp = function () {
+                $scope.showEmergencyModal = false;
+                document.body.style.overflow = 'auto';
+            };
+
+            // Mode
+            $scope.viewMode = 'easy';
+            $scope.setMode = function (mode) {
+                $scope.viewMode = mode;
+                if (mode === 'standard') {
+                    window.location.href = '/static/app/views/dashboard.html';
+                }
+            };
+
+            // Font Size
+            $scope.fontSize = 16;
+            $scope.increaseFontSize = function () {
+                if ($scope.fontSize < 24) {
+                    $scope.fontSize += 2;
+                    document.body.style.fontSize = $scope.fontSize + 'px';
+                }
+            };
+
+            $scope.decreaseFontSize = function () {
+                if ($scope.fontSize > 14) {
+                    $scope.fontSize -= 2;
+                    document.body.style.fontSize = $scope.fontSize + 'px';
+                }
+            };
+
+            // Language Menu
+            $scope.toggleLangMenu = function ($event) {
+                $event.stopPropagation();
+                $scope.showLangMenu = !$scope.showLangMenu;
+            };
+
+            $scope.selectLang = function (lang, $event) {
+                $event.preventDefault();
+                $event.stopPropagation();
+                $scope.selectedLang = lang.code;
+                $scope.showLangMenu = false;
+            };
+
+            // ========================================
+            // VOICE ASSISTANT - With Dialog
+            // ========================================
+            $scope.showVoiceModal = false;
+            $scope.voiceListening = false;
+
+            $scope.startVoiceAssistant = function () {
+                $scope.showVoiceModal = true;
+                $scope.voiceListening = true;
+                document.body.style.overflow = 'hidden';
+            };
+
+            $scope.closeVoiceModal = function () {
+                $scope.showVoiceModal = false;
+                $scope.voiceListening = false;
+                document.body.style.overflow = 'auto';
+            };
+
+            // ========================================
+            // SHARE WITH FAMILY - With Dialog
+            // ========================================
+            $scope.showFamilyModal = false;
+            $scope.familyShareSent = false;
+
+            $scope.shareWithFamily = function () {
+                $scope.showFamilyModal = true;
+                $scope.familyShareSent = false;
+                document.body.style.overflow = 'hidden';
+            };
+
+            $scope.closeFamilyModal = function () {
+                $scope.showFamilyModal = false;
+                $scope.familyShareSent = false;
+                document.body.style.overflow = 'auto';
+            };
+
+            $scope.confirmFamilyShare = function () {
+                $scope.familyShareSent = true;
+            };
+
+            // Help Modal
+            $scope.showHelpModal = false;
+
+            $scope.openHelp = function () {
+                $scope.showHelpModal = true;
+                document.body.style.overflow = 'hidden';
+            };
+
+            $scope.closeHelp = function () {
+                $scope.showHelpModal = false;
+                document.body.style.overflow = 'auto';
+            };
+
+            // ========================================
+            // LOGOUT - With Confirmation Dialog
+            // ========================================
+            $scope.showLogoutModal = false;
+
+            $scope.logout = function () {
+                $scope.showLogoutModal = true;
+                document.body.style.overflow = 'hidden';
+            };
+
+            $scope.cancelLogout = function () {
+                $scope.showLogoutModal = false;
+                document.body.style.overflow = 'auto';
+            };
+
+            $scope.confirmLogout = function () {
+                $scope.showLogoutModal = false;
+                document.body.style.overflow = 'auto';
+                // Show success briefly then redirect
+                $scope.openModal('success', {
+                    icon: '✅',
+                    title: 'Logged Out Successfully',
+                    message: 'Thank you for using Suvidha! See you soon.'
+                });
+                // In real app, redirect to login
+            };
+
+            // Close menu on outside click
+            document.addEventListener('click', function () {
+                $scope.$apply(function () {
+                    $scope.showLangMenu = false;
+                });
+            });
+        }]);
+    </script>
+</body>
+
+</html>

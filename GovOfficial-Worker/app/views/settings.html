@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="workerApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Field Agent | Suvidha</title>
+    <link rel="stylesheet" href="../../css/worker-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        /* Settings Page Styles */
+        .settings-page-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Readiness Score Badge (Innovation 1) */
+        .readiness-banner {
+            background: linear-gradient(135deg, rgba(56, 161, 105, 0.1) 0%, rgba(56, 161, 105, 0.05) 100%);
+            border: 1px solid rgba(56, 161, 105, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .readiness-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .readiness-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gov-success);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .readiness-icon.warning {
+            background: var(--gov-warning);
+        }
+
+        .readiness-icon.danger {
+            background: var(--gov-danger);
+        }
+
+        .readiness-text h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gov-gray-800);
+            margin-bottom: 0.15rem;
+        }
+
+        .readiness-text p {
+            font-size: 0.8rem;
+            color: var(--gov-gray-500);
+        }
+
+        .readiness-score {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .score-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: conic-gradient(var(--gov-success) 0% var(--score-percent),
+                    var(--gov-gray-200) var(--score-percent) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 52px;
+            height: 52px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .score-value {
+            position: relative;
+            z-index: 1;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gov-success);
+        }
+
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--gov-gray-500);
+            text-align: center;
+        }
+
+        /* Settings Cards */
+        .settings-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gov-gray-200);
+            margin-bottom: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .settings-card-header {
+            padding: 1.25rem 1.5rem;
+            background: var(--gov-gray-50);
+            border-bottom: 1px solid var(--gov-gray-200);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .settings-card-icon {
+            font-size: 1.25rem;
+        }
+
+        .settings-card-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--gov-gray-800);
+        }
+
+        .settings-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gov-gray-100);
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gov-primary) 0%, var(--gov-primary-dark) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+            margin-bottom: 0.35rem;
+        }
+
+        .profile-email {
+            font-size: 0.9rem;
+            color: var(--gov-gray-500);
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.85rem;
+            background: var(--gov-success-light);
+            color: var(--gov-success);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Profile Details Grid */
+        .profile-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .profile-detail-item {
+            padding: 1rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+        }
+
+        .profile-detail-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gov-gray-500);
+            margin-bottom: 0.35rem;
+        }
+
+        .profile-detail-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--gov-gray-800);
+        }
+
+        .profile-notice {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.25rem;
+            padding: 0.75rem 1rem;
+            background: rgba(49, 130, 206, 0.08);
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            color: var(--gov-gray-600);
+        }
+
+        .profile-notice-icon {
+            color: var(--gov-info);
+        }
+
+        /* Setting Items */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gov-gray-100);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .setting-item:first-child {
+            padding-top: 0;
+        }
+
+        .setting-info {
+            flex: 1;
+            padding-right: 1rem;
+        }
+
+        .setting-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--gov-gray-800);
+            margin-bottom: 0.2rem;
+        }
+
+        .setting-description {
+            font-size: 0.8rem;
+            color: var(--gov-gray-500);
+            line-height: 1.4;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gov-gray-300);
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked+.toggle-slider {
+            background-color: var(--gov-success);
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Select Dropdown */
+        .setting-select {
+            padding: 0.5rem 2rem 0.5rem 1rem;
+            border: 1px solid var(--gov-gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            min-width: 140px;
+        }
+
+        .setting-select:focus {
+            outline: none;
+            border-color: var(--gov-primary);
+        }
+
+        /* Device Status Items */
+        .device-status-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .device-status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--gov-gray-100);
+        }
+
+        .device-status-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .device-status-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            background: var(--gov-gray-100);
+        }
+
+        .device-status-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gov-gray-700);
+        }
+
+        .device-status-value {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .device-status-value.ready {
+            color: var(--gov-success);
+        }
+
+        .device-status-value.warning {
+            color: var(--gov-warning);
+        }
+
+        .device-status-value.error {
+            color: var(--gov-danger);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.ready {
+            background: var(--gov-success);
+            box-shadow: 0 0 8px rgba(56, 161, 105, 0.5);
+        }
+
+        .status-dot.warning {
+            background: var(--gov-warning);
+        }
+
+        .status-dot.error {
+            background: var(--gov-danger);
+        }
+
+        /* Offline Safety Message (Innovation 2) */
+        .offline-message {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding: 0.875rem 1rem;
+            background: linear-gradient(135deg, rgba(49, 130, 206, 0.08) 0%, rgba(49, 130, 206, 0.03) 100%);
+            border: 1px solid rgba(49, 130, 206, 0.2);
+            border-radius: var(--radius-md);
+        }
+
+        .offline-message-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gov-info-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .offline-message-text {
+            font-size: 0.85rem;
+            color: var(--gov-gray-700);
+            flex: 1;
+        }
+
+        .offline-message-text strong {
+            color: var(--gov-info);
+        }
+
+        /* Quick Actions */
+        .quick-actions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .quick-action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.9rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            width: 100%;
+        }
+
+        .quick-action-btn.primary {
+            background: var(--gov-primary);
+            color: white;
+        }
+
+        .quick-action-btn.primary:hover {
+            background: var(--gov-primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .quick-action-btn.secondary {
+            background: var(--gov-gray-100);
+            color: var(--gov-gray-700);
+            border: 1px solid var(--gov-gray-200);
+        }
+
+        .quick-action-btn.secondary:hover {
+            background: var(--gov-gray-200);
+        }
+
+        .quick-action-btn.danger {
+            background: rgba(229, 62, 62, 0.1);
+            color: var(--gov-danger);
+            border: 1px solid rgba(229, 62, 62, 0.3);
+        }
+
+        .quick-action-btn.danger:hover {
+            background: var(--gov-danger);
+            color: white;
+        }
+
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        /* Audit Footer (Innovation 3) */
+        .audit-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--gov-gray-500);
+        }
+
+        .audit-footer-icon {
+            color: var(--gov-gray-400);
+        }
+
+        /* Logout Confirmation Modal */
+        .logout-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .logout-modal {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .logout-modal-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(229, 62, 62, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1rem;
+        }
+
+        .logout-modal h3 {
+            font-size: 1.2rem;
+            color: var(--gov-gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .logout-modal p {
+            font-size: 0.9rem;
+            color: var(--gov-gray-500);
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .logout-modal-sync {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--gov-success-light);
+            border-radius: var(--radius-md);
+            margin-bottom: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--gov-success);
+            justify-content: center;
+        }
+
+        .logout-modal-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .logout-modal-btn {
+            flex: 1;
+            padding: 0.875rem;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-modal-btn.cancel {
+            background: var(--gov-gray-100);
+            border: 1px solid var(--gov-gray-200);
+            color: var(--gov-gray-700);
+        }
+
+        .logout-modal-btn.confirm {
+            background: var(--gov-danger);
+            border: none;
+            color: white;
+        }
+
+        .logout-modal-btn.confirm:hover {
+            background: #c53030;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .profile-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .profile-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .readiness-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .readiness-left {
+                flex-direction: column;
+            }
+
+            .action-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body ng-controller="SettingsController">
+    <!-- Sidebar -->
+    <aside class="worker-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='⚡'">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1>
+                    <span class="brand-subtitle">FIELD AGENT</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Status Indicator -->
+        <div class="agent-status-card">
+            <div class="status-indicator" ng-class="{'online': agentStatus === 'online', 'busy': agentStatus === 'on_task', 'offline': agentStatus === 'offline'}">
+                <span class="status-dot"></span>
+                <span class="status-text">{{agentStatus === 'online' ? 'Available' : agentStatus === 'on_task' ? 'On Task' : 'Offline'}}</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <!-- Flat menu - no section titles -->
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon-wrapper"><span class="nav-icon">📊</span></span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="search.html" class="nav-item">
+                <span class="nav-icon-wrapper"><span class="nav-icon">🏠</span></span>
+                <span class="nav-text">Households</span>
+            </a>
+            <a href="report.html" class="nav-item">
+                <span class="nav-icon-wrapper"><span class="nav-icon">⚠️</span></span>
+                <span class="nav-text">Report Issue</span>
+            </a>
+            <a href="settings.html" class="nav-item active">
+                <span class="nav-icon-wrapper"><span class="nav-icon">⚙️</span></span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p class="user-category">{{user.category || 'Field Agent'}}</p>
+                </div>
+            </div>
+            
+            <!-- GPS/Offline indicator at bottom -->
+            <div class="gps-offline-indicator" style="display: flex; justify-content: center; gap: 1rem; padding: 0.75rem; margin: 0.75rem 0; background: var(--gov-gray-50); border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem;">
+                    <span>📍</span>
+                    <span style="font-weight: 500;">GPS {{gpsEnabled ? 'Active' : 'Off'}}</span>
+                </div>
+                <div style="width: 1px; background: var(--gov-gray-300);"></div>
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--gov-gray-600);">
+                    <span>📶</span>
+                    <span style="font-weight: 500;">Online</span>
+                </div>
+            </div>
+            
+            <button class="logout-btn" ng-click="logout()">
+                <span>🚪</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="worker-main-content">
+        <header class="worker-header">
+            <div class="header-left">
+                <h2>Settings</h2>
+                <p>Manage your profile, preferences, and device settings</p>
+            </div>
+            <div class="header-right">
+                <button class="topbar-btn sync-btn" ng-click="syncNow()" title="Refresh Data">
+                    🔄
+                </button>
+                
+                <!-- Improved Language Dropdown -->
+                <div class="lang-dropdown" style="position: relative;">
+                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-weight: 500;">
+                        🌐 <span>{{selectedLang}}</span> 
+                        <span style="font-size: 0.7rem; transition: transform 0.2s;" ng-style="{'transform': showLangMenu ? 'rotate(180deg)' : 'rotate(0deg)'}">▼</span>
+                    </button>
+                    <div class="lang-dropdown-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()" style="position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border: 1px solid var(--gov-gray-200); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); min-width: 180px; max-height: 300px; overflow-y: auto; z-index: 1000;">
+                        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gov-gray-100); font-size: 0.75rem; font-weight: 600; color: var(--gov-gray-500); text-transform: uppercase;">Select Language</div>
+                        <a href="#" class="lang-option" ng-repeat="lang in languages"
+                            ng-class="{active: selectedLang === lang.code}"
+                            ng-click="selectLang(lang, $event)"
+                            style="display: flex; align-items: center; padding: 0.75rem 1rem; text-decoration: none; color: var(--gov-gray-700); transition: all 0.15s; border-bottom: 1px solid var(--gov-gray-50);"
+                            ng-style="{'background': selectedLang === lang.code ? 'var(--gov-info-light)' : 'transparent', 'font-weight': selectedLang === lang.code ? '600' : '400'}">
+                            <span style="margin-right: 0.5rem;" ng-if="selectedLang === lang.code">✓</span>
+                            {{lang.name}}
+                        </a>
+                    </div>
+                </div>
+                
+                <button class="topbar-btn notification-btn" title="Notifications" ng-click="toggleNotifications()" style="position: relative; padding: 0.5rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-size: 1.25rem;">
+                    🔔<span class="notification-badge" ng-if="notifications > 0" style="position: absolute; top: -5px; right: -5px; background: var(--gov-danger); color: white; font-size: 0.7rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">{{notifications}}</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="worker-content">
+            <div class="settings-page-container">
+                <!-- Readiness Score Banner (Innovation 1) -->
+                <div class="readiness-banner">
+                    <div class="readiness-left">
+                        <div class="readiness-icon"
+                            ng-class="{'warning': readiness.score < 80, 'danger': readiness.score < 50}">
+                            {{readiness.score >= 80 ? '✓' : (readiness.score >= 50 ? '⚠' : '✗')}}
+                        </div>
+                        <div class="readiness-text">
+                            <h3>Field Readiness</h3>
+                            <p>All systems checked for meter reading operations</p>
+                        </div>
+                    </div>
+                    <div class="readiness-score">
+                        <div class="score-circle" ng-style="{'--score-percent': readiness.score + '%'}">
+                            <span class="score-value">{{readiness.score}}%</span>
+                        </div>
+                        <div class="score-label">Ready</div>
+                    </div>
+                </div>
+
+                <!-- Profile Information Card -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-card-icon">👤</span>
+                        <span class="settings-card-title">Profile Information</span>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="profile-section">
+                            <div class="profile-avatar">{{user.initials}}</div>
+                            <div class="profile-info">
+                                <div class="profile-name">{{user.name}}</div>
+                                <div class="profile-email">{{user.email}}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Role & Work Type Display -->
+                        <div style="margin-bottom: 1.25rem; padding: 1.25rem; background: linear-gradient(135deg, rgba(56, 161, 105, 0.12) 0%, rgba(56, 161, 105, 0.04) 100%); border: 2px solid rgba(56, 161, 105, 0.3); border-radius: 12px;">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <div style="width: 56px; height: 56px; background: var(--gov-success); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: white;">🏛️</div>
+                                <div>
+                                    <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--gov-gray-500); font-weight: 600; letter-spacing: 0.5px;">Your Role</div>
+                                    <div style="font-size: 1.35rem; font-weight: 700; color: var(--gov-success);">Field Agent</div>
+                                    <div style="font-size: 0.85rem; color: var(--gov-gray-600); margin-top: 0.15rem;">Suvidha Government Services</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                                <span style="padding: 0.4rem 0.85rem; background: white; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--gov-gray-700); display: flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+                                    <span>📋</span> Meter Reading
+                                </span>
+                                <span style="padding: 0.4rem 0.85rem; background: white; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--gov-gray-700); display: flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+                                    <span>📍</span> Door-to-Door
+                                </span>
+                                <span style="padding: 0.4rem 0.85rem; background: white; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--gov-gray-700); display: flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+                                    <span>📷</span> Photo Verification
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Meter Reading Type Selection -->
+                        <div style="margin-bottom: 1.25rem; padding: 1rem; background: linear-gradient(135deg, rgba(49, 130, 206, 0.08) 0%, rgba(49, 130, 206, 0.03) 100%); border: 1px solid rgba(49, 130, 206, 0.2); border-radius: 10px;">
+                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--gov-gray-500); font-weight: 600; margin-bottom: 0.75rem;">📊 Assigned Meter Reading Type</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: white; border: 2px solid; border-radius: 10px; cursor: pointer; transition: all 0.2s;" ng-style="{'border-color': meterType === 'electric' ? 'var(--gov-warning)' : 'var(--gov-gray-200)', 'background': meterType === 'electric' ? 'var(--gov-warning-light)' : 'white'}">
+                                    <input type="radio" ng-model="meterType" value="electric" style="display: none;">
+                                    <span style="font-size: 1.25rem;">⚡</span>
+                                    <span style="font-weight: 600; color: var(--gov-gray-700);">Electric Meter</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: white; border: 2px solid; border-radius: 10px; cursor: pointer; transition: all 0.2s;" ng-style="{'border-color': meterType === 'water' ? 'var(--gov-info)' : 'var(--gov-gray-200)', 'background': meterType === 'water' ? 'var(--gov-info-light)' : 'white'}">
+                                    <input type="radio" ng-model="meterType" value="water" style="display: none;">
+                                    <span style="font-size: 1.25rem;">💧</span>
+                                    <span style="font-weight: 600; color: var(--gov-gray-700);">Water Meter</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: white; border: 2px solid; border-radius: 10px; cursor: pointer; transition: all 0.2s;" ng-style="{'border-color': meterType === 'gas' ? 'var(--gov-danger)' : 'var(--gov-gray-200)', 'background': meterType === 'gas' ? 'var(--gov-danger-light)' : 'white'}">
+                                    <input type="radio" ng-model="meterType" value="gas" style="display: none;">
+                                    <span style="font-size: 1.25rem;">🔥</span>
+                                    <span style="font-weight: 600; color: var(--gov-gray-700);">Gas Cylinder</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-details-grid">
+                            <div class="profile-detail-item">
+                                <div class="profile-detail-label">Agent ID</div>
+                                <div class="profile-detail-value">{{user.agentId}}</div>
+                            </div>
+                            <div class="profile-detail-item">
+                                <div class="profile-detail-label">Role</div>
+                                <div class="profile-detail-value" style="color: var(--gov-success); font-weight: 600;">Field Agent</div>
+                            </div>
+                            <div class="profile-detail-item">
+                                <div class="profile-detail-label">Work Type</div>
+                                <div class="profile-detail-value">{{meterTypeLabel || 'Electric Meter'}}</div>
+                            </div>
+                            <div class="profile-detail-item">
+                                <div class="profile-detail-label">Phone Number</div>
+                                <div class="profile-detail-value">{{user.phone}}</div>
+                            </div>
+                            <div class="profile-detail-item">
+                                <div class="profile-detail-label">Assigned District</div>
+                                <div class="profile-detail-value">{{user.district}}</div>
+                            </div>
+                            <div class="profile-detail-item">
+                                <div class="profile-detail-label">Join Date</div>
+                                <div class="profile-detail-value">{{user.joinDate}}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Verified Village moved down -->
+                        <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--gov-success-light); border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-size: 1.1rem;">✅</span>
+                            <span style="font-weight: 600; color: var(--gov-success);">Verified Village Agent</span>
+                        </div>
+                        
+                        <div class="profile-notice">
+                            <span class="profile-notice-icon">ℹ️</span>
+                            <span>To update profile information, contact your supervisor.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- App Preferences Card -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-card-icon">⚙️</span>
+                        <span class="settings-card-title">App Preferences</span>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Language</div>
+                                <div class="setting-description">Select your preferred language for the app interface
+                                </div>
+                            </div>
+                            <select class="setting-select" ng-model="preferences.language">
+                                <option value="en">English</option>
+                                <option value="hi">हिन्दी</option>
+                                <option value="mr">मराठी</option>
+                                <option value="ta">தமிழ்</option>
+                                <option value="te">తెలుగు</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Push Notifications</div>
+                                <div class="setting-description">Receive alerts for new assignments and updates</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" ng-model="preferences.notifications">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Auto-Sync Data</div>
+                                <div class="setting-description">Automatically upload readings when connected to
+                                    internet (recommended)</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" ng-model="preferences.autoSync">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">High Quality Photos</div>
+                                <div class="setting-description">Capture higher resolution meter images (uses more
+                                    storage)</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" ng-model="preferences.highQualityPhotos">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Device Status Card -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-card-icon">📱</span>
+                        <span class="settings-card-title">Device Status</span>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="device-status-grid">
+                            <div class="device-status-item">
+                                <div class="device-status-left">
+                                    <div class="device-status-icon">📷</div>
+                                    <span class="device-status-label">Camera</span>
+                                </div>
+                                <span class="device-status-value" ng-class="deviceStatus.camera.class">
+                                    <span class="status-dot" ng-class="deviceStatus.camera.class"></span>
+                                    {{deviceStatus.camera.text}}
+                                </span>
+                            </div>
+                            <div class="device-status-item">
+                                <div class="device-status-left">
+                                    <div class="device-status-icon">📍</div>
+                                    <span class="device-status-label">GPS Location</span>
+                                </div>
+                                <span class="device-status-value" ng-class="deviceStatus.gps.class">
+                                    <span class="status-dot" ng-class="deviceStatus.gps.class"></span>
+                                    {{deviceStatus.gps.text}}
+                                </span>
+                            </div>
+                            <div class="device-status-item">
+                                <div class="device-status-left">
+                                    <div class="device-status-icon">📶</div>
+                                    <span class="device-status-label">Internet Connection</span>
+                                </div>
+                                <span class="device-status-value" ng-class="deviceStatus.internet.class">
+                                    <span class="status-dot" ng-class="deviceStatus.internet.class"></span>
+                                    {{deviceStatus.internet.text}}
+                                </span>
+                            </div>
+                            <div class="device-status-item">
+                                <div class="device-status-left">
+                                    <div class="device-status-icon">💾</div>
+                                    <span class="device-status-label">Storage Available</span>
+                                </div>
+                                <span class="device-status-value ready">
+                                    {{deviceStatus.storage}}
+                                </span>
+                            </div>
+                            <div class="device-status-item">
+                                <div class="device-status-left">
+                                    <div class="device-status-icon">📦</div>
+                                    <span class="device-status-label">App Version</span>
+                                </div>
+                                <span class="device-status-value" style="color: var(--gov-gray-700);">
+                                    {{deviceStatus.appVersion}}
+                                </span>
+                            </div>
+                            <div class="device-status-item">
+                                <div class="device-status-left">
+                                    <div class="device-status-icon">🔄</div>
+                                    <span class="device-status-label">Last Sync</span>
+                                </div>
+                                <span class="device-status-value" style="color: var(--gov-gray-700);">
+                                    {{deviceStatus.lastSync}}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Offline Safety Message (Innovation 2) -->
+                        <div class="offline-message" ng-if="deviceStatus.internet.class === 'warning'">
+                            <div class="offline-message-icon">📡</div>
+                            <div class="offline-message-text">
+                                <strong>You can continue working offline.</strong>
+                                Data will sync automatically when connection is restored.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-card-icon">⚡</span>
+                        <span class="settings-card-title">Quick Actions</span>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="quick-actions-grid">
+                            <div class="action-row">
+                                <button class="quick-action-btn primary" ng-click="syncNow()">
+                                    🔄 Sync Now
+                                </button>
+                                <button class="quick-action-btn secondary" ng-click="clearCache()">
+                                    🧹 Clear Cache
+                                </button>
+                            </div>
+                            <button class="quick-action-btn danger" ng-click="showLogoutConfirm()">
+                                🚪 Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Footer (Innovation 3) -->
+                <div class="audit-footer">
+                    <span class="audit-footer-icon">🔒</span>
+                    <span>All actions are logged for audit and quality assurance.</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="logout-modal-overlay" ng-if="showLogoutModal" ng-click="cancelLogout()">
+        <div class="logout-modal" ng-click="$event.stopPropagation()">
+            <div class="logout-modal-icon">🚪</div>
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout? Make sure all your data is synced before logging out.</p>
+            <div class="logout-modal-sync">
+                <span>✓</span>
+                <span>All data synced • Last sync: {{deviceStatus.lastSync}}</span>
+            </div>
+            <div class="logout-modal-actions">
+                <button class="logout-modal-btn cancel" ng-click="cancelLogout()">Cancel</button>
+                <button class="logout-modal-btn confirm" ng-click="confirmLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('workerApp', []);
+
+        app.controller('SettingsController', ['$scope', function ($scope) {
+            // Load user data from localStorage (set during login/signup)
+            var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+            if (storedUser) {
+                var uName = storedUser.full_name || storedUser.name || 'Field Agent';
+                $scope.user = {
+                    name: uName,
+                    initials: uName.split(' ').map(function(n) { return n[0]; }).join('').toUpperCase().substring(0, 2) || 'FA',
+                    email: storedUser.email || '',
+                    agentId: storedUser.employee_id || 'N/A',
+                    phone: storedUser.phone || '',
+                    district: storedUser.assigned_district || storedUser.assigned_ward || '',
+                    joinDate: storedUser.created_at ? new Date(storedUser.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
+                    category: storedUser.category || 'Field Agent'
+                };
+            } else {
+                $scope.user = {
+                    name: 'Field Agent',
+                    initials: 'FA',
+                    email: '',
+                    agentId: 'N/A',
+                    phone: '',
+                    district: '',
+                    joinDate: '',
+                    category: 'Field Agent'
+                };
+            }
+
+            // Meter Type Selection
+            $scope.meterType = 'electric';
+            $scope.meterTypeLabel = 'Electric Meter';
+            
+            // Update label when meter type changes
+            $scope.$watch('meterType', function(newVal) {
+                var labels = {
+                    'electric': 'Electric Meter',
+                    'water': 'Water Meter',
+                    'gas': 'Gas Cylinder'
+                };
+                $scope.meterTypeLabel = labels[newVal] || 'Electric Meter';
+                // Save to localStorage
+                localStorage.setItem('workerMeterType', newVal);
+            });
+            
+            // Load saved meter type from localStorage
+            var savedMeterType = localStorage.getItem('workerMeterType');
+            if (savedMeterType) {
+                $scope.meterType = savedMeterType;
+            }
+
+            // Agent Status
+            $scope.agentStatus = 'on_task';
+            $scope.gpsEnabled = true;
+            $scope.performanceScore = 92;
+
+            // Date & Language
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            $scope.selectedLang = 'EN';
+            $scope.showLangMenu = false;
+            $scope.languages = [
+                { code: 'EN', name: 'English' },
+                { code: 'HI', name: 'हिन्दी' },
+                { code: 'TA', name: 'தமிழ்' },
+                { code: 'TE', name: 'తెలుగు' },
+                { code: 'BN', name: 'বাংলা' },
+                { code: 'MR', name: 'मराठी' }
+            ];
+            $scope.notifications = 2;
+
+            // Readiness Score (Innovation 1)
+            $scope.readiness = {
+                score: 92
+            };
+
+            // App Preferences
+            $scope.preferences = {
+                language: 'en',
+                notifications: true,
+                autoSync: true,
+                highQualityPhotos: false
+            };
+
+            // Device Status
+            $scope.deviceStatus = {
+                camera: { text: 'Ready', class: 'ready' },
+                gps: { text: 'Active', class: 'ready' },
+                internet: { text: 'Connected', class: 'ready' },
+                storage: '2.4 GB free',
+                appVersion: 'v2.1.0 (Build 147)',
+                lastSync: new Date().toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) + ' today'
+            };
+
+            // Logout Modal
+            $scope.showLogoutModal = false;
+
+            // Functions
+            $scope.toggleLangMenu = function ($event) {
+                $event.stopPropagation();
+                $scope.showLangMenu = !$scope.showLangMenu;
+            };
+
+            $scope.selectLang = function (lang, $event) {
+                $event.preventDefault();
+                $scope.selectedLang = lang.code;
+                $scope.showLangMenu = false;
+            };
+
+            $scope.syncNow = function () {
+                alert('Syncing data with server...\n\n✓ Readings synced: 17\n✓ Issues synced: 2\n✓ Profile updated\n\nLast sync: ' + new Date().toLocaleTimeString('en-IN'));
+                $scope.deviceStatus.lastSync = new Date().toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) + ' today';
+            };
+
+            $scope.clearCache = function () {
+                if (confirm('Clear app cache? This will remove temporary files but keep your readings.')) {
+                    alert('Cache cleared successfully.\n\nFreed: 156 MB\nCurrent storage: 2.5 GB free');
+                    $scope.deviceStatus.storage = '2.5 GB free';
+                }
+            };
+
+            $scope.showLogoutConfirm = function () {
+                $scope.showLogoutModal = true;
+            };
+
+            $scope.cancelLogout = function () {
+                $scope.showLogoutModal = false;
+            };
+
+            $scope.confirmLogout = function () {
+                window.location.href = '/static/app/views/landing.html';
+            };
+
+            // Calculate readiness score based on device status
+            function calculateReadiness() {
+                var score = 0;
+                if ($scope.deviceStatus.camera.class === 'ready') score += 25;
+                if ($scope.deviceStatus.gps.class === 'ready') score += 25;
+                if ($scope.deviceStatus.internet.class === 'ready') score += 25;
+                else if ($scope.deviceStatus.internet.class === 'warning') score += 15;
+
+                // Storage check
+                var storageGB = parseFloat($scope.deviceStatus.storage);
+                if (storageGB >= 2) score += 25;
+                else if (storageGB >= 1) score += 15;
+                else score += 5;
+
+                $scope.readiness.score = score;
+            }
+
+            // Simulate weak connection scenario for demo
+            // Uncomment to test offline message:
+            // $scope.deviceStatus.internet = { text: 'Weak Signal', class: 'warning' };
+            // calculateReadiness();
+
+            // Close language menu on outside click
+            document.addEventListener('click', function () {
+                $scope.$apply(function () {
+                    $scope.showLangMenu = false;
+                });
+            });
+        }]);
+    </script>
+</body>
+
+</html>

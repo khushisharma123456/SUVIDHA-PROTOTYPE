@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="seniorApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Waste Service | Suvidha - Easy View</title>
+    <link rel="stylesheet" href="../../css/senior-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    <script src="../app.js"></script>
+    <style>
+        /* Live Waste Service Styles */
+        .live-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .live-map-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .live-map-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gov-gray-800);
+            margin: 0;
+        }
+
+        .map-container {
+            border: 2px solid var(--gov-gray-200);
+            border-radius: var(--radius-lg);
+            height: 400px;
+            background: rgba(255, 255, 255, 0.98);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .map-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(200, 200, 220, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 200, 220, 0.2) 1px, transparent 1px);
+            background-size: 50px 50px;
+            top: 0;
+            left: 0;
+        }
+
+        .map-marker {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .map-marker.truck {
+            top: 30%;
+            left: 65%;
+            animation: bounce 2s infinite;
+        }
+
+        .map-marker.user {
+            top: 60%;
+            left: 35%;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .map-marker-label {
+            background: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            color: var(--gov-gray-700);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .map-marker-distance-line {
+            position: absolute;
+            border: 2px dashed var(--gov-primary);
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .status-item {
+            background: var(--gov-info-light);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: center;
+        }
+
+        .status-item-icon {
+            font-size: 2rem;
+        }
+
+        .status-item-label {
+            font-size: 0.85rem;
+            color: var(--gov-gray-600);
+            font-weight: 500;
+        }
+
+        .status-item-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gov-primary);
+        }
+
+        .status-item-value.active {
+            color: var(--gov-success);
+        }
+
+        .truck-info-card {
+            background: linear-gradient(135deg, var(--gov-primary) 0%, var(--gov-primary-dark) 100%);
+            color: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .truck-info-left {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .truck-icon {
+            font-size: 2.5rem;
+        }
+
+        .truck-details h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .truck-details p {
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .truck-status-badge {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-back,
+        .btn-refresh {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            flex: 1;
+        }
+
+        .btn-back {
+            background: var(--gov-gray-200);
+            color: var(--gov-gray-800);
+        }
+
+        .btn-back:hover {
+            background: var(--gov-gray-300);
+            transform: translateY(-2px);
+        }
+
+        .btn-refresh {
+            background: var(--gov-primary);
+            color: white;
+        }
+
+        .btn-refresh:hover {
+            background: var(--gov-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(26, 54, 93, 0.3);
+        }
+
+        .btn-refresh.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gov-success);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .live-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49%, 100% { opacity: 1; }
+            50%, 99% { opacity: 0; }
+        }
+
+        .help-section {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+        }
+
+        .help-section h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gov-gray-800);
+            margin: 0 0 1.5rem 0;
+        }
+
+        .help-tips {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .help-tip {
+            padding: 1rem;
+            background: var(--gov-info-light);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+        }
+
+        .help-tip strong {
+            color: var(--gov-primary);
+        }
+
+        @media (max-width: 1024px) {
+            .status-grid,
+            .help-tips {
+                grid-template-columns: 1fr;
+            }
+
+            .truck-info-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .truck-info-left {
+                justify-content: center;
+            }
+
+            .map-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body ng-controller="LiveWasteServiceController">
+    <!-- Sidebar - Reused from Dashboard -->
+    <aside class="sc-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha-logo.png" alt="Suvidha"
+                        onerror="this.style.display='none'; this.parentNode.innerHTML='🏠';">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1>
+                    <span>Easy View</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Home</span>
+            </a>
+            <a href="bills.html" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">My Bills</span>
+            </a>
+            <a href="waste-management.html" class="nav-item active">
+                <span class="nav-icon">🗑️</span>
+                <span class="nav-text">Waste Collection</span>
+            </a>
+            <a href="complaints.html" class="nav-item">
+                <span class="nav-icon">📞</span>
+                <span class="nav-text">Help & Complaints</span>
+            </a>
+            <a href="updates.html" class="nav-item">
+                <span class="nav-icon">📍</span>
+                <span class="nav-text">My Area Updates</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p>Welcome back</p>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()">
+                <span>↪️</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="sc-main-content">
+        <header class="sc-header">
+            <div class="header-left">
+                <h2>Live Waste Service Near You</h2>
+                <span class="live-badge">🟢 Live tracking active</span>
+            </div>
+            <div class="header-right">
+                <div class="accessibility-controls">
+                    <button class="font-size-btn" ng-click="increaseFontSize()" ng-class="{active: currentFontSize === 'increased'}">A+</button>
+                    <button class="font-size-btn" ng-click="decreaseFontSize()" ng-class="{active: currentFontSize === 'normal'}">A</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="sc-content">
+            <div class="live-container">
+                <!-- Map Section -->
+                <div class="live-map-card">
+                    <h3>📍 Real-time Location</h3>
+                    <div class="map-container">
+                        <div class="map-grid"></div>
+                        <div class="map-marker truck">
+                            <span class="map-marker-label">🚛 Truck T-42</span>
+                            <span>🚗</span>
+                        </div>
+                        <div class="map-marker user">
+                            <span class="map-marker-label">📍 Your Location</span>
+                            <span>📍</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Information -->
+                <div class="truck-info-card">
+                    <div class="truck-info-left">
+                        <div class="truck-icon">🚛</div>
+                        <div class="truck-details">
+                            <h4>Truck T-42 (Sector 5-6)</h4>
+                            <p>Municipal Waste Collection Service</p>
+                        </div>
+                    </div>
+                    <div class="truck-status-badge">{{truckStatus}}</div>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-item-icon">📏</div>
+                        <div class="status-item-label">Distance Away</div>
+                        <div class="status-item-value">{{distance}}</div>
+                    </div>
+
+                    <div class="status-item">
+                        <div class="status-item-icon">⏱️</div>
+                        <div class="status-item-label">Estimated Time</div>
+                        <div class="status-item-value">{{eta}}</div>
+                    </div>
+
+                    <div class="status-item">
+                        <div class="status-item-icon">✅</div>
+                        <div class="status-item-label">Areas Completed</div>
+                        <div class="status-item-value">{{areasCompleted}}</div>
+                    </div>
+                </div>
+
+                <!-- Service Details -->
+                <div class="live-map-card">
+                    <h3>ℹ️ Service Details</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div style="padding: 1rem; background: var(--gov-info-light); border-radius: var(--radius-md);">
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--gov-gray-600); font-weight: 500;">Driver</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem; font-weight: 600; color: var(--gov-gray-800);">{{driverName}}</p>
+                        </div>
+                        <div style="padding: 1rem; background: var(--gov-info-light); border-radius: var(--radius-md);">
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--gov-gray-600); font-weight: 500;">Waste Type</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem; font-weight: 600; color: var(--gov-gray-800);">{{wasteType}}</p>
+                        </div>
+                        <div style="padding: 1rem; background: var(--gov-info-light); border-radius: var(--radius-md);">
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--gov-gray-600); font-weight: 500;">Next Stop</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem; font-weight: 600; color: var(--gov-gray-800);">{{nextStop}}</p>
+                        </div>
+                        <div style="padding: 1rem; background: var(--gov-info-light); border-radius: var(--radius-md);">
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--gov-gray-600); font-weight: 500;">Vehicle Capacity</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem; font-weight: 600; color: var(--gov-gray-800);">{{capacity}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Tips -->
+                <div class="help-section">
+                    <h3>💡 Tips While Waiting</h3>
+                    <div class="help-tips">
+                        <div class="help-tip">
+                            <strong>✓ Prepare waste</strong> in designated bags and place them near the curb
+                        </div>
+                        <div class="help-tip">
+                            <strong>✓ Segregate properly</strong> to earn more points and help the environment
+                        </div>
+                        <div class="help-tip">
+                            <strong>✓ Clear area</strong> around waste bins for easy access
+                        </div>
+                        <div class="help-tip">
+                            <strong>✓ Have documents ready</strong> if you need to discuss collection issues
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn-back" ng-click="goBack()">
+                        <span>← Back to Waste Management</span>
+                    </button>
+                    <button class="btn-refresh" ng-click="refreshLocation()" ng-class="{'loading': isLoading}">
+                        <span ng-if="!isLoading">🔄 Refresh Location</span>
+                        <span ng-if="isLoading">Updating...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Live Waste Service App
+        var app = angular.module('seniorApp', ['ngRoute']);
+
+        app.controller('LiveWasteServiceController', ['$scope', '$timeout',
+            function($scope, $timeout) {
+
+                // User Data - Load from localStorage
+                var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+                var userName = storedUser ? (storedUser.full_name || storedUser.name || 'Guest User') : 'Guest User';
+                var userInitials = userName.split(' ').map(function(word) { return word[0]; }).join('').toUpperCase().substring(0, 2);
+                $scope.user = {
+                    name: userName,
+                    initials: userInitials
+                };
+
+                // Live Service Data
+                $scope.truckStatus = 'On the way';
+                $scope.distance = '1.2 km';
+                $scope.eta = '5-7 minutes';
+                $scope.areasCompleted = '23 areas';
+                $scope.driverName = 'Arun Singh';
+                $scope.wasteType = 'Mixed & Segregated';
+                $scope.nextStop = 'Sector 5, Block C';
+                $scope.capacity = '75% Full';
+                $scope.isLoading = false;
+
+                // Refresh Location
+                $scope.refreshLocation = function() {
+                    $scope.isLoading = true;
+
+                    $timeout(function() {
+                        // Simulate location update
+                        var distances = ['1.2 km', '1.0 km', '0.8 km'];
+                        var randomDistance = distances[Math.floor(Math.random() * distances.length)];
+                        $scope.distance = randomDistance;
+
+                        $scope.eta = (Math.floor(Math.random() * 5) + 3) + '-' + (Math.floor(Math.random() * 5) + 8) + ' minutes';
+
+                        $scope.isLoading = false;
+                    }, 1500);
+                };
+
+                // Go Back
+                $scope.goBack = function() {
+                    window.location.href = 'waste-management.html';
+                };
+
+                // Logout
+                $scope.logout = function() {
+                    if (confirm('Are you sure you want to logout?')) {
+                        window.location.href = 'dashboard.html';
+                    }
+                };
+
+                // Auto-refresh every 30 seconds
+                var autoRefreshInterval = setInterval(function() {
+                    $scope.refreshLocation();
+                }, 30000);
+
+                // Cleanup on page leave
+                $scope.$on('$destroy', function() {
+                    clearInterval(autoRefreshInterval);
+                });
+            }
+        ]);
+    </script>
+</body>
+
+</html>

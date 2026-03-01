@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="adminApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RWA Oversight - Suvidha City Control Room</title>
+    <link rel="stylesheet" href="../../css/gov-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        .rwa-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .rwa-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--gov-gray-200);
+            transition: all 0.2s;
+        }
+
+        .rwa-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .rwa-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .rwa-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .rwa-header small {
+            color: var(--gov-gray-500);
+            font-size: 0.8rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: var(--gov-success-light);
+            color: var(--gov-success);
+        }
+
+        .status-badge.review {
+            background: var(--gov-warning-light);
+            color: var(--gov-warning);
+        }
+
+        .status-badge.inactive {
+            background: var(--gov-danger-light);
+            color: var(--gov-danger);
+        }
+
+        .rwa-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .rwa-stat {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+        }
+
+        .rwa-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gov-primary);
+        }
+
+        .rwa-stat-label {
+            font-size: 0.7rem;
+            color: var(--gov-gray-500);
+            text-transform: uppercase;
+        }
+
+        .rwa-progress {
+            margin: 1rem 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--gov-gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .progress-fill.good {
+            background: var(--gov-success);
+        }
+
+        .progress-fill.warning {
+            background: var(--gov-warning);
+        }
+
+        .progress-fill.danger {
+            background: var(--gov-danger);
+        }
+
+        .rwa-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .rwa-actions button {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: none;
+        }
+
+        .rwa-actions .primary {
+            background: var(--gov-primary);
+            color: white;
+        }
+
+        .rwa-actions .outline {
+            background: white;
+            border: 1px solid var(--gov-gray-300);
+            color: var(--gov-gray-700);
+        }
+
+        /* Modal Dialog Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: scale(0.9) translateY(-20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gov-gray-200);
+            background: linear-gradient(135deg, var(--gov-primary) 0%, #1e40af 100%);
+            color: white;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gov-gray-200);
+            background: var(--gov-gray-50);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-section h4 {
+            font-size: 0.9rem;
+            color: var(--gov-gray-700);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .detail-item {
+            padding: 0.75rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+        }
+
+        .detail-item label {
+            font-size: 0.7rem;
+            color: var(--gov-gray-500);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-item span {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .complaint-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .complaint-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gov-gray-100);
+        }
+
+        .complaint-item:last-child {
+            border-bottom: none;
+        }
+
+        .complaint-info {
+            flex: 1;
+        }
+
+        .complaint-title {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .complaint-meta {
+            font-size: 0.75rem;
+            color: var(--gov-gray-500);
+        }
+
+        .complaint-amount {
+            text-align: right;
+        }
+
+        .amount-value {
+            font-weight: 600;
+            color: var(--gov-success);
+        }
+
+        .amount-label {
+            font-size: 0.7rem;
+            color: var(--gov-gray-500);
+        }
+
+        .contact-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .contact-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--gov-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 auto 1rem;
+        }
+
+        .contact-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-role {
+            font-size: 0.85rem;
+            color: var(--gov-gray-600);
+            margin-bottom: 1rem;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .contact-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: var(--radius-md);
+            text-align: left;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gov-primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .contact-info label {
+            font-size: 0.7rem;
+            color: var(--gov-gray-500);
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .contact-info span {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .gov-btn {
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .gov-btn.primary {
+            background: var(--gov-primary);
+            color: white;
+        }
+
+        .gov-btn.secondary {
+            background: var(--gov-gray-200);
+            color: var(--gov-gray-700);
+        }
+
+        .gov-btn.success {
+            background: var(--gov-success);
+            color: white;
+        }
+    </style>
+</head>
+
+<body ng-controller="RWAController" ng-click="closeAllDropdowns()">
+    <!-- Sidebar -->
+    <aside class="gov-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='🏛️'">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1><span>CITY CONTROL ROOM</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span
+                    class="nav-text">Dashboard</span></a>
+            <a href="grievance.html" class="nav-item"><span class="nav-icon">📢</span><span class="nav-text">Grievance
+                    Command</span></a>
+            <a href="meter.html" class="nav-item"><span class="nav-icon">⚡</span><span class="nav-text">Meter
+                    Integrity</span></a>
+            <a href="rwa.html" class="nav-item active"><span class="nav-icon">🏗️</span><span class="nav-text">RWA
+                    Oversight</span></a>
+            <a href="participation.html" class="nav-item"><span class="nav-icon">⭐</span><span
+                    class="nav-text">Participation & Incentives</span></a>
+            <a href="policy.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Policy
+                    Insights</span></a>
+            <a href="audit.html" class="nav-item"><span class="nav-icon">🔐</span><span class="nav-text">Audit
+                    Vault</span></a>
+            <a href="field-operations.html" class="nav-item"><span class="nav-icon">👷</span><span
+                    class="nav-text">Field Operations</span></a>
+            <a href="waste-management.html" class="nav-item"><span class="nav-icon">♻️</span><span
+                    class="nav-text">Waste Management</span></a>
+            <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span><span
+                    class="nav-text">Settings</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p>{{user.role}}</p>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()"><span>🚪</span><span>Logout</span></button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="gov-main">
+        <header class="gov-topbar">
+            <div class="topbar-left">
+                <h2>RWA Oversight</h2>
+                <p>{{currentDate}}</p>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" title="Accessibility">♿</button>
+                <div class="lang-dropdown" ng-click="$event.stopPropagation()">
+                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)">🌐 <span>{{selectedLang}}</span>
+                        ▼</button>
+                    <div class="lang-dropdown-menu" ng-show="showLangMenu">
+                        <a href="#" class="lang-option" ng-repeat="lang in languages"
+                            ng-class="{active: selectedLang === lang.code}"
+                            ng-click="selectLang(lang, $event)">{{lang.name}}</a>
+                    </div>
+                </div>
+                <button class="topbar-btn notification-btn">🔔<span
+                        class="notification-badge">{{notifications}}</span></button>
+            </div>
+        </header>
+
+        <div class="gov-content">
+            <!-- Stats Row -->
+            <div class="section-header">
+                <h3><span class="icon">🏗️</span> RWA Performance Overview</h3>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card success">
+                    <div class="stat-icon-box green"><span>✅</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.active}}</div>
+                        <div class="stat-label">Active RWAs</div>
+                        <small class="stat-context">Meeting targets</small>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon-box orange"><span>⚠️</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.review}}</div>
+                        <div class="stat-label">Under Review</div>
+                        <small class="stat-context">Needs attention</small>
+                    </div>
+                </div>
+                <div class="stat-card primary">
+                    <div class="stat-icon-box blue"><span>🏘️</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.households | number}}</div>
+                        <div class="stat-label">Total Households</div>
+                        <small class="stat-context">Covered by RWAs</small>
+                    </div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-icon-box red"><span>📊</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.collection}}%</div>
+                        <div class="stat-label">Avg Collection Rate</div>
+                        <small class="stat-context">This month</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RWA Cards Grid -->
+            <div class="section-header" style="margin-top: 2rem;">
+                <h3><span class="icon">📋</span> RWA Details ({{filteredRwas().length}} total)</h3>
+            </div>
+            
+            <!-- Status Filters -->
+            <div class="risk-filters" style="background: var(--gov-gray-50); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <button class="risk-filter-btn" ng-class="{active: statusFilter === 'all'}" ng-click="setStatusFilter('all')" style="padding: 0.4rem 0.75rem; border: 1px solid var(--gov-gray-200); background: white; border-radius: 20px; font-size: 0.8rem; cursor: pointer;">All ({{rwas.length}})</button>
+                <button class="risk-filter-btn" ng-class="{active: statusFilter === 'active'}" ng-click="setStatusFilter('active')" style="padding: 0.4rem 0.75rem; border: 1px solid var(--gov-gray-200); background: white; border-radius: 20px; font-size: 0.8rem; cursor: pointer;">✅ Active ({{stats.active}})</button>
+                <button class="risk-filter-btn" ng-class="{active: statusFilter === 'review'}" ng-click="setStatusFilter('review')" style="padding: 0.4rem 0.75rem; border: 1px solid var(--gov-gray-200); background: white; border-radius: 20px; font-size: 0.8rem; cursor: pointer;">⚠️ Review ({{stats.review}})</button>
+                <button class="risk-filter-btn" ng-class="{active: statusFilter === 'inactive'}" ng-click="setStatusFilter('inactive')" style="padding: 0.4rem 0.75rem; border: 1px solid var(--gov-gray-200); background: white; border-radius: 20px; font-size: 0.8rem; cursor: pointer;">🔴 Inactive ({{stats.inactive}})</button>
+            </div>
+
+            <div class="rwa-grid">
+                <div class="rwa-card" ng-repeat="rwa in paginatedRwas()">
+                    <div class="rwa-header">
+                        <div>
+                            <h4>{{rwa.name}}</h4>
+                            <small>{{rwa.location}} | ID: {{rwa.id}}</small>
+                        </div>
+                        <span class="status-badge" ng-class="rwa.statusClass">{{rwa.status}}</span>
+                    </div>
+                    <div class="rwa-stats">
+                        <div class="rwa-stat">
+                            <div class="rwa-stat-value">{{rwa.households}}</div>
+                            <div class="rwa-stat-label">Households</div>
+                        </div>
+                        <div class="rwa-stat">
+                            <div class="rwa-stat-value">{{rwa.complaints}}</div>
+                            <div class="rwa-stat-label">Complaints</div>
+                        </div>
+                        <div class="rwa-stat">
+                            <div class="rwa-stat-value">{{rwa.resolved}}</div>
+                            <div class="rwa-stat-label">Resolved</div>
+                        </div>
+                    </div>
+                    <div class="rwa-progress">
+                        <div class="progress-label">
+                            <span>Collection Rate</span>
+                            <span>{{rwa.collectionRate}}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" ng-class="rwa.progressClass"
+                                ng-style="{width: rwa.collectionRate + '%'}"></div>
+                        </div>
+                    </div>
+                    <div class="rwa-actions">
+                        <button class="primary" ng-click="viewDetails(rwa)">View Details</button>
+                        <button class="outline" ng-click="contactRWA(rwa)">Contact</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 2rem; flex-wrap: wrap;" ng-if="getTotalPages() > 1">
+                <button ng-click="prevPage()" ng-disabled="currentPage === 1" style="padding: 0.5rem 1rem; border: 1px solid var(--gov-gray-300); background: white; border-radius: var(--radius-sm); cursor: pointer;">← Previous</button>
+                <button ng-repeat="page in getPageNumbers()" ng-click="goToPage(page)" ng-class="{'active': currentPage === page}" style="padding: 0.5rem 0.75rem; border: 1px solid var(--gov-gray-300); background: white; border-radius: var(--radius-sm); cursor: pointer; min-width: 40px;">{{page}}</button>
+                <button ng-click="nextPage()" ng-disabled="currentPage === getTotalPages()" style="padding: 0.5rem 1rem; border: 1px solid var(--gov-gray-300); background: white; border-radius: var(--radius-sm); cursor: pointer;">Next →</button>
+            </div>
+            <div style="text-align: center; margin-top: 1rem; color: var(--gov-gray-500); font-size: 0.85rem;">
+                Showing {{(currentPage - 1) * itemsPerPage + 1}} - {{getEndItem()}} of {{filteredRwas().length}} RWAs
+            </div>
+        </div>
+
+        <!-- View Details Modal -->
+        <div class="modal-overlay" ng-show="showDetails" ng-click="closeModal()">
+            <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 680px;">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--gov-primary) 0%, #1e40af 100%); color: white; border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
+                    <div>
+                        <h2 style="margin: 0; font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>🏢</span> {{selectedRwa.name}}
+                        </h2>
+                        <span style="font-size: 0.8rem; opacity: 0.9;">{{selectedRwa.location}} • {{selectedRwa.id}}</span>
+                    </div>
+                    <button class="modal-close" ng-click="closeModal()" style="color: white; background: rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <!-- Status Badge and Stats Row -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <span class="status-badge" ng-class="selectedRwa.statusClass" style="padding: 0.5rem 1rem; font-size: 0.85rem;">{{selectedRwa.status}}</span>
+                        <div style="display: flex; gap: 1.5rem;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--gov-primary);">{{selectedRwa.households}}</div>
+                                <div style="font-size: 0.7rem; color: var(--gov-gray-500); text-transform: uppercase;">Households</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--gov-success);">{{selectedRwa.collectionRate}}%</div>
+                                <div style="font-size: 0.7rem; color: var(--gov-gray-500); text-transform: uppercase;">Collection</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RWA Information -->
+                    <div class="detail-section">
+                        <h4 style="font-size: 0.95rem; color: var(--gov-gray-700); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>📋</span> RWA Information
+                        </h4>
+                        <div class="detail-grid" style="gap: 0.75rem;">
+                            <div class="detail-item" style="background: var(--gov-gray-50); padding: 0.75rem; border-radius: var(--radius-sm);">
+                                <label>RWA ID</label>
+                                <span style="color: var(--gov-primary); font-weight: 600;">{{selectedRwa.id}}</span>
+                            </div>
+                            <div class="detail-item" style="background: var(--gov-gray-50); padding: 0.75rem; border-radius: var(--radius-sm);">
+                                <label>Location</label>
+                                <span>{{selectedRwa.location}}</span>
+                            </div>
+                            <div class="detail-item" style="background: var(--gov-gray-50); padding: 0.75rem; border-radius: var(--radius-sm);">
+                                <label>Established</label>
+                                <span>{{selectedRwa.established}}</span>
+                            </div>
+                            <div class="detail-item" style="background: var(--gov-gray-50); padding: 0.75rem; border-radius: var(--radius-sm);">
+                                <label>Last Inspection</label>
+                                <span>{{selectedRwa.lastInspection}}</span>
+                            </div>
+                            <div class="detail-item" style="background: var(--gov-gray-50); padding: 0.75rem; border-radius: var(--radius-sm); grid-column: span 2;">
+                                <label>President</label>
+                                <span style="font-weight: 600;">{{selectedRwa.president}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Complaint Statistics -->
+                    <div class="detail-section">
+                        <h4 style="font-size: 0.95rem; color: var(--gov-gray-700); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>📊</span> Complaint Statistics
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+                            <div style="text-align: center; padding: 1rem; background: rgba(49, 130, 206, 0.1); border-radius: var(--radius-md);">
+                                <div style="font-size: 1.75rem; font-weight: 700; color: var(--gov-primary);">{{selectedRwa.complaints}}</div>
+                                <div style="font-size: 0.75rem; color: var(--gov-gray-600);">Total Complaints</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem; background: rgba(56, 161, 105, 0.1); border-radius: var(--radius-md);">
+                                <div style="font-size: 1.75rem; font-weight: 700; color: var(--gov-success);">{{selectedRwa.resolved}}</div>
+                                <div style="font-size: 0.75rem; color: var(--gov-gray-600);">Resolved</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem; background: rgba(221, 107, 32, 0.1); border-radius: var(--radius-md);">
+                                <div style="font-size: 1.75rem; font-weight: 700; color: var(--gov-warning);">{{selectedRwa.complaints - selectedRwa.resolved}}</div>
+                                <div style="font-size: 0.75rem; color: var(--gov-gray-600);">Pending</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Complaints from RWA -->
+                    <div class="detail-section" ng-if="selectedRwa.complaintsList && selectedRwa.complaintsList.length > 0" style="margin-bottom: 0;">
+                        <h4 style="font-size: 0.95rem; color: var(--gov-gray-700); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>📝</span> Recent Complaints & Allocations
+                        </h4>
+                        <div class="complaint-list" style="max-height: 180px; overflow-y: auto; border: 1px solid var(--gov-gray-200); border-radius: var(--radius-md);">
+                            <div ng-repeat="complaint in selectedRwa.complaintsList" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--gov-gray-100);" ng-style="{'border-bottom': $last ? 'none' : '1px solid var(--gov-gray-100)'}">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 500; font-size: 0.85rem;">{{complaint.subject}}</div>
+                                    <div style="font-size: 0.75rem; color: var(--gov-gray-500);">{{complaint.id}} • {{complaint.date}}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span ng-if="complaint.amountGiven > 0" style="font-weight: 600; color: var(--gov-success);">+₹{{complaint.amountGiven | number}}</span>
+                                    <span ng-if="complaint.amountGiven === 0" style="color: var(--gov-gray-400);">-</span>
+                                </div>
+                                <span style="padding: 0.2rem 0.5rem; font-size: 0.7rem; border-radius: 12px; margin-left: 0.75rem;" ng-class="{'background: var(--gov-success-light); color: var(--gov-success);': complaint.status === 'Resolved', 'background: var(--gov-warning-light); color: var(--gov-warning);': complaint.status !== 'Resolved'}" ng-style="{background: complaint.status === 'Resolved' ? 'rgba(56, 161, 105, 0.15)' : 'rgba(221, 107, 32, 0.15)', color: complaint.status === 'Resolved' ? 'var(--gov-success)' : 'var(--gov-warning)'}">{{complaint.status}}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(56, 161, 105, 0.1); border-radius: var(--radius-md); margin-top: 0.75rem;">
+                            <span style="font-weight: 600; font-size: 0.9rem;">Total Amount Allocated</span>
+                            <span style="font-size: 1.25rem; font-weight: 700; color: var(--gov-success);">₹{{getTotalAmountGiven() | number}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: var(--gov-gray-50); border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                    <button class="gov-btn gov-btn-outline" ng-click="closeModal()">Close</button>
+                    <button class="gov-btn gov-btn-primary" ng-click="contactFromDetails()" style="display: flex; align-items: center; gap: 0.5rem;">📞 Contact RWA</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Modal -->
+        <div class="modal-overlay" ng-show="showContact" ng-click="closeContactModal()">
+            <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 440px;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
+                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>📞</span> Contact Information
+                    </h2>
+                    <button class="modal-close" ng-click="closeContactModal()" style="color: white; background: rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <!-- Contact Card -->
+                    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+                        <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--gov-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 700; margin: 0 auto 1rem;">{{getInitials(selectedRwa.president)}}</div>
+                        <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem;">{{selectedRwa.president}}</div>
+                        <div style="font-size: 0.85rem; color: var(--gov-gray-600); margin-bottom: 0.25rem;">RWA President</div>
+                        <div style="font-size: 0.8rem; color: var(--gov-primary); font-weight: 500;">{{selectedRwa.name}}</div>
+                    </div>
+
+                    <!-- Contact Details - Clickable Items -->
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- Phone -->
+                        <a href="tel:{{selectedRwa.phone}}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gov-gray-50); border-radius: var(--radius-md); text-decoration: none; color: inherit; transition: all 0.2s; border: 1px solid transparent;" onmouseover="this.style.background='rgba(49, 130, 206, 0.08)'; this.style.borderColor='var(--gov-primary)'" onmouseout="this.style.background='var(--gov-gray-50)'; this.style.borderColor='transparent'">
+                            <span style="font-size: 1.5rem;">📞</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.7rem; color: var(--gov-gray-500); text-transform: uppercase; margin-bottom: 0.25rem;">Phone Number</div>
+                                <div style="font-weight: 600; font-size: 0.95rem; color: var(--gov-primary);">{{selectedRwa.phone}}</div>
+                            </div>
+                            <span style="color: var(--gov-gray-400);">→</span>
+                        </a>
+                        
+                        <!-- Email -->
+                        <a href="mailto:{{selectedRwa.email}}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gov-gray-50); border-radius: var(--radius-md); text-decoration: none; color: inherit; transition: all 0.2s; border: 1px solid transparent;" onmouseover="this.style.background='rgba(49, 130, 206, 0.08)'; this.style.borderColor='var(--gov-primary)'" onmouseout="this.style.background='var(--gov-gray-50)'; this.style.borderColor='transparent'">
+                            <span style="font-size: 1.5rem;">📧</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.7rem; color: var(--gov-gray-500); text-transform: uppercase; margin-bottom: 0.25rem;">Email Address</div>
+                                <div style="font-weight: 600; font-size: 0.95rem; color: var(--gov-primary);">{{selectedRwa.email}}</div>
+                            </div>
+                            <span style="color: var(--gov-gray-400);">→</span>
+                        </a>
+                        
+                        <!-- Aadhaar -->
+                        <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gov-gray-50); border-radius: var(--radius-md);">
+                            <span style="font-size: 1.5rem;">🏢</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.7rem; color: var(--gov-gray-500); text-transform: uppercase; margin-bottom: 0.25rem;">Aadhaar Number</div>
+                                <div style="font-weight: 600; font-size: 0.95rem;">{{selectedRwa.aadhaar}}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Address -->
+                        <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gov-gray-50); border-radius: var(--radius-md);">
+                            <span style="font-size: 1.5rem;">📍</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.7rem; color: var(--gov-gray-500); text-transform: uppercase; margin-bottom: 0.25rem;">Address</div>
+                                <div style="font-weight: 500; font-size: 0.9rem;">{{selectedRwa.location}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: var(--gov-gray-50); border-radius: 0 0 var(--radius-lg) var(--radius-lg); justify-content: center; gap: 1rem;">
+                    <button class="gov-btn gov-btn-outline" ng-click="closeContactModal()">Close</button>
+                    <button class="gov-btn" style="background: var(--gov-success); color: white;" ng-click="callRWA()">📞 Call Now</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        var app = angular.module('adminApp', []);
+
+        app.controller('RWAController', ['$scope', function ($scope) {
+            $scope.user = { name: 'Rajesh Kumar', initials: 'RK', role: 'Government Official' };
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            $scope.notifications = 5;
+            $scope.selectedLang = 'EN';
+            $scope.showLangMenu = false;
+            $scope.languages = [{ code: 'EN', name: 'English' }, { code: 'HI', name: 'हिन्दी' }, { code: 'TA', name: 'தமிழ்' }, { code: 'TE', name: 'తెలుగు' }, { code: 'BN', name: 'বাংলা' }, { code: 'MR', name: 'मराठी' }];
+            $scope.statusFilter = 'all';
+            $scope.currentPage = 1;
+            $scope.itemsPerPage = 12;
+
+            // Generate 65 dummy RWAs
+            var delhiLocations = ['Rohini', 'Dwarka', 'Saket', 'Lajpat Nagar', 'Model Town', 'Janakpuri', 'Pitampura', 'Vasant Kunj', 'Greater Kailash', 'Karol Bagh', 'Rajouri Garden', 'Mayur Vihar', 'Preet Vihar', 'Shahdara', 'Dilshad Garden', 'Shalimar Bagh', 'Paschim Vihar', 'Patel Nagar', 'Tilak Nagar', 'Uttam Nagar'];
+            var sectors = ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6', 'Sector 7', 'Sector 8', 'Sector 9', 'Sector 10', 'Sector 11', 'Sector 12', 'Block A', 'Block B', 'Block C', 'Block D', 'Block E', 'Block F', 'Phase I', 'Phase II'];
+            var wards = ['North Delhi', 'South Delhi', 'East Delhi', 'West Delhi', 'Central Delhi', 'South West Delhi', 'North West Delhi', 'North East Delhi', 'South East Delhi', 'New Delhi'];
+
+            $scope.rwas = [];
+            for (var i = 1; i <= 65; i++) {
+                var statusRand = Math.random();
+                var status, statusClass, progressClass;
+                if (statusRand < 0.65) { status = 'Active'; statusClass = 'active'; }
+                else if (statusRand < 0.85) { status = 'Review'; statusClass = 'review'; }
+                else { status = 'Inactive'; statusClass = 'inactive'; }
+
+                var collectionRate = status === 'Active' ? Math.floor(Math.random() * 20) + 80 :
+                                     status === 'Review' ? Math.floor(Math.random() * 25) + 55 :
+                                     Math.floor(Math.random() * 30) + 20;
+                progressClass = collectionRate >= 80 ? 'good' : collectionRate >= 60 ? 'warning' : 'danger';
+
+                var households = Math.floor(Math.random() * 800) + 150;
+                var complaints = Math.floor(Math.random() * 40) + 2;
+                var resolved = Math.floor(complaints * (0.5 + Math.random() * 0.5));
+
+                // Generate complaints list for this RWA
+                var complaintSubjects = ['Water supply disruption', 'Street light malfunction', 'Garbage collection delay', 'Road repair needed', 'Drainage blockage', 'Park maintenance', 'Security concerns', 'Parking issues', 'Noise complaints', 'Stray animal problem'];
+                var complaintsList = [];
+                var numComplaints = Math.floor(Math.random() * 5) + 2;
+                for (var j = 0; j < numComplaints; j++) {
+                    var cStatus = Math.random() > 0.3 ? 'Resolved' : 'Pending';
+                    complaintsList.push({
+                        id: 'CMP-' + String(i).padStart(3, '0') + '-' + String(j + 1).padStart(2, '0'),
+                        subject: complaintSubjects[Math.floor(Math.random() * complaintSubjects.length)],
+                        date: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toLocaleDateString('en-IN'),
+                        status: cStatus,
+                        statusClass: cStatus === 'Resolved' ? 'resolved' : 'pending',
+                        amountGiven: cStatus === 'Resolved' ? Math.floor(Math.random() * 45000) + 5000 : 0
+                    });
+                }
+
+                var presidentNames = ['Amit Sharma', 'Priya Singh', 'Rahul Gupta', 'Neha Verma', 'Vikram Mehta', 'Sunita Rao', 'Anil Kumar', 'Kavita Joshi'];
+                var presidentName = presidentNames[i % 8];
+                var emailPrefix = presidentName.toLowerCase().replace(' ', '.');
+
+                $scope.rwas.push({
+                    id: 'RWA-' + String(i).padStart(4, '0'),
+                    name: delhiLocations[i % delhiLocations.length] + ' ' + sectors[i % sectors.length] + ' RWA',
+                    location: 'Ward ' + ((i % 30) + 1) + ', ' + wards[i % wards.length],
+                    status: status,
+                    statusClass: statusClass,
+                    households: households,
+                    complaints: complaints,
+                    resolved: resolved,
+                    collectionRate: collectionRate,
+                    progressClass: progressClass,
+                    president: presidentName,
+                    phone: '+91 98' + String(Math.floor(Math.random() * 90000000) + 10000000),
+                    email: emailPrefix + '@rwa.gov.in',
+                    aadhaar: 'XXXX-XXXX-' + String(Math.floor(Math.random() * 9000) + 1000),
+                    established: (2010 + (i % 14)),
+                    lastInspection: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toLocaleDateString('en-IN'),
+                    complaintsList: complaintsList
+                });
+            }
+
+            // Calculate stats dynamically
+            $scope.stats = {
+                active: $scope.rwas.filter(function(r) { return r.status === 'Active'; }).length,
+                review: $scope.rwas.filter(function(r) { return r.status === 'Review'; }).length,
+                inactive: $scope.rwas.filter(function(r) { return r.status === 'Inactive'; }).length,
+                households: $scope.rwas.reduce(function(sum, r) { return sum + r.households; }, 0),
+                collection: Math.round($scope.rwas.reduce(function(sum, r) { return sum + r.collectionRate; }, 0) / $scope.rwas.length)
+            };
+
+            // Language functions
+            $scope.toggleLangMenu = function($event) { $event.stopPropagation(); $scope.showLangMenu = !$scope.showLangMenu; };
+            $scope.selectLang = function(lang, $event) { $event.preventDefault(); $scope.selectedLang = lang.code; $scope.showLangMenu = false; };
+            $scope.closeAllDropdowns = function() { $scope.showLangMenu = false; };
+
+            // Filter and pagination
+            $scope.setStatusFilter = function(filter) { $scope.statusFilter = filter; $scope.currentPage = 1; };
+
+            $scope.filteredRwas = function() {
+                if ($scope.statusFilter === 'all') return $scope.rwas;
+                return $scope.rwas.filter(function(r) { return r.status.toLowerCase() === $scope.statusFilter; });
+            };
+
+            $scope.paginatedRwas = function() {
+                var filtered = $scope.filteredRwas();
+                var start = ($scope.currentPage - 1) * $scope.itemsPerPage;
+                return filtered.slice(start, start + $scope.itemsPerPage);
+            };
+
+            $scope.getTotalPages = function() { return Math.ceil($scope.filteredRwas().length / $scope.itemsPerPage); };
+            $scope.getEndItem = function() { return Math.min($scope.currentPage * $scope.itemsPerPage, $scope.filteredRwas().length); };
+            $scope.getPageNumbers = function() {
+                var pages = [], total = $scope.getTotalPages();
+                for (var i = 1; i <= total; i++) pages.push(i);
+                return pages;
+            };
+            $scope.goToPage = function(page) { if (page >= 1 && page <= $scope.getTotalPages()) $scope.currentPage = page; };
+            $scope.nextPage = function() { if ($scope.currentPage < $scope.getTotalPages()) $scope.currentPage++; };
+            $scope.prevPage = function() { if ($scope.currentPage > 1) $scope.currentPage--; };
+
+            // Modal states
+            $scope.showDetails = false;
+            $scope.showContact = false;
+            $scope.selectedRwa = {};
+
+            $scope.viewDetails = function(rwa) {
+                $scope.selectedRwa = rwa;
+                $scope.showDetails = true;
+            };
+
+            $scope.closeModal = function() {
+                $scope.showDetails = false;
+            };
+
+            $scope.contactRWA = function(rwa) {
+                $scope.selectedRwa = rwa;
+                $scope.showContact = true;
+            };
+
+            $scope.closeContactModal = function() {
+                $scope.showContact = false;
+            };
+
+            $scope.contactFromDetails = function() {
+                $scope.showDetails = false;
+                $scope.showContact = true;
+            };
+
+            $scope.getInitials = function(name) {
+                if (!name) return 'NA';
+                return name.split(' ').map(function(n) { return n[0]; }).join('').toUpperCase();
+            };
+
+            $scope.getTotalAmountGiven = function() {
+                if (!$scope.selectedRwa || !$scope.selectedRwa.complaintsList) return 0;
+                return $scope.selectedRwa.complaintsList.reduce(function(sum, c) { return sum + c.amountGiven; }, 0);
+            };
+
+            $scope.callRWA = function() {
+                window.location.href = 'tel:' + $scope.selectedRwa.phone.replace(/\s/g, '');
+            };
+
+            $scope.logout = function() { if (confirm('Are you sure you want to logout?')) alert('Logged out successfully'); };
+        }]);
+    </script>
+</body>
+
+</html>

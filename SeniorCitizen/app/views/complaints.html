@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="seniorApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Complaints | Suvidha - Easy View</title>
+    <link rel="stylesheet" href="../../css/senior-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="../app.js"></script>
+    <style>
+        .sc-content {
+            padding: 2rem 2.5rem;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--gov-gray-100);
+            border: 1px solid var(--gov-gray-200);
+            border-radius: var(--radius-md);
+            color: var(--gov-gray-700);
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .comfort-message {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--gov-success-light);
+            border-radius: var(--radius-md);
+            color: var(--gov-success);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Action Cards - Calmer Colors */
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .action-card:hover {
+            border-color: var(--gov-info);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(49, 130, 206, 0.12);
+        }
+
+        .action-card.selected {
+            border-color: var(--gov-info);
+            background: var(--gov-info-light);
+        }
+
+        .action-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .action-subtitle {
+            font-size: 1rem;
+            color: var(--gov-gray-500);
+        }
+
+        /* Step-by-Step Wizard */
+        .complaint-wizard {
+            background: rgba(255, 255, 255, 0.99);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .wizard-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gov-gray-100);
+        }
+
+        .wizard-icon {
+            font-size: 2rem;
+        }
+
+        .wizard-title h4 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .wizard-title p {
+            font-size: 0.95rem;
+            color: var(--gov-gray-500);
+        }
+
+        /* Step Indicators */
+        .step-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gov-gray-200);
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            background: var(--gov-info);
+            transform: scale(1.2);
+        }
+
+        .step-dot.completed {
+            background: var(--gov-success);
+        }
+
+        /* Step Content */
+        .step-content {
+            min-height: 200px;
+        }
+
+        .step-label {
+            font-size: 1rem;
+            color: var(--gov-info);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--gov-gray-700);
+            margin-bottom: 0.75rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--gov-gray-200);
+            border-radius: var(--radius-lg);
+            font-size: 1.1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--gov-info);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+
+        .form-hint {
+            font-size: 0.95rem;
+            color: var(--gov-gray-500);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Wizard Navigation */
+        .wizard-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gov-gray-100);
+        }
+
+        .wizard-btn {
+            padding: 1rem 2rem;
+            border-radius: var(--radius-lg);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .wizard-btn.back {
+            background: var(--gov-gray-100);
+            color: var(--gov-gray-600);
+        }
+
+        .wizard-btn.back:hover {
+            background: var(--gov-gray-200);
+        }
+
+        .wizard-btn.next {
+            background: var(--gov-info);
+            color: white;
+        }
+
+        .wizard-btn.next:hover {
+            background: #2b6cb0;
+            transform: translateY(-2px);
+        }
+
+        .wizard-btn.submit {
+            background: var(--gov-success);
+            color: white;
+            padding: 1.25rem 2.5rem;
+            font-size: 1.2rem;
+        }
+
+        .wizard-btn.submit:hover {
+            background: #2f855a;
+            transform: translateY(-2px);
+        }
+
+        .wizard-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Success Confirmation */
+        .success-banner {
+            background: linear-gradient(135deg, rgba(56, 161, 105, 0.1) 0%, rgba(56, 161, 105, 0.02) 100%);
+            border: 2px solid var(--gov-success);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gov-success);
+            margin-bottom: 0.5rem;
+        }
+
+        .success-message {
+            font-size: 1.15rem;
+            color: var(--gov-gray-700);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .success-id {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 2px solid var(--gov-success);
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gov-success);
+            margin-bottom: 1rem;
+        }
+
+        .success-next-steps {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+
+        .success-next-steps h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gov-gray-700);
+            margin-bottom: 0.75rem;
+        }
+
+        .success-next-steps ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .success-next-steps li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+            color: var(--gov-gray-600);
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .success-btn {
+            padding: 1rem 2rem;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .success-btn.primary {
+            background: var(--gov-info);
+            color: white;
+        }
+
+        .success-btn.secondary {
+            background: var(--gov-gray-100);
+            color: var(--gov-gray-700);
+        }
+
+        /* Help Section */
+        .help-section {
+            background: var(--gov-info-light);
+            border: 2px solid rgba(49, 130, 206, 0.2);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .help-section h4 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            color: var(--gov-gray-800);
+        }
+
+        .help-contacts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .help-contact {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.25rem;
+            background: white;
+            border-radius: var(--radius-lg);
+        }
+
+        .help-contact-icon {
+            font-size: 2rem;
+        }
+
+        .help-contact-text {
+            font-size: 1rem;
+            color: var(--gov-gray-700);
+            text-align: center;
+        }
+
+        .help-contact-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gov-info);
+        }
+
+        .reassurance {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--gov-gray-500);
+            font-size: 1rem;
+            font-style: italic;
+        }
+
+        /* Track Complaint Section */
+        .track-section {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .track-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .track-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .track-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--gov-success-light);
+            border-radius: 20px;
+            color: var(--gov-success);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .action-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .help-contacts {
+                grid-template-columns: 1fr;
+            }
+
+            .wizard-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .wizard-btn {
+                width: 100%;
+            }
+
+            .success-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body ng-controller="ComplaintsController">
+    <!-- Simplified Sidebar -->
+    <aside class="sc-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha-logo.png" alt="Suvidha"
+                        onerror="this.style.display='none'; this.parentNode.innerHTML='🏠';">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1>
+                    <span>Easy View</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Home</span>
+            </a>
+            <a href="bills.html" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">My Bills</span>
+            </a>
+            <a href="complaints.html" class="nav-item active">
+                <span class="nav-icon">📞</span>
+                <span class="nav-text">Help & Complaints</span>
+            </a>
+            <a href="updates.html" class="nav-item">
+                <span class="nav-icon">📍</span>
+                <span class="nav-text">My Area Updates</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                </div>
+            </div>
+            <button class="logout-btn">
+                <span>↪️</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="sc-main-content">
+        <header class="sc-header">
+            <div class="header-left">
+                <h2>Help & Complaints</h2>
+            </div>
+            <div class="header-right">
+                <div class="accessibility-controls">
+                    <button class="font-size-btn" ng-click="increaseFontSize()" ng-class="{active: currentFontSize === 'increased'}">A+</button>
+                    <button class="font-size-btn" ng-click="decreaseFontSize()" ng-class="{active: currentFontSize === 'normal'}">A</button>
+                </div>
+                <div class="lang-dropdown">
+                    <button class="lang-toggle-btn">EN ▼</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="sc-content">
+            <div class="page-header">
+                <h3 class="page-title">How can we help you?</h3>
+                <a href="dashboard.html" class="back-btn">
+                    ← Back to Home
+                </a>
+            </div>
+
+            <div class="comfort-message">
+                🤝 We're here to help. Take your time explaining your problem.
+            </div>
+
+            <!-- Success Banner - Show after submission -->
+            <div class="success-banner" ng-if="currentView === 'success'">
+                <div class="success-icon">✅</div>
+                <div class="success-title">Complaint Submitted Successfully!</div>
+                <div class="success-message">
+                    We have received your complaint. Someone will call you within 24 hours.
+                </div>
+                <div class="success-id">Complaint ID: {{submittedComplaintId}}</div>
+
+                <div class="success-next-steps">
+                    <h5>What happens next:</h5>
+                    <ul>
+                        <li><span>1️⃣</span> We will review your complaint</li>
+                        <li><span>2️⃣</span> Someone will call you within 24 hours</li>
+                        <li><span>3️⃣</span> You can track status in "Track My Complaint"</li>
+                    </ul>
+                </div>
+
+                <div class="success-actions">
+                    <a href="dashboard.html" class="success-btn primary">← Back to Home</a>
+                    <button class="success-btn secondary" ng-click="showTrackView()">Track My Complaint</button>
+                </div>
+            </div>
+
+            <!-- Action Cards (only show when not in success state) -->
+            <div class="action-cards" ng-if="currentView !== 'success'">
+                <div class="action-card" ng-click="showReportForm()" ng-class="{selected: currentView === 'report'}">
+                    <div class="action-icon">📝</div>
+                    <div class="action-title">Report a Problem</div>
+                    <div class="action-subtitle">Tell us what's wrong</div>
+                </div>
+                <div class="action-card" ng-click="showTrackView()" ng-class="{selected: currentView === 'track'}">
+                    <div class="action-icon">🔍</div>
+                    <div class="action-title">Track My Complaint</div>
+                    <div class="action-subtitle">Check complaint status</div>
+                </div>
+            </div>
+
+            <!-- Step-by-Step Wizard Form -->
+            <div class="complaint-wizard" ng-if="currentView === 'report'">
+                <div class="wizard-header">
+                    <span class="wizard-icon">📝</span>
+                    <div class="wizard-title">
+                        <h4>Report a Problem</h4>
+                        <p>Step {{currentStep}} of 3 - {{stepLabels[currentStep - 1]}}</p>
+                    </div>
+                </div>
+
+                <!-- Step Indicators -->
+                <div class="step-indicators">
+                    <div class="step-dot" ng-class="{'active': currentStep === 1, 'completed': currentStep > 1}"></div>
+                    <div class="step-dot" ng-class="{'active': currentStep === 2, 'completed': currentStep > 2}"></div>
+                    <div class="step-dot" ng-class="{'active': currentStep === 3}"></div>
+                </div>
+
+                <!-- Step 1: Problem Type -->
+                <div class="step-content" ng-if="currentStep === 1">
+                    <div class="step-label">Step 1: Select Problem Type</div>
+                    <div class="form-group">
+                        <label>What type of problem is it?</label>
+                        <select ng-model="complaint.type">
+                            <option value="">-- Select an option --</option>
+                            <option value="billing">Bill amount seems wrong</option>
+                            <option value="service">Service not working</option>
+                            <option value="meter">Meter reading issue</option>
+                            <option value="payment">Payment problem</option>
+                            <option value="other">Something else</option>
+                        </select>
+                        <p class="form-hint">💡 Choose the option that best describes your problem</p>
+                    </div>
+                </div>
+
+                <!-- Step 2: Description -->
+                <div class="step-content" ng-if="currentStep === 2">
+                    <div class="step-label">Step 2: Describe the Problem</div>
+                    <div class="form-group">
+                        <label>Tell us more about the problem</label>
+                        <textarea ng-model="complaint.description"
+                            placeholder="Explain in your own words... We're listening."></textarea>
+                        <p class="form-hint">💡 Don't worry about being technical. Just explain what happened.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3: Contact Info -->
+                <div class="step-content" ng-if="currentStep === 3">
+                    <div class="step-label">Step 3: Confirm Your Contact</div>
+                    <div class="form-group">
+                        <label>Your phone number (we'll call you back)</label>
+                        <input type="tel" ng-model="complaint.phone">
+                        <p class="form-hint">📞 We will use this number to call you about your complaint</p>
+                    </div>
+
+                    <div
+                        style="background: var(--gov-info-light); padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem;">
+                        <p style="font-size: 0.95rem; color: var(--gov-gray-600);">
+                            🛡️ <strong>Ready to submit?</strong> After you submit, we will call you within 24 hours to
+                            help resolve your issue.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Wizard Navigation -->
+                <div class="wizard-nav">
+                    <button class="wizard-btn back" ng-click="previousStep()" ng-if="currentStep > 1">
+                        ← Go Back
+                    </button>
+                    <div ng-if="currentStep === 1"></div>
+
+                    <button class="wizard-btn next" ng-click="nextStep()" ng-if="currentStep < 3"
+                        ng-disabled="!canProceed()">
+                        Continue →
+                    </button>
+
+                    <button class="wizard-btn submit" ng-click="submitComplaint()" ng-if="currentStep === 3">
+                        ✓ Submit My Complaint
+                    </button>
+                </div>
+
+                <p class="reassurance" ng-if="currentStep < 3">
+                    Nothing will happen until you complete all steps. You can go back anytime.
+                </p>
+            </div>
+
+            <!-- Track View -->
+            <div class="track-section" ng-if="currentView === 'track'">
+                <div class="track-icon">✅</div>
+                <div class="track-title">Your Complaints</div>
+                <p style="color: var(--gov-gray-600); font-size: 1.1rem; margin: 1rem 0;">
+                    You have no pending complaints. Everything is good!
+                </p>
+                <div class="track-status">
+                    <span>✓</span> All complaints resolved
+                </div>
+                <p style="color: var(--gov-gray-500); font-size: 0.95rem; margin-top: 1.5rem;">
+                    Last complaint resolved on: <strong>5 January 2026</strong>
+                </p>
+            </div>
+
+            <!-- Help Section -->
+            <div class="help-section" ng-if="currentView !== 'success'">
+                <h4>📞 Need Immediate Help?</h4>
+                <div class="help-contacts">
+                    <div class="help-contact">
+                        <span class="help-contact-icon">☎️</span>
+                        <span class="help-contact-text">Call Us (Free)</span>
+                        <span class="help-contact-value">1800-123-4567</span>
+                    </div>
+                    <div class="help-contact">
+                        <span class="help-contact-icon">📧</span>
+                        <span class="help-contact-text">Email Us</span>
+                        <span class="help-contact-value">help@suvidha.gov.in</span>
+                    </div>
+                    <div class="help-contact">
+                        <span class="help-contact-icon">🕐</span>
+                        <span class="help-contact-text">Available</span>
+                        <span class="help-contact-value">24 hours, 7 days</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reassurance" ng-if="currentView !== 'success'">
+                🤝 Help is always available. Don't hesitate to reach out.
+            </div>
+        </div>
+    </main>
+
+    <button class="help-btn-fixed">
+        <span class="help-icon">?</span>
+        <span>Need Help?</span>
+    </button>
+
+    <script>
+        var app = angular.module('seniorApp', []);
+
+        app.controller('ComplaintsController', ['$scope', function ($scope) {
+            // Load user from localStorage
+            var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+            var userName = 'Guest User';
+            var userInitials = 'GU';
+            
+            if (storedUser) {
+                userName = storedUser.full_name || storedUser.name || 'Guest User';
+                var nameParts = userName.split(' ');
+                userInitials = nameParts.length >= 2 
+                    ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
+                    : userName.substring(0, 2).toUpperCase();
+            }
+            
+            $scope.user = {
+                name: userName,
+                initials: userInitials
+            };
+
+            $scope.currentView = 'report';
+            $scope.currentStep = 1;
+            $scope.stepLabels = ['Select Problem Type', 'Describe the Problem', 'Confirm & Submit'];
+            $scope.submittedComplaintId = '';
+
+            $scope.complaint = {
+                type: '',
+                description: '',
+                phone: '+91 98765 43210'
+            };
+
+            $scope.showReportForm = function () {
+                $scope.currentView = 'report';
+                $scope.currentStep = 1;
+            };
+
+            $scope.showTrackView = function () {
+                $scope.currentView = 'track';
+            };
+
+            $scope.canProceed = function () {
+                if ($scope.currentStep === 1) {
+                    return $scope.complaint.type !== '';
+                }
+                if ($scope.currentStep === 2) {
+                    return $scope.complaint.description.trim() !== '';
+                }
+                return true;
+            };
+
+            $scope.nextStep = function () {
+                if ($scope.canProceed() && $scope.currentStep < 3) {
+                    $scope.currentStep++;
+                }
+            };
+
+            $scope.previousStep = function () {
+                if ($scope.currentStep > 1) {
+                    $scope.currentStep--;
+                }
+            };
+
+            $scope.submitComplaint = function () {
+                if (!$scope.complaint.type) {
+                    alert('Please select what type of problem you have.');
+                    return;
+                }
+                if (!$scope.complaint.description.trim()) {
+                    alert('Please tell us about your problem so we can help you.');
+                    return;
+                }
+
+                // Generate complaint ID
+                $scope.submittedComplaintId = 'CMP-2026-' + Math.floor(Math.random() * 10000);
+
+                // Reset form and show success
+                $scope.complaint.type = '';
+                $scope.complaint.description = '';
+                $scope.currentView = 'success';
+            };
+        }]);
+    </script>
+</body>
+
+</html>

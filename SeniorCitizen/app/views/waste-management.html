@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="seniorApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste Management | Suvidha - Easy View</title>
+    <link rel="stylesheet" href="../../css/senior-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    <script src="../app.js"></script>
+    <style>
+        /* Waste Management Page Styles */
+        .waste-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .waste-status-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .waste-status-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gov-gray-800);
+            margin: 0;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--gov-info-light);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+        }
+
+        .status-item.good {
+            background: rgba(56, 161, 105, 0.1);
+        }
+
+        .status-item.warning {
+            background: rgba(237, 137, 54, 0.1);
+        }
+
+        .status-label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .status-label-text {
+            font-size: 0.9rem;
+            color: var(--gov-gray-600);
+            font-weight: 500;
+        }
+
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gov-primary);
+        }
+
+        .status-value.good {
+            color: var(--gov-success);
+        }
+
+        .status-value.warning {
+            color: var(--gov-warning);
+        }
+
+        .status-icon {
+            font-size: 2rem;
+        }
+
+        .waste-form-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid var(--gov-gray-100);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+        }
+
+        .waste-form-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gov-gray-800);
+            margin: 0 0 1.5rem 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--gov-gray-700);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gov-gray-200);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--gov-primary);
+            box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-submit,
+        .btn-live-service {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .btn-submit {
+            background: var(--gov-success);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-submit:hover {
+            background: var(--gov-success-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(56, 161, 105, 0.3);
+        }
+
+        .btn-submit:disabled {
+            background: var(--gov-gray-300);
+            color: var(--gov-gray-500);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-live-service {
+            background: var(--gov-primary);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-live-service:hover {
+            background: var(--gov-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(26, 54, 93, 0.3);
+        }
+
+        .success-message {
+            background: rgba(56, 161, 105, 0.1);
+            border: 2px solid var(--gov-success);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            animation: slideDown 0.3s ease;
+        }
+
+        .success-message.hidden {
+            display: none;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-message-icon {
+            font-size: 1.5rem;
+        }
+
+        .success-message-text {
+            color: var(--gov-success);
+            font-weight: 600;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 1024px) {
+            .waste-container {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+
+<body ng-controller="WasteManagementController">
+    <!-- Sidebar - Reused from Dashboard -->
+    <aside class="sc-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha-logo.png" alt="Suvidha"
+                        onerror="this.style.display='none'; this.parentNode.innerHTML='🏠';">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1>
+                    <span>Easy View</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Home</span>
+            </a>
+            <a href="bills.html" class="nav-item">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">My Bills</span>
+            </a>
+            <a href="waste-management.html" class="nav-item active">
+                <span class="nav-icon">🗑️</span>
+                <span class="nav-text">Waste Collection</span>
+            </a>
+            <a href="complaints.html" class="nav-item">
+                <span class="nav-icon">📞</span>
+                <span class="nav-text">Help & Complaints</span>
+            </a>
+            <a href="updates.html" class="nav-item">
+                <span class="nav-icon">📍</span>
+                <span class="nav-text">My Area Updates</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p>Welcome back</p>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()">
+                <span>↪️</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="sc-main-content">
+        <header class="sc-header">
+            <div class="header-left">
+                <h2>Waste Collection</h2>
+            </div>
+            <div class="header-right">
+                <div class="accessibility-controls">
+                    <button class="font-size-btn" ng-click="increaseFontSize()" ng-class="{active: currentFontSize === 'increased'}">A+</button>
+                    <button class="font-size-btn" ng-click="decreaseFontSize()" ng-class="{active: currentFontSize === 'normal'}">A</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="sc-content">
+            <!-- Page Introduction -->
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h3>Track garbage collection,<br><strong>report issues</strong>, and keep your area clean.</h3>
+                </div>
+                <span class="comfort-message">
+                    ✅ Today's pickup is on schedule
+                </span>
+            </div>
+
+            <!-- Status + Form Layout -->
+            <div class="waste-container">
+                <!-- Today's Waste Status -->
+                <div class="waste-status-card">
+                    <h3>📊 Today's Status</h3>
+
+                    <div class="status-item good">
+                        <div class="status-label">
+                            <span class="status-label-text">Last Pickup</span>
+                            <span class="status-value good">{{lastPickup}}</span>
+                        </div>
+                        <span class="status-icon">✅</span>
+                    </div>
+
+                    <div class="status-item">
+                        <div class="status-label">
+                            <span class="status-label-text">Waste Type</span>
+                            <span class="status-value">{{wasteType}}</span>
+                        </div>
+                        <span class="status-icon">♻️</span>
+                    </div>
+
+                    <div class="status-item" ng-class="{'good': pointsEarned > 0}">
+                        <div class="status-label">
+                            <span class="status-label-text">Points Earned</span>
+                            <span class="status-value" ng-class="{'good': pointsEarned > 0}">+{{pointsEarned}}</span>
+                        </div>
+                        <span class="status-icon">⭐</span>
+                    </div>
+
+                    <!-- Live Service Button -->
+                    <button class="btn-live-service" ng-click="openLiveService()">
+                        <span>🚛</span>
+                        <span>Live Waste Service</span>
+                    </button>
+                </div>
+
+                <!-- Report Waste Issue Form -->
+                <div class="waste-form-card">
+                    <h3>🔴 Report an Issue</h3>
+
+                    <form ng-submit="submitIssue()" name="wasteForm">
+                        <!-- Issue Type -->
+                        <div class="form-group">
+                            <label for="issueType">What's the problem?</label>
+                            <select id="issueType" ng-model="issue.type" required>
+                                <option value="">-- Select an issue --</option>
+                                <option value="missed">Missed garbage pickup</option>
+                                <option value="mixed">Mixed waste collected</option>
+                                <option value="overflow">Overflowing bin</option>
+                                <option value="other">Other issue</option>
+                            </select>
+                        </div>
+
+                        <!-- Address (Read-only) -->
+                        <div class="form-group">
+                            <label for="address">Your Address</label>
+                            <input type="text" id="address" ng-model="issue.address" readonly>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label for="description">Additional Details (Optional)</label>
+                            <textarea id="description" ng-model="issue.description" placeholder="Please provide any additional information that might help us..."></textarea>
+                        </div>
+
+                        <!-- Photo Upload -->
+                        <div class="form-group">
+                            <label for="photo">Upload Photo (Optional)</label>
+                            <input type="file" id="photo" accept="image/*" ng-model="issue.photo">
+                            <span style="font-size: 0.85rem; color: var(--gov-gray-500);">JPG, PNG up to 5MB</span>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn-submit" ng-disabled="!wasteForm.$valid || isSubmitting">
+                                {{isSubmitting ? 'Submitting...' : 'Submit Request'}}
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Success Message -->
+                    <div class="success-message" ng-class="{'hidden': !showSuccess}">
+                        <span class="success-message-icon">✅</span>
+                        <span class="success-message-text">{{successMessage}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="waste-status-card full-width" style="margin-top: 2rem;">
+                <h3>❓ How to Report Issues</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+                    <div style="padding: 1rem; background: var(--gov-info-light); border-radius: var(--radius-md);">
+                        <strong style="color: var(--gov-primary);">Step 1</strong>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Select the type of issue you're facing</p>
+                    </div>
+                    <div style="padding: 1rem; background: var(--gov-info-light); border-radius: var(--radius-md);">
+                        <strong style="color: var(--gov-primary);">Step 2</strong>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Add any important details</p>
+                    </div>
+                    <div style="padding: 1rem; background: var(--gov-info-light); border-radius: var(--radius-md);">
+                        <strong style="color: var(--gov-primary);">Step 3</strong>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Submit and track your request</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Waste Management App
+        var app = angular.module('seniorApp', ['ngRoute']);
+
+        app.controller('WasteManagementController', ['$scope', '$timeout', '$location',
+            function($scope, $timeout, $location) {
+
+                // User Data - Load from localStorage
+                var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+                var userName = storedUser ? (storedUser.full_name || storedUser.name || 'Guest User') : 'Guest User';
+                var userInitials = userName.split(' ').map(function(word) { return word[0]; }).join('').toUpperCase().substring(0, 2);
+                $scope.user = {
+                    name: userName,
+                    initials: userInitials
+                };
+
+                // Waste Status Data
+                $scope.lastPickup = 'Today, 10:30 AM';
+                $scope.wasteType = 'Segregated ✓';
+                $scope.pointsEarned = 15;
+
+                // Form Data
+                $scope.issue = {
+                    type: '',
+                    address: '123 Sector 5, Ward 12, Delhi',
+                    description: '',
+                    photo: null
+                };
+
+                $scope.isSubmitting = false;
+                $scope.showSuccess = false;
+                $scope.successMessage = '';
+
+                // Submit Waste Issue
+                $scope.submitIssue = function() {
+                    if (!$scope.issue.type) {
+                        alert('Please select an issue type');
+                        return;
+                    }
+
+                    $scope.isSubmitting = true;
+
+                    // Simulate API call
+                    $timeout(function() {
+                        $scope.isSubmitting = false;
+                        $scope.showSuccess = true;
+                        $scope.successMessage = 'Your issue has been reported! We\'ll address it within 24 hours.';
+
+                        // Reset form
+                        $scope.issue = {
+                            type: '',
+                            address: '123 Sector 5, Ward 12, Delhi',
+                            description: '',
+                            photo: null
+                        };
+
+                        // Hide success message after 5 seconds
+                        $timeout(function() {
+                            $scope.showSuccess = false;
+                        }, 5000);
+                    }, 1500);
+                };
+
+                // Open Live Waste Service
+                $scope.openLiveService = function() {
+                    // Navigate to internal page
+                    window.location.href = 'live-waste-service.html';
+                };
+
+                // Logout
+                $scope.logout = function() {
+                    if (confirm('Are you sure you want to logout?')) {
+                        window.location.href = 'dashboard.html';
+                    }
+                };
+            }
+        ]);
+    </script>
+</body>
+
+</html>

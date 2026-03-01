@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="govAdminApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Suvidha City Control Room</title>
+    <link rel="stylesheet" href="../../css/gov-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="../app.js"></script>
+</head>
+
+<body ng-controller="DashboardController" ng-click="closeAllDropdowns()">
+    <!-- Sidebar -->
+    <aside class="gov-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='🏛️'">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1>
+                    <span>CITY CONTROL ROOM</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="grievance.html" class="nav-item">
+                <span class="nav-icon">📢</span>
+                <span class="nav-text">Grievance Command</span>
+            </a>
+            <a href="meter.html" class="nav-item">
+                <span class="nav-icon">⚡</span>
+                <span class="nav-text">Meter Integrity</span>
+            </a>
+            <a href="rwa.html" class="nav-item">
+                <span class="nav-icon">🏗️</span>
+                <span class="nav-text">RWA Oversight</span>
+            </a>
+            <a href="participation.html" class="nav-item">
+                <span class="nav-icon">⭐</span>
+                <span class="nav-text">Participation & Incentives</span>
+            </a>
+            <a href="policy.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Policy Insights</span>
+            </a>
+            <a href="audit.html" class="nav-item">
+                <span class="nav-icon">🔐</span>
+                <span class="nav-text">Audit Vault</span>
+            </a>
+            <a href="field-operations.html" class="nav-item">
+                <span class="nav-icon">👷</span>
+                <span class="nav-text">Field Operations</span>
+            </a>
+            <a href="waste-management.html" class="nav-item">
+                <span class="nav-icon">♻️</span>
+                <span class="nav-text">Waste Management</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p>{{user.role}}</p>
+                    <small>Last Login: {{user.lastLogin}}</small>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()">
+                <span>🚪</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="gov-main">
+        <header class="gov-topbar">
+            <div class="topbar-left">
+                <h2>Dashboard</h2>
+                <p>{{currentDate}}</p>
+                <span class="role-badge">🔒 Role: Government Official (Read-only Oversight)</span>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" title="Accessibility">♿</button>
+                <div class="lang-dropdown">
+                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)">
+                        🌐 <span>{{selectedLang}}</span> ▼
+                    </button>
+                    <div class="lang-dropdown-menu" ng-class="{'show': showLangMenu}" ng-click="$event.stopPropagation()" style="max-height: 300px; overflow-y: auto;">
+                        <a href="#" class="lang-option" ng-repeat="lang in languages"
+                            ng-class="{active: selectedLang === lang.code}"
+                            ng-click="selectLang(lang, $event)">{{lang.name}}</a>
+                    </div>
+                </div>
+                <div class="notification-dropdown">
+                    <button class="topbar-btn notification-btn" ng-click="toggleNotificationPanel($event)">
+                        🔔
+                        <span class="notification-badge" ng-show="aggregatedAlerts.length > 0">{{aggregatedAlerts.length}}</span>
+                    </button>
+                    <div class="notification-panel" ng-show="showNotificationPanel" ng-click="$event.stopPropagation()">
+                        <div class="notification-header">
+                            <h4>🚨 Aggregated Alerts</h4>
+                            <span class="notification-count">{{aggregatedAlerts.length}} Active Issues</span>
+                        </div>
+                        <div class="notification-list">
+                            <div class="notification-item" ng-repeat="alert in aggregatedAlerts" ng-class="alert.severity">
+                                <div class="notification-icon" ng-class="alert.type">
+                                    <span ng-if="alert.type === 'electricity'">⚡</span>
+                                    <span ng-if="alert.type === 'water'">💧</span>
+                                    <span ng-if="alert.type === 'waste'">🗑️</span>
+                                    <span ng-if="alert.type === 'gas'">🔥</span>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">{{alert.title}}</div>
+                                    <div class="notification-details">{{alert.description}}</div>
+                                    <div class="notification-meta">
+                                        <span class="notification-location">📍 {{alert.location}}</span>
+                                        <span class="notification-count-badge">{{alert.complaintCount}} complaints</span>
+                                        <span class="notification-time">{{alert.time}}</span>
+                                    </div>
+                                </div>
+                                <span class="notification-severity" ng-class="alert.severity">{{alert.severity}}</span>
+                            </div>
+                        </div>
+                        <div class="notification-footer">
+                            <a href="grievance.html">View All Complaints →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="gov-content">
+            <!-- Geographic Control Bar -->
+            <div class="geo-filter-bar">
+                <div class="filter-label">
+                    <span class="filter-icon">📍</span>
+                    <span>Filter by Geography</span>
+                </div>
+                <div class="filter-controls">
+                    <div class="filter-select">
+                        <label>State</label>
+                        <select ng-model="filters.state" ng-change="onStateChange()">
+                            <option ng-repeat="state in allStates" value="{{state.code}}">{{state.name}}</option>
+                        </select>
+                    </div>
+                    <span class="filter-arrow">→</span>
+                    <div class="filter-select">
+                        <label>District</label>
+                        <select ng-model="filters.district" ng-change="onDistrictChange()">
+                            <option ng-repeat="district in availableDistricts" value="{{district.code}}">{{district.name}}</option>
+                        </select>
+                    </div>
+                    <span class="filter-arrow">→</span>
+                    <div class="filter-select">
+                        <label>Ward</label>
+                        <select ng-model="filters.ward" ng-change="onWardChange()">
+                            <option ng-repeat="ward in availableWards" value="{{ward.code}}">{{ward.name}}</option>
+                        </select>
+                    </div>
+                    <span class="filter-arrow">→</span>
+                    <div class="filter-select">
+                        <label>Locality</label>
+                        <select ng-model="filters.locality" ng-change="onLocalityChange()">
+                            <option ng-repeat="locality in availableLocalities" value="{{locality.code}}">{{locality.name}}</option>
+                        </select>
+                    </div>
+                    <button class="filter-apply-btn" ng-click="applyFilters()">
+                        <span>🔄</span> Apply Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Filter Badge -->
+            <div class="active-filter-badge">
+                <span class="badge-icon">📌</span>
+                <span class="badge-text">{{filterBadgeText}}</span>
+                <button class="badge-clear" ng-click="clearFilters()">✕ Clear</button>
+            </div>
+
+            <!-- Operational Snapshot Section -->
+            <div class="section-header">
+                <h3><span class="icon">📊</span> Operational Snapshot <span class="geography-tag">(Selected
+                        Geography)</span></h3>
+                <span class="section-context">Based on selected geography</span>
+            </div>
+
+            <!-- Stats Cards Row -->
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon-box blue"><span>📋</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.activeComplaints | number}}</div>
+                        <div class="stat-label">Active Complaints</div>
+                        <span class="stat-trend up">↑ 12% from yesterday</span>
+                        <small class="stat-context">For selected region</small>
+                    </div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-icon-box red"><span>⚠️</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.slaBreaches}}</div>
+                        <div class="stat-label">SLA Breaches</div>
+                        <span class="stat-trend up">+ 3 new today</span>
+                        <small class="stat-context">Requires immediate attention</small>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon-box orange"><span>📍</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.areasStress}}</div>
+                        <div class="stat-label">Areas Under Stress</div>
+                        <span class="stat-trend down">↓ 2 resolved</span>
+                        <small class="stat-context">Infrastructure hotspots</small>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon-box green"><span>🔧</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.activeOutages}}</div>
+                        <div class="stat-label">Active Outages</div>
+                        <span class="stat-trend down">↓ 5 fixed today</span>
+                        <small class="stat-context">Utility disruptions</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="dashboard-grid">
+                <!-- Utility Consumption Chart -->
+                <div class="gov-card chart-card">
+                    <div class="card-header">
+                        <h3><span class="icon">📈</span> Utility Consumption Trends</h3>
+                        <div class="period-toggle">
+                            <button class="toggle-btn" ng-class="{active: chartPeriod === 'today'}"
+                                ng-click="setChartPeriod('today')">Today</button>
+                            <button class="toggle-btn" ng-class="{active: chartPeriod === '7days'}"
+                                ng-click="setChartPeriod('7days')">7 Days</button>
+                            <button class="toggle-btn" ng-class="{active: chartPeriod === '30days'}"
+                                ng-click="setChartPeriod('30days')">30 Days</button>
+                        </div>
+                    </div>
+                    <p class="chart-subtitle">{{chartSubtitle}}</p>
+                    <div class="chart-container">
+                        <canvas id="utilityChart"></canvas>
+                    </div>
+                    <div class="chart-filter-badge">
+                        <span class="badge-pill">📍 Filtered by Geography</span>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="right-column">
+                    <!-- Infrastructure Snapshot -->
+                    <div class="gov-card map-card">
+                        <div class="card-header">
+                            <h3><span class="icon">🗺️</span> Infrastructure Snapshot</h3>
+                            <span class="zoom-indicator">{{zoomLevel}}</span>
+                        </div>
+                        <div class="mini-map">
+                            <div class="map-placeholder" style="position: relative; min-height: 180px;">
+                                <!-- State Map SVG Preview -->
+                                <svg viewBox="0 0 400 350" class="state-mini-svg" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 160px;">
+                                    <defs>
+                                        <linearGradient id="miniStateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#e8f4fd;stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:#c5ddf5;stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                    
+                                    <!-- Delhi Shape -->
+                                    <path ng-if="filters.state === 'DL' || filters.state === 'all'" 
+                                        d="M150,50 L250,40 L300,80 L320,150 L310,220 L280,280 L200,310 L120,290 L80,230 L70,150 L90,90 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Maharashtra Shape -->
+                                    <path ng-if="filters.state === 'MH'" 
+                                        d="M50,80 L150,50 L280,60 L350,100 L370,180 L350,260 L280,320 L150,330 L80,280 L30,200 L40,120 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Karnataka Shape -->
+                                    <path ng-if="filters.state === 'KA'" 
+                                        d="M100,40 L200,30 L300,50 L340,120 L330,200 L300,280 L200,320 L100,300 L60,220 L70,140 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Tamil Nadu Shape -->
+                                    <path ng-if="filters.state === 'TN'" 
+                                        d="M120,30 L250,40 L320,90 L350,180 L330,270 L260,330 L150,320 L80,260 L70,180 L90,100 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Gujarat Shape -->
+                                    <path ng-if="filters.state === 'GJ'" 
+                                        d="M30,100 L120,50 L250,60 L300,100 L320,180 L290,250 L220,300 L130,310 L50,260 L20,180 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- UP Shape -->
+                                    <path ng-if="filters.state === 'UP'" 
+                                        d="M40,120 L150,60 L300,50 L370,100 L380,200 L340,280 L220,320 L100,300 L40,230 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Rajasthan Shape -->
+                                    <path ng-if="filters.state === 'RJ'" 
+                                        d="M60,80 L180,40 L300,60 L360,130 L340,220 L280,300 L160,320 L70,270 L30,180 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Kerala Shape -->
+                                    <path ng-if="filters.state === 'KL'" 
+                                        d="M150,30 L200,50 L220,120 L200,200 L170,280 L130,330 L100,280 L110,180 L130,100 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- West Bengal Shape -->
+                                    <path ng-if="filters.state === 'WB'" 
+                                        d="M180,30 L250,60 L280,130 L260,220 L220,290 L160,320 L120,260 L140,170 L160,90 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Punjab Shape -->
+                                    <path ng-if="filters.state === 'PB'" 
+                                        d="M100,60 L200,40 L280,80 L300,160 L260,240 L180,280 L100,250 L70,170 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Telangana Shape -->
+                                    <path ng-if="filters.state === 'TS'" 
+                                        d="M80,70 L200,50 L310,90 L340,170 L300,260 L200,300 L100,270 L60,180 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Bihar Shape -->
+                                    <path ng-if="filters.state === 'BR'" 
+                                        d="M60,90 L180,50 L300,80 L340,160 L300,250 L180,290 L80,250 L40,170 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Andhra Pradesh Shape -->
+                                    <path ng-if="filters.state === 'AP'" 
+                                        d="M100,40 L250,50 L340,110 L360,200 L320,290 L200,330 L90,280 L50,180 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Madhya Pradesh Shape -->
+                                    <path ng-if="filters.state === 'MP'" 
+                                        d="M40,100 L160,50 L320,70 L380,140 L360,240 L260,300 L120,290 L40,220 Z" 
+                                        fill="url(#miniStateGradient)" stroke="#3182ce" stroke-width="2"/>
+                                    
+                                    <!-- Issue Markers on Map -->
+                                    <circle ng-repeat="marker in mapMarkers.critical" 
+                                        ng-attr-cx="{{marker.x}}" ng-attr-cy="{{marker.y}}" r="8" 
+                                        fill="#e53e3e" stroke="#fff" stroke-width="2" class="pulse-marker"/>
+                                    <circle ng-repeat="marker in mapMarkers.warning" 
+                                        ng-attr-cx="{{marker.x}}" ng-attr-cy="{{marker.y}}" r="6" 
+                                        fill="#dd6b20" stroke="#fff" stroke-width="2"/>
+                                    <circle ng-repeat="marker in mapMarkers.info" 
+                                        ng-attr-cx="{{marker.x}}" ng-attr-cy="{{marker.y}}" r="5" 
+                                        fill="#3182ce" stroke="#fff" stroke-width="2"/>
+                                    <circle ng-repeat="marker in mapMarkers.resolved" 
+                                        ng-attr-cx="{{marker.x}}" ng-attr-cy="{{marker.y}}" r="4" 
+                                        fill="#38a169" stroke="#fff" stroke-width="2"/>
+                                </svg>
+                                
+                                <div class="map-overlay">
+                                    <span class="map-region-label">{{mapRegion}}</span>
+                                </div>
+                            </div>
+                            <div class="map-legend">
+                                <span><span class="dot red"></span> Critical</span>
+                                <span><span class="dot orange"></span> Warning</span>
+                                <span><span class="dot blue"></span> Info</span>
+                                <span><span class="dot green"></span> Resolved</span>
+                            </div>
+                        </div>
+                        <button class="gov-btn primary full-width" ng-click="openInfrastructureMap()">Open Full Infrastructure Map</button>
+                    </div>
+
+                    <!-- Priority Alerts -->
+                    <div class="gov-card alerts-card">
+                        <div class="card-header">
+                            <h3><span class="icon">🚨</span> Priority Alerts</h3>
+                            <span class="alert-count">{{alerts.length}} Active</span>
+                        </div>
+                        <div class="alerts-list">
+                            <div class="alert-item" ng-repeat="alert in alerts" ng-class="alert.type">
+                                <span class="alert-dot" ng-class="alert.type"></span>
+                                <div class="alert-content">
+                                    <span class="alert-text">{{alert.text}}</span>
+                                    <small class="alert-location">📍 {{alert.location}}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="grievance.html" class="view-all-link">View All Priority Alerts →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Overview Section -->
+            <div class="section-header">
+                <h3><span class="icon">💰</span> Revenue Overview</h3>
+                <span class="section-badge">📍 Filtered by Region</span>
+            </div>
+            <div class="revenue-grid">
+                <div class="gov-card revenue-card">
+                    <div class="card-header">
+                        <h3><span class="icon">💵</span> Collections Summary</h3>
+                        <span class="live-badge">🟢 Live</span>
+                    </div>
+                    <div class="revenue-stats">
+                        <div class="revenue-item">
+                            <span class="revenue-label">Today's Collections</span>
+                            <span class="revenue-value">{{revenue.todayCollections}}</span>
+                        </div>
+                        <div class="revenue-item">
+                            <span class="revenue-label">Month-to-Date</span>
+                            <span class="revenue-value highlight">{{revenue.mtdCollections}}</span>
+                        </div>
+                        <div class="revenue-item">
+                            <span class="revenue-label">Fiscal Year Progress</span>
+                            <span class="revenue-value">{{revenue.fyProgress}}</span>
+                        </div>
+                    </div>
+                    <div class="revenue-footer">
+                        <span class="update-time">⏱️ Updated 2m ago</span>
+                        <span class="update-badge success">Real-time Sync</span>
+                    </div>
+                </div>
+
+                <div class="gov-card revenue-card">
+                    <div class="card-header">
+                        <h3><span class="icon">📊</span> Pending & Alerts</h3>
+                    </div>
+                    <div class="revenue-stats">
+                        <div class="revenue-item">
+                            <span class="revenue-label">Pending Bills</span>
+                            <span class="revenue-value warning">{{revenue.pendingBills}}</span>
+                        </div>
+                        <div class="revenue-item">
+                            <span class="revenue-label">Overdue Amount</span>
+                            <span class="revenue-value danger">{{revenue.overdueAmount}}</span>
+                        </div>
+                        <div class="revenue-item">
+                            <span class="revenue-label">Billing Sync Alerts</span>
+                            <span class="revenue-value alert">⚠️ {{revenue.syncAlerts}} alerts</span>
+                        </div>
+                    </div>
+                    <button class="gov-btn primary" ng-click="openRevenueMonitor()">Open Revenue Monitor</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        var app = angular.module('adminApp', []);
+
+        app.controller('DashboardController', ['$scope', '$timeout', function ($scope, $timeout) {
+            // User
+            $scope.user = {
+                name: 'Rajesh Kumar',
+                initials: 'RK',
+                role: 'Government Official',
+                lastLogin: 'Today, 09:30 AM'
+            };
+
+            // Date
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+
+            // Language
+            $scope.selectedLang = 'EN';
+            $scope.showLangMenu = false;
+            $scope.languages = [
+                { code: 'EN', name: 'English' },
+                { code: 'HI', name: 'हिंदी (Hindi)' },
+                { code: 'BN', name: 'বাংলা (Bengali)' },
+                { code: 'TE', name: 'తెలుగు (Telugu)' },
+                { code: 'MR', name: 'मराठी (Marathi)' },
+                { code: 'TA', name: 'தமிழ் (Tamil)' },
+                { code: 'GU', name: 'ગુજરાતી (Gujarati)' },
+                { code: 'KN', name: 'ಕನ್ನಡ (Kannada)' },
+                { code: 'ML', name: 'മലయാളം (Malayalam)' },
+                { code: 'PA', name: 'ਪੰਜਾਬੀ (Punjabi)' },
+                { code: 'OR', name: 'ଓଡ଼ିଆ (Odia)' },
+                { code: 'AS', name: 'অসমীয়া (Assamese)' },
+                { code: 'UR', name: 'اردو (Urdu)' },
+                { code: 'SA', name: 'संस्कृत (Sanskrit)' },
+                { code: 'KS', name: 'कॉशुर (Kashmiri)' },
+                { code: 'SD', name: 'سنڌي (Sindhi)' },
+                { code: 'NE', name: 'नेपाली (Nepali)' },
+                { code: 'KO', name: 'कोंकणी (Konkani)' },
+                { code: 'MN', name: 'মণিপুরী (Manipuri)' },
+                { code: 'BH', name: 'भोजपुरी (Bhojpuri)' },
+                { code: 'DO', name: 'डोगरी (Dogri)' },
+                { code: 'MA', name: 'मैथिली (Maithili)' },
+                { code: 'ST', name: 'संथाली (Santali)' }
+            ];
+            $scope.notifications = 5;
+
+            // Filters
+            $scope.filters = {
+                state: 'delhi',
+                district: 'all',
+                ward: 'all',
+                locality: 'all'
+            };
+            $scope.filterBadgeText = 'Showing: Delhi NCT (All Districts)';
+
+            // Stats
+            $scope.stats = {
+                activeComplaints: 1247,
+                slaBreaches: 23,
+                areasStress: 8,
+                activeOutages: 3
+            };
+
+            // Chart
+            $scope.chartPeriod = '7days';
+            $scope.chartSubtitle = 'Delhi NCT – Last 7 Days | Forecasting & Stress Detection';
+            $scope.zoomLevel = 'City View';
+            $scope.mapRegion = 'Delhi NCT';
+
+            // Alerts
+            $scope.alerts = [
+                { type: 'critical', text: 'Complaint #8762 breached SLA > 24 hrs', location: 'Ward 12, South Delhi' },
+                { type: 'warning', text: 'Electricity load exceeding 80% capacity', location: 'Ward 5, Rohini' },
+                { type: 'info', text: 'Billing sync delayed > 1 hour', location: 'District-level sync' }
+            ];
+
+            // Revenue
+            $scope.revenue = {
+                todayCollections: '₹12.5L',
+                mtdCollections: '₹2.18Cr',
+                fyProgress: '₹54.6L',
+                pendingBills: '₹4.60L',
+                overdueAmount: '₹1.23L',
+                syncAlerts: 2
+            };
+
+            // Functions
+            $scope.toggleLangMenu = function ($event) {
+                $event.stopPropagation();
+                $scope.showLangMenu = !$scope.showLangMenu;
+            };
+
+            $scope.selectLang = function (lang, $event) {
+                $event.preventDefault();
+                $event.stopPropagation();
+                $scope.selectedLang = lang.code;
+                $scope.showLangMenu = false;
+            };
+
+            $scope.onFilterChange = function () {
+                var region = $scope.getSelectedRegionName();
+                $scope.filterBadgeText = 'Preview: ' + region + ' (Click Apply)';
+            };
+
+            $scope.getSelectedRegionName = function () {
+                var parts = [];
+                if ($scope.filters.locality !== 'all') {
+                    parts.push($scope.filters.locality.charAt(0).toUpperCase() + $scope.filters.locality.slice(1));
+                }
+                if ($scope.filters.ward !== 'all') {
+                    parts.push($scope.filters.ward.replace('-', ' ').replace(/\b\w/g, function (l) { return l.toUpperCase(); }));
+                }
+                if ($scope.filters.district !== 'all') {
+                    parts.push($scope.filters.district.charAt(0).toUpperCase() + $scope.filters.district.slice(1) + ' Delhi');
+                }
+                if ($scope.filters.state !== 'all') {
+                    parts.push($scope.filters.state === 'delhi' ? 'Delhi NCT' : $scope.filters.state.toUpperCase());
+                }
+                return parts.length > 0 ? parts.join(', ') : 'All Regions';
+            };
+
+            $scope.applyFilters = function () {
+                var region = $scope.getSelectedRegionName();
+                $scope.filterBadgeText = 'Showing: ' + region;
+                $scope.chartSubtitle = region + ' – Last 7 Days | Forecasting & Stress Detection';
+                $scope.mapRegion = region.split(',')[0];
+
+                // Update zoom level
+                if ($scope.filters.locality !== 'all') {
+                    $scope.zoomLevel = 'Locality View';
+                } else if ($scope.filters.ward !== 'all') {
+                    $scope.zoomLevel = 'Ward View';
+                } else if ($scope.filters.district !== 'all') {
+                    $scope.zoomLevel = 'District View';
+                } else {
+                    $scope.zoomLevel = 'City View';
+                }
+
+                // Simulate data update
+                $scope.stats = {
+                    activeComplaints: Math.floor(Math.random() * 2000) + 500,
+                    slaBreaches: Math.floor(Math.random() * 30) + 5,
+                    areasStress: Math.floor(Math.random() * 15) + 3,
+                    activeOutages: Math.floor(Math.random() * 10) + 1
+                };
+            };
+
+            $scope.clearFilters = function () {
+                $scope.filters = { state: 'delhi', district: 'all', ward: 'all', locality: 'all' };
+                $scope.applyFilters();
+            };
+
+            $scope.setChartPeriod = function (period) {
+                $scope.chartPeriod = period;
+                var periodText = period === 'today' ? 'Today' : period === '7days' ? 'Last 7 Days' : 'Last 30 Days';
+                $scope.chartSubtitle = $scope.mapRegion + ' – ' + periodText + ' | Forecasting & Stress Detection';
+            };
+
+            $scope.logout = function () {
+                if (confirm('Are you sure you want to logout?')) {
+                    alert('Logged out successfully');
+                }
+            };
+
+            // Initialize chart after DOM is ready
+            $timeout(function () {
+                var ctx = document.getElementById('utilityChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [
+                                {
+                                    label: 'Electricity',
+                                    data: [65, 72, 68, 80, 75, 70, 78],
+                                    borderColor: '#f6ad55',
+                                    backgroundColor: 'rgba(246, 173, 85, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Water',
+                                    data: [45, 50, 48, 55, 52, 58, 54],
+                                    borderColor: '#63b3ed',
+                                    backgroundColor: 'rgba(99, 179, 237, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Gas',
+                                    data: [30, 32, 28, 35, 33, 30, 32],
+                                    borderColor: '#68d391',
+                                    backgroundColor: 'rgba(104, 211, 145, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+            }, 100);
+        }]);
+    </script>
+
+    <!-- Infrastructure Map Modal -->
+    <div class="modal-overlay" ng-show="showInfraModal" ng-click="closeInfrastructureMap()">
+        <div class="modal-dialog infra-modal" ng-click="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>🗺️ Full Infrastructure Map - {{getSelectedRegionName()}}</h3>
+                <button class="modal-close" ng-click="closeInfrastructureMap()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="infra-map-container">
+                    <div class="infra-map-view">
+                        <!-- State Map SVG with Issue Markers -->
+                        <div class="state-map-wrapper">
+                            <svg viewBox="0 0 400 350" class="state-map-svg" xmlns="http://www.w3.org/2000/svg">
+                                <!-- State outline based on selected state -->
+                                <defs>
+                                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+                                    </filter>
+                                    <linearGradient id="stateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#e8f4fd;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#c5ddf5;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                
+                                <!-- Generic State Shape (Delhi-like polygon) -->
+                                <path ng-if="filters.state === 'DL' || filters.state === 'all'" 
+                                    d="M150,50 L250,40 L300,80 L320,150 L310,220 L280,280 L200,310 L120,290 L80,230 L70,150 L90,90 Z" 
+                                    fill="url(#stateGradient)" stroke="#3182ce" stroke-width="2" filter="url(#shadow)"/>
+                                
+                                <!-- Maharashtra Shape -->
+                                <path ng-if="filters.state === 'MH'" 
+                                    d="M50,80 L150,50 L280,60 L350,100 L370,180 L350,260 L280,320 L150,330 L80,280 L30,200 L40,120 Z" 
+                                    fill="url(#stateGradient)" stroke="#3182ce" stroke-width="2" filter="url(#shadow)"/>
+                                
+                                <!-- Karnataka Shape -->
+                                <path ng-if="filters.state === 'KA'" 
+                                    d="M100,40 L200,30 L300,50 L340,120 L330,200 L300,280 L200,320 L100,300 L60,220 L70,140 Z" 
+                                    fill="url(#stateGradient)" stroke="#3182ce" stroke-width="2" filter="url(#shadow)"/>
+                                
+                                <!-- Tamil Nadu Shape -->
+                                <path ng-if="filters.state === 'TN'" 
+                                    d="M120,30 L250,40 L320,90 L350,180 L330,270 L260,330 L150,320 L80,260 L70,180 L90,100 Z" 
+                                    fill="url(#stateGradient)" stroke="#3182ce" stroke-width="2" filter="url(#shadow)"/>
+                                
+                                <!-- Gujarat Shape -->
+                                <path ng-if="filters.state === 'GJ'" 
+                                    d="M30,100 L120,50 L250,60 L300,100 L320,180 L290,250 L220,300 L130,310 L50,260 L20,180 Z" 
+                                    fill="url(#stateGradient)" stroke="#3182ce" stroke-width="2" filter="url(#shadow)"/>
+                                
+                                <!-- UP Shape -->
+                                <path ng-if="filters.state === 'UP'" 
+                                    d="M40,120 L150,60 L300,50 L370,100 L380,200 L340,280 L220,320 L100,300 L40,230 Z" 
+                                    fill="url(#stateGradient)" stroke="#3182ce" stroke-width="2" filter="url(#shadow)"/>
+                                
+                                <!-- Default shape for other states -->
+                                <path ng-if="!['DL','MH','KA','TN','GJ','UP','all'].includes(filters.state)" 
+                                    d="M100,60 L200,40 L300,60 L340,130 L330,220 L280,290 L180,310 L80,280 L50,200 L60,120 Z" 
+                                    fill="url(#stateGradient)" stroke="#3182ce" stroke-width="2" filter="url(#shadow)"/>
+                                
+                                <!-- Issue Marker Dots -->
+                                <g class="issue-markers">
+                                    <!-- Critical Issues (Red) -->
+                                    <circle ng-repeat="marker in mapMarkers.critical" 
+                                        ng-attr-cx="{{marker.x}}" ng-attr-cy="{{marker.y}}" r="10" 
+                                        fill="#e53e3e" stroke="#fff" stroke-width="2" class="pulse-marker">
+                                        <animate attributeName="r" values="10;12;10" dur="1s" repeatCount="indefinite"/>
+                                    </circle>
+                                    <text ng-repeat="marker in mapMarkers.critical" 
+                                        ng-attr-x="{{marker.x}}" ng-attr-y="{{marker.y + 4}}" 
+                                        text-anchor="middle" fill="white" font-size="10" font-weight="bold">!</text>
+                                    
+                                    <!-- Warning Issues (Orange) -->
+                                    <circle ng-repeat="marker in mapMarkers.warning" 
+                                        ng-attr-cx="{{marker.x}}" ng-attr-cy="{{marker.y}}" r="8" 
+                                        fill="#dd6b20" stroke="#fff" stroke-width="2">
+                                    </circle>
+                                    
+                                    <!-- Info Issues (Blue) -->
+                                    <circle ng-repeat="marker in mapMarkers.info" 
+                                        ng-attr-cx="{{marker.x}}" ng-attr-cy="{{marker.y}}" r="6" 
+                                        fill="#3182ce" stroke="#fff" stroke-width="2">
+                                    </circle>
+                                    
+                                    <!-- Resolved Issues (Green) -->
+                                    <circle ng-repeat="marker in mapMarkers.resolved" 
+                                        ng-attr-cx="{{marker.x}}" ng-attr-cy="{{marker.y}}" r="5" 
+                                        fill="#38a169" stroke="#fff" stroke-width="2">
+                                    </circle>
+                                </g>
+                                
+                                <!-- District Labels -->
+                                <g class="district-labels" font-size="9" fill="#4a5568">
+                                    <text ng-repeat="label in mapLabels" 
+                                        ng-attr-x="{{label.x}}" ng-attr-y="{{label.y}}" 
+                                        text-anchor="middle">{{label.name}}</text>
+                                </g>
+                            </svg>
+                            
+                            <!-- Map Legend -->
+                            <div class="map-legend-inline">
+                                <span><span class="legend-dot critical"></span> Critical ({{mapMarkers.critical.length}})</span>
+                                <span><span class="legend-dot warning"></span> Warning ({{mapMarkers.warning.length}})</span>
+                                <span><span class="legend-dot info"></span> Info ({{mapMarkers.info.length}})</span>
+                                <span><span class="legend-dot resolved"></span> Resolved ({{mapMarkers.resolved.length}})</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Ward/Zone Grid Below Map -->
+                        <div class="zone-grid-container">
+                            <h5>Zone-wise Issue Distribution</h5>
+                            <div class="map-grid">
+                                <div class="map-zone" ng-repeat="zone in infrastructureZones" ng-class="zone.status">
+                                    <div class="zone-name">{{zone.name}}</div>
+                                    <div class="zone-markers">
+                                        <span class="zone-marker" ng-repeat="marker in zone.markers" ng-class="marker.type" title="{{marker.label}}">
+                                            <span ng-if="marker.type === 'electricity'">⚡</span>
+                                            <span ng-if="marker.type === 'water'">💧</span>
+                                            <span ng-if="marker.type === 'waste'">🗑️</span>
+                                            <span ng-if="marker.type === 'gas'">🔥</span>
+                                        </span>
+                                    </div>
+                                    <div class="zone-stats">
+                                        <span class="zone-complaints">{{zone.complaints}} issues</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="infra-sidebar">
+                        <h4>Infrastructure Status</h4>
+                        <div class="infra-status-list">
+                            <div class="infra-status-item">
+                                <span class="status-icon">⚡</span>
+                                <div class="status-info">
+                                    <span class="status-label">Electricity</span>
+                                    <div class="status-bar">
+                                        <div class="status-fill electricity" style="width: {{infrastructure.electricityLoad}}%"></div>
+                                    </div>
+                                    <span class="status-value">{{infrastructure.electricityLoad}}% Load</span>
+                                </div>
+                            </div>
+                            <div class="infra-status-item">
+                                <span class="status-icon">💧</span>
+                                <div class="status-info">
+                                    <span class="status-label">Water Pressure</span>
+                                    <div class="status-bar">
+                                        <div class="status-fill water" style="width: {{infrastructure.waterPressure}}%"></div>
+                                    </div>
+                                    <span class="status-value">{{infrastructure.waterPressure}}%</span>
+                                </div>
+                            </div>
+                            <div class="infra-status-item">
+                                <span class="status-icon">🔥</span>
+                                <div class="status-info">
+                                    <span class="status-label">Gas Supply</span>
+                                    <div class="status-bar">
+                                        <div class="status-fill gas" style="width: {{infrastructure.gasSupply}}%"></div>
+                                    </div>
+                                    <span class="status-value">{{infrastructure.gasSupply}}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <h4>Active Issues by Area</h4>
+                        <div class="issue-summary">
+                            <div class="issue-item" ng-repeat="zone in infrastructureZones | orderBy:'-complaints' | limitTo:5">
+                                <span class="issue-area">{{zone.name}}</span>
+                                <span class="issue-count" ng-class="{'critical': zone.complaints > 10, 'warning': zone.complaints > 5}">{{zone.complaints}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="gov-btn secondary" ng-click="closeInfrastructureMap()">Close</button>
+                <button class="gov-btn primary" ng-click="exportMapData()">📥 Export Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Monitor Modal -->
+    <div class="modal-overlay" ng-show="showRevenueModal" ng-click="closeRevenueMonitor()">
+        <div class="modal-dialog revenue-monitor-modal" ng-click="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>💰 Revenue Monitor - {{getSelectedRegionName()}}</h3>
+                <button class="modal-close" ng-click="closeRevenueMonitor()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="revenue-tabs">
+                    <button class="revenue-tab" ng-class="{active: revenueTab === 'overview'}" ng-click="setRevenueTab('overview')">📊 Overview</button>
+                    <button class="revenue-tab" ng-class="{active: revenueTab === 'pending'}" ng-click="setRevenueTab('pending')">⏳ Pending Bills</button>
+                    <button class="revenue-tab" ng-class="{active: revenueTab === 'alerts'}" ng-click="setRevenueTab('alerts')">⚠️ Sync Alerts</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div class="revenue-content" ng-show="revenueTab === 'overview'">
+                    <div class="revenue-stats-grid">
+                        <div class="revenue-stat-card success">
+                            <div class="revenue-stat-value">{{revenue.todayCollections}}</div>
+                            <div class="revenue-stat-label">Today's Collections</div>
+                        </div>
+                        <div class="revenue-stat-card">
+                            <div class="revenue-stat-value">{{revenue.mtdCollections}}</div>
+                            <div class="revenue-stat-label">Month-to-Date</div>
+                        </div>
+                        <div class="revenue-stat-card">
+                            <div class="revenue-stat-value">{{revenue.fyProgress}}</div>
+                            <div class="revenue-stat-label">Fiscal Year Progress</div>
+                        </div>
+                        <div class="revenue-stat-card warning">
+                            <div class="revenue-stat-value">{{revenue.pendingBills}}</div>
+                            <div class="revenue-stat-label">Total Pending</div>
+                        </div>
+                    </div>
+                    <h4 style="color: #1a365d; margin-bottom: 1rem;">Collection Breakdown by Utility</h4>
+                    <div class="revenue-stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="revenue-stat-card">
+                            <div class="revenue-stat-value" style="font-size: 1.2rem;">⚡ ₹18.4 Cr</div>
+                            <div class="revenue-stat-label">Electricity</div>
+                        </div>
+                        <div class="revenue-stat-card">
+                            <div class="revenue-stat-value" style="font-size: 1.2rem;">💧 ₹12.6 Cr</div>
+                            <div class="revenue-stat-label">Water</div>
+                        </div>
+                        <div class="revenue-stat-card">
+                            <div class="revenue-stat-value" style="font-size: 1.2rem;">🔥 ₹8.2 Cr</div>
+                            <div class="revenue-stat-label">Gas</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending Bills Tab -->
+                <div class="revenue-content" ng-show="revenueTab === 'pending'">
+                    <div class="revenue-stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1.5rem;">
+                        <div class="revenue-stat-card warning">
+                            <div class="revenue-stat-value">{{revenue.pendingBills}}</div>
+                            <div class="revenue-stat-label">Total Pending</div>
+                        </div>
+                        <div class="revenue-stat-card danger">
+                            <div class="revenue-stat-value">{{revenue.overdueAmount}}</div>
+                            <div class="revenue-stat-label">Overdue Amount</div>
+                        </div>
+                        <div class="revenue-stat-card">
+                            <div class="revenue-stat-value">{{pendingBillsData.length}}</div>
+                            <div class="revenue-stat-label">Bills Requiring Action</div>
+                        </div>
+                    </div>
+                    <table class="pending-bills-table">
+                        <thead>
+                            <tr>
+                                <th>Bill ID</th>
+                                <th>Consumer/Area</th>
+                                <th>Utility</th>
+                                <th>Amount</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="bill in pendingBillsData">
+                                <td>{{bill.id}}</td>
+                                <td>{{bill.consumer}}</td>
+                                <td>
+                                    <span ng-if="bill.utility === 'Electricity'">⚡</span>
+                                    <span ng-if="bill.utility === 'Water'">💧</span>
+                                    <span ng-if="bill.utility === 'Gas'">🔥</span>
+                                    {{bill.utility}}
+                                </td>
+                                <td><strong>{{bill.amount}}</strong></td>
+                                <td>{{bill.dueDate}}</td>
+                                <td><span class="status-badge" ng-class="bill.status">{{bill.status}}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Sync Alerts Tab -->
+                <div class="revenue-content" ng-show="revenueTab === 'alerts'">
+                    <div class="revenue-stats-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 1.5rem;">
+                        <div class="revenue-stat-card" ng-class="{'warning': revenue.syncAlerts > 0, 'success': revenue.syncAlerts === 0}">
+                            <div class="revenue-stat-value">{{revenue.syncAlerts}}</div>
+                            <div class="revenue-stat-label">Active Sync Alerts</div>
+                        </div>
+                        <div class="revenue-stat-card success">
+                            <div class="revenue-stat-value">98.7%</div>
+                            <div class="revenue-stat-label">Sync Success Rate</div>
+                        </div>
+                    </div>
+                    <h4 style="color: #1a365d; margin-bottom: 1rem;">Recent Sync Issues</h4>
+                    <div class="alerts-list" style="background: #f7fafc; border-radius: 8px; padding: 1rem;">
+                        <div class="alert-item" style="display: flex; gap: 0.75rem; padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">
+                            <span style="font-size: 1.5rem;">⚠️</span>
+                            <div>
+                                <div style="font-weight: 600; color: #1a202c;">Billing System Sync Delayed</div>
+                                <div style="font-size: 0.85rem; color: #718096;">Central billing server response delayed by 45 minutes</div>
+                                <div style="font-size: 0.75rem; color: #a0aec0; margin-top: 0.25rem;">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="alert-item" style="display: flex; gap: 0.75rem; padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">
+                            <span style="font-size: 1.5rem;">🔄</span>
+                            <div>
+                                <div style="font-weight: 600; color: #1a202c;">Payment Gateway Reconciliation</div>
+                                <div style="font-size: 0.85rem; color: #718096;">23 transactions pending reconciliation</div>
+                                <div style="font-size: 0.75rem; color: #a0aec0; margin-top: 0.25rem;">4 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="alert-item" style="display: flex; gap: 0.75rem; padding: 0.75rem;">
+                            <span style="font-size: 1.5rem;">✅</span>
+                            <div>
+                                <div style="font-weight: 600; color: #38a169;">Database Sync Completed</div>
+                                <div style="font-size: 0.85rem; color: #718096;">All records synchronized successfully</div>
+                                <div style="font-size: 0.75rem; color: #a0aec0; margin-top: 0.25rem;">6 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="gov-btn secondary" ng-click="closeRevenueMonitor()">Close</button>
+                <button class="gov-btn primary">📥 Export Revenue Report</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Notification Panel Styles */
+        .notification-dropdown { position: relative; }
+        .notification-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 420px;
+            max-height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow: hidden;
+        }
+        .notification-header {
+            padding: 1rem;
+            background: linear-gradient(135deg, #1a365d, #2c5282);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notification-header h4 { margin: 0; font-size: 1rem; }
+        .notification-count { font-size: 0.8rem; opacity: 0.9; }
+        .notification-list { max-height: 350px; overflow-y: auto; }
+        .notification-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            align-items: flex-start;
+        }
+        .notification-item:hover { background: #f7fafc; }
+        .notification-item.critical { border-left: 3px solid #e53e3e; }
+        .notification-item.warning { border-left: 3px solid #dd6b20; }
+        .notification-item.info { border-left: 3px solid #3182ce; }
+        .notification-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .notification-icon.electricity { background: #fef3c7; }
+        .notification-icon.water { background: #dbeafe; }
+        .notification-icon.waste { background: #d1fae5; }
+        .notification-icon.gas { background: #fee2e2; }
+        .notification-content { flex: 1; }
+        .notification-title { font-weight: 600; color: #1a202c; font-size: 0.9rem; }
+        .notification-details { font-size: 0.8rem; color: #4a5568; margin: 0.25rem 0; }
+        .notification-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .notification-location { font-size: 0.75rem; color: #718096; }
+        .notification-count-badge {
+            font-size: 0.7rem;
+            background: #e2e8f0;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            color: #4a5568;
+        }
+        .notification-time { font-size: 0.7rem; color: #a0aec0; }
+        .notification-severity {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .notification-severity.critical { background: #fed7d7; color: #c53030; }
+        .notification-severity.warning { background: #feebc8; color: #c05621; }
+        .notification-severity.info { background: #bee3f8; color: #2b6cb0; }
+        .notification-footer {
+            padding: 0.75rem;
+            text-align: center;
+            border-top: 1px solid #eee;
+            background: #f7fafc;
+        }
+        .notification-footer a { color: #3182ce; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-dialog {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 1100px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #1a365d, #2c5282);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.1rem; }
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.3); }
+        .modal-body { padding: 1.5rem; max-height: 60vh; overflow-y: auto; }
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: #f7fafc;
+        }
+
+        /* Infrastructure Map Modal */
+        .infra-map-container { display: flex; gap: 1.5rem; }
+        .infra-map-view { flex: 1; }
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .map-zone {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .map-zone:hover { border-color: #3182ce; transform: translateY(-2px); }
+        .map-zone.critical { border-color: #e53e3e; background: #fff5f5; }
+        .map-zone.warning { border-color: #dd6b20; background: #fffaf0; }
+        .map-zone.normal { border-color: #38a169; background: #f0fff4; }
+        .zone-name { font-weight: 600; color: #1a202c; margin-bottom: 0.5rem; }
+        .zone-markers { display: flex; justify-content: center; gap: 0.25rem; margin: 0.5rem 0; }
+        .zone-marker {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        .zone-marker.electricity { background: #fef3c7; }
+        .zone-marker.water { background: #dbeafe; }
+        .zone-marker.waste { background: #d1fae5; }
+        .zone-marker.gas { background: #fee2e2; }
+        .zone-stats { margin-top: 0.5rem; }
+        .zone-complaints { font-size: 0.8rem; color: #718096; }
+        .infra-sidebar { width: 280px; }
+        .infra-sidebar h4 { color: #1a365d; margin-bottom: 1rem; font-size: 0.95rem; }
+        .infra-status-list { margin-bottom: 1.5rem; }
+        .infra-status-item { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+        .status-icon { font-size: 1.5rem; }
+        .status-info { flex: 1; }
+        .status-label { font-size: 0.8rem; color: #4a5568; display: block; }
+        .status-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin: 0.25rem 0; }
+        .status-fill { height: 100%; border-radius: 4px; }
+        .status-fill.electricity { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+        .status-fill.water { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+        .status-fill.gas { background: linear-gradient(90deg, #34d399, #10b981); }
+        .status-value { font-size: 0.75rem; color: #718096; }
+        .issue-summary { background: #f7fafc; border-radius: 8px; padding: 0.75rem; }
+        .issue-item { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #e2e8f0; }
+        .issue-item:last-child { border-bottom: none; }
+        .issue-area { font-size: 0.8rem; color: #4a5568; }
+        .issue-count { font-size: 0.8rem; font-weight: 600; padding: 0.1rem 0.5rem; border-radius: 10px; background: #e2e8f0; }
+        .issue-count.critical { background: #fed7d7; color: #c53030; }
+        .issue-count.warning { background: #feebc8; color: #c05621; }
+        
+        /* State Map SVG Styles */
+        .state-map-wrapper {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        .state-map-svg {
+            width: 100%;
+            max-height: 280px;
+            display: block;
+            margin: 0 auto;
+        }
+        .pulse-marker {
+            animation: pulse-animation 1.5s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        .map-legend-inline {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        .map-legend-inline span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.75rem;
+            color: #4a5568;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .legend-dot.critical { background: #e53e3e; }
+        .legend-dot.warning { background: #dd6b20; }
+        .legend-dot.info { background: #3182ce; }
+        .legend-dot.resolved { background: #38a169; }
+        
+        .zone-grid-container {
+            margin-top: 1rem;
+        }
+        .zone-grid-container h5 {
+            color: #1a365d;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Revenue Monitor Modal */
+        .revenue-monitor-modal .modal-body {
+            padding: 0;
+        }
+        .revenue-tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            background: #f7fafc;
+        }
+        .revenue-tab {
+            padding: 1rem 1.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: #4a5568;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .revenue-tab.active {
+            color: #3182ce;
+            border-bottom-color: #3182ce;
+            background: white;
+        }
+        .revenue-content {
+            padding: 1.5rem;
+        }
+        .revenue-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .revenue-stat-card {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .revenue-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a365d;
+        }
+        .revenue-stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+        .revenue-stat-card.success .revenue-stat-value { color: #38a169; }
+        .revenue-stat-card.warning .revenue-stat-value { color: #dd6b20; }
+        .revenue-stat-card.danger .revenue-stat-value { color: #e53e3e; }
+        
+        .pending-bills-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .pending-bills-table th,
+        .pending-bills-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+        }
+        .pending-bills-table th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        .pending-bills-table .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .pending-bills-table .status-badge.overdue { background: #fed7d7; color: #c53030; }
+        .pending-bills-table .status-badge.pending { background: #feebc8; color: #c05621; }
+        .pending-bills-table .status-badge.paid { background: #c6f6d5; color: #276749; }
+    </style>
+</body>
+
+</html>

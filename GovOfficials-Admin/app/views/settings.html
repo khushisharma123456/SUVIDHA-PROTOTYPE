@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="adminApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Suvidha City Control Room</title>
+    <link rel="stylesheet" href="../../css/gov-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body ng-controller="SettingsController" ng-click="closeAllDropdowns()">
+    <!-- Sidebar -->
+    <aside class="gov-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='🏛️'">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1><span>CITY CONTROL ROOM</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span
+                    class="nav-text">Dashboard</span></a>
+            <a href="grievance.html" class="nav-item"><span class="nav-icon">📢</span><span class="nav-text">Grievance
+                    Command</span></a>
+            <a href="meter.html" class="nav-item"><span class="nav-icon">⚡</span><span class="nav-text">Meter
+                    Integrity</span></a>
+            <a href="rwa.html" class="nav-item"><span class="nav-icon">🏗️</span><span class="nav-text">RWA
+                    Oversight</span></a>
+            <a href="participation.html" class="nav-item"><span class="nav-icon">⭐</span><span
+                    class="nav-text">Participation</span></a>
+            <a href="policy.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Policy
+                    Insights</span></a>
+            <a href="audit.html" class="nav-item"><span class="nav-icon">🔐</span><span class="nav-text">Audit
+                    Vault</span></a>
+            <a href="field-operations.html" class="nav-item"><span class="nav-icon">👷</span><span
+                    class="nav-text">Field Operations</span></a>
+            <a href="waste-management.html" class="nav-item"><span class="nav-icon">♻️</span><span
+                    class="nav-text">Waste Management</span></a>
+            <a href="settings.html" class="nav-item active"><span class="nav-icon">⚙️</span><span
+                    class="nav-text">Settings</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p>{{user.role}}</p>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()"><span>🚪</span><span>Logout</span></button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="gov-main">
+        <header class="gov-topbar">
+            <div class="topbar-left">
+                <h2>Settings & Configuration</h2>
+                <p>{{currentDate}}</p>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" title="Accessibility">♿</button>
+                <div class="lang-dropdown">
+                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)">🌐 <span>{{selectedLang}}</span>
+                        ▼</button>
+                    <div class="lang-dropdown-menu" ng-show="showLangMenu">
+                        <a href="#" class="lang-option" ng-repeat="lang in languages"
+                            ng-class="{active: selectedLang === lang.code}"
+                            ng-click="selectLang(lang, $event)">{{lang.name}}</a>
+                    </div>
+                </div>
+                <button class="topbar-btn notification-btn">🔔<span
+                        class="notification-badge">{{notifications}}</span></button>
+            </div>
+        </header>
+
+        <div class="gov-content">
+            <!-- Page Header -->
+            <div class="settings-page-header">
+                <div class="header-content">
+                    <h1 class="page-title">⚙️ Settings & Preferences</h1>
+                    <p class="page-subtitle">Manage your profile, security, and system preferences</p>
+                </div>
+            </div>
+
+            <!-- Settings Tabs Navigation -->
+            <div class="settings-nav-tabs">
+                <button class="settings-tab-btn active" ng-click="activeTab = 'profile'" ng-class="{active: activeTab === 'profile'}">
+                    <i data-lucide="user" width="18" height="18"></i>
+                    <span>Profile</span>
+                </button>
+                <button class="settings-tab-btn" ng-click="activeTab = 'security'" ng-class="{active: activeTab === 'security'}">
+                    <i data-lucide="lock" width="18" height="18"></i>
+                    <span>Security</span>
+                </button>
+                <button class="settings-tab-btn" ng-click="activeTab = 'notifications'" ng-class="{active: activeTab === 'notifications'}">
+                    <i data-lucide="bell" width="18" height="18"></i>
+                    <span>Notifications</span>
+                </button>
+                <button class="settings-tab-btn" ng-click="activeTab = 'display'" ng-class="{active: activeTab === 'display'}">
+                    <i data-lucide="palette" width="18" height="18"></i>
+                    <span>Display</span>
+                </button>
+                <button class="settings-tab-btn" ng-click="activeTab = 'system'" ng-class="{active: activeTab === 'system'}">
+                    <i data-lucide="info" width="18" height="18"></i>
+                    <span>System</span>
+                </button>
+            </div>
+
+            <!-- Settings Content Area -->
+            <div class="settings-content-area">
+                
+                <!-- PROFILE SETTINGS TAB -->
+                <div class="settings-tab-content" ng-show="activeTab === 'profile'">
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h2>Personal Information</h2>
+                            <p>Update your profile details</p>
+                        </div>
+
+                        <div class="settings-card">
+                            <form ng-submit="saveProfile()" name="profileForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Full Name <span class="required">*</span></label>
+                                        <input type="text" ng-model="settings.profile.fullName" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email Address <span class="required">*</span></label>
+                                        <input type="email" ng-model="settings.profile.email" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Phone Number</label>
+                                        <input type="tel" ng-model="settings.profile.phone" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Designation</label>
+                                        <input type="text" ng-model="settings.profile.designation" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-group locked-setting">
+                                    <label>Department Assignment <span class="lock-badge">Locked</span></label>
+                                    <input type="text" value="{{settings.profile.department}}" class="form-control" readonly>
+                                    <small>Managed centrally for compliance</small>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">Save Changes</button>
+                                    <button type="button" class="btn-secondary" ng-click="resetProfile()">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECURITY SETTINGS TAB -->
+                <div class="settings-tab-content" ng-show="activeTab === 'security'">
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h2>Security Settings</h2>
+                            <p>Protect your account with strong security measures</p>
+                        </div>
+
+                        <!-- Change Password Card -->
+                        <div class="settings-card">
+                            <h3 class="card-title">Change Password</h3>
+                            <form ng-submit="changePassword()" name="passwordForm">
+                                <div class="form-group">
+                                    <label>Current Password <span class="required">*</span></label>
+                                    <input type="password" ng-model="security.currentPassword" class="form-control" placeholder="Enter current password">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>New Password <span class="required">*</span></label>
+                                    <input type="password" ng-model="security.newPassword" class="form-control" placeholder="Enter new password">
+                                    <small>Minimum 12 characters, 1 uppercase, 1 number, 1 special character</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Confirm Password <span class="required">*</span></label>
+                                    <input type="password" ng-model="security.confirmPassword" class="form-control" placeholder="Confirm new password">
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">Update Password</button>
+                                    <button type="button" class="btn-secondary">Clear</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Two-Factor Authentication -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <div>
+                                    <h3 class="card-title">Two-Factor Authentication (2FA)</h3>
+                                    <p class="card-subtitle">Mandatory for all government officials</p>
+                                </div>
+                                <span class="status-badge success">● Active</span>
+                            </div>
+                            <div class="security-status">
+                                <i data-lucide="check-circle" width="20" height="20" style="color: #38a169;"></i>
+                                <div>
+                                    <strong>Enabled via authenticator app</strong>
+                                    <p>Your account is protected with authenticated OTP verification</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Sessions -->
+                        <div class="settings-card">
+                            <h3 class="card-title">Active Sessions</h3>
+                            <div class="sessions-list">
+                                <div class="session-item">
+                                    <div class="session-info">
+                                        <strong>Current Session</strong>
+                                        <p>Chrome on Windows • 192.168.1.100</p>
+                                        <small>Last active: now</small>
+                                    </div>
+                                    <span class="session-badge current">Current</span>
+                                </div>
+                                <div class="session-item">
+                                    <div class="session-info">
+                                        <strong>Mobile Access</strong>
+                                        <p>Safari on iPhone • 192.168.1.105</p>
+                                        <small>Last active: 2 hours ago</small>
+                                    </div>
+                                    <button class="btn-sm-secondary">Logout</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTIFICATIONS SETTINGS TAB -->
+                <div class="settings-tab-content" ng-show="activeTab === 'notifications'">
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h2>Alert & Notification Preferences</h2>
+                            <p>Choose how you want to receive updates</p>
+                        </div>
+
+                        <!-- Mandatory Alerts -->
+                        <div class="settings-card mandatory">
+                            <h3 class="card-title">🚨 Mandatory Critical Alerts</h3>
+                            <p class="card-subtitle">These cannot be disabled for compliance and accountability</p>
+                            <div class="alerts-grid">
+                                <div class="alert-item locked">
+                                    <div class="alert-checkbox">
+                                        <input type="checkbox" disabled checked>
+                                        <strong>SLA Breach Alerts</strong>
+                                    </div>
+                                    <p>Receive alerts when service level agreements are breached</p>
+                                </div>
+                                <div class="alert-item locked">
+                                    <div class="alert-checkbox">
+                                        <input type="checkbox" disabled checked>
+                                        <strong>Integrity Violations</strong>
+                                    </div>
+                                    <p>Data integrity and system anomaly detection</p>
+                                </div>
+                                <div class="alert-item locked">
+                                    <div class="alert-checkbox">
+                                        <input type="checkbox" disabled checked>
+                                        <strong>Security & Access Alerts</strong>
+                                    </div>
+                                    <p>Unauthorized access attempts and security events</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Optional Alerts -->
+                        <div class="settings-card">
+                            <h3 class="card-title">✓ Optional Notifications</h3>
+                            <p class="card-subtitle">Configure these based on your preferences</p>
+                            <div class="alerts-grid">
+                                <div class="alert-item">
+                                    <div class="alert-checkbox">
+                                        <input type="checkbox" ng-model="settings.notifications.emailAlerts">
+                                        <strong>Email Notifications</strong>
+                                    </div>
+                                    <p>Receive updates via email</p>
+                                </div>
+                                <div class="alert-item">
+                                    <div class="alert-checkbox">
+                                        <input type="checkbox" ng-model="settings.notifications.smsAlerts">
+                                        <strong>SMS Notifications</strong>
+                                    </div>
+                                    <p>Get important updates via SMS</p>
+                                </div>
+                                <div class="alert-item">
+                                    <div class="alert-checkbox">
+                                        <input type="checkbox" ng-model="settings.notifications.dailyReport">
+                                        <strong>Daily Summary Report</strong>
+                                    </div>
+                                    <p>Receive daily digest of activities</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 1.5rem;">
+                                <label>Notification Frequency</label>
+                                <select ng-model="settings.notifications.frequency" class="form-control">
+                                    <option value="immediate">Immediate</option>
+                                    <option value="hourly">Hourly Digest</option>
+                                    <option value="daily">Daily Summary</option>
+                                </select>
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="btn-primary" ng-click="saveNotifications()">Save Preferences</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DISPLAY SETTINGS TAB -->
+                <div class="settings-tab-content" ng-show="activeTab === 'display'">
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h2>Display & Interface</h2>
+                            <p>Customize the look and feel of your dashboard</p>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="form-row">
+                                <div class="form-group locked-setting">
+                                    <label>Theme <span class="lock-badge">Locked</span></label>
+                                    <input type="text" value="Light (Government Standard)" class="form-control" readonly>
+                                    <small>Enforced for unified government appearance</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Language</label>
+                                    <select ng-model="settings.display.language" class="form-control">
+                                        <option value="en">English</option>
+                                        <option value="hi">हिंदी (Hindi)</option>
+                                        <option value="bn">বাংলা (Bengali)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Date Format</label>
+                                    <select ng-model="settings.display.dateFormat" class="form-control">
+                                        <option value="dd/mm/yyyy">DD/MM/YYYY</option>
+                                        <option value="mm/dd/yyyy">MM/DD/YYYY</option>
+                                        <option value="yyyy-mm-dd">YYYY-MM-DD</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Time Format</label>
+                                    <select class="form-control">
+                                        <option>24 Hour (00:00)</option>
+                                        <option>12 Hour (12:00 AM)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="preferences-row">
+                                <div class="preference-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" ng-model="settings.display.compactView">
+                                        <span>Compact View</span>
+                                    </label>
+                                    <small>Reduce spacing and simplify layout</small>
+                                </div>
+                                <div class="preference-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" ng-model="settings.display.animations">
+                                        <span>Enable Animations</span>
+                                    </label>
+                                    <small>Smooth transitions and visual effects</small>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="btn-primary" ng-click="saveDisplay()">Save Display Settings</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SYSTEM INFO TAB -->
+                <div class="settings-tab-content" ng-show="activeTab === 'system'">
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h2>System Information</h2>
+                            <p>Application and server status information</p>
+                        </div>
+
+                        <!-- Status Cards -->
+                        <div class="status-cards-grid">
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <i data-lucide="package" width="24" height="24"></i>
+                                    <span class="status-badge success">Active</span>
+                                </div>
+                                <div class="status-body">
+                                    <h4>Application Version</h4>
+                                    <p class="version-number">v2.4.1</p>
+                                    <small>Latest build</small>
+                                </div>
+                            </div>
+
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <i data-lucide="database" width="24" height="24"></i>
+                                    <span class="status-badge success">Connected</span>
+                                </div>
+                                <div class="status-body">
+                                    <h4>Database Status</h4>
+                                    <p>99.9% Uptime</p>
+                                    <small>Last ping: 2 seconds ago</small>
+                                </div>
+                            </div>
+
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <i data-lucide="server" width="24" height="24"></i>
+                                    <span class="status-badge success">Running</span>
+                                </div>
+                                <div class="status-body">
+                                    <h4>Server Status</h4>
+                                    <p>All systems operational</p>
+                                    <small>Response time: 45ms</small>
+                                </div>
+                            </div>
+
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <i data-lucide="save" width="24" height="24"></i>
+                                    <span class="status-badge success">Updated</span>
+                                </div>
+                                <div class="status-body">
+                                    <h4>Last Backup</h4>
+                                    <p>Feb 8, 2026</p>
+                                    <small>03:00 AM IST</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Details -->
+                        <div class="settings-card">
+                            <h3 class="card-title">Detailed System Information</h3>
+                            <div class="system-details">
+                                <div class="detail-row">
+                                    <span>Last Updated:</span>
+                                    <strong>{{systemInfo.lastUpdated}}</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Application Build:</span>
+                                    <strong>Build #2024.02.08</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Database Version:</span>
+                                    <strong>PostgreSQL 15.2</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>API Version:</span>
+                                    <strong>v3.2.1</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Compliance Status:</span>
+                                    <strong style="color: #38a169;">✓ Fully Compliant</strong>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="btn-outline" ng-click="generateReport()">📄 Generate Audit Report</button>
+                                <button class="btn-outline" ng-click="downloadLogs()">📥 Download System Logs</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Message -->
+    <div class="toast-message" ng-show="successMessage" ng-class="{error: successMessage.type === 'error'}">
+        <span>{{successMessage.text}}</span>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        var app = angular.module('adminApp', []);
+
+        app.controller('SettingsController', ['$scope', function($scope) {
+            // Load user data from localStorage (set during login/signup)
+            var official = JSON.parse(localStorage.getItem('currentOfficial') || 'null') || JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+            var uName = official ? (official.full_name || official.name || 'Government Official') : 'Government Official';
+            var initials = uName.split(' ').map(function(n) { return n[0]; }).join('').toUpperCase().substring(0, 2) || 'GO';
+            
+            $scope.user = { name: uName, initials: initials, role: official ? (official.designation || official.role || 'Government Official').replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); }) : 'Government Official' };
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            $scope.notifications = 3;
+            $scope.activeTab = 'profile';
+
+            // Language dropdown
+            $scope.selectedLang = 'EN';
+            $scope.showLangMenu = false;
+            $scope.languages = [
+                { code: 'EN', name: 'English' },
+                { code: 'HI', name: 'हिन्दी' },
+                { code: 'TA', name: 'தமிழ்' },
+                { code: 'TE', name: 'తెలుగు' },
+                { code: 'BN', name: 'বাংলা' },
+                { code: 'MR', name: 'मराठी' }
+            ];
+
+            $scope.toggleLangMenu = function($event) {
+                $event.stopPropagation();
+                $scope.showLangMenu = !$scope.showLangMenu;
+            };
+
+            $scope.selectLang = function(lang, $event) {
+                $event.preventDefault();
+                $scope.selectedLang = lang.code;
+                $scope.showLangMenu = false;
+            };
+
+            $scope.closeAllDropdowns = function() {
+                $scope.showLangMenu = false;
+            };
+
+            // Profile data - populated from logged-in user
+            $scope.profile = {
+                fullName: uName,
+                employeeId: official ? (official.employee_id || 'N/A') : 'N/A',
+                email: official ? (official.email || '') : '',
+                phone: official ? (official.phone || '') : '',
+                department: official ? (official.department || '').replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); }) : '',
+                designation: official ? (official.designation || '').replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); }) : '',
+                bio: ''
+            };
+
+            // System info
+            $scope.systemInfo = {
+                lastUpdated: 'Feb 8, 2026'
+            };
+
+            // Success message
+            $scope.successMessage = null;
+
+            $scope.showSuccess = function(text, type) {
+                $scope.successMessage = { text: text, type: type || 'success' };
+                setTimeout(function() {
+                    $scope.$apply(function() {
+                        $scope.successMessage = null;
+                    });
+                }, 3000);
+            };
+
+            $scope.saveProfile = function() {
+                $scope.showSuccess('✓ Profile updated successfully!');
+            };
+
+            $scope.generateReport = function() {
+                $scope.showSuccess('📄 Audit report generation started');
+            };
+
+            $scope.downloadLogs = function() {
+                $scope.showSuccess('📥 System logs downloading...');
+            };
+
+            $scope.logout = function() {
+                if (confirm('Are you sure you want to logout?')) {
+                    alert('Logged out successfully');
+                }
+            };
+        }]);
+    </script>
+</body>
+
+</html>

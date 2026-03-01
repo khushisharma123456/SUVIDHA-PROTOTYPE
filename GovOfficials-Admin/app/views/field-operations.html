@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="adminApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Operations - Suvidha City Control Room</title>
+    <link rel="stylesheet" href="../../css/gov-style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        .operations-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .operations-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 1.5rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .agent-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .agent-table th,
+        .agent-table td {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gov-gray-200);
+            white-space: nowrap;
+        }
+
+        .agent-table th {
+            background: var(--gov-gray-50);
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--gov-gray-600);
+            text-transform: uppercase;
+        }
+
+        .agent-table tr:hover {
+            background: var(--gov-gray-50);
+        }
+
+        .agent-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .agent-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gov-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .agent-id {
+            font-size: 0.75rem;
+            color: var(--gov-gray-500);
+        }
+
+        .agent-type {
+            font-size: 0.7rem;
+            color: var(--gov-gray-500);
+            margin-top: 2px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.online {
+            background: var(--gov-success);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.busy {
+            background: var(--gov-warning);
+        }
+
+        .status-dot.offline {
+            background: var(--gov-gray-400);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge.success { background: var(--gov-success-light); color: var(--gov-success); }
+        .badge.warning { background: var(--gov-warning-light); color: var(--gov-warning); }
+        .badge.info { background: var(--gov-info-light); color: var(--gov-info); }
+        .badge.danger { background: var(--gov-danger-light); color: var(--gov-danger); }
+        .badge.electric { background: #fef3c7; color: #d97706; }
+        .badge.water { background: #dbeafe; color: #2563eb; }
+        .badge.gas { background: #fce7f3; color: #db2777; }
+
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .action-btn.primary {
+            background: var(--gov-primary);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: var(--gov-primary-dark);
+        }
+
+        .action-btn.outline {
+            background: white;
+            border: 1px solid var(--gov-gray-300);
+            color: var(--gov-gray-700);
+        }
+
+        .action-btn.outline:hover {
+            border-color: var(--gov-primary);
+            color: var(--gov-primary);
+        }
+
+        .performance-score {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .score-bar {
+            width: 60px;
+            height: 6px;
+            background: var(--gov-gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .score-fill.excellent { background: var(--gov-success); }
+        .score-fill.good { background: var(--gov-info); }
+        .score-fill.average { background: var(--gov-warning); }
+        .score-fill.poor { background: var(--gov-danger); }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-top: 1px solid var(--gov-gray-200);
+        }
+
+        .table-info {
+            font-size: 0.8rem;
+            color: var(--gov-gray-500);
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gov-gray-200);
+            background: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-btn:hover {
+            border-color: var(--gov-primary);
+        }
+
+        .category-btn.active {
+            background: var(--gov-primary);
+            color: white;
+            border-color: var(--gov-primary);
+        }
+
+        .live-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .live-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 1px solid var(--gov-gray-200);
+        }
+
+        .live-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .live-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--gov-danger);
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+            border-left: 3px solid transparent;
+        }
+
+        .activity-item.completed {
+            border-left-color: var(--gov-success);
+        }
+
+        .activity-item.arrived {
+            border-left-color: var(--gov-info);
+        }
+
+        .activity-item.flagged {
+            border-left-color: var(--gov-warning);
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .activity-icon.success { background: var(--gov-success-light); }
+        .activity-icon.warning { background: var(--gov-warning-light); }
+        .activity-icon.info { background: var(--gov-info-light); }
+
+        .activity-content { flex: 1; }
+        .activity-text { font-size: 0.85rem; font-weight: 500; }
+        .activity-meta { font-size: 0.75rem; color: var(--gov-gray-500); }
+        .activity-status {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            margin-top: 0.25rem;
+            display: inline-block;
+        }
+        .activity-status.completed { background: var(--gov-success-light); color: var(--gov-success); }
+        .activity-status.arrived { background: var(--gov-info-light); color: var(--gov-info); }
+
+        .map-placeholder {
+            height: 180px;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gov-gray-500);
+            font-size: 0.9rem;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gov-gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gov-gray-500);
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gov-gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Track Modal Specific */
+        .track-agent-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--gov-primary) 0%, #1e40af 100%);
+            border-radius: var(--radius-md);
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .track-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .track-info h3 { margin: 0; font-size: 1.1rem; }
+        .track-info p { margin: 0.25rem 0 0; opacity: 0.9; font-size: 0.85rem; }
+
+        .track-gps-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .gps-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 1s infinite;
+        }
+
+        .track-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .track-section h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gov-gray-700);
+            margin: 0 0 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .location-card {
+            padding: 1rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .location-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gov-info-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .location-details h5 { margin: 0; font-size: 0.95rem; }
+        .location-details p { margin: 0.25rem 0 0; font-size: 0.8rem; color: var(--gov-gray-500); }
+
+        .houses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .house-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--gov-gray-50);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid transparent;
+        }
+
+        .house-item.completed { border-left-color: var(--gov-success); }
+        .house-item.problem { border-left-color: var(--gov-danger); }
+        .house-item.pending { border-left-color: var(--gov-warning); }
+
+        .house-info { flex: 1; }
+        .house-number { font-weight: 600; font-size: 0.9rem; }
+        .house-meta { font-size: 0.75rem; color: var(--gov-gray-500); }
+
+        .house-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .photo-indicator {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--gov-success-light);
+            color: var(--gov-success);
+            border-radius: 10px;
+        }
+
+        .problem-badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--gov-danger-light);
+            color: var(--gov-danger);
+            border-radius: 10px;
+        }
+
+        /* Assign Modal Specific */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: var(--gov-gray-700);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gov-gray-300);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--gov-primary);
+        }
+
+        .task-type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .task-type-btn {
+            padding: 1rem;
+            border: 2px solid var(--gov-gray-200);
+            border-radius: var(--radius-md);
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .task-type-btn:hover {
+            border-color: var(--gov-primary);
+        }
+
+        .task-type-btn.selected {
+            border-color: var(--gov-primary);
+            background: var(--gov-primary-light);
+        }
+
+        .task-type-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .task-type-label { font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 1024px) {
+            .operations-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .task-type-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body ng-controller="FieldOperationsController">
+    <!-- Sidebar -->
+    <aside class="gov-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='🏛️'">
+                </div>
+                <div class="brand-text">
+                    <h1>Suvidha</h1><span>CITY CONTROL ROOM</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span
+                    class="nav-text">Dashboard</span></a>
+            <a href="grievance.html" class="nav-item"><span class="nav-icon">📢</span><span class="nav-text">Grievance
+                    Command</span></a>
+            <a href="meter.html" class="nav-item"><span class="nav-icon">⚡</span><span class="nav-text">Meter
+                    Integrity</span></a>
+            <a href="rwa.html" class="nav-item"><span class="nav-icon">🏗️</span><span class="nav-text">RWA
+                    Oversight</span></a>
+            <a href="participation.html" class="nav-item"><span class="nav-icon">⭐</span><span
+                    class="nav-text">Participation & Incentives</span></a>
+            <a href="policy.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Policy
+                    Insights</span></a>
+            <a href="audit.html" class="nav-item"><span class="nav-icon">🔐</span><span class="nav-text">Audit
+                    Vault</span></a>
+            <a href="field-operations.html" class="nav-item active"><span class="nav-icon">👷</span><span
+                    class="nav-text">Field Operations</span></a>
+            <a href="waste-management.html" class="nav-item"><span class="nav-icon">♻️</span><span
+                    class="nav-text">Waste Management</span></a>
+            <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span><span
+                    class="nav-text">Settings</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{user.initials}}</div>
+                <div class="user-info">
+                    <h4>{{user.name}}</h4>
+                    <p>{{user.role}}</p>
+                </div>
+            </div>
+            <button class="logout-btn" ng-click="logout()"><span>🚪</span><span>Logout</span></button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="gov-main">
+        <header class="gov-topbar">
+            <div class="topbar-left">
+                <h2>Field Operations</h2>
+                <p>{{currentDate}}</p>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" title="Accessibility">♿</button>
+                <button class="topbar-btn notification-btn">🔔<span
+                        class="notification-badge">{{notifications}}</span></button>
+            </div>
+        </header>
+
+        <div class="gov-content">
+            <!-- Stats Row -->
+            <div class="section-header">
+                <h3><span class="icon">👷</span> Field Agent Overview</h3>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card success">
+                    <div class="stat-icon-box green"><span>🟢</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.online}}</div>
+                        <div class="stat-label">Agents Online</div>
+                        <small class="stat-context">Active in field</small>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon-box orange"><span>🔄</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.onTask}}</div>
+                        <div class="stat-label">On Active Task</div>
+                        <small class="stat-context">Currently working</small>
+                    </div>
+                </div>
+                <div class="stat-card primary">
+                    <div class="stat-icon-box blue"><span>✅</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.completedToday}}</div>
+                        <div class="stat-label">Tasks Completed</div>
+                        <small class="stat-context">Today</small>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon-box blue"><span>📊</span></div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{stats.avgTime}}</div>
+                        <div class="stat-label">Avg Response Time</div>
+                        <small class="stat-context">This week</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operations Layout -->
+            <div class="operations-layout">
+                <!-- Field Agent Database -->
+                <div class="gov-card">
+                    <div class="card-header">
+                        <h3><span class="icon">📋</span> Field Agent Database</h3>
+                    </div>
+                    
+                    <!-- Category Filter -->
+                    <div class="category-filter">
+                        <button class="category-btn" ng-class="{'active': categoryFilter === 'all'}" ng-click="setCategoryFilter('all')">
+                            <span>👥</span> All Agents
+                        </button>
+                        <button class="category-btn" ng-class="{'active': categoryFilter === 'electric'}" ng-click="setCategoryFilter('electric')">
+                            <span>⚡</span> Electric Meter
+                        </button>
+                        <button class="category-btn" ng-class="{'active': categoryFilter === 'water'}" ng-click="setCategoryFilter('water')">
+                            <span>💧</span> Water Meter
+                        </button>
+                        <button class="category-btn" ng-class="{'active': categoryFilter === 'gas'}" ng-click="setCategoryFilter('gas')">
+                            <span>🔥</span> Gas Cylinder
+                        </button>
+                        <button class="category-btn" ng-class="{'active': categoryFilter === 'rwa'}" ng-click="setCategoryFilter('rwa')">
+                            <span>🏗️</span> RWA Work
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="agent-table">
+                            <thead>
+                                <tr>
+                                    <th>Agent</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Current Task</th>
+                                    <th>Location</th>
+                                    <th>Tasks Today</th>
+                                    <th>Performance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="agent in filteredAgents()">
+                                    <td>
+                                        <div class="agent-info">
+                                            <div class="agent-avatar">{{agent.initials}}</div>
+                                            <div>
+                                                <div class="agent-name">{{agent.name}}</div>
+                                                <div class="agent-id">{{agent.id}}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge" ng-class="agent.categoryClass">{{agent.category}}</span></td>
+                                    <td>
+                                        <div class="status-indicator">
+                                            <span class="status-dot" ng-class="agent.statusClass"></span>
+                                            <span>{{agent.status}}</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge" ng-class="agent.taskClass">{{agent.currentTask}}</span></td>
+                                    <td>{{agent.location}}</td>
+                                    <td><strong>{{agent.tasksCompleted}}</strong>/{{agent.tasksAssigned}}</td>
+                                    <td>
+                                        <div class="performance-score">
+                                            <div class="score-bar">
+                                                <div class="score-fill" ng-class="agent.performanceClass" ng-style="{width: agent.performanceScore + '%'}"></div>
+                                            </div>
+                                            <span style="font-size: 0.8rem; font-weight: 600;">{{agent.performanceScore}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn primary" ng-click="openTrackModal(agent)">📍 Track</button>
+                                            <button class="action-btn outline" ng-click="openAssignModal(agent)">📝 Assign</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-footer">
+                        <span class="table-info">Showing {{filteredAgents().length}} of {{agents.length}} agents</span>
+                    </div>
+                </div>
+
+                <!-- Operations Grid -->
+                <div class="operations-grid">
+                    <!-- Recent Assignments -->
+                    <div class="gov-card">
+                        <div class="card-header">
+                            <h3><span class="icon">📋</span> Recent Task Assignments</h3>
+                        </div>
+                        <div class="table-container">
+                            <table class="agent-table">
+                                <thead>
+                                    <tr>
+                                        <th>Agent</th>
+                                        <th>Task Type</th>
+                                        <th>House/Location</th>
+                                        <th>Ward</th>
+                                        <th>Assigned</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="task in recentTasks">
+                                        <td>{{task.agentName}}</td>
+                                        <td><span class="badge" ng-class="task.typeClass">{{task.taskType}}</span></td>
+                                        <td>{{task.houseNumber}}</td>
+                                        <td>{{task.ward}}</td>
+                                        <td>{{task.assignedTime}}</td>
+                                        <td><span class="badge" ng-class="task.statusClass">{{task.status}}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Live Panel -->
+                    <div class="live-panel">
+                        <div class="live-card">
+                            <div class="live-header">
+                                <span class="live-title"><span class="live-indicator"></span> Live Activity</span>
+                            </div>
+                            <div class="activity-list">
+                                <div class="activity-item" ng-repeat="activity in liveActivities" ng-class="activity.statusType">
+                                    <div class="activity-icon" ng-class="activity.iconClass">{{activity.icon}}</div>
+                                    <div class="activity-content">
+                                        <div class="activity-text">{{activity.text}}</div>
+                                        <div class="activity-meta">{{activity.time}}</div>
+                                        <span class="activity-status" ng-class="activity.statusType" ng-if="activity.statusLabel">{{activity.statusLabel}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="live-card">
+                            <div class="live-header">
+                                <span class="live-title">📍 Field Map</span>
+                            </div>
+                            <div class="map-placeholder">
+                                🗺️ Interactive Map - Coming Soon
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track Agent Modal -->
+        <div class="modal-overlay" ng-show="showTrackModal" ng-click="closeTrackModal()">
+            <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 650px;">
+                <div class="modal-header">
+                    <h2 style="margin: 0; font-size: 1.25rem; font-weight: 600;">📍 Track Agent</h2>
+                    <button class="modal-close" ng-click="closeTrackModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <!-- Agent Header -->
+                    <div class="track-agent-header">
+                        <div class="track-avatar">{{trackedAgent.initials}}</div>
+                        <div class="track-info">
+                            <h3>{{trackedAgent.name}}</h3>
+                            <p>{{trackedAgent.id}} • {{trackedAgent.category}}</p>
+                        </div>
+                        <div class="track-gps-status" ng-if="trackedAgent.gpsEnabled">
+                            <span class="gps-dot"></span> GPS Active
+                        </div>
+                        <div class="track-gps-status" ng-if="!trackedAgent.gpsEnabled" style="background: rgba(239,68,68,0.3);">
+                            <span style="color: #fca5a5;">⚠️ GPS Offline</span>
+                        </div>
+                    </div>
+
+                    <!-- Current Location -->
+                    <div class="track-section">
+                        <h4>📍 Current Location</h4>
+                        <div class="location-card">
+                            <div class="location-icon">🗺️</div>
+                            <div class="location-details">
+                                <h5>{{trackedAgent.currentLocation}}</h5>
+                                <p>{{trackedAgent.locationAddress}}</p>
+                                <p style="color: var(--gov-info); margin-top: 0.5rem;">Last updated: {{trackedAgent.lastUpdate}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Houses Completed -->
+                    <div class="track-section">
+                        <h4>🏠 Houses Visited Today ({{trackedAgent.housesCompleted.length}})</h4>
+                        <div class="houses-list">
+                            <div class="house-item" ng-repeat="house in trackedAgent.housesCompleted" ng-class="house.status">
+                                <div class="house-info">
+                                    <div class="house-number">{{house.houseNumber}}</div>
+                                    <div class="house-meta">{{house.ward}} • {{house.time}}</div>
+                                </div>
+                                <div class="house-status">
+                                    <span class="photo-indicator" ng-if="house.photoAdded">📷 Photo</span>
+                                    <span class="problem-badge" ng-if="house.problemRaised">⚠️ {{house.problemType}}</span>
+                                    <span class="badge success" ng-if="house.status === 'completed' && !house.problemRaised">✓ Done</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Problems Raised -->
+                    <div class="track-section" ng-if="trackedAgent.problemsRaised.length > 0">
+                        <h4>⚠️ Problems Raised ({{trackedAgent.problemsRaised.length}})</h4>
+                        <div class="houses-list">
+                            <div class="house-item problem" ng-repeat="problem in trackedAgent.problemsRaised">
+                                <div class="house-info">
+                                    <div class="house-number">{{problem.houseNumber}}</div>
+                                    <div class="house-meta">{{problem.ward}} • {{problem.time}}</div>
+                                    <div style="font-size: 0.8rem; color: var(--gov-danger); margin-top: 0.25rem;">{{problem.description}}</div>
+                                </div>
+                                <div class="house-status">
+                                    <span class="problem-badge">{{problem.type}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="gov-btn gov-btn-outline" ng-click="closeTrackModal()">Close</button>
+                    <button class="gov-btn gov-btn-primary" ng-click="refreshTracking()">🔄 Refresh Location</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assign Task Modal -->
+        <div class="modal-overlay" ng-show="showAssignModal" ng-click="closeAssignModal()">
+            <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 550px;">
+                <div class="modal-header">
+                    <h2 style="margin: 0; font-size: 1.25rem; font-weight: 600;">📝 Assign New Task</h2>
+                    <button class="modal-close" ng-click="closeAssignModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <!-- Agent Info -->
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gov-gray-50); border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+                        <div class="agent-avatar" style="width: 48px; height: 48px; font-size: 1rem;">{{assignAgent.initials}}</div>
+                        <div>
+                            <div style="font-weight: 600;">{{assignAgent.name}}</div>
+                            <div style="font-size: 0.85rem; color: var(--gov-gray-500);">{{assignAgent.id}} • {{assignAgent.category}}</div>
+                        </div>
+                    </div>
+
+                    <!-- Task Type Selection -->
+                    <div class="form-group">
+                        <label>Task Type</label>
+                        <div class="task-type-grid">
+                            <div class="task-type-btn" ng-class="{'selected': newTask.type === 'electric'}" ng-click="newTask.type = 'electric'">
+                                <div class="task-type-icon">⚡</div>
+                                <div class="task-type-label">Electric Meter</div>
+                            </div>
+                            <div class="task-type-btn" ng-class="{'selected': newTask.type === 'water'}" ng-click="newTask.type = 'water'">
+                                <div class="task-type-icon">💧</div>
+                                <div class="task-type-label">Water Meter</div>
+                            </div>
+                            <div class="task-type-btn" ng-class="{'selected': newTask.type === 'gas'}" ng-click="newTask.type = 'gas'">
+                                <div class="task-type-icon">🔥</div>
+                                <div class="task-type-label">Gas Cylinder</div>
+                            </div>
+                            <div class="task-type-btn" ng-class="{'selected': newTask.type === 'rwa'}" ng-click="newTask.type = 'rwa'">
+                                <div class="task-type-icon">🏗️</div>
+                                <div class="task-type-label">RWA Work</div>
+                            </div>
+                            <div class="task-type-btn" ng-class="{'selected': newTask.type === 'grievance'}" ng-click="newTask.type = 'grievance'">
+                                <div class="task-type-icon">📢</div>
+                                <div class="task-type-label">Grievance</div>
+                            </div>
+                            <div class="task-type-btn" ng-class="{'selected': newTask.type === 'inspection'}" ng-click="newTask.type = 'inspection'">
+                                <div class="task-type-icon">🔍</div>
+                                <div class="task-type-label">Inspection</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Details -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>House/Building Number</label>
+                            <input type="text" ng-model="newTask.houseNumber" placeholder="e.g., A-45, Block C">
+                        </div>
+                        <div class="form-group">
+                            <label>Ward Number</label>
+                            <select ng-model="newTask.ward">
+                                <option value="">Select Ward</option>
+                                <option ng-repeat="ward in wards" value="{{ward}}">{{ward}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>City/Area</label>
+                            <select ng-model="newTask.city">
+                                <option value="">Select City</option>
+                                <option ng-repeat="city in cities" value="{{city}}">{{city}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Locality</label>
+                            <input type="text" ng-model="newTask.locality" placeholder="e.g., Saket, Rohini">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Full Address</label>
+                            <textarea ng-model="newTask.address" placeholder="Enter complete address..." rows="2"></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Priority</label>
+                            <select ng-model="newTask.priority">
+                                <option value="low">Low Priority</option>
+                                <option value="normal">Normal Priority</option>
+                                <option value="high">High Priority</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Additional Notes (Optional)</label>
+                            <textarea ng-model="newTask.notes" placeholder="Any special instructions..." rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="gov-btn gov-btn-outline" ng-click="closeAssignModal()">Cancel</button>
+                    <button class="gov-btn gov-btn-success" ng-click="confirmAssignment()">✓ Assign Task</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Load API Service -->
+    <script src="../services/field-agent.service.js"></script>
+    
+    <script>
+        var app = angular.module('adminApp', []);
+
+        app.controller('FieldOperationsController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
+            var API_BASE = '/api';
+            
+            $scope.user = { name: 'Rajesh Kumar', initials: 'RK', role: 'Government Official' };
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            $scope.notifications = 5;
+
+            $scope.stats = { online: 0, onTask: 0, completedToday: 0, avgTime: '0 min' };
+            $scope.categoryFilter = 'all';
+            $scope.loading = true;
+            $scope.agents = [];
+            $scope.recentTasks = [];
+            $scope.liveActivities = [];
+
+            // Category and Status Maps
+            var categoryMap = {
+                'electric_meter': { name: 'Electric Meter', class: 'electric' },
+                'water_meter': { name: 'Water Meter', class: 'water' },
+                'gas_cylinder': { name: 'Gas Cylinder', class: 'gas' },
+                'rwa_work': { name: 'RWA Work', class: 'info' }
+            };
+            
+            var statusMap = {
+                'online': { name: 'Online', class: 'online' },
+                'on_task': { name: 'On Task', class: 'busy' },
+                'offline': { name: 'Offline', class: 'offline' },
+                'break': { name: 'Break', class: 'offline' }
+            };
+
+            // Format agent from API for display
+            function formatAgent(agent) {
+                var cat = categoryMap[agent.category] || { name: agent.category, class: 'info' };
+                var stat = statusMap[agent.status] || { name: agent.status, class: 'offline' };
+                
+                var performanceClass = 'average';
+                if (agent.performance_score >= 90) performanceClass = 'excellent';
+                else if (agent.performance_score >= 70) performanceClass = 'good';
+                
+                return {
+                    id: agent.id,
+                    employeeId: agent.employee_id,
+                    name: agent.full_name,
+                    initials: agent.full_name.split(' ').map(function(n) { return n[0]; }).join(''),
+                    category: cat.name,
+                    categoryClass: cat.class,
+                    status: stat.name,
+                    statusClass: stat.class,
+                    currentTask: agent.status === 'on_task' ? 'Working' : 'Available',
+                    taskClass: agent.status === 'on_task' ? 'warning' : 'success',
+                    location: agent.assigned_ward || 'N/A',
+                    tasksCompleted: agent.tasks_completed_today || 0,
+                    tasksAssigned: 10,
+                    performanceScore: Math.round(agent.performance_score),
+                    performanceClass: performanceClass,
+                    gpsEnabled: agent.gps_enabled,
+                    currentLocation: agent.current_address || 'Unknown',
+                    locationAddress: agent.assigned_district + ', ' + agent.assigned_state,
+                    latitude: agent.current_latitude,
+                    longitude: agent.current_longitude,
+                    lastUpdate: agent.location_updated_at ? 
+                        new Date(agent.location_updated_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 
+                        'N/A',
+                    phone: agent.phone,
+                    email: agent.email,
+                    totalTasksCompleted: agent.total_tasks_completed,
+                    housesCompleted: [],
+                    problemsRaised: []
+                };
+            }
+
+            // Format task from API for display
+            function formatTask(task, agentName) {
+                var taskTypeMap = {
+                    'electric_meter': { name: 'Electric Meter', class: 'electric' },
+                    'water_meter': { name: 'Water Meter', class: 'water' },
+                    'gas_cylinder': { name: 'Gas Cylinder', class: 'gas' },
+                    'rwa_work': { name: 'RWA Work', class: 'info' },
+                    'grievance': { name: 'Grievance', class: 'warning' },
+                    'inspection': { name: 'Inspection', class: 'info' }
+                };
+                
+                var taskStatusMap = {
+                    'pending': { name: 'Pending', class: 'warning' },
+                    'in_progress': { name: 'In Progress', class: 'info' },
+                    'completed': { name: 'Completed', class: 'success' },
+                    'failed': { name: 'Failed', class: 'danger' }
+                };
+                
+                var type = taskTypeMap[task.task_type] || { name: task.task_type, class: 'info' };
+                var stat = taskStatusMap[task.status] || { name: task.status, class: 'secondary' };
+                
+                return {
+                    agentName: agentName || 'Unknown',
+                    taskType: type.name,
+                    typeClass: type.class,
+                    houseNumber: task.house_number,
+                    ward: task.ward,
+                    assignedTime: new Date(task.assigned_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+                    status: stat.name,
+                    statusClass: stat.class
+                };
+            }
+
+            // Sample fallback data for when API is not available
+            var sampleAgents = [
+                { id: '1', employee_id: 'FA-2026-00001', full_name: 'Vikram Singh', category: 'electric_meter', status: 'on_task', assigned_ward: 'Ward 45, Saket', assigned_district: 'South Delhi', assigned_state: 'Delhi', performance_score: 92, tasks_completed_today: 15, total_tasks_completed: 1247, gps_enabled: true, current_latitude: 28.5355, current_longitude: 77.2410, location_updated_at: new Date().toISOString(), phone: '+91 98765 43210', email: 'vikram.singh@suvidha.gov.in' },
+                { id: '2', employee_id: 'FA-2026-00002', full_name: 'Ramesh Kumar', category: 'electric_meter', status: 'online', assigned_ward: 'Ward 46, Malviya Nagar', assigned_district: 'South Delhi', assigned_state: 'Delhi', performance_score: 88, tasks_completed_today: 12, total_tasks_completed: 1102, gps_enabled: true, current_latitude: 28.5400, current_longitude: 77.2200, location_updated_at: new Date().toISOString(), phone: '+91 98765 43211', email: 'ramesh.kumar@suvidha.gov.in' },
+                { id: '3', employee_id: 'FA-2026-00003', full_name: 'Suresh Yadav', category: 'water_meter', status: 'on_task', assigned_ward: 'Ward 45, Saket', assigned_district: 'South Delhi', assigned_state: 'Delhi', performance_score: 85, tasks_completed_today: 10, total_tasks_completed: 956, gps_enabled: true, current_latitude: 28.5300, current_longitude: 77.2500, location_updated_at: new Date().toISOString(), phone: '+91 98765 43212', email: 'suresh.yadav@suvidha.gov.in' },
+                { id: '4', employee_id: 'FA-2026-00004', full_name: 'Priya Sharma', category: 'gas_cylinder', status: 'online', assigned_ward: 'Ward 47, Hauz Khas', assigned_district: 'South Delhi', assigned_state: 'Delhi', performance_score: 94, tasks_completed_today: 18, total_tasks_completed: 823, gps_enabled: true, current_latitude: 28.5500, current_longitude: 77.2100, location_updated_at: new Date().toISOString(), phone: '+91 98765 43213', email: 'priya.sharma@suvidha.gov.in' },
+                { id: '5', employee_id: 'FA-2026-00005', full_name: 'Amit Patel', category: 'rwa_work', status: 'offline', assigned_ward: 'Ward 45, Saket', assigned_district: 'South Delhi', assigned_state: 'Delhi', performance_score: 76, tasks_completed_today: 5, total_tasks_completed: 445, gps_enabled: false, current_latitude: 28.5250, current_longitude: 77.2300, location_updated_at: new Date().toISOString(), phone: '+91 98765 43214', email: 'amit.patel@suvidha.gov.in' },
+                { id: '6', employee_id: 'FA-2026-00006', full_name: 'Deepak Verma', category: 'electric_meter', status: 'on_task', assigned_ward: 'Ward 12, Model Town', assigned_district: 'North Delhi', assigned_state: 'Delhi', performance_score: 89, tasks_completed_today: 14, total_tasks_completed: 1089, gps_enabled: true, current_latitude: 28.7000, current_longitude: 77.1800, location_updated_at: new Date().toISOString(), phone: '+91 98765 43215', email: 'deepak.verma@suvidha.gov.in' },
+                { id: '7', employee_id: 'FA-2026-00007', full_name: 'Sanjay Gupta', category: 'water_meter', status: 'online', assigned_ward: 'Ward 13, Rohini', assigned_district: 'North Delhi', assigned_state: 'Delhi', performance_score: 82, tasks_completed_today: 8, total_tasks_completed: 678, gps_enabled: true, current_latitude: 28.7200, current_longitude: 77.1200, location_updated_at: new Date().toISOString(), phone: '+91 98765 43216', email: 'sanjay.gupta@suvidha.gov.in' },
+                { id: '8', employee_id: 'FA-2026-00008', full_name: 'Kavita Joshi', category: 'electric_meter', status: 'online', assigned_ward: 'Ward 30, Janakpuri', assigned_district: 'West Delhi', assigned_state: 'Delhi', performance_score: 91, tasks_completed_today: 16, total_tasks_completed: 912, gps_enabled: true, current_latitude: 28.6300, current_longitude: 77.0800, location_updated_at: new Date().toISOString(), phone: '+91 98765 43218', email: 'kavita.joshi@suvidha.gov.in' }
+            ];
+
+            var sampleTasks = [
+                { agent_id: '1', agent_name: 'Vikram Singh', task_type: 'electric_meter', house_number: '101', ward: 'Ward 45, Saket', status: 'completed', assigned_at: new Date().toISOString() },
+                { agent_id: '2', agent_name: 'Ramesh Kumar', task_type: 'electric_meter', house_number: '205', ward: 'Ward 46, Malviya Nagar', status: 'in_progress', assigned_at: new Date().toISOString() },
+                { agent_id: '3', agent_name: 'Suresh Yadav', task_type: 'water_meter', house_number: '302', ward: 'Ward 45, Saket', status: 'completed', assigned_at: new Date().toISOString() },
+                { agent_id: '4', agent_name: 'Priya Sharma', task_type: 'gas_cylinder', house_number: '108', ward: 'Ward 47, Hauz Khas', status: 'pending', assigned_at: new Date().toISOString() },
+                { agent_id: '6', agent_name: 'Deepak Verma', task_type: 'electric_meter', house_number: '412', ward: 'Ward 12, Model Town', status: 'completed', assigned_at: new Date().toISOString() },
+                { agent_id: '7', agent_name: 'Sanjay Gupta', task_type: 'water_meter', house_number: '210', ward: 'Ward 13, Rohini', status: 'in_progress', assigned_at: new Date().toISOString() },
+                { agent_id: '8', agent_name: 'Kavita Joshi', task_type: 'electric_meter', house_number: '315', ward: 'Ward 30, Janakpuri', status: 'completed', assigned_at: new Date().toISOString() },
+                { agent_id: '1', agent_name: 'Vikram Singh', task_type: 'inspection', house_number: '102', ward: 'Ward 45, Saket', status: 'pending', assigned_at: new Date().toISOString() }
+            ];
+
+            // Load Field Agents from API
+            function loadAgents() {
+                $scope.loading = true;
+                $http.get(API_BASE + '/field-agents').then(function(response) {
+                    if (response.data.success && response.data.agents.length > 0) {
+                        $scope.agents = response.data.agents.map(formatAgent);
+                        
+                        // Load tasks for each agent
+                        $scope.agents.forEach(function(agent) {
+                            loadAgentTasks(agent);
+                        });
+                    } else {
+                        // Use sample data if API returns empty
+                        $scope.agents = sampleAgents.map(formatAgent);
+                    }
+                    updateStats();
+                    $scope.loading = false;
+                }).catch(function(error) {
+                    console.error('Error loading agents:', error);
+                    // Use sample data on API error
+                    $scope.agents = sampleAgents.map(formatAgent);
+                    updateStats();
+                    $scope.loading = false;
+                });
+            }
+
+            // Update stats from loaded agents
+            function updateStats() {
+                var online = 0, onTask = 0, completedToday = 0;
+                $scope.agents.forEach(function(agent) {
+                    if (agent.statusClass === 'online') online++;
+                    if (agent.statusClass === 'busy') onTask++;
+                    completedToday += agent.tasksCompleted || 0;
+                });
+                $scope.stats = {
+                    online: online,
+                    onTask: onTask,
+                    completedToday: completedToday,
+                    avgTime: '15 min'
+                };
+            }
+
+            // Load tasks for a specific agent
+            function loadAgentTasks(agent) {
+                $http.get(API_BASE + '/tasks', { params: { agent_id: agent.id } }).then(function(response) {
+                    if (response.data.success) {
+                        var tasks = response.data.tasks;
+                        agent.tasksAssigned = tasks.length;
+                        agent.housesCompleted = tasks.filter(function(t) { return t.status === 'completed'; }).map(function(t) {
+                            return {
+                                houseNumber: t.house_number,
+                                ward: t.ward,
+                                time: t.completed_at ? new Date(t.completed_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '-',
+                                status: t.status,
+                                photoAdded: t.photos_added,
+                                problemRaised: t.problem_raised,
+                                problemType: t.problem_type
+                            };
+                        });
+                        agent.problemsRaised = tasks.filter(function(t) { return t.problem_raised; }).map(function(t) {
+                            return {
+                                houseNumber: t.house_number,
+                                ward: t.ward,
+                                time: new Date(t.assigned_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                                type: t.problem_type,
+                                description: t.problem_description
+                            };
+                        });
+                    }
+                });
+            }
+
+            // Load Dashboard Stats from API
+            function loadStats() {
+                $http.get(API_BASE + '/admin/field-stats').then(function(response) {
+                    if (response.data.success) {
+                        var stats = response.data.stats;
+                        $scope.stats = {
+                            online: stats.agents.online,
+                            onTask: stats.agents.on_task,
+                            completedToday: stats.tasks_today.completed,
+                            avgTime: '15 min'
+                        };
+                    }
+                }).catch(function(error) {
+                    console.error('Error loading stats:', error);
+                    // Stats will be updated from agent data via updateStats()
+                });
+            }
+
+            // Load Recent Tasks from API
+            function loadRecentTasks() {
+                $http.get(API_BASE + '/tasks').then(function(response) {
+                    if (response.data.success && response.data.tasks.length > 0) {
+                        // Get agent names for tasks
+                        $http.get(API_BASE + '/field-agents').then(function(agentResponse) {
+                            var agentMap = {};
+                            if (agentResponse.data.success) {
+                                agentResponse.data.agents.forEach(function(a) {
+                                    agentMap[a.id] = a.full_name;
+                                });
+                            }
+                            
+                            $scope.recentTasks = response.data.tasks.slice(0, 10).map(function(task) {
+                                return formatTask(task, agentMap[task.agent_id]);
+                            });
+                        });
+                    } else {
+                        // Use sample tasks if API returns empty
+                        $scope.recentTasks = sampleTasks.map(function(task) {
+                            return formatTask(task, task.agent_name);
+                        });
+                    }
+                }).catch(function(error) {
+                    console.error('Error loading tasks:', error);
+                    // Use sample tasks on error
+                    $scope.recentTasks = sampleTasks.map(function(task) {
+                        return formatTask(task, task.agent_name);
+                    });
+                });
+            }
+
+            // Initialize live activities (simulated for now)
+            function initLiveActivities() {
+                $scope.liveActivities = [
+                    { icon: '✅', iconClass: 'success', text: 'Agent completed task', time: '2 min ago', statusType: 'completed', statusLabel: 'Completed' },
+                    { icon: '📍', iconClass: 'info', text: 'Agent arrived at location', time: '5 min ago', statusType: 'arrived', statusLabel: 'Arrived' },
+                    { icon: '🚀', iconClass: 'info', text: 'Agent started route', time: '10 min ago', statusType: '', statusLabel: '' }
+                ];
+            }
+
+            // Initialize Page
+            function init() {
+                loadStats();
+                loadAgents();
+                loadRecentTasks();
+                initLiveActivities();
+                
+                // Auto-refresh every 30 seconds
+                setInterval(function() {
+                    loadStats();
+                    loadAgents();
+                }, 30000);
+            }
+
+            init();
+
+            // Form Data
+            $scope.wards = ['Ward 1', 'Ward 2', 'Ward 3', 'Ward 5', 'Ward 8', 'Ward 11', 'Ward 15', 'Ward 18', 'Ward 22', 'Ward 25'];
+            $scope.cities = ['New Delhi', 'North Delhi', 'South Delhi', 'East Delhi', 'West Delhi', 'Central Delhi'];
+
+            // Modal State
+            $scope.showTrackModal = false;
+            $scope.showAssignModal = false;
+            $scope.trackedAgent = {};
+            $scope.assignAgent = {};
+            $scope.newTask = { type: '', priority: 'normal' };
+
+            // Category Filter
+            $scope.setCategoryFilter = function(filter) {
+                $scope.categoryFilter = filter;
+            };
+
+            $scope.filteredAgents = function() {
+                if ($scope.categoryFilter === 'all') return $scope.agents;
+                var categoryMap = {
+                    'electric': 'Electric Meter',
+                    'water': 'Water Meter',
+                    'gas': 'Gas Cylinder',
+                    'rwa': 'RWA Work'
+                };
+                return $scope.agents.filter(function(agent) {
+                    return agent.category === categoryMap[$scope.categoryFilter];
+                });
+            };
+
+            // Track Modal
+            $scope.openTrackModal = function(agent) {
+                $scope.trackedAgent = agent;
+                $scope.showTrackModal = true;
+            };
+
+            $scope.closeTrackModal = function() {
+                $scope.showTrackModal = false;
+            };
+
+            $scope.refreshTracking = function() {
+                $scope.trackedAgent.lastUpdate = 'Just now';
+                alert('Location refreshed for ' + $scope.trackedAgent.name);
+            };
+
+            // Assign Modal
+            $scope.openAssignModal = function(agent) {
+                $scope.assignAgent = agent;
+                $scope.newTask = { type: '', priority: 'normal' };
+                $scope.showAssignModal = true;
+            };
+
+            $scope.closeAssignModal = function() {
+                $scope.showAssignModal = false;
+            };
+
+            $scope.confirmAssignment = function() {
+                if (!$scope.newTask.type || !$scope.newTask.houseNumber || !$scope.newTask.ward) {
+                    alert('Please fill in required fields: Task Type, House Number, and Ward');
+                    return;
+                }
+                
+                var typeLabels = {
+                    'electric': 'Electric Meter',
+                    'water': 'Water Meter',
+                    'gas': 'Gas Cylinder',
+                    'rwa': 'RWA Work',
+                    'grievance': 'Grievance',
+                    'inspection': 'Inspection'
+                };
+
+                var typeApiMap = {
+                    'electric': 'electric_meter',
+                    'water': 'water_meter',
+                    'gas': 'gas_cylinder',
+                    'rwa': 'rwa_work',
+                    'grievance': 'grievance',
+                    'inspection': 'inspection'
+                };
+
+                // Create task via API
+                var taskData = {
+                    agent_id: $scope.assignAgent.id,
+                    task_type: typeApiMap[$scope.newTask.type] || $scope.newTask.type,
+                    house_number: $scope.newTask.houseNumber,
+                    ward: $scope.newTask.ward,
+                    priority: $scope.newTask.priority || 'normal',
+                    notes: $scope.newTask.notes || ''
+                };
+
+                $http.post(API_BASE + '/tasks', taskData).then(function(response) {
+                    if (response.data.success) {
+                        // Refresh data from server
+                        loadRecentTasks();
+                        loadAgents();
+                        loadStats();
+                        
+                        alert('Task assigned successfully to ' + $scope.assignAgent.name + '!\n\nTask: ' + typeLabels[$scope.newTask.type] + '\nLocation: ' + $scope.newTask.houseNumber + ', ' + $scope.newTask.ward);
+                        $scope.closeAssignModal();
+                    } else {
+                        alert('Error assigning task: ' + (response.data.error || 'Unknown error'));
+                    }
+                }).catch(function(error) {
+                    console.error('Error creating task:', error);
+                    alert('Failed to assign task. Please try again.');
+                });
+            };
+
+            $scope.logout = function () { if (confirm('Are you sure you want to logout?')) alert('Logged out successfully'); };
+        }]);
+    </script>
+</body>
+
+</html>
