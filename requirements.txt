@@ -1,3 +1,5 @@
-flaskflask-sqlalchemy
+flask
+flask-sqlalchemy
 flask-cors
 werkzeug>=2.0.0
+gunicorn
