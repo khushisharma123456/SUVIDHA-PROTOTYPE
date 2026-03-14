@@ -282,6 +282,45 @@
             vm.selectedRecord = null;
         };
 
+        // Photo Gallery Modal Functions
+        vm.openPhotoDialog = function (record) {
+            vm.selectedRecord = record;
+            vm.showPhotoDialog = true;
+            $timeout(function () {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 50);
+        };
+
+        vm.closePhotoDialog = function () {
+            vm.showPhotoDialog = false;
+        };
+
+        vm.payBill = function (record) {
+            if (!record) return;
+            $rootScope.showDialog(
+                'Payment Initiated',
+                'Processing payment of ₹' + record.amount + ' for ' + record.utility + ' bill (' + record.billId + '). You will be redirected to the payment gateway.\n\nNote: In production, this would integrate with UPI/Net Banking.',
+                'success'
+            );
+            // Mark as paid in UI
+            $timeout(function () {
+                record.status = 'Paid';
+                record.statusClass = 'paid';
+                record.statusIcon = 'check-circle';
+                // Update pending count
+                var pendingCount = 0;
+                vm.records.forEach(function (r) {
+                    if (r.status === 'Pending' || r.status === 'Overdue') pendingCount++;
+                });
+                vm.stats.pending = pendingCount;
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 500);
+        };
+
         vm.downloadBill = function (record) {
             var csvContent = 'Bill Receipt - Suvidha Portal\n';
             csvContent += '================================\n\n';
@@ -318,6 +357,75 @@
 
         vm.exportPDF = function () {
             $rootScope.showDialog('Export PDF', 'Generating a comprehensive PDF report of ' + vm.filteredRecords.length + ' billing records with summary statistics. This may take a moment.', 'info');
+        };
+
+        vm.showPayBillDialog = false;
+        vm.payBillData = {};
+        vm.payMethod = 'upi';
+        vm.payBillProcessing = false;
+
+        vm.openPayBillDialog = function (record) {
+            var targetRecord = record || null;
+
+            if (!targetRecord && vm.records && vm.records.length) {
+                for (var i = 0; i < vm.records.length; i++) {
+                    if (vm.records[i].status === 'Pending' || vm.records[i].status === 'Overdue') {
+                        targetRecord = vm.records[i];
+                        break;
+                    }
+                }
+            }
+
+            vm.payBillData = {
+                amount: targetRecord ? targetRecord.amount : '0',
+                label: targetRecord ? (targetRecord.utility + ' Bill') : 'Utility Bill',
+                period: targetRecord ? targetRecord.date : 'Current Period',
+                dueDate: targetRecord ? (targetRecord.dueDate || 'See records') : 'N/A',
+                record: targetRecord
+            };
+
+            vm.showPayBillDialog = true;
+
+            $timeout(function () {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 50);
+        };
+
+        vm.closePayBillDialog = function () {
+            vm.showPayBillDialog = false;
+            vm.payBillProcessing = false;
+        };
+
+        vm.confirmPayBill = function () {
+            vm.payBillProcessing = true;
+
+            $timeout(function () {
+                if (vm.payBillData.record) {
+                    vm.payBillData.record.status = 'Paid';
+                    vm.payBillData.record.statusClass = 'paid';
+                }
+
+                vm.payBillProcessing = false;
+                vm.showPayBillDialog = false;
+                vm.selectedRecord = null;
+
+                vm.stats.pending = vm.records.filter(function (r) {
+                    return r.status === 'Pending' || r.status === 'Overdue';
+                }).length;
+
+                $rootScope.showDialog(
+                    'Payment Successful',
+                    'Bill payment of ₹' + vm.payBillData.amount + ' processed successfully!',
+                    'success',
+                    'Great!'
+                );
+
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 1500);
         };
 
         function init() {

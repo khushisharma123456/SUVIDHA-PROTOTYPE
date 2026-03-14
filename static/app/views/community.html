@@ -3,79 +3,43 @@
     <div class="community-header" style="text-align:center;">
         <div class="community-title-row" style="flex-direction:column; align-items:center;">
             <div style="margin-bottom:1rem;">
-                <h1>Community</h1>
+                <h1>Welcome, {{vm.citizenName || 'Citizen'}}, to your Community</h1>
                 <p>Utility performance and community participation for <strong ng-bind="vm.selectedWard"></strong></p>
             </div>
+            
             <div style="display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center; align-items:flex-end;">
                 <div class="ward-selector-enhanced">
-                    <label>
-                        <i data-lucide="globe"></i>
-                        State
-                    </label>
+                    <label><i data-lucide="globe"></i> State</label>
                     <select ng-model="vm.selectedState" ng-change="vm.onStateChange()" class="form-control enhanced">
                         <option ng-repeat="s in vm.stateList" value="{{s}}">{{s}}</option>
                     </select>
                 </div>
                 <div class="ward-selector-enhanced">
-                    <label>
-                        <i data-lucide="building"></i>
-                        City
-                    </label>
+                    <label><i data-lucide="building"></i> City</label>
                     <select ng-model="vm.selectedCity" ng-change="vm.onCityChange()" class="form-control enhanced">
                         <option ng-repeat="c in vm.cityList" value="{{c}}">{{c}}</option>
                     </select>
                 </div>
                 <div class="ward-selector-enhanced">
-                    <label>
-                        <i data-lucide="map-pin"></i>
-                        Ward
-                    </label>
+                    <label><i data-lucide="map-pin"></i> Ward</label>
                     <select ng-model="vm.selectedWard" ng-change="vm.loadWardData()" class="form-control enhanced">
                         <option ng-repeat="w in vm.wardList" value="{{w.value}}">{{w.label}}</option>
                     </select>
+                </div>
+                
+                <!-- Utility Selector Next to Ward Selection -->
+                <div style="display:flex; gap:0.5rem; justify-content:center; align-items:center; margin-left:1rem; padding-bottom: 0.5rem;">
+                    <button class="btn btn-sm" ng-class="{'btn-primary': vm.selectedUtility === 'electricity', 'btn-outline': vm.selectedUtility !== 'electricity'}" ng-click="vm.selectUtility('electricity')"><i data-lucide="zap" style="width: 14px;"></i> Electricity</button>
+                    <button class="btn btn-sm" ng-class="{'btn-primary': vm.selectedUtility === 'water', 'btn-outline': vm.selectedUtility !== 'water'}" ng-click="vm.selectUtility('water')"><i data-lucide="droplet" style="width: 14px;"></i> Water</button>
+                    <button class="btn btn-sm" ng-class="{'btn-primary': vm.selectedUtility === 'gas', 'btn-outline': vm.selectedUtility !== 'gas'}" ng-click="vm.selectUtility('gas')"><i data-lucide="flame" style="width: 14px;"></i> Gas</button>
+                    <button class="btn btn-sm" ng-class="{'btn-primary': vm.selectedUtility === 'waste', 'btn-outline': vm.selectedUtility !== 'waste'}" ng-click="vm.selectUtility('waste')"><i data-lucide="trash-2" style="width: 14px;"></i> Waste</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Stats Grid - Admin Pattern -->
-    <div class="stats-grid">
-        <div class="stat-card success">
-            <div class="stat-icon-box green">
-                <i data-lucide="trending-up"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-label">Ward Health Score</div>
-                <div class="stat-value" ng-bind="vm.stats.healthScore"></div>
-                <span class="stat-trend up">
-                    <i data-lucide="trending-up"></i> Overall Rating
-                </span>
-            </div>
-        </div>
-        <div class="stat-card primary">
-            <div class="stat-icon-box blue">
-                <i data-lucide="users"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-label">Active Participants</div>
-                <div class="stat-value" ng-bind="vm.stats.activeParticipants"></div>
-                <span class="stat-trend neutral">This quarter</span>
-            </div>
-        </div>
-        <div class="stat-card warning">
-            <div class="stat-icon-box orange">
-                <i data-lucide="activity"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-label">Recent Reports</div>
-                <div class="stat-value" ng-bind="vm.stats.recentReports"></div>
-                <span class="stat-trend neutral">Last 30 days</span>
-            </div>
-        </div>
-    </div>
-
     <!-- Navigation Tabs -->
-    <div class="community-tabs">
+    <div class="community-tabs" style="margin-top:2rem;">
         <button class="community-tab" ng-class="{active: vm.activeSection === 'overview'}"
             ng-click="vm.showSection('overview')">
             <i data-lucide="layout-grid"></i>
@@ -91,11 +55,6 @@
             <i data-lucide="megaphone"></i>
             <span>Advisories</span>
         </button>
-        <button class="community-tab" ng-class="{active: vm.activeSection === 'activity'}"
-            ng-click="vm.showSection('activity')">
-            <i data-lucide="rss"></i>
-            <span>Activity Feed</span>
-        </button>
         <button class="community-tab" ng-class="{active: vm.activeSection === 'insights'}"
             ng-click="vm.showSection('insights')">
             <i data-lucide="bar-chart-3"></i>
@@ -109,613 +68,300 @@
         <!-- SECTION 1: OVERVIEW -->
         <div id="overview" class="community-section" ng-show="vm.activeSection === 'overview'">
 
-            <!-- Ward Health Score Card -->
-            <div class="enhanced-card health-score-card">
-                <div class="card-icon-header">
-                    <div class="icon-badge success">
-                        <i data-lucide="heart-pulse"></i>
-                    </div>
-                    <div>
-                        <h3><span class="icon">💪</span> Ward Health Score</h3>
-                        <p>Calculated using reliability, quality, and service metrics</p>
-                    </div>
+            <!-- Competitive Graphs -->
+            <div class="enhanced-card" style="margin-bottom: 2rem; background: #ffffff;">
+                <div class="card-header-with-actions">
+                    <h3><span class="icon">📊</span> <span style="text-transform: capitalize;">{{vm.selectedUtility}}</span> Savings & Usage Overview</h3>
                 </div>
-                <div class="score-display">
-                    <div class="score-circle">
-                        <svg viewBox="0 0 120 120" class="circular-progress">
-                            <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="8" />
-                            <circle cx="60" cy="60" r="54" fill="none" stroke="#10b981" stroke-width="8"
-                                stroke-dasharray="339.292" stroke-dashoffset="84.823" stroke-linecap="round"
-                                transform="rotate(-90 60 60)" />
-                        </svg>
-                        <div class="score-text">
-                            <span class="score-val">78</span>
-                            <span class="score-max">/100</span>
+                <p style="color:var(--text-muted); font-size: 0.9rem;">See how you and your ward are scoring in savings.</p>
+                <div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:space-between; margin-top:2rem;">
+                    
+                    <!-- Left Graph: Ward compared to Nearby Wards -->
+                    <div style="flex:1; min-width: 300px; padding: 1rem; border: 1px solid var(--border-color); border-radius:8px; background:#ffffff;">
+                        <h4 style="text-align:center; font-size:1.1rem; color:var(--text-color);">Your Ward vs Nearby Wards in Saving <span style="text-transform: capitalize;">{{vm.selectedUtility}}</span> (Jan - Mar 2026)</h4>
+                        <div class="vertical-bar-chart" style="display:flex; align-items:flex-end; height: 200px; gap:1rem; border-bottom: 2px solid #e5e7eb; padding-bottom:0.5rem; margin-top:2rem; justify-content: space-around;">
+                            <div class="bar-wrapper" ng-repeat="wardScore in vm.wardSavingsGraphData" style="display:flex; flex-direction:column; align-items:center; flex:1;" title="{{wardScore.tooltip}}">
+                                <div class="bar-fill" ng-style="{ height: wardScore.percent + '%', background: wardScore.isCurrent ? 'var(--primary-color)' : '#9ca3af', width: '40px', borderRadius: '4px 4px 0 0', position: 'relative', transition: 'height 0.3s ease' }">
+                                    <span style="position: absolute; top: -22px; text-align:center; width: 100%; font-size:0.85rem; font-weight:bold; color:var(--text-color);">{{wardScore.score}}</span>
+                                </div>
+                                <span style="font-size:0.85rem; margin-top: 0.75rem; text-align:center; font-weight:600; color:var(--text-color);">{{wardScore.label}}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="score-breakdown">
-                        <div class="breakdown-item electric">
-                            <i data-lucide="zap"></i>
-                            <span>Electricity: 82/100</span>
+
+                    <!-- Right Graph: User vs Average People in Ward -->
+                    <div style="flex:1; min-width: 300px; padding: 1rem; border: 1px solid var(--border-color); border-radius:8px; background:#ffffff;">
+                        <h4 style="text-align:center; font-size:1.1rem; color:var(--text-color);">Your <span style="text-transform: capitalize;">{{vm.selectedUtility}}</span> Standing vs Ward (Mar 2026)</h4>
+                        <div class="vertical-bar-chart" style="display:flex; align-items:flex-end; height: 200px; gap:3rem; justify-content:center; border-bottom: 2px solid #e5e7eb; padding-bottom:0.5rem; margin-top:2rem;">
+                            <!-- Average User -->
+                            <div class="bar-wrapper" style="display:flex; flex-direction:column; align-items:center;" title="Average usage of people in your ward">
+                                <div class="bar-fill" ng-style="{ height: vm.userStandingGraphData.avgPercent + '%', background: '#9ca3af', width: '60px', borderRadius: '4px 4px 0 0', position: 'relative', transition: 'height 0.3s ease' }">
+                                    <span style="position: absolute; top: -22px; text-align:center; width: 100%; font-size:0.85rem; font-weight:bold; color:var(--text-color);">{{vm.userStandingGraphData.avgVal}}</span>
+                                </div>
+                                <span style="font-size:0.85rem; margin-top: 0.75rem; font-weight:bold; color:var(--text-color);">Ward Avg</span>
+                            </div>
+
+                            <!-- You -->
+                            <div class="bar-wrapper" style="display:flex; flex-direction:column; align-items:center;" title="{{vm.userStandingGraphData.tooltip}}">
+                                <div class="bar-fill" ng-style="{ height: vm.userStandingGraphData.userPercent + '%', background: 'var(--success-color)', width: '60px', borderRadius: '4px 4px 0 0', position: 'relative', transition: 'height 0.3s ease' }">
+                                    <span style="position: absolute; top: -22px; text-align:center; width: 100%; font-size:0.85rem; font-weight:bold; color:var(--text-color);">{{vm.userStandingGraphData.userVal}}</span>
+                                </div>
+                                <span style="font-size:0.85rem; margin-top: 0.75rem; font-weight:bold; color:var(--text-color);">You</span>
+                            </div>
                         </div>
-                        <div class="breakdown-item water">
-                            <i data-lucide="droplet"></i>
-                            <span>Water: 85/100</span>
-                        </div>
-                        <div class="breakdown-item gas">
-                            <i data-lucide="flame"></i>
-                            <span>Gas: 68/100</span>
-                        </div>
+                        <p style="text-align: center; margin-top: 1rem; color: var(--success-color); font-weight: 600;" ng-bind="vm.userStandingGraphData.summaryText"></p>
                     </div>
                 </div>
             </div>
 
-            <!-- Snapshot Cards Grid -->
-            <div class="snapshot-grid">
-                <div class="enhanced-card snapshot-card">
-                    <div class="snapshot-icon">
-                        <i data-lucide="indian-rupee"></i>
-                    </div>
-                    <div class="snapshot-content">
-                        <span class="snap-label">Avg Electricity Bill</span>
-                        <strong class="snap-val">₹1,150</strong>
-                        <small class="snap-trend positive">
-                            <i data-lucide="trending-down"></i>
-                            -5% from last month
-                        </small>
-                    </div>
-                </div>
-                <div class="enhanced-card snapshot-card">
-                    <div class="snapshot-icon water">
-                        <i data-lucide="droplets"></i>
-                    </div>
-                    <div class="snapshot-content">
-                        <span class="snap-label">Avg Water Usage</span>
-                        <strong class="snap-val">19 KL</strong>
-                        <small class="snap-trend">
-                            <i data-lucide="minus"></i>
-                            Same as average
-                        </small>
-                    </div>
-                </div>
-                <div class="enhanced-card snapshot-card">
-                    <div class="snapshot-icon alert">
-                        <i data-lucide="power-off"></i>
-                    </div>
-                    <div class="snapshot-content">
-                        <span class="snap-label">Power Cuts</span>
-                        <strong class="snap-val">1.2 Hrs/M</strong>
-                        <small class="snap-trend negative">
-                            <i data-lucide="trending-up"></i>
-                            +15min from last month
-                        </small>
-                    </div>
-                </div>
-                <div class="enhanced-card snapshot-card">
-                    <div class="snapshot-icon success">
-                        <i data-lucide="sun"></i>
-                    </div>
-                    <div class="snapshot-content">
-                        <span class="snap-label">Solar Adoption</span>
-                        <strong class="snap-val">14%</strong>
-                        <small class="snap-trend positive">
-                            <i data-lucide="trending-up"></i>
-                            +3% from last year
-                        </small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- HEATMAP -->
-            <div class="enhanced-card heatmap-container">
+            <!-- HEATMAP / STRESS MAP -->
+            <div class="enhanced-card heatmap-container" style="margin-bottom: 2rem; background: #ffffff;">
                 <div class="card-header-with-actions">
                     <div>
-                        <h3><span class="icon">🗺️</span> Ward Stress Map</h3>
-                        <p>Map shows aggregated service reliability by block</p>
+                        <h3><span class="icon">🗺️</span> Stress Map for {{vm.selectedWard}}</h3>
+                        <p>Aggregated stress indicators across the region.</p>
                     </div>
                     <div class="map-toggles">
-                        <button class="map-toggle-btn" ng-class="{active: vm.mapView === 'ward'}"
-                            ng-click="vm.changeMapView('ward')">
-                            <i data-lucide="home"></i>
-                            Ward
-                        </button>
-                        <button class="map-toggle-btn" ng-class="{active: vm.mapView === 'zone'}"
-                            ng-click="vm.changeMapView('zone')">
-                            <i data-lucide="building"></i>
-                            Zone
-                        </button>
-                        <button class="map-toggle-btn" ng-class="{active: vm.mapView === 'city'}"
-                            ng-click="vm.changeMapView('city')">
-                            <i data-lucide="map"></i>
-                            City
-                        </button>
+                        <button class="map-toggle-btn" ng-click="vm.openMapModal('ward')"><i data-lucide="home"></i> Ward</button>
+                        <button class="map-toggle-btn" ng-click="vm.openMapModal('zone')"><i data-lucide="building"></i> Zone</button>
+                        <button class="map-toggle-btn" ng-click="vm.openMapModal('city')"><i data-lucide="map"></i> City</button>
                     </div>
                 </div>
-                <div class="heatmap-visual" style="grid-template-columns:repeat(4,1fr); gap:0.5rem;">
-                    <div class="heat-zone low-stress" ng-click="vm.showBlockDetails('A')" title="Block A — Stable (92%)">
-                        <span class="block-label">A</span>
-                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:#10b981;">92%</span>
-                    </div>
-                    <div class="heat-zone med-stress" ng-click="vm.showBlockDetails('B')" title="Block B — Moderate (68%)">
-                        <span class="block-label">B</span>
-                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:#f59e0b;">68%</span>
-                    </div>
-                    <div class="heat-zone high-stress" ng-click="vm.showBlockDetails('C')" title="Block C — High Stress (41%)">
-                        <span class="block-label">C</span>
-                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:#ef4444;">41%</span>
-                    </div>
-                    <div class="heat-zone low-stress" ng-click="vm.showBlockDetails('D')" title="Block D — Stable (88%)">
-                        <span class="block-label">D</span>
-                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:#10b981;">88%</span>
-                    </div>
-                    <div class="heat-zone low-stress" ng-click="vm.showBlockDetails('E')" title="Block E — Stable (95%)">
-                        <span class="block-label">E</span>
-                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:#10b981;">95%</span>
-                    </div>
-                    <div class="heat-zone med-stress" ng-click="vm.showBlockDetails('F')" title="Block F — Moderate (60%)">
-                        <span class="block-label">F</span>
-                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:#f59e0b;">60%</span>
-                    </div>
-                    <div class="heat-zone low-stress" ng-click="vm.showBlockDetails('G')" title="Block G — Stable (83%)">
-                        <span class="block-label">G</span>
-                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:#10b981;">83%</span>
-                    </div>
-                    <div class="heat-zone high-stress" ng-click="vm.showBlockDetails('H')" title="Block H — High Stress (35%)">
-                        <span class="block-label">H</span>
-                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:#ef4444;">35%</span>
+                
+                <div class="heatmap-visual" style="grid-template-columns:repeat(4,1fr); gap:0.5rem; margin-top:1rem;">
+                    <div ng-repeat="block in vm.heatmapBlocks" class="heat-zone" ng-class="block.stressClass" title="{{block.label}} ({{block.score}}%)" style="cursor: pointer;" onclick="alert('Block selected')">
+                        <span class="block-label">{{block.label}}</span>
+                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:inherit;">{{block.score}}%</span>
                     </div>
                 </div>
-                <!-- Gradient Legend Bar -->
-                <div class="heatmap-legend" style="flex-direction:column; gap:0.5rem;">
-                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted);">
-                        <span>High Stress</span>
-                        <span>Moderate</span>
+
+                <div style="margin-top: 2rem; padding-top:1rem; border-top: 1px solid var(--border-color);">
+                    <h4 style="margin-bottom:0.75rem;">Stress Marking Progress</h4>
+                    <div class="progress" style="height: 16px; background:#e5e7eb; border-radius: 8px; overflow:hidden; display:flex;">
+                         <div ng-style="{'width': vm.overallStress.success + '%', 'background': '#10b981'}" title="Stable ({{vm.overallStress.success}}%)"></div>
+                         <div ng-style="{'width': vm.overallStress.warning + '%', 'background': '#f59e0b'}" title="Moderate ({{vm.overallStress.warning}}%)"></div>
+                         <div ng-style="{'width': vm.overallStress.danger + '%', 'background': '#ef4444'}" title="High ({{vm.overallStress.danger}}%)"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-top:0.5rem;">
                         <span>Stable</span>
+                        <span>Moderate</span>
+                        <span>High Stress</span>
                     </div>
-                    <div style="height:8px; border-radius:4px; background:linear-gradient(90deg, #ef4444, #f59e0b, #10b981);"></div>
-                    <div style="display:flex; gap:1.5rem; margin-top:0.25rem;">
-                        <span class="legend-item"><span class="dot success"></span> Stable (&gt;75%)</span>
-                        <span class="legend-item"><span class="dot warning"></span> Moderate (50-75%)</span>
-                        <span class="legend-item"><span class="dot danger"></span> High Stress (&lt;50%)</span>
+                </div>
+            </div>
+
+            <!-- Averages and Ward Ranking -->
+            <div class="enhanced-card" style="margin-bottom: 2rem; background: #ffffff;">
+                <h3><span class="icon">🏆</span> Ward Standings & Ranking</h3>
+                <div class="snapshot-grid" style="margin-top: 1rem;">
+                    <div class="enhanced-card snapshot-card" style="box-shadow: none; border: 1px solid var(--border-color); background: #ffffff;">
+                        <div class="snapshot-icon elec"><i data-lucide="zap"></i></div>
+                        <div class="snapshot-content">
+                            <span class="snap-label">Avg Electricity Bill</span>
+                            <strong class="snap-val">₹1,150</strong>
+                            <small class="snap-trend positive" style="margin-top:0.25rem;">(Lowest in Zone)</small>
+                        </div>
                     </div>
+                    <div class="enhanced-card snapshot-card" style="box-shadow: none; border: 1px solid var(--border-color); background: #ffffff;">
+                        <div class="snapshot-icon water"><i data-lucide="droplets"></i></div>
+                        <div class="snapshot-content">
+                            <span class="snap-label">Avg Water Usage</span>
+                            <strong class="snap-val">19 KL</strong>
+                            <small class="snap-trend positive" style="margin-top:0.25rem;">(Below average)</small>
+                        </div>
+                    </div>
+                    <div class="enhanced-card snapshot-card" style="box-shadow: none; border: 1px solid var(--border-color); background: #ffffff;">
+                        <div class="snapshot-icon alert"><i data-lucide="power-off"></i></div>
+                        <div class="snapshot-content">
+                            <span class="snap-label">Avg Power Cuts</span>
+                            <strong class="snap-val">1.2 Hrs/M</strong>
+                            <small class="snap-trend positive" style="margin-top:0.25rem;">(Least power cuts)</small>
+                        </div>
+                    </div>
+                    <div class="enhanced-card snapshot-card" style="box-shadow: none; border: 1px solid var(--border-color); background: #ffffff;">
+                        <div class="snapshot-icon success"><i data-lucide="sun"></i></div>
+                        <div class="snapshot-content">
+                            <span class="snap-label">Est. Solar Adoption</span>
+                            <strong class="snap-val">14%</strong>
+                            <small class="snap-trend positive" style="margin-top:0.25rem;">(Highest in City)</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem; background: rgba(16, 185, 129, 0.1); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--success-color);">
+                    <h4><i data-lucide="award" style="color:var(--success-color); vertical-align:middle; width:20px;"></i> Ward Ranking & Allocation</h4>
+                    <p style="margin-top: 0.75rem; line-height: 1.6; font-size:1.05rem; color:var(--text-color);">
+                        People whose electricity is the least is from <strong>{{vm.selectedWard}}</strong>. 
+                        Whose water usage is less is from <strong>{{vm.selectedWard}}</strong>. 
+                        This ward has the least power cuts overall, and this ward has the most solar adoption in the zone.
+                    </p>
+                    <p style="font-weight:bold; color: var(--success-color); margin-top: 0.5rem; font-size:1.1rem;">
+                        So {{vm.selectedWard}} is ranked the highest! All people of this ward have been allocated 2 points. 🎉
+                    </p>
                 </div>
             </div>
         </div>
 
         <!-- SECTION 2: CHALLENGES -->
         <div id="challenges" class="community-section" ng-show="vm.activeSection === 'challenges'">
+            <!-- Filters -->
+            <div class="advisory-filters" style="margin-bottom: 1.5rem; display:flex; gap:0.5rem;">
+                <button class="filter-chip" ng-class="{active: vm.challengeFilter === 'past'}" ng-click="vm.challengeFilter = 'past'">Past Challenges</button>
+                <button class="filter-chip" ng-class="{active: vm.challengeFilter === 'current'}" ng-click="vm.challengeFilter = 'current'">Current Challenges</button>
+                <button class="filter-chip" ng-class="{active: vm.challengeFilter === 'future'}" ng-click="vm.challengeFilter = 'future'">Future Challenges</button>
+            </div>
 
-            <!-- Participation Score -->
-            <div class="enhanced-card participation-card">
-                <div class="participation-header">
-                    <div class="participation-score">
-                        <div class="score-icon">
-                            <i data-lucide="award"></i>
-                        </div>
-                        <div>
-                            <h3><span class="icon">🏆</span> Your Civic Participation</h3>
-                            <div class="participation-stats">
-                                <div class="part-stat">
-                                    <strong ng-bind="vm.participation.points"></strong>
-                                    <span>Points Earned</span>
+            <!-- Participation Graphs -->
+            <div class="enhanced-card" style="margin-bottom: 2rem; background: #ffffff;">
+                <h3><span class="icon">📈</span> Participation Comparison</h3>
+                
+                <div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:space-between; margin-top:2rem;">
+                    
+                    <!-- Left: Your Participation vs Others in Ward -->
+                    <div style="flex:1; min-width: 300px; padding: 1rem; border: 1px solid var(--border-color); border-radius:8px; background: #ffffff;">
+                        <h4 style="text-align:center; font-size:1.1rem; color:var(--text-color);">Your Participation vs Others (March 2026)</h4>
+                        <div class="vertical-bar-chart" style="display:flex; align-items:flex-end; height: 180px; gap:3rem; justify-content:center; border-bottom: 2px solid #e5e7eb; padding-bottom:0.5rem; margin-top:1rem;">
+                            <div class="bar-wrapper" style="display:flex; flex-direction:column; align-items:center;">
+                                <div class="bar-fill" style="height: 80%; background: var(--primary-color); width: 60px; border-radius: 4px 4px 0 0; position:relative;">
+                                    <span style="position:absolute; top:-22px; width:100%; text-align:center; font-weight:bold; color:var(--text-color);">120 pts</span>
                                 </div>
-                                <div class="part-stat">
-                                    <strong ng-bind="vm.participation.rank"></strong>
-                                    <span>In Ward</span>
+                                <span style="font-size:0.85rem; margin-top: 0.75rem; font-weight:bold; color:var(--text-color);">You</span>
+                            </div>
+                            <div class="bar-wrapper" style="display:flex; flex-direction:column; align-items:center;">
+                                <div class="bar-fill" style="height: 45%; background: #9ca3af; width: 60px; border-radius: 4px 4px 0 0; position:relative;">
+                                    <span style="position:absolute; top:-22px; width:100%; text-align:center; font-weight:bold; color:var(--text-color);">68 pts</span>
                                 </div>
+                                <span style="font-size:0.85rem; margin-top: 0.75rem; font-weight:bold; color:var(--text-color);">Others (Avg)</span>
                             </div>
                         </div>
                     </div>
-                    <div class="badges-display">
-                        <div class="badge-earned" ng-repeat="badge in vm.earnedBadges" title="{{badge.name}}">
-                            <i ng-attr-data-lucide="{{badge.icon}}"></i>
+
+                    <!-- Right: Ward vs Zone -->
+                    <div style="flex:1; min-width: 300px; padding: 1rem; border: 1px solid var(--border-color); border-radius:8px; background: #ffffff;">
+                        <h4 style="text-align:center; font-size:1.1rem; color:var(--text-color);">Ward-wise & Zone-wise (Jan - Mar 2026)</h4>
+                        <div class="vertical-bar-chart" style="display:flex; align-items:flex-end; height: 180px; gap:3rem; justify-content:center; border-bottom: 2px solid #e5e7eb; padding-bottom:0.5rem; margin-top:1rem;">
+                            <div class="bar-wrapper" style="display:flex; flex-direction:column; align-items:center;">
+                                <div class="bar-fill" style="height: 95%; background: var(--success-color); width: 60px; border-radius: 4px 4px 0 0; position:relative;">
+                                    <span style="position:absolute; top:-22px; width:100%; text-align:center; font-weight:bold; color:var(--text-color);">High</span>
+                                </div>
+                                <span style="font-size:0.85rem; margin-top: 0.75rem; font-weight:bold; color:var(--text-color);">Your Ward</span>
+                            </div>
+                            <div class="bar-wrapper" style="display:flex; flex-direction:column; align-items:center;">
+                                <div class="bar-fill" style="height: 60%; background: #9ca3af; width: 60px; border-radius: 4px 4px 0 0; position:relative;">
+                                    <span style="position:absolute; top:-22px; width:100%; text-align:center; font-weight:bold; color:var(--text-color);">Med</span>
+                                </div>
+                                <span style="font-size:0.85rem; margin-top: 0.75rem; font-weight:bold; color:var(--text-color);">Zone (Avg)</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Challenge Cards Grid -->
-            <div class="challenge-grid">
-                <!-- Electricity Challenge -->
-                <div class="enhanced-card challenge-card">
+            <!-- List of challenges -->
+            <div class="challenge-grid" style="margin-top: 1rem;">
+                <div class="enhanced-card challenge-card" ng-repeat="challenge in vm.filteredChallenges" style="background: #ffffff;">
                     <div class="challenge-icon-badge elec">
-                        <i data-lucide="zap"></i>
+                        <i data-lucide="{{challenge.icon}}"></i>
                     </div>
                     <div class="challenge-header">
-                        <h4><span class="icon">⚡</span> Peak Hour Saver</h4>
+                        <h4 style="display:flex;align-items:center;gap:0.5rem;">{{challenge.title}}</h4>
                         <span class="points-badge">
                             <i data-lucide="coins"></i>
-                            50 Points
+                            {{challenge.points}} Points
                         </span>
                     </div>
-                    <p class="challenge-desc">Follow peak hour advisories to reduce grid stress</p>
-                    <div class="challenge-progress">
-                        <div class="progress-info">
-                            <span>2/5 Days</span>
-                            <span>40%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 40%"></div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" ng-click="vm.joinChallenge('peak_hour')">
-                        <i data-lucide="user-plus"></i>
-                        Join Challenge
-                    </button>
-                    <div class="challenge-note">
-                        <i data-lucide="info"></i>
-                        Does not affect billing
-                    </div>
+                    <p class="challenge-desc" style="margin-top:1rem;">{{challenge.desc}}</p>
+                    <button class="btn btn-primary" style="margin-top: 1.5rem; width: 100%; justify-content:center;" ng-if="challenge.type === 'current'">Join Challenge</button>
+                    <button class="btn btn-outline" style="margin-top: 1.5rem; width: 100%; justify-content:center;" ng-if="challenge.type !== 'current'" disabled>{{challenge.type === 'past' ? 'Completed/Expired' : 'Coming Soon'}}</button>
                 </div>
-
-                <!-- Water Challenge -->
-                <div class="enhanced-card challenge-card">
-                    <div class="challenge-icon-badge water">
-                        <i data-lucide="droplet"></i>
-                    </div>
-                    <div class="challenge-header">
-                        <h4><span class="icon">💧</span> Leak Detective</h4>
-                        <span class="points-badge">
-                            <i data-lucide="coins"></i>
-                            30 Points
-                        </span>
-                    </div>
-                    <p class="challenge-desc">Report visible leaks in your neighborhood</p>
-                    <div class="challenge-meta">
-                        <div class="meta-stat">
-                            <i data-lucide="users"></i>
-                            <span>42 Participants</span>
-                        </div>
-                        <div class="meta-stat">
-                            <i data-lucide="check-circle"></i>
-                            <span>18 Leaks Fixed</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" ng-click="vm.reportLeak()">
-                        <i data-lucide="flag"></i>
-                        Report Now
-                    </button>
-                    <div class="challenge-note">
-                        <i data-lucide="info"></i>
-                        Community service initiative
-                    </div>
-                </div>
-
-                <!-- Gas Safety Challenge -->
-                <div class="enhanced-card challenge-card">
-                    <div class="challenge-icon-badge gas">
-                        <i data-lucide="flame"></i>
-                    </div>
-                    <div class="challenge-header">
-                        <h4><span class="icon">🔥</span> Safety First</h4>
-                        <span class="points-badge premium">
-                            <i data-lucide="star"></i>
-                            100 Points
-                        </span>
-                    </div>
-                    <p class="challenge-desc">Complete annual safety inspection checklist</p>
-                    <div class="challenge-checklist">
-                        <div class="checklist-item">
-                            <i data-lucide="check"></i>
-                            <span>Inspect connections</span>
-                        </div>
-                        <div class="checklist-item">
-                            <i data-lucide="circle"></i>
-                            <span>Test leak detector</span>
-                        </div>
-                        <div class="checklist-item">
-                            <i data-lucide="circle"></i>
-                            <span>Verify ventilation</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" ng-click="vm.startSafetyChecklist()">
-                        <i data-lucide="clipboard-check"></i>
-                        Start Checklist
-                    </button>
-                    <div class="challenge-note">
-                        <i data-lucide="shield"></i>
-                        Safety awareness program
-                    </div>
-                </div>
-            </div>
-
-            <!-- Active Challenges -->
-            <div class="enhanced-card active-challenges" ng-if="vm.activeChallenges.length > 0">
-                <h3>
-                    <span class="icon">🏅</span>
-                    Your Active Challenges
-                </h3>
-                <div class="active-challenge-list">
-                    <div class="active-challenge-item" ng-repeat="challenge in vm.activeChallenges">
-                        <div class="challenge-icon-sm" ng-class="challenge.type">
-                            <i ng-attr-data-lucide="{{challenge.icon}}"></i>
-                        </div>
-                        <div class="challenge-details">
-                            <strong ng-bind="challenge.name"></strong>
-                            <div class="mini-progress">
-                                <div class="mini-progress-bar" ng-style="{width: challenge.progress + '%'}"></div>
-                            </div>
-                        </div>
-                        <div class="challenge-status">
-                            <span class="status-text" ng-bind="challenge.daysLeft + ' ' + t('days_left')"></span>
-                        </div>
-                    </div>
+                <div ng-if="!vm.filteredChallenges.length" style="padding: 2rem; text-align:center; color: var(--text-muted); width: 100%;">
+                    No {{vm.challengeFilter}} challenges found.
                 </div>
             </div>
         </div>
 
         <!-- SECTION 3: ADVISORIES -->
         <div id="advisories" class="community-section" ng-show="vm.activeSection === 'advisories'">
-
-            <div class="advisory-filters">
-                <button class="filter-chip" ng-class="{active: vm.advisoryFilter === 'all'}"
-                    ng-click="vm.filterAdvisories('all')">
-                    All
-                </button>
-                <button class="filter-chip" ng-class="{active: vm.advisoryFilter === 'electricity'}"
-                    ng-click="vm.filterAdvisories('electricity')">
-                    <i data-lucide="zap"></i>
-                    Electricity
-                </button>
-                <button class="filter-chip" ng-class="{active: vm.advisoryFilter === 'water'}"
-                    ng-click="vm.filterAdvisories('water')">
-                    <i data-lucide="droplet"></i>
-                    Water
-                </button>
-                <button class="filter-chip" ng-class="{active: vm.advisoryFilter === 'gas'}"
-                    ng-click="vm.filterAdvisories('gas')">
-                    <i data-lucide="flame"></i>
-                    Gas
-                </button>
-            </div>
-
-            <div class="advisory-list">
-                <div class="enhanced-card advisory-card urgent"
-                    ng-repeat="advisory in vm.filteredAdvisories | limitTo:5">
-                    <div class="advisory-tag" ng-class="advisory.priority">
-                        <i data-lucide="alert-triangle" ng-if="advisory.priority === 'urgent'"></i>
-                        <i data-lucide="info" ng-if="advisory.priority === 'info'"></i>
-                        <span ng-bind="advisory.priority"></span>
+            <div class="enhanced-card" style="margin-bottom: 1.5rem; background: #ffffff;">
+                <div class="card-icon-header">
+                    <div class="icon-badge warning">
+                        <i data-lucide="megaphone"></i>
                     </div>
-                    <div class="advisory-header">
-                        <div class="advisory-title-row">
-                            <div class="utility-icon" ng-class="advisory.utility">
-                                <i ng-attr-data-lucide="{{advisory.utilityIcon}}"></i>
-                            </div>
-                            <h3 ng-bind="advisory.title"></h3>
-                        </div>
-                        <div class="advisory-meta">
-                            <span class="advisory-source">
-                                <i data-lucide="building"></i>
-                                Issued By: <strong ng-bind="advisory.issuedBy"></strong>
-                            </span>
-                            <span class="advisory-date">
-                                <i data-lucide="calendar"></i>
-                                <span ng-bind="advisory.validTill"></span>
-                            </span>
-                        </div>
-                    </div>
-                    <p class="advisory-description" ng-bind="advisory.description"></p>
-                    <div class="advisory-footer">
-                        <div class="affected-area">
-                            <i data-lucide="map-pin"></i>
-                            Affected Area: <span ng-bind="advisory.affectedArea"></span>
-                        </div>
-                        <button class="btn-text" ng-click="vm.viewAdvisoryDetails(advisory)">
-                            View Details
-                            <i data-lucide="arrow-right"></i>
-                        </button>
+                    <div>
+                        <h3><span class="icon">📢</span> Advisories for {{vm.selectedWard}} Area</h3>
+                        <p style="color:var(--text-muted);">Only the current ward advisories are displayed below</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Empty State -->
-            <div class="empty-state" ng-if="vm.filteredAdvisories.length === 0">
-                <i data-lucide="inbox"></i>
-                <p>No Advisories Found</p>
-            </div>
-        </div>
-
-        <!-- SECTION 4: ACTIVITY FEED -->
-        <div id="activity" class="community-section" ng-show="vm.activeSection === 'activity'">
-
-            <div class="enhanced-card">
-                <h3>
-                    <span class="icon">📡</span>
-                    Community Activity
-                </h3>
-                <p class="section-desc">Anonymous feed of civic participation and improvements</p>
-            </div>
-
-            <div class="activity-timeline">
-                <div class="activity-item" ng-repeat="activity in vm.activityFeed">
-                    <div class="activity-icon" ng-class="activity.type">
-                        <i ng-attr-data-lucide="{{activity.icon}}"></i>
+            <div class="advisory-list" style="margin-top: 1.5rem;">
+                <div class="enhanced-card advisory-card" ng-repeat="advisory in vm.advisories" style="display:flex; gap:1.5rem; align-items:flex-start; background: #ffffff;">
+                    <div class="utility-icon-large" style="background:#fef3c7; color:#d97706; padding:1rem; border-radius:12px;">
+                        <i data-lucide="{{advisory.icon}}" style="width:24px;height:24px;"></i>
                     </div>
-                    <div class="activity-content">
-                        <p ng-bind-html="activity.message"></p>
-                        <div class="activity-meta">
-                            <span class="activity-time" ng-bind="activity.timeAgo"></span>
-                            <span class="activity-location" ng-if="activity.location">
-                                <i data-lucide="map-pin"></i>
-                                <span ng-bind="activity.location"></span>
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                            <h4 style="margin:0; font-size:1.1rem;">{{advisory.title}}</h4>
+                            <span style="font-size:0.8rem; background:rgba(217,119,6,0.1); color:#d97706; padding:0.25rem 0.5rem; border-radius:4px; font-weight:bold; text-transform:uppercase;">
+                                {{advisory.priority}}
                             </span>
                         </div>
-                    </div>
-                    <div class="activity-actions" ng-if="activity.actionable">
-                        <button class="btn-icon" ng-click="vm.likeActivity(activity)" title="Helpful">
-                            <i data-lucide="thumbs-up"></i>
-                            <span ng-bind="activity.likes" ng-if="activity.likes > 0"></span>
-                        </button>
+                        <p style="color:var(--text-muted); margin-bottom: 0.5rem; font-size: 0.95rem;">{{advisory.desc}}</p>
+                        <span style="font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:0.25rem;">
+                            <i data-lucide="calendar" style="width:14px;height:14px;"></i>
+                            Valid: {{advisory.date}}
+                        </span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Load More -->
-            <div class="load-more-section" ng-if="vm.hasMoreActivity">
-                <button class="btn btn-secondary" ng-click="vm.loadMoreActivity()">
-                    <i data-lucide="refresh-cw"></i>
-                    Load More
-                </button>
             </div>
         </div>
 
         <!-- SECTION 5: INSIGHTS -->
         <div id="insights" class="community-section" ng-show="vm.activeSection === 'insights'">
-
-            <!-- Comparison Table -->
-            <div class="enhanced-card comparison-table-card">
+            <div class="enhanced-card" style="margin-bottom: 2rem; background: #ffffff;">
                 <div class="card-header-with-actions">
                     <div>
-                        <h3><span class="icon">📊</span> Comparison with Ward and City</h3>
-                        <p>How these insights are calculated</p>
+                        <h3><span class="icon">🔍</span> Insights for {{vm.selectedWard}}</h3>
+                        <p>Detailed breakdown of your ward's overall performance.</p>
                     </div>
-                    <button class="btn-icon" ng-click="vm.exportInsights()" title="Export Data">
-                        <i data-lucide="download"></i>
-                    </button>
                 </div>
-                <div class="comparison-table-wrapper">
-                    <table class="enhanced-table">
-                        <thead>
-                            <tr>
-                                <th>Metric</th>
-                                <th>
-                                    <div class="th-content">
-                                        <i data-lucide="home"></i>
-                                        <span ng-bind="vm.selectedWard"></span>
-                                    </div>
-                                </th>
-                                <th>
-                                    <div class="th-content">
-                                        <i data-lucide="building"></i>
-                                        South Delhi Zone
-                                    </div>
-                                </th>
-                                <th>
-                                    <div class="th-content">
-                                        <i data-lucide="map"></i>
-                                        Delhi City
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="metric in vm.comparisonMetrics">
-                                <td class="metric-name">
-                                    <i ng-attr-data-lucide="{{metric.icon}}"></i>
-                                    <span ng-bind="metric.name"></span>
-                                </td>
-                                <td>
-                                    <strong ng-bind="metric.ward"></strong>
-                                    <span class="trend-indicator" ng-class="metric.wardTrend" ng-if="metric.wardTrend">
-                                        <i data-lucide="trending-up" ng-if="metric.wardTrend === 'up'"></i>
-                                        <i data-lucide="trending-down" ng-if="metric.wardTrend === 'down'"></i>
-                                    </span>
-                                </td>
-                                <td ng-bind="metric.zone"></td>
-                                <td ng-bind="metric.city"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Performance Bars -->
-            <div class="performance-bars-grid">
-                <div class="enhanced-card performance-card">
-                    <h4>
-                        <span class="icon">⚡</span>
-                        Electricity Performance
+                
+                <div style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border-left: 4px solid var(--success-color);">
+                    <h4 style="color: #065f46; margin-bottom: 1rem; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;">
+                        <i data-lucide="check-circle" style="color:var(--success-color);"></i>
+                        Your ward has performed exceptionally well!
                     </h4>
-                    <div class="performance-bar-item">
-                        <span class="bar-label">Reliability</span>
-                        <div class="performance-bar">
-                            <div class="bar-fill success" style="width: 92%">92%</div>
-                        </div>
-                    </div>
-                    <div class="performance-bar-item">
-                        <span class="bar-label">Peak Load Management</span>
-                        <div class="performance-bar">
-                            <div class="bar-fill warning" style="width: 78%">78%</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="enhanced-card performance-card">
-                    <h4>
-                        <span class="icon">💧</span>
-                        Water Performance
-                    </h4>
-                    <div class="performance-bar-item">
-                        <span class="bar-label">Supply Consistency</span>
-                        <div class="performance-bar">
-                            <div class="bar-fill success" style="width: 88%">88%</div>
-                        </div>
-                    </div>
-                    <div class="performance-bar-item">
-                        <span class="bar-label">Quality Index</span>
-                        <div class="performance-bar">
-                            <div class="bar-fill success" style="width: 95%">95%</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="enhanced-card performance-card">
-                    <h4>
-                        <span class="icon">🔥</span>
-                        Gas Performance
-                    </h4>
-                    <div class="performance-bar-item">
-                        <span class="bar-label">Delivery Pressure</span>
-                        <div class="performance-bar">
-                            <div class="bar-fill success" style="width: 85%">85%</div>
-                        </div>
-                    </div>
-                    <div class="performance-bar-item">
-                        <span class="bar-label">Safety Compliance</span>
-                        <div class="performance-bar">
-                            <div class="bar-fill success" style="width: 98%">98%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Insights Cards -->
-            <div class="insights-cards-grid">
-                <div class="enhanced-card insight-card">
-                    <div class="insight-badge positive">
-                        <i data-lucide="trending-up"></i>
-                    </div>
-                    <h4><span class="icon">📈</span> Improving Metrics</h4>
-                    <ul class="insight-list">
-                        <li>Solar adoption up 3% year-on-year</li>
-                        <li>Water quality index improved</li>
-                        <li>Fewer power outage complaints</li>
-                    </ul>
-                </div>
-
-                <div class="enhanced-card insight-card">
-                    <div class="insight-badge attention">
-                        <i data-lucide="alert-circle"></i>
-                    </div>
-                    <h4><span class="icon">⚠️</span> Needs Attention</h4>
-                    <ul class="insight-list">
-                        <li>Peak hour stress increasing</li>
-                        <li>Gas connection backlog remains</li>
+                    <ul class="insight-list" style="color: #064e3b; list-style-type: none; padding-left: 0; line-height: 1.8; font-size: 1.05rem;">
+                        <li style="display:flex; align-items:flex-start; gap:0.5rem;">
+                            <i data-lucide="zap" style="color:var(--primary-color); width:18px; margin-top:4px;"></i> 
+                            <span>This is your ward. Electricity consumption is impressively <strong>low</strong> compared to average.</span>
+                        </li>
+                        <li style="display:flex; align-items:flex-start; gap:0.5rem; margin-top:0.5rem;">
+                            <i data-lucide="sun" style="color:#f59e0b; width:18px; margin-top:4px;"></i> 
+                            <span>Average electricity usage remains low due to strong solar penetration. <strong>{{vm.stats.solarAdoptionCount}} users</strong> have increased solar penetration this quarter.</span>
+                        </li>
+                        <li style="margin-top: 1.5rem; padding-top:1rem; border-top:1px solid rgba(16, 185, 129, 0.3); font-weight: 500; font-size:1.1rem; display:flex; align-items:flex-start; gap:0.5rem;">
+                            <i data-lucide="globe" style="color:var(--success-color); width:20px; margin-top:2px;"></i>
+                            <div>
+                                <strong style="display:block; margin-bottom:0.25rem;">Environmental Impact Over Time:</strong>
+                                Your ward has saved <strong style="color:var(--success-color);">{{vm.wardInsights.coalSaved}} kg of Coal</strong>, 
+                                <strong style="color:var(--success-color);">{{vm.wardInsights.gasSaved}} kg of Gas</strong>, and 
+                                <strong style="color:var(--success-color);">{{vm.wardInsights.waterSaved}} kL of Water</strong>!
+                            </div>
+                        </li>
                     </ul>
                 </div>
             </div>
         </div>
 
     </main>
+
 </div>
 
-<!-- Initialize Lucide Icons -->
 <script>
     if (typeof lucide !== 'undefined') {
         setTimeout(function () {
             lucide.createIcons();
-        }, 100);
+        }, 300);
     }
 </script>
-</div> <!-- /.main-content -->

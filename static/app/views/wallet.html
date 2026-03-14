@@ -1,0 +1,520 @@
+<div class="main-content">
+    <!-- Wallet Page Header -->
+    <div class="page-header-welcome">
+        <div class="welcome-left">
+            <h1 class="welcome-title">💳 Wallet & Rewards</h1>
+            <p class="welcome-subtitle">Earn community points and redeem them for services, coupons, and more</p>
+        </div>
+    </div>
+
+    <!-- Main Balance and Stats Row -->
+    <div class="wallet-top-section">
+        <!-- Main Wallet Balance Circle -->
+        <div class="wallet-balance-card enhanced-card">
+            <div class="balance-card-header">
+                <h3>
+                    <i data-lucide="wallet"></i>
+                    Your Wallet Balance
+                </h3>
+                <button class="btn-icon" ng-click="vm.refreshBalance()" title="Refresh">
+                    <i data-lucide="refresh-cw"></i>
+                </button>
+            </div>
+            <div class="wallet-circle-main">
+                <div class="circle-wrapper">
+                    <svg class="circle-svg" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" class="circle-bg"></circle>
+                        <circle cx="100" cy="100" r="90" class="circle-progress" 
+                                style="stroke-dasharray: 565.48; stroke-dashoffset: {{565.48 - (565.48 * vm.walletBalance / 5000)}};"></circle>
+                    </svg>
+                    <div class="circle-content">
+                        <div class="circle-amount">{{vm.walletBalance}}</div>
+                        <div class="circle-label">Points</div>
+                        <div class="circle-sublabel">Available to Use</div>
+                    </div>
+                </div>
+            </div>
+            <div class="balance-footer">
+                <div class="balance-info-item">
+                    <span class="info-label">Equivalent Value</span>
+                    <span class="info-value">₹{{vm.walletBalance * 0.1 | number:0}}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Cards -->
+        <div class="wallet-quick-stats">
+            <div class="quick-stat-card earned">
+                <div class="stat-icon-wrapper">
+                    <i data-lucide="trending-up"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">+{{vm.pointsEarned}}</div>
+                    <div class="stat-label">Earned This Month</div>
+                    <div class="stat-trend positive">
+                        <i data-lucide="arrow-up"></i>
+                        <span>12% from last month</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-stat-card used">
+                <div class="stat-icon-wrapper">
+                    <i data-lucide="shopping-cart"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">-{{vm.pointsUsed}}</div>
+                    <div class="stat-label">Used This Month</div>
+                    <div class="stat-trend neutral">
+                        <i data-lucide="minus"></i>
+                        <span>Same as average</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-stat-card expiring">
+                <div class="stat-icon-wrapper">
+                    <i data-lucide="clock"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{vm.pointsExpiring}}</div>
+                    <div class="stat-label">Expiring in 30 Days</div>
+                    <div class="stat-trend warning">
+                        <i data-lucide="alert-circle"></i>
+                        <span>Use them soon!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Use Your Points Section -->
+    <section class="wallet-section">
+        <div class="section-header-enhanced">
+            <div>
+                <h2 class="section-title">
+                    <span class="section-icon">🎯</span>
+                    Redeem Your Points
+                </h2>
+                <p class="section-desc">Use your points for bills, transport, coupons, and government services</p>
+            </div>
+        </div>
+
+        <div class="usage-options-grid-enhanced">
+            <!-- Electricity Payment -->
+            <div class="usage-card-enhanced electricity">
+                <div class="usage-card-header">
+                    <div class="usage-icon">
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <span class="usage-badge">100 pts = ₹10</span>
+                </div>
+                <div class="usage-card-body">
+                    <h3>Electricity Bills</h3>
+                    <p>Pay your monthly electricity bills using reward points</p>
+                    <div class="usage-stats">
+                        <div class="usage-stat">
+                            <i data-lucide="trending-down"></i>
+                            <span>Save up to 20%</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="usage-btn-enhanced" ng-click="vm.openRedeemDialog('electricity')">
+                    <span>Use Points</span>
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Water Payment -->
+            <div class="usage-card-enhanced water">
+                <div class="usage-card-header">
+                    <div class="usage-icon">
+                        <i data-lucide="droplet"></i>
+                    </div>
+                    <span class="usage-badge">100 pts = ₹8</span>
+                </div>
+                <div class="usage-card-body">
+                    <h3>Water Bills</h3>
+                    <p>Pay your monthly water charges with reward points</p>
+                    <div class="usage-stats">
+                        <div class="usage-stat">
+                            <i data-lucide="droplets"></i>
+                            <span>Instant credit</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="usage-btn-enhanced" ng-click="vm.openRedeemDialog('water')">
+                    <span>Use Points</span>
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- DMRC/Public Transport -->
+            <div class="usage-card-enhanced transport">
+                <div class="usage-card-header">
+                    <div class="usage-icon">
+                        <i data-lucide="train"></i>
+                    </div>
+                    <span class="usage-badge">100 pts = ₹12</span>
+                </div>
+                <div class="usage-card-body">
+                    <h3>DMRC & Public Transport</h3>
+                    <p>Recharge metro cards, bus passes, and travel vouchers</p>
+                    <div class="usage-stats">
+                        <div class="usage-stat">
+                            <i data-lucide="ticket"></i>
+                            <span>All metro lines</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="usage-btn-enhanced" ng-click="vm.openRedeemDialog('transport')">
+                    <span>Recharge Now</span>
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Coupons & Discounts -->
+            <div class="usage-card-enhanced coupons">
+                <div class="usage-card-header">
+                    <div class="usage-icon">
+                        <i data-lucide="gift"></i>
+                    </div>
+                    <span class="usage-badge popular">Popular</span>
+                </div>
+                <div class="usage-card-body">
+                    <h3>Coupons & Discounts</h3>
+                    <p>Unlock exclusive deals, shopping vouchers, and discounts</p>
+                    <div class="usage-stats">
+                        <div class="usage-stat">
+                            <i data-lucide="percent"></i>
+                            <span>Up to 50% off</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="usage-btn-enhanced" ng-click="vm.openRedeemDialog('coupons')">
+                    <span>Browse Coupons</span>
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Government Apps & Services -->
+            <div class="usage-card-enhanced govapps">
+                <div class="usage-card-header">
+                    <div class="usage-icon">
+                        <i data-lucide="landmark"></i>
+                    </div>
+                    <span class="usage-badge">Gov Services</span>
+                </div>
+                <div class="usage-card-body">
+                    <h3>Government Services</h3>
+                    <p>Use for municipal tax, parking, and other gov applications</p>
+                    <div class="usage-stats">
+                        <div class="usage-stat">
+                            <i data-lucide="shield-check"></i>
+                            <span>Verified services</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="usage-btn-enhanced" ng-click="vm.openRedeemDialog('govapps')">
+                    <span>Explore Services</span>
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Charity Donation -->
+            <div class="usage-card-enhanced charity">
+                <div class="usage-card-header">
+                    <div class="usage-icon">
+                        <i data-lucide="heart"></i>
+                    </div>
+                    <span class="usage-badge">Give Back</span>
+                </div>
+                <div class="usage-card-body">
+                    <h3>Donate to Charity</h3>
+                    <p>Contribute your points to community welfare programs</p>
+                    <div class="usage-stats">
+                        <div class="usage-stat">
+                            <i data-lucide="users"></i>
+                            <span>Help others</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="usage-btn-enhanced" ng-click="vm.openRedeemDialog('charity')">
+                    <span>Donate Points</span>
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Transaction History Section -->
+    <section class="wallet-section">
+        <div class="section-header-enhanced">
+            <div>
+                <h2 class="section-title">
+                    <span class="section-icon">📊</span>
+                    Transaction History & E-Statement
+                </h2>
+                <p class="section-desc">View all your point transactions and download statements</p>
+            </div>
+            <button class="btn-export" ng-click="vm.exportStatement()">
+                <i data-lucide="download"></i>
+                <span>Download E-Statement</span>
+            </button>
+        </div>
+
+        <div class="transaction-filters">
+            <select class="filter-select-enhanced" ng-model="vm.selectedMonth" ng-change="vm.onMonthChange()">
+                <option value="current">Current Month (March 2026)</option>
+                <option value="prev1">February 2026</option>
+                <option value="prev2">January 2026</option>
+                <option value="prev3">December 2025</option>
+                <option value="prev6">Last 6 Months</option>
+                <option value="all">All Time</option>
+            </select>
+            <div class="filter-chips">
+                <button class="filter-chip" ng-class="{active: vm.transactionFilter === 'all'}" 
+                        ng-click="vm.filterTransactions('all')">
+                    All
+                </button>
+                <button class="filter-chip" ng-class="{active: vm.transactionFilter === 'earned'}" 
+                        ng-click="vm.filterTransactions('earned')">
+                    <i data-lucide="plus"></i>
+                    Earned
+                </button>
+                <button class="filter-chip" ng-class="{active: vm.transactionFilter === 'used'}" 
+                        ng-click="vm.filterTransactions('used')">
+                    <i data-lucide="minus"></i>
+                    Used
+                </button>
+            </div>
+        </div>
+
+        <!-- Transaction Timeline -->
+        <div class="transactions-timeline">
+            <div class="transaction-item-enhanced" ng-repeat="transaction in vm.filteredTransactions">
+                <div class="transaction-icon-wrapper" ng-class="transaction.type">
+                    <div class="transaction-icon" ng-class="transaction.type">
+                        <i ng-attr-data-lucide="{{transaction.icon}}"></i>
+                    </div>
+                </div>
+                <div class="transaction-content-card">
+                    <div class="transaction-header">
+                        <h4>{{transaction.title}}</h4>
+                        <div class="transaction-amount" ng-class="transaction.type">
+                            <span class="amount-sign">{{transaction.type === 'earned' ? '+' : '-'}}</span>
+                            <span class="amount-value">{{transaction.points}}</span>
+                            <span class="amount-label">pts</span>
+                        </div>
+                    </div>
+                    <p class="transaction-description">{{transaction.description}}</p>
+                    <div class="transaction-footer">
+                        <span class="transaction-date">
+                            <i data-lucide="calendar"></i>
+                            {{transaction.date | date : 'MMM dd, yyyy'}}
+                        </span>
+                        <span class="transaction-time">
+                            <i data-lucide="clock"></i>
+                            {{transaction.date | date : 'shortTime'}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" ng-if="vm.filteredTransactions.length === 0">
+                <div class="empty-state-icon">
+                    <i data-lucide="inbox"></i>
+                </div>
+                <h4>No Transactions Found</h4>
+                <p>No transactions match your selected filters</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Points Usage Breakdown -->
+    <section class="wallet-section">
+        <div class="section-header-enhanced">
+            <div>
+                <h2 class="section-title">
+                    <span class="section-icon">📈</span>
+                    Points Usage Breakdown
+                </h2>
+                <p class="section-desc">See where your points are being utilized</p>
+            </div>
+        </div>
+
+        <div class="breakdown-grid">
+            <!-- Electricity Usage -->
+            <div class="breakdown-card">
+                <div class="breakdown-circle-wrapper">
+                    <svg class="breakdown-circle-svg" viewBox="0 0 160 160">
+                        <circle cx="80" cy="80" r="70" class="circle-bg"></circle>
+                        <circle cx="80" cy="80" r="70" class="circle-progress electricity-progress" 
+                                style="stroke-dasharray: 439.82; stroke-dashoffset: {{439.82 - (439.82 * 0.32)}};"></circle>
+                    </svg>
+                    <div class="breakdown-circle-content">
+                        <div class="breakdown-icon electricity">
+                            <i data-lucide="zap"></i>
+                        </div>
+                        <div class="breakdown-percentage">32%</div>
+                    </div>
+                </div>
+                <div class="breakdown-info">
+                    <h4>Electricity Bills</h4>
+                    <p class="breakdown-amount">1,280 points</p>
+                    <p class="breakdown-value">≈ ₹128</p>
+                </div>
+            </div>
+
+            <!-- Transport Usage -->
+            <div class="breakdown-card">
+                <div class="breakdown-circle-wrapper">
+                    <svg class="breakdown-circle-svg" viewBox="0 0 160 160">
+                        <circle cx="80" cy="80" r="70" class="circle-bg"></circle>
+                        <circle cx="80" cy="80" r="70" class="circle-progress transport-progress" 
+                                style="stroke-dasharray: 439.82; stroke-dashoffset: {{439.82 - (439.82 * 0.28)}};"></circle>
+                    </svg>
+                    <div class="breakdown-circle-content">
+                        <div class="breakdown-icon transport">
+                            <i data-lucide="train"></i>
+                        </div>
+                        <div class="breakdown-percentage">28%</div>
+                    </div>
+                </div>
+                <div class="breakdown-info">
+                    <h4>Public Transport</h4>
+                    <p class="breakdown-amount">1,120 points</p>
+                    <p class="breakdown-value">≈ ₹134</p>
+                </div>
+            </div>
+
+            <!-- Water Usage -->
+            <div class="breakdown-card">
+                <div class="breakdown-circle-wrapper">
+                    <svg class="breakdown-circle-svg" viewBox="0 0 160 160">
+                        <circle cx="80" cy="80" r="70" class="circle-bg"></circle>
+                        <circle cx="80" cy="80" r="70" class="circle-progress water-progress" 
+                                style="stroke-dasharray: 439.82; stroke-dashoffset: {{439.82 - (439.82 * 0.18)}};"></circle>
+                    </svg>
+                    <div class="breakdown-circle-content">
+                        <div class="breakdown-icon water">
+                            <i data-lucide="droplet"></i>
+                        </div>
+                        <div class="breakdown-percentage">18%</div>
+                    </div>
+                </div>
+                <div class="breakdown-info">
+                    <h4>Water Bills</h4>
+                    <p class="breakdown-amount">720 points</p>
+                    <p class="breakdown-value">≈ ₹58</p>
+                </div>
+            </div>
+
+            <!-- Coupons & Others -->
+            <div class="breakdown-card">
+                <div class="breakdown-circle-wrapper">
+                    <svg class="breakdown-circle-svg" viewBox="0 0 160 160">
+                        <circle cx="80" cy="80" r="70" class="circle-bg"></circle>
+                        <circle cx="80" cy="80" r="70" class="circle-progress rewards-progress" 
+                                style="stroke-dasharray: 439.82; stroke-dashoffset: {{439.82 - (439.82 * 0.22)}};"></circle>
+                    </svg>
+                    <div class="breakdown-circle-content">
+                        <div class="breakdown-icon rewards">
+                            <i data-lucide="gift"></i>
+                        </div>
+                        <div class="breakdown-percentage">22%</div>
+                    </div>
+                </div>
+                <div class="breakdown-info">
+                    <h4>Coupons & Others</h4>
+                    <p class="breakdown-amount">880 points</p>
+                    <p class="breakdown-value">≈ ₹88</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Earn Points -->
+    <section class="wallet-section">
+        <div class="section-header-enhanced">
+            <div>
+                <h2 class="section-title">
+                    <span class="section-icon">⭐</span>
+                    How to Earn More Points
+                </h2>
+                <p class="section-desc">Complete these activities to earn reward points</p>
+            </div>
+        </div>
+
+        <div class="earn-methods-grid-enhanced">
+            <div class="earn-card-enhanced">
+                <div class="earn-icon-badge">📱</div>
+                <h4>Report Issues</h4>
+                <p>Report water leaks, waste issues, or service problems in your area</p>
+                <div class="earn-footer">
+                    <span class="points-badge-enhanced">+50 points</span>
+                    <span class="earn-frequency">Per report</span>
+                </div>
+            </div>
+
+            <div class="earn-card-enhanced">
+                <div class="earn-icon-badge">♻️</div>
+                <h4>Waste Segregation</h4>
+                <p>Properly segregate and dispose of waste according to guidelines</p>
+                <div class="earn-footer">
+                    <span class="points-badge-enhanced">+100 points</span>
+                    <span class="earn-frequency">Monthly</span>
+                </div>
+            </div>
+
+            <div class="earn-card-enhanced">
+                <div class="earn-icon-badge">💡</div>
+                <h4>Energy Conservation</h4>
+                <p>Keep your electricity usage below the ward average</p>
+                <div class="earn-footer">
+                    <span class="points-badge-enhanced">+75 points</span>
+                    <span class="earn-frequency">Monthly</span>
+                </div>
+            </div>
+
+            <div class="earn-card-enhanced">
+                <div class="earn-icon-badge">💧</div>
+                <h4>Water Saving</h4>
+                <p>Conserve water and maintain usage below threshold</p>
+                <div class="earn-footer">
+                    <span class="points-badge-enhanced">+75 points</span>
+                    <span class="earn-frequency">Monthly</span>
+                </div>
+            </div>
+
+            <div class="earn-card-enhanced">
+                <div class="earn-icon-badge">🤝</div>
+                <h4>Community Participation</h4>
+                <p>Attend RWA meetings and community events</p>
+                <div class="earn-footer">
+                    <span class="points-badge-enhanced">+150 points</span>
+                    <span class="earn-frequency">Per event</span>
+                </div>
+            </div>
+
+            <div class="earn-card-enhanced">
+                <div class="earn-icon-badge">✅</div>
+                <h4>On-Time Payments</h4>
+                <p>Pay all utility bills before the due date</p>
+                <div class="earn-footer">
+                    <span class="points-badge-enhanced">+25 points</span>
+                    <span class="earn-frequency">Per bill</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            setTimeout(function() {
+                lucide.createIcons();
+            }, 100);
+        }
+    </script>
+</div>

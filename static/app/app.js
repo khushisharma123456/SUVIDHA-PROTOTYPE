@@ -18,10 +18,7 @@
                     requireAuth: true
                 })
                 .when('/utilities', {
-                    templateUrl: '/static/app/views/utilities.html',
-                    controller: 'UtilitiesController',
-                    controllerAs: 'vm',
-                    requireAuth: true
+                    redirectTo: '/dashboard'
                 })
                 .when('/insights', {
                     templateUrl: '/static/app/views/insights.html',
@@ -62,6 +59,12 @@
                 .when('/waste-management', {
                     templateUrl: '/static/app/views/waste-management.html',
                     controller: 'WasteManagementController',
+                    controllerAs: 'vm',
+                    requireAuth: true
+                })
+                .when('/wallet', {
+                    templateUrl: '/static/app/views/wallet.html',
+                    controller: 'walletController',
                     controllerAs: 'vm',
                     requireAuth: true
                 })

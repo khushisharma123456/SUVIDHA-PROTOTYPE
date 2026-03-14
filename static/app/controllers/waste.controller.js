@@ -15,16 +15,17 @@
 
         // User Data
         vm.userData = {
-            name: 'User',
+            username: $rootScope.currentUser?.name || 'Citizen',
+            name: $rootScope.currentUser?.name || 'User',
             address: ''
         };
 
         // Waste Status Data
         vm.wasteStatus = {
-            lastPickup: 'Today, 10:30 AM',
-            wasteType: 'Segregated ✓',
+            lastPickup: 'Today',
+            wasteType: 'Segregated',
             pointsEarned: 15,
-            nextScheduledPickup: 'Tomorrow, 10:00 AM',
+            nextScheduledPickup: 'Tomorrow',
             binStatus: 'Normal'
         };
 
@@ -190,21 +191,8 @@
             vm.showLiveService = false;
         };
 
-        // Refresh Location
-        vm.refreshLocation = function () {
-            vm.isRefreshing = true;
-
-            $timeout(function () {
-                // Simulate location update
-                var distances = ['1.2 km', '1.0 km', '0.8 km'];
-                var randomDistance = distances[Math.floor(Math.random() * distances.length)];
-                vm.liveServiceData.distance = randomDistance;
-
-                vm.liveServiceData.eta = (Math.floor(Math.random() * 5) + 3) + '-' + (Math.floor(Math.random() * 5) + 8) + ' minutes';
-
-                vm.isRefreshing = false;
-            }, 1500);
-        };
+        // Waste validation now happens automatically from backend when driver confirms collection
+        // No manual validation button for citizens
 
         // Analyze Waste Photo with AI
         vm.analyzeWastePhoto = function () {

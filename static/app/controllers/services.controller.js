@@ -14,6 +14,11 @@
         vm.serviceMode = 'complaint';
         vm.serviceFilter = 'elec';
 
+        // User Data
+        vm.userData = {
+            username: $rootScope.currentUser?.name || 'Citizen'
+        };
+
         // Header Stats
         vm.stats = {
             activeRequests: 2,
@@ -200,7 +205,6 @@
         vm.successRate = 80;
         vm.historyInsight = 'Your complaints are typically resolved 20% faster than ward average.';
 
-        // Methods
         vm.toggleServiceMode = toggleServiceMode;
         vm.quickReport = quickReport;
         vm.submitComplaint = submitComplaint;
@@ -214,6 +218,8 @@
         vm.viewFAQ = viewFAQ;
         vm.viewGrievanceCell = viewGrievanceCell;
         vm.downloadGuide = downloadGuide;
+        vm.useAiHelper = useAiHelper;
+        vm.openMapPicker = openMapPicker;
 
         function init() {
             $timeout(function() {
@@ -272,6 +278,49 @@
                 vm.identifierLabel = 'BP Number';
                 vm.slaTime = 'Emergency: 2-4 hours, Others: 3-5 days';
             }
+        }
+
+        function useAiHelper() {
+            if (!vm.aiPrompt) return;
+            
+            var text = vm.aiPrompt.toLowerCase();
+            vm.priority = 'medium'; 
+            
+            if (text.includes('street light') || text.includes('power') || text.includes('electricity')) {
+                vm.selectedUtility = 'electricity';
+                vm.updateCategories();
+                
+                if (text.includes('street light')) vm.category = 'Street Light';
+                else if (text.includes('outage') || text.includes('no power')) vm.category = 'Power Outage';
+                else if (text.includes('bill')) vm.category = 'Billing Issue';
+                
+                if (text.includes('spark') || text.includes('fire')) vm.priority = 'high';
+            } 
+            else if (text.includes('water') || text.includes('pipe') || text.includes('leak')) {
+                vm.selectedUtility = 'water';
+                vm.updateCategories();
+                vm.category = text.includes('leak') ? 'Leakage' : 'Supply Issue';
+                
+                if (text.includes('flood') || text.includes('burst')) vm.priority = 'high';
+            }
+            else if (text.includes('gas') || text.includes('smell')) {
+                vm.selectedUtility = 'gas';
+                vm.updateCategories();
+                vm.category = 'Gas Leakage';
+                vm.priority = 'high';
+            }
+            
+            if (text.includes('house') || text.includes('my home')) vm.impactScope = 'Individual House';
+            else if (text.includes('street') || text.includes('road')) vm.impactScope = 'Entire Street';
+            
+            vm.description = vm.aiPrompt;
+            vm.location = 'Kalkaji, New Delhi'; // Mocked
+            
+            $rootScope.showDialog('AI Assistant', 'I have identified the utility, category, and priority based on your description. Please review and submit.', 'success');
+        }
+
+        function openMapPicker() {
+            $rootScope.showDialog('Select Location', 'A map selection modal would open here to let you pin the exact location.', 'info');
         }
 
         function submitComplaint() {

@@ -1,15 +1,15 @@
 <div class="main-content">
     <div class="dashboard-container">
-        <!-- Services Header with Stats -->
-        <div class="services-header" style="text-align:center;">
-            <div class="header-content">
-                <h1>Services & Grievances</h1>
-                <p>Single window for complaints and service requests</p>
+        <!-- Welcome Header -->
+        <div class="page-header-welcome">
+            <div class="welcome-left">
+                <h1 class="welcome-title">Welcome, {{vm.userData.username || 'Citizen'}} 👋</h1>
+                <p class="welcome-subtitle">Services & Grievances - Single window for complaints and service requests</p>
             </div>
         </div>
 
-        <!-- Stats Grid - Admin Pattern -->
-        <div class="stats-grid">
+        <!-- Stats Grid - Improved spacing -->
+        <div class="stats-grid" style="gap: 1.5rem; margin-bottom: 2rem;">
             <div class="stat-card primary">
                 <div class="stat-icon-box blue">
                     <i data-lucide="ticket"></i>
@@ -59,41 +59,29 @@
             </div>
             <div class="card-body">
                 <div class="quick-actions-grid">
-                    <button class="quick-action-card alert" ng-click="vm.quickReport('power_theft')">
-                        <div class="action-icon">
-                            <i data-lucide="alert-triangle"></i>
-                        </div>
-                        <span>Report Power Theft</span>
-                    </button>
                     <button class="quick-action-card warning" ng-click="vm.quickReport('power_outage')">
                         <div class="action-icon">
                             <i data-lucide="zap-off"></i>
                         </div>
                         <span>Power Outage</span>
                     </button>
-                    <button class="quick-action-card" ng-click="vm.quickReport('street_light')">
+                    <button class="quick-action-card info" ng-click="vm.quickReport('street_light')">
                         <div class="action-icon">
                             <i data-lucide="lightbulb"></i>
                         </div>
                         <span>Street Light</span>
                     </button>
-                    <button class="quick-action-card" ng-click="vm.quickReport('water_supply')">
+                    <button class="quick-action-card info" ng-click="vm.quickReport('water_supply')">
                         <div class="action-icon">
                             <i data-lucide="droplet"></i>
                         </div>
                         <span>Water Supply</span>
                     </button>
-                    <button class="quick-action-card" ng-click="vm.quickReport('gas_leakage')">
+                    <button class="quick-action-card alert" ng-click="vm.quickReport('gas_leakage')">
                         <div class="action-icon">
                             <i data-lucide="flame"></i>
                         </div>
                         <span>Gas Leakage</span>
-                    </button>
-                    <button class="quick-action-card" ng-click="vm.quickReport('bill_issue')">
-                        <div class="action-icon">
-                            <i data-lucide="file-text"></i>
-                        </div>
-                        <span>Bill Issue</span>
                     </button>
                 </div>
             </div>
@@ -122,13 +110,32 @@
 
         <!-- Complaint Section -->
         <div ng-show="vm.serviceMode === 'complaint'" class="service-section">
-            <div class="content-grid enhanced two-column">
-                <div class="card enhanced form-card">
+            <div class="content-grid enhanced two-column" style="align-items: stretch;">
+                <div class="card enhanced form-card" style="display: flex; flex-direction: column; height: 100%;">
                     <div class="card-header">
                         <h3><span class="icon">📝</span> Lodge a Grievance</h3>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="flex-grow: 1;">
                         <form id="complaintForm" ng-submit="vm.submitComplaint()">
+                            <!-- AI Helper box -->
+                            <div class="ai-helper-box" style="background: linear-gradient(135deg, #f0fdfa, #ccfbf1); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #99f6e4;">
+                                <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                                    <div style="background: white; padding: 0.5rem; border-radius: 8px; color: #0d9488; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                        <i data-lucide="sparkles"></i>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <h4 style="margin: 0 0 0.25rem 0; color: #115e59; font-size: 0.95rem; font-weight: 600;">AI Complaint Helper</h4>
+                                        <p style="margin: 0 0 0.75rem 0; color: #0f766e; font-size: 0.8rem;">Describe your problem and let AI automatically select the utility, category, and priority details.</p>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <input type="text" ng-model="vm.aiPrompt" placeholder='e.g., "Street light not working near my house"' class="form-control enhanced" style="background: white; border-color: #5eead4; margin-bottom: 0;">
+                                            <button type="button" class="btn-primary" ng-click="vm.useAiHelper()" style="background: #0d9488; border: none; padding: 0 1rem; border-radius: 8px; flex-shrink: 0;">
+                                                <i data-lucide="wand-2" style="width: 16px; height: 16px;"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-group enhanced">
                                 <label class="form-label">
                                     <i data-lucide="zap"></i>
@@ -165,6 +172,32 @@
                             </div>
 
                             <div ng-show="vm.category">
+                                <div class="form-row">
+                                    <div class="form-group enhanced">
+                                        <label class="form-label">
+                                            <i data-lucide="map-pin"></i>
+                                            Location / Address
+                                        </label>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <input type="text" class="form-control enhanced" ng-model="vm.location" placeholder="Enter complete address">
+                                            <button type="button" class="btn-secondary" style="flex-shrink: 0; padding: 0 0.75rem;" title="Pin Location on Map" ng-click="vm.openMapPicker()">
+                                                <i data-lucide="map"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group enhanced">
+                                        <label class="form-label">
+                                            <i data-lucide="alert-circle"></i>
+                                            Priority Level
+                                        </label>
+                                        <select class="form-control enhanced" ng-model="vm.priority">
+                                            <option value="">-- Select Priority --</option>
+                                            <option value="low">Low (Routine)</option>
+                                            <option value="medium">Medium (Moderate Issue)</option>
+                                            <option value="high">High (Emergency/Danger)</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="form-row">
                                     <div class="form-group enhanced">
                                         <label class="form-label">
@@ -238,11 +271,11 @@
                 </div>
 
                 <!-- Outage Information Card -->
-                <div class="card enhanced outage-card">
+                <div class="card enhanced outage-card" style="display: flex; flex-direction: column; height: 100%;">
                     <div class="card-header">
                         <h3><span class="icon">⚠️</span> Outage & Maintenance Info</h3>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="flex-grow: 1;">
                         <div class="outage-items">
                             <div class="outage-item planned">
                                 <div class="outage-badge planned">
@@ -273,6 +306,8 @@
                         </a>
                     </div>
                 </div>
+            </div>
+            
             </div>
         </div>
         <!-- Apply for Service Section -->
@@ -351,157 +386,252 @@
 
         <!-- Track Requests Section -->
         <div ng-show="vm.serviceMode === 'track'" class="service-section">
-            <div class="content-grid enhanced two-column">
-                <!-- Active Tickets -->
-                <div class="card enhanced">
-                    <div class="card-header">
-                        <h3><span class="icon">🔄</span> Active Requests</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="tickets-list">
-                            <div ng-repeat="ticket in vm.activeTickets" class="ticket-card">
-                                <div class="ticket-header-row">
-                                    <div class="ticket-info">
-                                        <span class="ticket-id">{{ticket.id}}</span>
-                                        <span class="ticket-badge"
-                                            ng-class="ticket.statusClass">{{ticket.status}}</span>
-                                    </div>
-                                    <button class="ticket-menu-btn" ng-click="vm.toggleTicketMenu(ticket)">
-                                        <i data-lucide="more-vertical"></i>
-                                    </button>
+            <!-- Track Your Requests - Full Width -->
+            <div class="card enhanced" style="margin-bottom: 1.5rem;">
+                <div class="card-header">
+                    <h3><span class="icon">📋</span> Track Your Requests</h3>
+                    <p class="card-subtitle" style="margin-top: 0.25rem; font-size: 0.85rem; color: var(--text-secondary);">View detailed status and updates for all your service requests</p>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <!-- Request Card 1 -->
+                    <div style="border-bottom: 1px solid var(--gray-200); padding: 1.5rem;">
+                        <!-- Request Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.75rem; font-weight: 700; color: #2563eb; letter-spacing: 0.5px;">#REQ-2024-001</span>
+                                    <span style="padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.7rem; font-weight: 700; color: #fff; background: #f59e0b;">IN PROGRESS</span>
                                 </div>
-                                <h4 class="ticket-title">{{ticket.title}}</h4>
-                                <p class="ticket-desc">{{ticket.category}} • {{ticket.utility}}</p>
+                                <h4 style="margin: 0 0 0.25rem 0; font-size: 1.05rem; font-weight: 700; color: #111827;">Power Outage - Sector 12</h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: #6b7280;">Power Outage • Electricity</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280;">Days ago</div>
+                                <div style="font-size: 1.25rem; font-weight: 700; color: #111827;">2</div>
+                            </div>
+                        </div>
 
-                                <div class="ticket-timeline">
-                                    <div ng-repeat="step in ticket.timeline" class="timeline-step"
-                                        ng-class="step.state">
-                                        <div class="timeline-dot"></div>
-                                        <div class="timeline-content">
-                                            <strong>{{step.label}}</strong>
-                                            <small ng-if="step.date">{{step.date}}</small>
+                        <!-- Timeline -->
+                        <div style="margin: 1.5rem 0; padding-left: 1rem;">
+                            <div style="position: relative;">
+                                <!-- Complaint Filed -->
+                                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                                    <div style="position: relative; top: 4px;">
+                                        <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 3px solid #fff; box-shadow: 0 0 0 2px #10b981;"></div>
+                                    </div>
+                                    <div>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">Complaint Filed</h5>
+                                        <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">2 Feb, 10:30 AM</p>
+                                    </div>
+                                </div>
+
+                                <!-- Acknowledged -->
+                                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                                    <div style="position: relative; top: 4px;">
+                                        <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 3px solid #fff; box-shadow: 0 0 0 2px #10b981;"></div>
+                                    </div>
+                                    <div>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">Acknowledged by Vendor</h5>
+                                        <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">2 Feb, 11:00 AM</p>
+                                    </div>
+                                </div>
+
+                                <!-- Assigned -->
+                                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                                    <div style="position: relative; top: 4px;">
+                                        <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 3px solid #fff; box-shadow: 0 0 0 2px #10b981;"></div>
+                                    </div>
+                                    <div>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">Field Team Assigned</h5>
+                                        <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">2 Feb, 2:00 PM</p>
+                                    </div>
+                                </div>
+
+                                <!-- Current Status -->
+                                <div style="display: flex; gap: 1rem;">
+                                    <div style="position: relative; top: 4px;">
+                                        <div style="width: 14px; height: 14px; border-radius: 50%; background: #f59e0b; border: 3px solid #fff; box-shadow: 0 0 0 2px #f59e0b;"></div>
+                                    </div>
+                                    <div>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">In Resolution</h5>
+                                        <div style="margin-top: 0.5rem; padding: 0.75rem; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px;">
+                                            <p style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #166534;">Vendor Update</p>
+                                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: #166534;">Technician en route to location</p>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="vendor-remarks-box" ng-if="ticket.remarks">
-                                    <div class="remarks-icon">
-                                        <i data-lucide="message-circle"></i>
+                        <!-- Action Buttons -->
+                        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                            <button ng-click="vm.viewTicketDetails({id: '#REQ-2024-001'})" style="flex: 1; padding: 0.6rem; border: 1px solid var(--gray-300); background: white; border-radius: 8px; color: #2563eb; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;">
+                                <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                View Details
+                            </button>
+                            <button ng-click="vm.escalateTicket({id: '#REQ-2024-001'})" style="flex: 1; padding: 0.6rem; border: 1px solid var(--gray-300); background: white; border-radius: 8px; color: #ef4444; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;">
+                                <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
+                                Escalate
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Request Card 2 -->
+                    <div style="padding: 1.5rem;">
+                        <!-- Request Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.75rem; font-weight: 700; color: #2563eb; letter-spacing: 0.5px;">#REQ-2024-002</span>
+                                    <span style="padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.7rem; font-weight: 700; color: #fff; background: #f59e0b;">PENDING</span>
+                                </div>
+                                <h4 style="margin: 0 0 0.25rem 0; font-size: 1.05rem; font-weight: 700; color: #111827;">Water Supply Irregular</h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: #6b7280;">Water Supply • Water</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280;">Days ago</div>
+                                <div style="font-size: 1.25rem; font-weight: 700; color: #111827;">5</div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div style="margin: 1.5rem 0; padding-left: 1rem;">
+                            <div style="position: relative;">
+                                <!-- Complaint Filed -->
+                                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                                    <div style="position: relative; top: 4px;">
+                                        <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 3px solid #fff; box-shadow: 0 0 0 2px #10b981;"></div>
                                     </div>
-                                    <div class="remarks-content">
-                                        <strong>Vendor Update</strong>
-                                        <p>{{ticket.remarks}}</p>
+                                    <div>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">Complaint Filed</h5>
+                                        <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">5 Feb, 9:00 AM</p>
                                     </div>
                                 </div>
 
-                                <div class="ticket-actions">
-                                    <button class="btn-secondary" ng-click="vm.viewTicketDetails(ticket)">
-                                        <i data-lucide="eye"></i>
-                                        <span>View Details</span>
-                                    </button>
-                                    <button class="btn-text-danger" ng-click="vm.escalateTicket(ticket)">
-                                        <i data-lucide="alert-triangle"></i>
-                                        <span>Escalate</span>
-                                    </button>
+                                <!-- Pending -->
+                                <div style="display: flex; gap: 1rem;">
+                                    <div style="position: relative; top: 4px;">
+                                        <div style="width: 14px; height: 14px; border-radius: 50%; background: #d1d5db; border: 3px solid #fff; box-shadow: 0 0 0 2px #d1d5db;"></div>
+                                    </div>
+                                    <div>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #6b7280;">Awaiting Vendor Response</h5>
+                                        <p style="margin: 0; font-size: 0.8rem; color: #9ca3af;">Typically responds within 24 hours</p>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div ng-if="vm.activeTickets.length === 0" class="empty-state">
-                                <i data-lucide="inbox"></i>
-                                <p>No active requests</p>
+                        <!-- Action Buttons -->
+                        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                            <button ng-click="vm.viewTicketDetails({id: '#REQ-2024-002'})" style="flex: 1; padding: 0.6rem; border: 1px solid var(--gray-300); background: white; border-radius: 8px; color: #2563eb; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;">
+                                <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                View Details
+                            </button>
+                            <button ng-click="vm.escalateTicket({id: '#REQ-2024-002'})" style="flex: 1; padding: 0.6rem; border: 1px solid var(--gray-300); background: white; border-radius: 8px; color: #ef4444; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;">
+                                <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
+                                Escalate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats, Help, Contacts in One Row -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+                <!-- Your Statistics - Compact -->
+                <div class="card enhanced">
+                    <div class="card-header" style="padding: 1rem;">
+                        <h3 style="margin: 0; font-size: 1rem;"><span class="icon">📊</span> Your Statistics</h3>
+                    </div>
+                    <div class="card-body" style="padding: 1rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background: var(--gray-50); border-radius: 8px;">
+                                <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i data-lucide="file-text" style="width: 14px; height: 14px; color: #3b82f6;"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Total Complaints</div>
+                                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">{{vm.complaintsCount}}</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background: var(--gray-50); border-radius: 8px;">
+                                <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i data-lucide="check-circle" style="width: 14px; height: 14px; color: #10b981;"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Resolved</div>
+                                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">{{vm.resolvedCount}}</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background: var(--gray-50); border-radius: 8px;">
+                                <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(245, 158, 11, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i data-lucide="clock" style="width: 14px; height: 14px; color: #f59e0b;"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Avg Resolution</div>
+                                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">{{vm.avgResolutionTime}}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- History & Analytics -->
-                <div>
-                    <div class="card enhanced">
-                        <div class="card-header">
-                            <h3><span class="icon">📊</span> Your Statistics</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="stats-grid">
-                                <div class="stat-box">
-                                    <div class="stat-icon">
-                                        <i data-lucide="file-text"></i>
-                                    </div>
-                                    <div class="stat-details">
-                                        <span class="stat-value">{{vm.complaintsCount}}</span>
-                                        <span class="stat-label">Total Complaints</span>
-                                        <span class="stat-period">Last 12 months</span>
-                                    </div>
-                                </div>
-                                <div class="stat-box">
-                                    <div class="stat-icon success">
-                                        <i data-lucide="check-circle"></i>
-                                    </div>
-                                    <div class="stat-details">
-                                        <span class="stat-value">{{vm.resolvedCount}}</span>
-                                        <span class="stat-label">Resolved</span>
-                                        <span class="stat-period">Success rate: {{vm.successRate}}%</span>
-                                    </div>
-                                </div>
-                                <div class="stat-box">
-                                    <div class="stat-icon warning">
-                                        <i data-lucide="clock"></i>
-                                    </div>
-                                    <div class="stat-details">
-                                        <span class="stat-value">{{vm.avgResolutionTime}}</span>
-                                        <span class="stat-label">Avg Resolution</span>
-                                        <span class="stat-period">Days to resolve</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="insight-box" ng-if="vm.historyInsight">
-                                <div class="insight-icon">
-                                    <i data-lucide="lightbulb"></i>
-                                </div>
-                                <div class="insight-content">
-                                    <strong>Insight</strong>
-                                    <p>{{vm.historyInsight}}</p>
-                                </div>
-                            </div>
+                <!-- Need Help - Compact -->
+                <div class="card enhanced">
+                    <div class="card-header" style="padding: 1rem;">
+                        <h3 style="margin: 0; font-size: 1rem;"><span class="icon">❓</span> Need Help?</h3>
+                    </div>
+                    <div class="card-body" style="padding: 1rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                            <a href="#" ng-click="vm.viewFAQ()" style="padding: 0.6rem; background: var(--gray-50); border-radius: 8px; text-decoration: none; color: var(--primary-blue); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                                <i data-lucide="book-open" style="width: 14px; height: 14px;"></i>
+                                <span>FAQ</span>
+                            </a>
+                            <a href="#" ng-click="vm.viewGrievanceCell()" style="padding: 0.6rem; background: var(--gray-50); border-radius: 8px; text-decoration: none; color: var(--primary-blue); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                                <i data-lucide="phone" style="width: 14px; height: 14px;"></i>
+                                <span>Grievance Cell</span>
+                            </a>
+                            <a href="#" ng-click="vm.downloadGuide()" style="padding: 0.6rem; background: var(--gray-50); border-radius: 8px; text-decoration: none; color: var(--primary-blue); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                                <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                                <span>User Guide</span>
+                            </a>
                         </div>
                     </div>
+                </div>
 
-                    <div class="card enhanced">
-                        <div class="card-header">
-                            <h3><span class="icon">❓</span> Need Help?</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-items">
-                                <a href="#" class="help-item" ng-click="vm.viewFAQ()">
-                                    <div class="help-icon">
-                                        <i data-lucide="book-open"></i>
-                                    </div>
-                                    <div class="help-content">
-                                        <strong>FAQ</strong>
-                                        <p>Common questions answered</p>
-                                    </div>
-                                    <i data-lucide="chevron-right"></i>
-                                </a>
-                                <a href="#" class="help-item" ng-click="vm.viewGrievanceCell()">
-                                    <div class="help-icon">
-                                        <i data-lucide="phone"></i>
-                                    </div>
-                                    <div class="help-content">
-                                        <strong>Grievance Cell</strong>
-                                        <p>Escalation contact details</p>
-                                    </div>
-                                    <i data-lucide="chevron-right"></i>
-                                </a>
-                                <a href="#" class="help-item" ng-click="vm.downloadGuide()">
-                                    <div class="help-icon">
-                                        <i data-lucide="download"></i>
-                                    </div>
-                                    <div class="help-content">
-                                        <strong>User Guide</strong>
-                                        <p>How to file complaints</p>
-                                    </div>
-                                    <i data-lucide="chevron-right"></i>
-                                </a>
+                <!-- Emergency Contacts - Compact -->
+                <div class="card enhanced">
+                    <div class="card-header" style="padding: 1rem;">
+                        <h3 style="margin: 0; font-size: 1rem;"><span class="icon">🚨</span> Emergency</h3>
+                    </div>
+                    <div class="card-body" style="padding: 1rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem; border-radius: 8px; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2);">
+                                <div style="width: 28px; height: 28px; border-radius: 6px; background: white; color: rgb(239, 68, 68); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 0.7rem; color: #6b7280;">Power</div>
+                                    <strong style="font-size: 0.95rem; color: #111827; display: block;">1912</strong>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem; border-radius: 8px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2);">
+                                <div style="width: 28px; height: 28px; border-radius: 6px; background: white; color: rgb(245, 158, 11); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i data-lucide="flame" style="width: 14px; height: 14px;"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 0.7rem; color: #6b7280;">Gas</div>
+                                    <strong style="font-size: 0.95rem; color: #111827; display: block;">1906</strong>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem; border-radius: 8px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2);">
+                                <div style="width: 28px; height: 28px; border-radius: 6px; background: white; color: rgb(59, 130, 246); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i data-lucide="droplet" style="width: 14px; height: 14px;"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 0.7rem; color: #6b7280;">Water</div>
+                                    <strong style="font-size: 0.95rem; color: #111827; display: block;">1916</strong>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -1,21 +1,21 @@
 <div class="main-content">
-    <!-- Records Page Header -->
-    <div class="records-header">
-        <div class="records-title-row">
-            <div>
-                <h1>Records & History</h1>
-                <p>Official meter readings and billing records</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-secondary" ng-click="vm.downloadCSV()">
-                    <i data-lucide="download"></i>
-                    Download CSV
-                </button>
-                <button class="btn btn-primary" ng-click="vm.exportPDF()">
-                    <i data-lucide="file-text"></i>
-                    Export PDF
-                </button>
-            </div>
+    <!-- Welcome Section -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="margin: 0 0 1.5rem 0; font-size: 1.25rem; font-weight: 600; color: #111827;">Welcome Citizen to your Records and Billing</h2>
+        
+        <div style="display: flex; gap: 0.75rem; width: 100%; flex-wrap: nowrap;">
+            <button class="btn btn-secondary" ng-click="vm.downloadCSV()" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1rem; color: #000; font-weight: 600; min-height: 44px;">
+                <i data-lucide="download"></i>
+                Download CSV
+            </button>
+            <button class="btn btn-secondary" ng-click="vm.exportPDF()" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1rem; color: #000; font-weight: 600; min-height: 44px;">
+                <i data-lucide="file-text"></i>
+                Export PDF
+            </button>
+            <button class="btn btn-primary" ng-click="vm.openPayBillDialog()" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1rem; color: #fff; font-weight: 600; min-height: 44px;">
+                <i data-lucide="credit-card"></i>
+                Pay Bill
+            </button>
         </div>
     </div>
 
@@ -215,6 +215,12 @@
                                 <button class="btn-icon-small" ng-click="vm.downloadBill(record)" title="Download">
                                     <i data-lucide="download"></i>
                                 </button>
+                                <button class="btn-icon-small btn-pay-small"
+                                    ng-if="record.status === 'Pending' || record.status === 'Overdue'"
+                                    ng-click="vm.payBill(record)" title="Pay Bill"
+                                    style="background: #10b981; color: #fff;">
+                                    <i data-lucide="credit-card"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -270,6 +276,13 @@
                     <button class="btn-icon-small" ng-click="vm.downloadBill(record)" title="Download">
                         <i data-lucide="download"></i>
                     </button>
+                    <button class="btn btn-sm"
+                        ng-if="record.status === 'Pending' || record.status === 'Overdue'"
+                        ng-click="vm.payBill(record)"
+                        style="background: #10b981; color: #fff; border: none; border-radius: 8px; padding: 0.4rem 0.75rem; font-size: 0.8rem; cursor: pointer; display:flex; align-items:center; gap:0.3rem;">
+                        <i data-lucide="credit-card"></i>
+                        Pay Bill
+                    </button>
                 </div>
             </div>
 
@@ -302,21 +315,58 @@
         <p class="source-note">All data is sourced from official meter readings and validated billing records</p>
     </div>
 
+    <!-- Pay Bill Dialog (Records) -->
+    <div class="modal-overlay" ng-show="vm.showPayBillDialog" ng-click="vm.closePayBillDialog()" style="z-index:9000;"></div>
+    <div class="utility-modal" ng-show="vm.showPayBillDialog" ng-class="{'active': vm.showPayBillDialog}" style="z-index:9001;">
+        <div class="modal-content" style="max-width:460px;">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-header-icon"><i data-lucide="credit-card"></i></div>
+                    <h2 class="modal-title">Pay Bill</h2>
+                </div>
+                <button class="modal-close" ng-click="vm.closePayBillDialog()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body" style="padding:1.5rem;">
+                <div class="pay-bill-summary">
+                    <div class="pay-bill-amount-large"><span class="currency-sym">₹</span>{{vm.payBillData.amount}}</div>
+                    <p class="pay-bill-period">{{vm.payBillData.label}} — {{vm.payBillData.period}}</p>
+                    <p class="pay-bill-due">Due: {{vm.payBillData.dueDate}}</p>
+                </div>
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select class="form-control" ng-model="vm.payMethod">
+                        <option value="upi">UPI / BHIM</option>
+                        <option value="netbanking">Net Banking</option>
+                        <option value="card">Debit / Credit Card</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem;">
+                <button class="btn-primary" style="flex:1;" ng-click="vm.confirmPayBill()" ng-disabled="vm.payBillProcessing">
+                    <i data-lucide="check-circle" style="width:16px;height:16px;"></i>
+                    {{vm.payBillProcessing ? 'Processing...' : 'Confirm Payment'}}
+                </button>
+                <button class="btn-secondary" ng-click="vm.closePayBillDialog()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Bill Detail Modal -->
-    <div class="modal-overlay" ng-show="vm.showBillModal" ng-click="vm.closeBillModal()"></div>
-    <div class="waste-guide-modal" ng-show="vm.showBillModal">
-        <div class="waste-guide-content" style="max-width:520px;">
+    <div class="modal-overlay" ng-show="vm.showBillModal" ng-click="vm.closeBillModal()" style="z-index:8998;"></div>
+    <div class="waste-guide-modal" ng-show="vm.showBillModal" style="z-index:8999;">
+        <div class="waste-guide-content" style="max-width:600px;">
             <div class="waste-guide-header">
                 <h2>
                     <i data-lucide="file-text"></i>
-                    Bill Details
+                    Bill Details & Meter Photos
                 </h2>
                 <button ng-click="vm.closeBillModal()">
                     <i data-lucide="x"></i>
                 </button>
             </div>
             <div class="waste-guide-body" ng-if="vm.selectedRecord">
-                <div style="text-align:center; margin-bottom:1.5rem;">
+                <!-- Bill Amount -->
+                <div style="text-align:center; margin-bottom:2rem; padding-bottom:1.5rem; border-bottom:1px solid #e5e7eb;">
                     <div style="font-size:2rem; font-weight:700; color:var(--text-primary);">
                         ₹{{vm.selectedRecord.amount}}
                     </div>
@@ -324,42 +374,72 @@
                         {{vm.selectedRecord.utility}} Bill
                     </div>
                 </div>
-                <div style="display:flex; flex-direction:column; gap:0.75rem;">
-                    <div
-                        style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
-                        <span style="font-size:0.85rem; color:#6b7280;">Bill ID</span>
-                        <strong
-                            style="font-size:0.85rem; color:var(--text-primary);">{{vm.selectedRecord.billId}}</strong>
+
+                <!-- Bill Details -->
+                <div style="margin-bottom:2rem;">
+                    <h4 style="margin:0 0 1rem 0; font-size:0.95rem; font-weight:600; color:#111827;">Bill Information</h4>
+                    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                        <div
+                            style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
+                            <span style="font-size:0.85rem; color:#6b7280;">Bill ID</span>
+                            <strong
+                                style="font-size:0.85rem; color:var(--text-primary);">{{vm.selectedRecord.billId}}</strong>
+                        </div>
+                        <div
+                            style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
+                            <span style="font-size:0.85rem; color:#6b7280;">Date</span>
+                            <strong
+                                style="font-size:0.85rem; color:var(--text-primary);">{{vm.selectedRecord.date}}</strong>
+                        </div>
+                        <div
+                            style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
+                            <span style="font-size:0.85rem; color:#6b7280;">Utility</span>
+                            <strong
+                                style="font-size:0.85rem; color:var(--text-primary);">{{vm.selectedRecord.utility}}</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
+                            <span style="font-size:0.85rem; color:#6b7280;">Meter Reading</span>
+                            <strong
+                                style="font-size:0.85rem; color:var(--text-primary);">{{vm.selectedRecord.reading}}</strong>
+                        </div>
+                        <div
+                            style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
+                            <span style="font-size:0.85rem; color:#6b7280;">Status</span>
+                            <span class="status-badge" ng-class="vm.selectedRecord.statusClass" style="font-size:0.8rem;">
+                                {{vm.selectedRecord.status}}
+                            </span>
+                        </div>
+                        <div
+                            style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
+                            <span style="font-size:0.85rem; color:#6b7280;">Payment Method</span>
+                            <strong style="font-size:0.85rem; color:var(--text-primary);">Online / UPI</strong>
+                        </div>
                     </div>
-                    <div
-                        style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
-                        <span style="font-size:0.85rem; color:#6b7280;">Date</span>
-                        <strong
-                            style="font-size:0.85rem; color:var(--text-primary);">{{vm.selectedRecord.date}}</strong>
+                </div>
+
+                <!-- Worker Meter Photo Section -->
+                <div style="margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:1px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div style="font-size: 1.5rem;">📷</div>
+                        <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #111827;">Worker Meter Photos</h4>
                     </div>
-                    <div
-                        style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
-                        <span style="font-size:0.85rem; color:#6b7280;">Utility</span>
-                        <strong
-                            style="font-size:0.85rem; color:var(--text-primary);">{{vm.selectedRecord.utility}}</strong>
-                    </div>
-                    <div
-                        style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
-                        <span style="font-size:0.85rem; color:#6b7280;">Meter Reading</span>
-                        <strong
-                            style="font-size:0.85rem; color:var(--text-primary);">{{vm.selectedRecord.reading}}</strong>
-                    </div>
-                    <div
-                        style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
-                        <span style="font-size:0.85rem; color:#6b7280;">Status</span>
-                        <span class="status-badge" ng-class="vm.selectedRecord.statusClass" style="font-size:0.8rem;">
-                            {{vm.selectedRecord.status}}
-                        </span>
-                    </div>
-                    <div
-                        style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
-                        <span style="font-size:0.85rem; color:#6b7280;">Payment Method</span>
-                        <strong style="font-size:0.85rem; color:var(--text-primary);">Online / UPI</strong>
+                    <p style="margin: 0 0 1rem 0; font-size: 0.8rem; color: #6b7280;">Official photos captured by the municipal meter reader</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+                        <!-- Photo Placeholder 1 -->
+                        <div style="aspect-ratio: 1; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border: 2px dashed #d1d5db; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem; color: #6b7280; padding: 1rem; text-align: center;">
+                            <i data-lucide="camera" style="width: 32px; height: 32px;"></i>
+                            <span style="font-size: 0.75rem;">Photo 1</span>
+                        </div>
+                        <!-- Photo Placeholder 2 -->
+                        <div style="aspect-ratio: 1; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border: 2px dashed #d1d5db; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem; color: #6b7280; padding: 1rem; text-align: center;">
+                            <i data-lucide="camera" style="width: 32px; height: 32px;"></i>
+                            <span style="font-size: 0.75rem;">Photo 2</span>
+                        </div>
+                        <!-- Photo Placeholder 3 -->
+                        <div style="aspect-ratio: 1; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border: 2px dashed #d1d5db; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem; color: #6b7280; padding: 1rem; text-align: center;">
+                            <i data-lucide="camera" style="width: 32px; height: 32px;"></i>
+                            <span style="font-size: 0.75rem;">Photo 3</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -368,12 +448,94 @@
                     <i data-lucide="download"></i>
                     Download Receipt
                 </button>
+                <button class="btn btn-sm"
+                    ng-if="vm.selectedRecord && (vm.selectedRecord.status === 'Pending' || vm.selectedRecord.status === 'Overdue')"
+                    ng-click="vm.openPayBillDialog(vm.selectedRecord)"
+                    style="background: #10b981; color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.85rem; cursor: pointer; display:flex; align-items:center; gap:0.35rem;">
+                    <i data-lucide="credit-card"></i>
+                    Pay Bill
+                </button>
                 <button class="btn btn-primary btn-sm" ng-click="vm.closeBillModal()">
                     Close
                 </button>
             </div>
         </div>
     </div>
+
+    <!-- Photo Gallery Modal -->
+    <div class="modal-overlay" ng-show="vm.showPhotoDialog" ng-click="vm.closePhotoDialog()" style="z-index:9000;"></div>
+    <div class="waste-guide-modal" ng-show="vm.showPhotoDialog" style="z-index:9001;">
+        <div class="waste-guide-content" style="max-width:600px;">
+            <div class="waste-guide-header">
+                <h2>
+                    <i data-lucide="camera"></i>
+                    Meter Reading Photos
+                </h2>
+                <button ng-click="vm.closePhotoDialog()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="waste-guide-body">
+                <!-- Citizen Photos Section -->
+                <div style="margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div style="font-size: 1.5rem;">📸</div>
+                        <h3 style="margin: 0; font-size: 1rem; font-weight: 600; color: var(--text-primary);">Citizen Uploaded Photos</h3>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <!-- Photo Placeholder 1 -->
+                        <div style="aspect-ratio: 1; background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem; color: #6b7280;">
+                            <i data-lucide="image" style="width: 32px; height: 32px;"></i>
+                            <span style="font-size: 0.75rem; text-align: center;">Photo pending<br/>(from citizen)</span>
+                        </div>
+                        <!-- Photo Placeholder 2 -->
+                        <div style="aspect-ratio: 1; background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem; color: #6b7280;">
+                            <i data-lucide="image" style="width: 32px; height: 32px;"></i>
+                            <span style="font-size: 0.75rem; text-align: center;">Photo pending<br/>(from citizen)</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 6px;">
+                        <p style="margin: 0; font-size: 0.85rem; color: #92400e;">
+                            <i data-lucide="info" style="width: 14px; height: 14px; display: inline; margin-right: 0.5rem;"></i>
+                            Photos uploaded by citizen for this meter reading
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Worker/Official Photos Section -->
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div style="font-size: 1.5rem;">👨‍💼</div>
+                        <h3 style="margin: 0; font-size: 1rem; font-weight: 600; color: var(--text-primary);">Official Meter Reader Photos</h3>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <!-- Photo Placeholder 1 -->
+                        <div style="aspect-ratio: 1; background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem; color: #6b7280;">
+                            <i data-lucide="image" style="width: 32px; height: 32px;"></i>
+                            <span style="font-size: 0.75rem; text-align: center;">Photo pending<br/>(from meter reader)</span>
+                        </div>
+                        <!-- Photo Placeholder 2 -->
+                        <div style="aspect-ratio: 1; background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem; color: #6b7280;">
+                            <i data-lucide="image" style="width: 32px; height: 32px;"></i>
+                            <span style="font-size: 0.75rem; text-align: center;">Photo pending<br/>(from meter reader)</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: #dbeafe; border-left: 4px solid #2563eb; border-radius: 6px;">
+                        <p style="margin: 0; font-size: 0.85rem; color: #1e40af;">
+                            <i data-lucide="info" style="width: 14px; height: 14px; display: inline; margin-right: 0.5rem;"></i>
+                            Official photos captured by municipal meter reader
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="waste-guide-footer" style="justify-content: flex-end;">
+                <button class="btn btn-primary btn-sm" ng-click="vm.closePhotoDialog()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Initialize Lucide Icons -->
     <script>
         if (typeof lucide !== 'undefined') {

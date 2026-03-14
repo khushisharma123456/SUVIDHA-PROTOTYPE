@@ -12,6 +12,473 @@
         vm.userData = {};
         vm.userLocation = null;
         
+        // ===== Utility Consumption Section =====
+        vm.selectedUtility = 'electricity';
+        vm.selectedPeriod = '6months';
+        vm.utilitiesData = {};
+        vm.utilityStats = {
+            consumption: 0,
+            unit: 'kWh',
+            currentMonth: 'March 2026',
+            pendingBills: 0,
+            currentBill: 0,
+            average: 0,
+            chartSubtitle: 'Trend analysis for the past 6 months',
+            peakMonth: '—',
+            lowestMonth: '—',
+            trendText: '—',
+            trendClass: '',
+            dataSource: 'Official Meter Readings',
+            ratePlanTip: 'Loading rate plan data...'
+        };
+
+        // Rate Plan Data (from utilities controller)
+        vm.ratePlanData = {
+            electricity: {
+                provider: 'BRPL (BSES Rajdhani)',
+                slabs: [
+                    { range: '0 – 200 units', rate: '₹3.00/kWh', type: 'Subsidized', highlight: false },
+                    { range: '201 – 400 units', rate: '₹4.50/kWh', type: 'Standard', highlight: true },
+                    { range: '401 – 800 units', rate: '₹6.50/kWh', type: 'Higher', highlight: false },
+                    { range: '800+ units', rate: '₹7.00/kWh', type: 'Peak', highlight: false }
+                ],
+                fixedCharge: '₹25/kW/month',
+                surcharge: '8% on energy charges',
+                lastUpdated: 'Oct 2025'
+            },
+            gas: {
+                provider: 'IGL (Indraprastha Gas)',
+                slabs: [
+                    { range: '0 – 30 SCM', rate: '₹28.82/SCM', type: 'Domestic', highlight: true },
+                    { range: '30+ SCM', rate: '₹34.50/SCM', type: 'Above quota', highlight: false }
+                ],
+                fixedCharge: '₹45/month',
+                lastUpdated: 'Nov 2025'
+            },
+            water: {
+                provider: 'Delhi Jal Board',
+                slabs: [
+                    { range: '0 – 20 kL', rate: '₹2.58/kL', type: 'Essential', highlight: false },
+                    { range: '20 – 30 kL', rate: '₹3.90/kL', type: 'Standard', highlight: true },
+                    { range: '30+ kL', rate: '₹15.00/kL', type: 'Excess', highlight: false }
+                ],
+                fixedCharge: '₹98.82/month (sewage)',
+                lastUpdated: 'Sep 2025'
+            }
+        };
+
+        vm.showRatePlanModal = false;
+
+        vm.viewRatePlanDetails = function() {
+            vm.showRatePlanModal = true;
+            $timeout(function() {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 50);
+        };
+
+        vm.closeRatePlanModal = function() {
+            vm.showRatePlanModal = false;
+        };
+
+        // ===== NEW DASHBOARD WIDGETS DATA =====
+        // Utility Health Score
+        vm.healthScore = 82;
+
+        // Unpaid Bills Tracking
+        vm.unpaidBills = [
+            { type: 'electricity', period: 'Feb 2026', amount: 1200, dueDate: '2026-02-28' },
+            { type: 'water', period: 'Feb 2026', amount: 340, dueDate: '2026-02-28' },
+            { type: 'gas', period: 'Jan 2026', amount: 680, dueDate: '2026-01-31' }
+        ];
+
+        vm.getTotalUnpaidBills = function() {
+            return vm.unpaidBills.reduce(function(total, bill) {
+                return total + bill.amount;
+            }, 0);
+        };
+
+        vm.downloadBill = function(bill) {
+            $rootScope.showDialog('Download Bill', 
+                'Bill for ' + bill.type + ' (' + bill.period + ') for ₹' + bill.amount + ' is ready to download.', 
+                'info', 'OK');
+            // In real implementation, this would generate and download a PDF
+        };
+
+        vm.payBillIndividually = function(bill) {
+            vm.showPayBillDialog = true;
+            vm.payBillData = {
+                amount: bill.amount,
+                label: bill.type.charAt(0).toUpperCase() + bill.type.slice(1) + ' Bill',
+                period: bill.period,
+                dueDate: bill.dueDate
+            };
+            vm.payMethod = 'upi';
+            $timeout(function() { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
+        };
+
+        vm.payAllBills = function() {
+            var totalAmount = vm.getTotalUnpaidBills();
+            vm.showPayBillDialog = true;
+            vm.payBillData = {
+                amount: totalAmount,
+                label: 'All Outstanding Bills',
+                period: 'Electricity + Water + Gas',
+                dueDate: 'Immediate'
+            };
+            vm.payMethod = 'upi';
+            $timeout(function() { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
+        };
+
+        // Monthly cost breakdown
+        vm.monthlyMaxCosts = {
+            electricity: 1850,
+            water: 340,
+            gas: 280
+        };
+
+        vm.getTotalMonthlyCost = function() {
+            return vm.monthlyMaxCosts.electricity + vm.monthlyMaxCosts.water + vm.monthlyMaxCosts.gas;
+        };
+
+        // Sustainability & Environmental Contribution Data
+        vm.totalPoints = 2450;
+        vm.electricitySaved = 1250;
+        vm.waterSaved = 3680;
+        vm.gasSaved = 285;
+        vm.coalSaved = 425;
+        vm.carbonReduction = 520;
+        vm.waterProjection = 3.2;
+
+        // Government Schemes Data (State-specific)
+        vm.userState = 'Delhi';
+        vm.currentSchemeIndex = 0;
+        vm.governmentSchemes = [
+            {
+                name: 'Electricity Subsidy Scheme',
+                description: 'Subsidized electricity rates for domestic consumers up to 400 units',
+                icon: '⚡',
+                subsidy: 'Up to ₹3000/year',
+                link: 'https://sites.google.com/site/brpldelhionline/'
+            },
+            {
+                name: 'Solar Rooftop Subsidy',
+                description: 'Government subsidy for installing solar panels on residential rooftops',
+                icon: '☀️',
+                subsidy: 'Up to 40% grant',
+                link: 'https://mnre.gov.in/solar/current_status/status-of-grid-connected-rooftop-solar-and-other-schemes'
+            },
+            {
+                name: 'Water Conservation Grant',
+                description: 'Rebate on water bills for households implementing water-saving measures',
+                icon: '💧',
+                subsidy: 'Up to ₹2000/year',
+                link: 'https://dwcd.delhi.gov.in/'
+            },
+            {
+                name: 'Affordable Housing Scheme',
+                description: 'Affordable housing units with subsidized utility connections',
+                icon: '🏠',
+                subsidy: '50% connection fee waived',
+                link: 'https://housing.delhi.gov.in/'
+            },
+            {
+                name: 'LPG Subsidy Scheme',
+                description: 'Direct benefit transfer for cooking gas cylinder subsidy',
+                icon: '🔥',
+                subsidy: '₹200-300 per cylinder',
+                link: 'https://www.pmuy.gov.in/'
+            },
+            {
+                name: 'Drinking Water Scheme',
+                description: 'Pure drinking water supply in all households with minimal charges',
+                icon: '🚰',
+                subsidy: 'Free installation',
+                link: 'https://jal.delhi.gov.in/'
+            },
+            {
+                name: 'Pollution Control Incentive',
+                description: 'Incentive for switching to CNG or electric vehicles',
+                icon: '🌿',
+                subsidy: 'Up to ₹5000 subsidy',
+                link: 'https://parivesh.nic.in/'
+            },
+            {
+                name: 'Elderly Utility Discount',
+                description: 'Special discount on electricity and water bills for senior citizens',
+                icon: '👴',
+                subsidy: '5-10% discount',
+                link: 'https://social.delhi.gov.in/'
+            }
+        ];
+
+        // Set up carousel auto-scroll
+        vm.setCurrentScheme = function(index) {
+            vm.currentSchemeIndex = index;
+        };
+
+        vm.openSchemeLink = function(scheme) {
+            if (scheme && scheme.link) {
+                window.open(scheme.link, '_blank');
+            }
+        };
+
+        // Auto-rotate carousel every 5 seconds
+        var schemeAutoRotate = $timeout(function rotateScheme() {
+            vm.currentSchemeIndex = (vm.currentSchemeIndex + 1) % vm.governmentSchemes.length;
+            schemeAutoRotate = $timeout(rotateScheme, 5000);
+        }, 5000);
+
+        // Cleanup on controller destroy
+        $scope.$on('$destroy', function() {
+            if (schemeAutoRotate) {
+                $timeout.cancel(schemeAutoRotate);
+            }
+        });
+
+        // Bill Forecast (estimated next bill)
+        vm.forecastElectricity = 950;
+        vm.forecastWater = 210;
+        vm.forecastGas = 480;
+
+        // Utility consumption chart instance
+        var utilityChartInstance = null;
+
+        // Default consumption data (will be overridden by API)
+        var defaultConsumptionData = {
+            electricity: {
+                months: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+                monthly_data: [280, 310, 290, 350, 310, 295, 285, 305, 342, 245, 260, 275],
+                provider: 'BRPL (BSES Rajdhani)',
+                unit: 'kWh'
+            },
+            gas: {
+                months: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+                monthly_data: [18, 14, 10, 10, 12, 14, 16, 20, 24, 22, 20, 18],
+                provider: 'IGL (Indraprastha Gas)',
+                unit: 'SCM'
+            },
+            water: {
+                months: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+                monthly_data: [18, 20, 22, 25, 22, 20, 19, 18, 18, 20, 19, 21],
+                provider: 'Delhi Jal Board',
+                unit: 'kL'
+            }
+        };
+
+        // Switch utility tab
+        vm.switchUtility = function(utility) {
+            vm.selectedUtility = utility;
+            updateUtilityStats();
+            updateUtilityChart();
+            $timeout(function() {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 50);
+        };
+
+        // On period change
+        vm.onPeriodChange = function() {
+            updateUtilityStats();
+            updateUtilityChart();
+        };
+
+        // Get months count from period
+        function getMonthsForPeriod(period) {
+            switch(period) {
+                case '3months': return 3;
+                case '6months': return 6;
+                case '1year': return 12;
+                default: return 6;
+            }
+        }
+
+        // Update utility stats based on selected utility and period
+        function updateUtilityStats() {
+            var utility = vm.selectedUtility;
+            var data = vm.utilitiesData[utility] || defaultConsumptionData[utility];
+            if (!data) return;
+
+            var monthsCount = getMonthsForPeriod(vm.selectedPeriod);
+            var monthlyData = data.monthly_data || [];
+            var months = data.months || [];
+
+            // Slice to period
+            var slicedData = monthlyData.slice(-monthsCount);
+            var slicedMonths = months.slice(-monthsCount);
+
+            // Consumption total
+            var total = slicedData.reduce(function(a, b) { return a + b; }, 0);
+            var avg = slicedData.length > 0 ? Math.round(total / slicedData.length) : 0;
+
+            // Peak and lowest
+            var peakVal = Math.max.apply(null, slicedData.length > 0 ? slicedData : [0]);
+            var lowestVal = Math.min.apply(null, slicedData.length > 0 ? slicedData : [0]);
+            var peakIdx = slicedData.indexOf(peakVal);
+            var lowestIdx = slicedData.indexOf(lowestVal);
+
+            // Unit
+            var unitMap = { electricity: 'kWh', gas: 'SCM', water: 'kL' };
+            var unit = data.unit || unitMap[utility] || 'Units';
+
+            // Data source
+            var sourceMap = {
+                electricity: 'Data Source: BRPL Official Meter Readings',
+                gas: 'Data Source: IGL Meter Readings',
+                water: 'Data Source: Delhi Jal Board'
+            };
+
+            // Trend calculation
+            var trendText = '—';
+            var trendClass = '';
+            if (slicedData.length >= 2) {
+                var last = slicedData[slicedData.length - 1];
+                var prev = slicedData[slicedData.length - 2];
+                if (prev > 0) {
+                    var change = Math.round(((last - prev) / prev) * 100);
+                    if (change > 0) {
+                        trendText = '+' + change + '% from last month';
+                        trendClass = 'trend-up';
+                    } else if (change < 0) {
+                        trendText = change + '% from last month';
+                        trendClass = 'trend-down';
+                    } else {
+                        trendText = 'No change from last month';
+                        trendClass = '';
+                    }
+                }
+            }
+
+            // Current bill estimation
+            var currentConsumption = monthlyData.length > 0 ? monthlyData[monthlyData.length - 1] : 0;
+            var billAmount = 0;
+            if (utility === 'electricity') {
+                billAmount = Math.round(currentConsumption * 4.5);
+            } else if (utility === 'water') {
+                billAmount = Math.round(currentConsumption * 20);
+            } else if (utility === 'gas') {
+                billAmount = Math.round(currentConsumption * 50);
+            }
+
+            // Pending bills
+            var pendingBills = 0;
+            if (vm.userData.consumption) {
+                var statuses = ['pending', 'overdue'];
+                if (statuses.indexOf((vm.userData.consumption[utility] || {}).status) !== -1) {
+                    pendingBills = 1;
+                }
+            }
+
+            // Rate plan tip
+            var tipMap = {
+                electricity: 'Your current usage places you in Slab 2. Save 45 units to get subsidized rates!',
+                gas: 'Your usage is within the domestic quota at ₹28.82/SCM.',
+                water: 'Your usage is in the standard range. Keep it below 20 kL for essential rates!'
+            };
+
+            // Chart subtitle
+            var subtitleMap = {
+                '3months': 'Trend for the past 3 months',
+                '6months': 'Trend for the past 6 months',
+                '1year': 'Trend for the past 12 months'
+            };
+
+            var now = new Date();
+            var currentMonthStr = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+            vm.utilityStats = {
+                consumption: total,
+                unit: unit,
+                currentMonth: currentMonthStr,
+                pendingBills: pendingBills,
+                currentBill: billAmount,
+                average: avg,
+                chartSubtitle: subtitleMap[vm.selectedPeriod] || 'Trend analysis',
+                peakMonth: (slicedMonths[peakIdx] || '—') + ' (' + peakVal + ' ' + unit + ')',
+                lowestMonth: (slicedMonths[lowestIdx] || '—') + ' (' + lowestVal + ' ' + unit + ')',
+                trendText: trendText,
+                trendClass: trendClass,
+                dataSource: sourceMap[utility] || 'Official Meter Readings',
+                ratePlanTip: tipMap[utility] || ''
+            };
+        }
+
+        // Update utility chart
+        function updateUtilityChart() {
+            var utility = vm.selectedUtility;
+            var data = vm.utilitiesData[utility] || defaultConsumptionData[utility];
+            if (!data) return;
+
+            var monthsCount = getMonthsForPeriod(vm.selectedPeriod);
+            var slicedData = (data.monthly_data || []).slice(-monthsCount);
+            var slicedMonths = (data.months || []).slice(-monthsCount);
+
+            var colorMap = {
+                electricity: { bg: '#0F52BA', border: '#0F52BA' },
+                gas: { bg: '#FF9933', border: '#FF9933' },
+                water: { bg: '#00A86B', border: '#00A86B' }
+            };
+            var chartType = utility === 'gas' ? 'line' : 'bar';
+            var colors = colorMap[utility] || colorMap.electricity;
+
+            $timeout(function() {
+                var canvas = document.getElementById('utilityConsumptionChart');
+                if (!canvas) return;
+
+                if (utilityChartInstance) {
+                    utilityChartInstance.destroy();
+                    utilityChartInstance = null;
+                }
+
+                var unitMap = { electricity: 'kWh', gas: 'SCM', water: 'kL' };
+                var unit = data.unit || unitMap[utility] || 'Units';
+
+                var dataset = {
+                    label: 'Units (' + unit + ')',
+                    data: slicedData,
+                    backgroundColor: chartType === 'line' ? 'rgba(' + hexToRgb(colors.bg) + ', 0.1)' : colors.bg,
+                    borderColor: colors.border,
+                    borderRadius: chartType === 'bar' ? 4 : 0,
+                    fill: chartType === 'line',
+                    tension: chartType === 'line' ? 0.4 : 0
+                };
+
+                utilityChartInstance = new Chart(canvas, {
+                    type: chartType,
+                    data: {
+                        labels: slicedMonths,
+                        datasets: [dataset]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { display: true, color: '#f0f0f0' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }, 100);
+        }
+
+        function hexToRgb(hex) {
+            hex = hex.replace('#', '');
+            var r = parseInt(hex.substring(0,2), 16);
+            var g = parseInt(hex.substring(2,4), 16);
+            var b = parseInt(hex.substring(4,6), 16);
+            return r + ', ' + g + ', ' + b;
+        }
+
         // Default dummy data for display
         var defaultData = {
             consumption: {
@@ -23,11 +490,19 @@
             community: { points: 120 }
         };
 
+        function deriveDisplayName(dashboardData, stored) {
+            var fromBackend = dashboardData && dashboardData.user &&
+                (dashboardData.user.full_name || dashboardData.user.name || dashboardData.user.username);
+            var fromRoot = dashboardData && (dashboardData.full_name || dashboardData.name || dashboardData.username);
+            var fromStored = stored && (stored.full_name || stored.name || stored.username);
+            return fromBackend || fromRoot || fromStored || 'Citizen';
+        }
+
         // Load user from localStorage immediately for fast display
         var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
         if (storedUser) {
             vm.userData = {
-                username: storedUser.full_name || storedUser.name || 'Guest User',
+                username: storedUser.full_name || storedUser.name || 'Citizen',
                 user: {
                     full_name: storedUser.full_name || storedUser.name || '',
                     email: storedUser.email || '',
@@ -41,8 +516,11 @@
                 community: defaultData.community
             };
         } else {
-            vm.userData = angular.extend({ username: 'Guest User', user: {} }, defaultData);
+            vm.userData = angular.extend({ username: 'Citizen', user: {} }, defaultData);
         }
+        vm.userData.username = deriveDisplayName(vm.userData, storedUser);
+        // Set initial urgent alert + notification count from stored/default data
+        $timeout(function() { updateUrgentAlert(); }, 0);
         
         // Request browser geolocation
         vm.requestLocation = function() {
@@ -101,15 +579,296 @@
         vm.showUtilityModal = false;
         vm.modalData = {};
 
-        // Navigate to utilities page
-        vm.navigateToUtility = function() {
-            vm.closeModal();
-            window.location.hash = '#!/utilities';
-        };
-
         // Close modal
         vm.closeModal = function() {
             vm.showUtilityModal = false;
+        };
+
+        // Open modal for specific utility
+        vm.openModal = function(utility) {
+            var utilityKey = utility || 'electricity';
+            var consumptionData = vm.userData.consumption ? vm.userData.consumption[utilityKey] : null;
+            var defaultData = defaultConsumptionData[utilityKey] || {};
+            var usageInsights = getUtilityUsageInsights(utilityKey);
+            var iconClass = utilityKey === 'electricity' ? 'zap' : (utilityKey === 'gas' ? 'flame' : 'droplet');
+            
+            vm.modalData = {
+                title: (utilityKey === 'electricity' ? 'Electricity' : (utilityKey === 'gas' ? 'Gas' : 'Water')),
+                icon: iconClass,
+                type: utilityKey,
+                currentBill: consumptionData ? ('₹' + (consumptionData.current_bill || 0)) : '₹0',
+                lastMonth: consumptionData ? ('₹' + (consumptionData.last_bill || 0)) : 'N/A',
+                units: (consumptionData ? (consumptionData.current || 0) : 0) + ' ' + (defaultData.unit || 'units'),
+                status: consumptionData ? (consumptionData.status || 'N/A').charAt(0).toUpperCase() + (consumptionData.status || 'N/A').slice(1) : 'N/A',
+                dueDate: consumptionData ? (consumptionData.due_date || 'N/A') : 'N/A',
+                trend: consumptionData ? (consumptionData.trend || '+5% from last month') : '+5% from last month',
+                leastUsageMonth: usageInsights.leastMonth,
+                highestUsageMonth: usageInsights.highestMonth,
+                leastUsageSeason: usageInsights.leastSeason,
+                highestUsageSeason: usageInsights.highestSeason
+            };
+            
+            vm.showUtilityModal = true;
+            vm.bandhuUtility = utilityKey;
+            
+            $timeout(function() {
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }, 50);
+        };
+
+        // ===== NOTIFICATION PANEL =====
+        vm.showNotifDropdown = false;
+        vm.pendingNotifCount = 0;
+
+        vm.toggleNotifications = function() {
+            vm.showNotifDropdown = !vm.showNotifDropdown;
+            vm.showAllNotifDialog = false;
+        };
+
+        vm.closeNotifications = function() {
+            vm.showNotifDropdown = false;
+        };
+
+        vm.showAllNotifDialog = false;
+
+        vm.openAllNotifDialog = function() {
+            vm.showNotifDropdown = false;
+            vm.showAllNotifDialog = true;
+            $timeout(function() { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
+        };
+
+        vm.closeAllNotifDialog = function() {
+            vm.showAllNotifDialog = false;
+        };
+
+        // ===== SERVICE STATUS DIALOG =====
+        vm.showServiceDialog = false;
+
+        vm.openServiceStatusDialog = function() {
+            vm.showServiceDialog = true;
+            $timeout(function() { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
+        };
+
+        vm.closeServiceDialog = function() {
+            vm.showServiceDialog = false;
+        };
+
+        // ===== PAY BILL DIALOG =====
+        vm.showPayBillDialog = false;
+        vm.payBillData = {};
+        vm.payMethod = 'upi';
+        vm.payBillProcessing = false;
+
+        vm.openPayBillDialog = function() {
+            vm.payBillData = {
+                amount: (vm.userData.consumption && vm.userData.consumption.electricity.current_bill) || 0,
+                label: 'Electricity Bill',
+                period: (vm.userData.consumption && vm.userData.consumption.electricity.billing_period) || 'Current Period',
+                dueDate: (vm.userData.consumption && vm.userData.consumption.electricity.due_date) || 'N/A'
+            };
+            vm.showPayBillDialog = true;
+            $timeout(function() { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
+        };
+
+        vm.closePayBillDialog = function() {
+            vm.showPayBillDialog = false;
+            vm.payBillProcessing = false;
+        };
+
+        vm.confirmPayBill = function() {
+            vm.payBillProcessing = true;
+            $timeout(function() {
+                if (vm.userData.consumption) {
+                    vm.userData.consumption.electricity.status = 'paid';
+                }
+                vm.payBillProcessing = false;
+                vm.showPayBillDialog = false;
+                updateUrgentAlert();
+                $rootScope.showDialog('Payment Successful',
+                    'Electricity bill payment of \u20b9' + vm.payBillData.amount + ' processed successfully!',
+                    'success', 'Great!');
+            }, 1500);
+        };
+
+        // ===== URGENT ALERT BANNER =====
+        vm.urgentAlert = false;
+
+        function updateUrgentAlert() {
+            var e = vm.userData.consumption && vm.userData.consumption.electricity;
+            var g = vm.userData.consumption && vm.userData.consumption.gas;
+            vm.urgentAlert = (e && (e.status === 'pending' || e.status === 'overdue')) ||
+                             (g && (g.status === 'pending' || g.status === 'overdue'));
+            vm.pendingNotifCount = 0;
+            if (e && (e.status === 'pending' || e.status === 'overdue')) vm.pendingNotifCount++;
+            if (g && (g.status === 'pending' || g.status === 'overdue')) vm.pendingNotifCount++;
+            if (vm.userData.reports && vm.userData.reports.resolved > 0) vm.pendingNotifCount++;
+        }
+
+        function monthKeyToIndex(monthLabel) {
+            if (!monthLabel) return -1;
+            var m = String(monthLabel).toLowerCase().slice(0, 3);
+            var map = {
+                jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+                jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11
+            };
+            return map[m] !== undefined ? map[m] : -1;
+        }
+
+        function getSeason(monthLabel) {
+            var idx = monthKeyToIndex(monthLabel);
+            if (idx === -1) return 'N/A';
+            if (idx === 11 || idx <= 1) return 'Winter';
+            if (idx >= 2 && idx <= 4) return 'Summer';
+            if (idx >= 5 && idx <= 8) return 'Monsoon';
+            return 'Autumn';
+        }
+
+        function getUtilityUsageInsights(utilityKey) {
+            var source = vm.utilitiesData[utilityKey] || defaultConsumptionData[utilityKey] || {};
+            var months = source.months || [];
+            var values = source.monthly_data || [];
+
+            if (!months.length || !values.length) {
+                return {
+                    leastMonth: 'N/A',
+                    highestMonth: 'N/A',
+                    leastSeason: 'N/A',
+                    highestSeason: 'N/A'
+                };
+            }
+
+            var minValue = Math.min.apply(null, values);
+            var maxValue = Math.max.apply(null, values);
+            var minIndex = values.indexOf(minValue);
+            var maxIndex = values.indexOf(maxValue);
+
+            var seasonTotals = {
+                Winter: 0,
+                Summer: 0,
+                Monsoon: 0,
+                Autumn: 0
+            };
+
+            for (var i = 0; i < months.length; i++) {
+                var seasonName = getSeason(months[i]);
+                if (seasonTotals[seasonName] !== undefined) {
+                    seasonTotals[seasonName] += Number(values[i]) || 0;
+                }
+            }
+
+            var leastSeason = 'Winter';
+            var highestSeason = 'Winter';
+            Object.keys(seasonTotals).forEach(function(seasonName) {
+                if (seasonTotals[seasonName] < seasonTotals[leastSeason]) {
+                    leastSeason = seasonName;
+                }
+                if (seasonTotals[seasonName] > seasonTotals[highestSeason]) {
+                    highestSeason = seasonName;
+                }
+            });
+
+            return {
+                leastMonth: (months[minIndex] || 'N/A') + ' (' + minValue + ')',
+                highestMonth: (months[maxIndex] || 'N/A') + ' (' + maxValue + ')',
+                leastSeason: leastSeason,
+                highestSeason: highestSeason
+            };
+        }
+
+        // ===== ASK SUVIDHA BANDHU (AI) =====
+        vm.showBandhuDialog = false;
+        vm.bandhuUtility = 'electricity';
+        vm.suvidhaInput = '';
+        vm.suvidhaResponse = '';
+        vm.suvidhaLoading = false;
+
+        vm.openBandhuDialog = function() {
+            vm.showBandhuDialog = true;
+            vm.bandhuUtility = (vm.modalData && vm.modalData.type) ? vm.modalData.type : 'electricity';
+            vm.suvidhaInput = '';
+            vm.suvidhaResponse = '';
+            $timeout(function() { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
+        };
+
+        vm.closeBandhuDialog = function() {
+            vm.showBandhuDialog = false;
+            vm.suvidhaLoading = false;
+        };
+
+        vm.askSuvidhaBandhu = function() {
+            if (!vm.suvidhaInput || vm.suvidhaLoading) return;
+            var question = vm.suvidhaInput;
+            vm.suvidhaLoading = true;
+            vm.suvidhaResponse = '';
+
+            var utility = vm.bandhuUtility || 'electricity';
+            var utilityTitle = utility.charAt(0).toUpperCase() + utility.slice(1);
+            var insights = getUtilityUsageInsights(utility);
+            var utilityData = (vm.userData.consumption && vm.userData.consumption[utility]) || {};
+            var totalCost = vm.getTotalCost();
+
+            var composedContext = [
+                'You are Suvidha Bandhu, an Indian civic utility advisor.',
+                'Analyze citizen utility trends and provide practical monthly cost reduction tips.',
+                'Utility: ' + utilityTitle,
+                'Current usage: ' + (utilityData.current || 0) + ' ' + (utilityData.unit || 'units'),
+                'Current bill: ₹' + (utilityData.current_bill || 0),
+                'Status: ' + (utilityData.status || 'N/A') + ', Due: ' + (utilityData.due_date || 'N/A'),
+                'Least usage month: ' + (insights.leastMonth || 'N/A'),
+                'Highest usage month: ' + (insights.highestMonth || 'N/A'),
+                'Least usage season: ' + (insights.leastSeason || 'N/A'),
+                'Highest usage season: ' + (insights.highestSeason || 'N/A'),
+                'Total monthly cost across utilities: ₹' + totalCost,
+                'User question: ' + question,
+                'Respond in concise plain English (4-6 short bullet points), mention both highest and lowest month/season, and give action steps for this month.'
+            ].join('\n');
+
+            var geminiApiKey = localStorage.getItem('geminiApiKey') || (window.GEMINI_API_KEY || '');
+            if (!geminiApiKey) {
+                vm.suvidhaLoading = false;
+                vm.suvidhaResponse = 'Gemini API key is not configured. Please set localStorage key "geminiApiKey" and try again.';
+                return;
+            }
+
+            fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + geminiApiKey, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            role: 'user',
+                            parts: [{ text: composedContext }]
+                        }
+                    ],
+                    generationConfig: {
+                        temperature: 0.6,
+                        topK: 32,
+                        topP: 0.95,
+                        maxOutputTokens: 450
+                    }
+                })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                $scope.$apply(function() {
+                    vm.suvidhaLoading = false;
+                    var candidates = data && data.candidates;
+                    var text = '';
+                    if (candidates && candidates[0] && candidates[0].content && candidates[0].content.parts) {
+                        text = candidates[0].content.parts.map(function(part) { return part.text || ''; }).join('\n');
+                    }
+                    vm.suvidhaResponse = text || 'I could not process your query right now. Please try again.';
+                    vm.suvidhaInput = '';
+                });
+            })
+            .catch(function() {
+                $scope.$apply(function() {
+                    vm.suvidhaLoading = false;
+                    vm.suvidhaResponse = 'Unable to connect to Gemini right now. Please check the API key and internet connection.';
+                });
+            });
         };
 
         // Chart period toggle
@@ -146,6 +905,7 @@
         // Initialize
         function init() {
             loadDashboardData();
+            loadUtilitiesData();
             $timeout(function() {
                 initializeHelixVisualization();
             }, 100);
@@ -157,6 +917,7 @@
                     // Handle response from main.py API
                     if (response.data.success && response.data.dashboard) {
                         vm.userData = response.data.dashboard;
+                        vm.userData.username = deriveDisplayName(response.data.dashboard, storedUser);
                         vm.user = response.data.dashboard.user;
                         vm.billsSummary = response.data.dashboard.bills_summary;
                         vm.complaintsSummary = response.data.dashboard.complaints_summary;
@@ -167,14 +928,35 @@
                         vm.userData = response.data;
                     }
                     vm.loading = false;
+                    updateUtilityStats();
+                    updateUrgentAlert();
                 })
                 .catch(function(error) {
                     console.error('Error loading dashboard data:', error);
                     vm.loading = false;
                     // Set default data to prevent errors
                     vm.userData = angular.extend(vm.userData || {}, defaultData);
+                    vm.userData.username = deriveDisplayName(vm.userData, storedUser);
                     if (!vm.userData.reports) vm.userData.reports = defaultData.reports;
                     if (!vm.userData.community) vm.userData.community = defaultData.community;
+                    updateUtilityStats();
+                    updateUrgentAlert();
+                });
+        }
+
+        function loadUtilitiesData() {
+            ApiService.getUtilitiesData()
+                .then(function(response) {
+                    vm.utilitiesData = response.data;
+                    updateUtilityStats();
+                    updateUtilityChart();
+                })
+                .catch(function(error) {
+                    console.error('Error loading utilities data:', error);
+                    // Use default data
+                    vm.utilitiesData = defaultConsumptionData;
+                    updateUtilityStats();
+                    updateUtilityChart();
                 });
         }
 
@@ -232,7 +1014,7 @@
                     trend: '+5%'
                 }
             };
-            
+
             const strandColors = [
                 utilityData.electricity.color,
                 utilityData.gas.color,
@@ -314,42 +1096,6 @@
                 
                 ctx.stroke();
                 ctx.shadowBlur = 0;
-                
-                // Draw connections
-                const connections = 12;
-                for (let i = 0; i <= connections; i++) {
-                    const t = i / connections * Math.PI * 3.5;
-                    const x = i * (segments * horizontalScale / connections) - segments * horizontalScale / 2 + depthOffset;
-                    const y = radius * Math.sin(t + rotationAngle + phaseOffset);
-                    const z = radius * Math.cos(t + rotationAngle + phaseOffset) + 100;
-                    
-                    const scale = 300 / (z + 300);
-                    const startX = centerX + x * scale;
-                    const startY = centerY + y * scale;
-                    
-                    const otherPhaseOffset = phaseOffset + Math.PI * 0.66;
-                    const otherY = radius * Math.sin(t + rotationAngle + otherPhaseOffset);
-                    const otherZ = radius * Math.cos(t + rotationAngle + otherPhaseOffset) + 100;
-                    
-                    const otherScale = 300 / (otherZ + 300);
-                    const endX = centerX + x * otherScale;
-                    const endY = centerY + otherY * otherScale;
-                    
-                    const connectionGradient = ctx.createLinearGradient(startX, startY, endX, endY);
-                    connectionGradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`);
-                    
-                    const connectedColorIndex = (strandColors.findIndex(c => 
-                        c.r === color.r && c.g === color.g && c.b === color.b) + 1) % strandColors.length;
-                    const connectedColor = strandColors[connectedColorIndex];
-                    connectionGradient.addColorStop(1, `rgba(${connectedColor.r}, ${connectedColor.g}, ${connectedColor.b}, 0.3)`);
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(startX, startY);
-                    ctx.lineTo(endX, endY);
-                    ctx.strokeStyle = connectionGradient;
-                    ctx.lineWidth = thickness * 0.3;
-                    ctx.stroke();
-                }
             }
             
             // Draw DNA
@@ -395,14 +1141,16 @@
                 const tooltipRect = tooltip.getBoundingClientRect();
                 const containerRect = container.getBoundingClientRect();
                 
-                let left = x - tooltipRect.width / 2;
-                let top = y - tooltipRect.height - 15;
+                // Calculate position relative to viewport (for fixed positioning)
+                let left = containerRect.left + x - tooltipRect.width / 2;
+                let top = containerRect.top + y - tooltipRect.height - 15;
                 
+                // Boundary checks for viewport
                 if (left < 10) left = 10;
-                if (left + tooltipRect.width > containerRect.width - 10) {
-                    left = containerRect.width - tooltipRect.width - 10;
+                if (left + tooltipRect.width > window.innerWidth - 10) {
+                    left = window.innerWidth - tooltipRect.width - 10;
                 }
-                if (top < 10) top = y + 20;
+                if (top < 10) top = containerRect.top + y + 20;
                 
                 tooltip.style.left = left + 'px';
                 tooltip.style.top = top + 'px';
@@ -415,6 +1163,7 @@
             // Show utility modal
             function showUtilityModal(utility, data) {
                 const iconClass = utility === 'electricity' ? 'zap' : (utility === 'gas' ? 'flame' : 'droplet');
+                const usageInsights = getUtilityUsageInsights(utility);
                 
                 vm.modalData = {
                     title: data.name,
@@ -425,9 +1174,14 @@
                     units: data.units,
                     status: data.status,
                     dueDate: data.dueDate,
-                    trend: data.trend
+                    trend: data.trend,
+                    leastUsageMonth: usageInsights.leastMonth,
+                    highestUsageMonth: usageInsights.highestMonth,
+                    leastUsageSeason: usageInsights.leastSeason,
+                    highestUsageSeason: usageInsights.highestSeason
                 };
                 vm.showUtilityModal = true;
+                vm.bandhuUtility = utility;
                 
                 $scope.$applyAsync(function() {
                     if (typeof lucide !== 'undefined') {
@@ -687,6 +1441,155 @@
                 }
             });
         }
+
+        // ===== SUVIDHA INSIGHTS MODAL =====
+        vm.showSuvidhaInsights = false;
+        vm.insightUtility = 'electricity';
+        vm.insightPeriod = '6months';
+        vm.insightHealthScore = 82;
+        vm.insightHealthStatus = 'Good - Keep it up!';
+        vm.insightTrendData = [
+            { month: 'Oct', value: 285 },
+            { month: 'Nov', value: 305 },
+            { month: 'Dec', value: 342 },
+            { month: 'Jan', value: 245 },
+            { month: 'Feb', value: 260 },
+            { month: 'Mar', value: 275 }
+        ];
+        vm.insightTrendMax = 350;
+        vm.insightTips = [
+            'Use LED bulbs to reduce electricity consumption',
+            'Turn off appliances when not in use',
+            'Use natural light during the day',
+            'Adjust AC temperature to 24°C or above',
+            'Maintain regular maintenance of electrical equipment'
+        ];
+        vm.insightQuestion = '';
+        vm.insightLoading = false;
+
+        vm.openSuvidhaInsights = function() {
+            vm.showSuvidhaInsights = true;
+            vm.insightUtility = vm.selectedUtility || 'electricity';
+            vm.insightPeriod = vm.selectedPeriod || '6months';
+            vm.insightQuestion = '';
+            updateInsightData();
+            $timeout(function() {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 50);
+        };
+
+        vm.closeSuvidhaInsights = function() {
+            vm.showSuvidhaInsights = false;
+            vm.insightLoading = false;
+        };
+
+        vm.onInsightUtilityChange = function() {
+            updateInsightData();
+        };
+
+        vm.onInsightPeriodChange = function() {
+            updateInsightData();
+        };
+
+        function updateInsightData() {
+            var utility = vm.insightUtility || 'electricity';
+            var period = vm.insightPeriod || '6months';
+
+            // Sample data based on utility and period
+            var healthScores = {
+                'electricity': 82,
+                'gas': 78,
+                'water': 85
+            };
+
+            var healthStatuses = {
+                'electricity': 'Good - Keep it up!',
+                'gas': 'Fair - Room for improvement',
+                'water': 'Excellent - Keep conserving!'
+            };
+
+            var tips = {
+                'electricity': [
+                    'Use LED bulbs to reduce consumption',
+                    'Turn off appliances when not in use',
+                    'Use natural light during day',
+                    'Adjust AC to 24°C or above',
+                    'Maintain regular equipment maintenance'
+                ],
+                'gas': [
+                    'Check for gas leaks regularly',
+                    'Use pressure cookers to save gas',
+                    'Maintain appliances properly',
+                    'Use thermostat efficiently',
+                    'Avoid excessive heating'
+                ],
+                'water': [
+                    'Fix leaking taps immediately',
+                    'Use bucket instead of shower',
+                    'Collect rainwater when possible',
+                    'Use water-efficient fixtures',
+                    'Turn off taps while brushing teeth'
+                ]
+            };
+
+            // Sample trend data
+            var trendDataByPeriod = {
+                '3months': [
+                    { month: 'Jan', value: 245 },
+                    { month: 'Feb', value: 260 },
+                    { month: 'Mar', value: 275 }
+                ],
+                '6months': [
+                    { month: 'Oct', value: 285 },
+                    { month: 'Nov', value: 305 },
+                    { month: 'Dec', value: 342 },
+                    { month: 'Jan', value: 245 },
+                    { month: 'Feb', value: 260 },
+                    { month: 'Mar', value: 275 }
+                ],
+                '1year': [
+                    { month: 'Apr', value: 280 },
+                    { month: 'May', value: 310 },
+                    { month: 'Jun', value: 290 },
+                    { month: 'Jul', value: 350 },
+                    { month: 'Aug', value: 310 },
+                    { month: 'Sep', value: 295 },
+                    { month: 'Oct', value: 285 },
+                    { month: 'Nov', value: 305 },
+                    { month: 'Dec', value: 342 },
+                    { month: 'Jan', value: 245 },
+                    { month: 'Feb', value: 260 },
+                    { month: 'Mar', value: 275 }
+                ]
+            };
+
+            vm.insightHealthScore = healthScores[utility] || 80;
+            vm.insightHealthStatus = healthStatuses[utility] || 'Average';
+            vm.insightTips = tips[utility] || [];
+            vm.insightTrendData = trendDataByPeriod[period] || trendDataByPeriod['6months'];
+            vm.insightTrendMax = Math.max.apply(null, vm.insightTrendData.map(function(d) { return d.value; })) || 350;
+        }
+
+        vm.submitInsightQuestion = function() {
+            if (!vm.insightQuestion || vm.insightLoading) return;
+            
+            var question = vm.insightQuestion;
+            vm.insightLoading = true;
+
+            var utility = vm.insightUtility || 'electricity';
+            var utilityTitle = utility.charAt(0).toUpperCase() + utility.slice(1);
+            var period = vm.insightPeriod || '6months';
+
+            // Placeholder response - in production, call Gemini API
+            $timeout(function() {
+                vm.insightLoading = false;
+                // Show success message
+                alert('Thank you for your question! Suvidha will analyze your consumption patterns and provide detailed insights soon.');
+                vm.insightQuestion = '';
+            }, 1500);
+        };
 
         init();
     }

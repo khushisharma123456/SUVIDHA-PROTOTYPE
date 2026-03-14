@@ -114,6 +114,48 @@
                 });
         }
 
+        // Upload profile picture
+        vm.uploadProfilePicture = function() {
+            var fileInput = document.getElementById('profilePhotoUpload');
+            var file = fileInput.files[0];
+            
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Image size must be less than 2MB');
+                return;
+            }
+            
+            // Read file and convert to data URL
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                // Store profile picture in localStorage
+                vm.user.profilePicture = e.target.result;
+                localStorage.setItem('suvidhaProfilePicture', e.target.result);
+                $scope.$apply();
+                
+                // Show success message
+                console.log('Profile picture updated successfully');
+            };
+            reader.readAsDataURL(file);
+            
+            // Reset file input
+            fileInput.value = '';
+        };
+
+        // Load profile picture from localStorage on init
+        var savedProfilePicture = localStorage.getItem('suvidhaProfilePicture');
+        if (savedProfilePicture && vm.user) {
+            vm.user.profilePicture = savedProfilePicture;
+        }
+
         init();
     }
 })();

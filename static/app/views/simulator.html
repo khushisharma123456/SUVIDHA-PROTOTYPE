@@ -1,63 +1,66 @@
 <div class="main-content">
-    <!-- Simulator Page Header -->
-    <div class="simulator-header">
-        <div class="simulator-title-row">
-            <div>
-                <h1>Bill Simulator</h1>
-                <p>Estimate utility bills and explore scenarios</p>
+    <div class="dashboard-container">
+        <!-- Simulator Page Header -->
+        <div class="page-header-welcome">
+            <div class="welcome-left">
+                <h1 class="welcome-title">Bill Simulator 🧮</h1>
+                <p class="welcome-subtitle">Estimate utility bills and explore various savings scenarios</p>
             </div>
         </div>
-    </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-        <div class="stat-card primary">
-            <div class="stat-icon-box blue">🧮</div>
-            <div class="stat-content">
-                <span class="stat-value">{{vm.totalSimulations}}</span>
-                <span class="stat-label">Simulations</span>
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-icon-box blue">
+                    <i data-lucide="calculator"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">{{vm.totalSimulations}}</span>
+                    <span class="stat-label">Simulations Run</span>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-icon-box green">
+                    <i data-lucide="piggy-bank"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">Up to 30%</span>
+                    <span class="stat-label">Potential Savings</span>
+                </div>
+                <div class="stat-trend up">
+                    <span>Explore scenarios</span>
+                </div>
             </div>
         </div>
-        <div class="stat-card success">
-            <div class="stat-icon-box green">💸</div>
-            <div class="stat-content">
-                <span class="stat-value">Up to 30%</span>
-                <span class="stat-label">Potential Savings</span>
-            </div>
-            <div class="stat-trend up">
-                <span>Explore scenarios</span>
-            </div>
-        </div>
-    </div>
 
-    <!-- Utility Selector Tabs -->
-    <div class="utility-selector-tabs">
-        <button class="utility-tab" ng-class="{active: vm.utilityType === 'electricity'}"
-            ng-click="vm.selectUtility('electricity')">
-            <i data-lucide="zap"></i>
-            <span>Electricity</span>
-        </button>
-        <button class="utility-tab" ng-class="{active: vm.utilityType === 'water'}"
-            ng-click="vm.selectUtility('water')">
-            <i data-lucide="droplet"></i>
-            <span>Water</span>
-        </button>
-        <button class="utility-tab" ng-class="{active: vm.utilityType === 'gas'}" ng-click="vm.selectUtility('gas')">
-            <i data-lucide="flame"></i>
-            <span>Gas</span>
-        </button>
-    </div>
+        <!-- Utility Selector Tabs -->
+        <div class="tabs-container enhanced" style="margin-bottom: 2rem;">
+            <div class="tabs">
+                <button class="service-tab" ng-class="{active: vm.utilityType === 'electricity'}" ng-click="vm.selectUtility('electricity')">
+                    <i data-lucide="zap"></i>
+                    <span>Electricity</span>
+                </button>
+                <button class="service-tab" ng-class="{active: vm.utilityType === 'water'}" ng-click="vm.selectUtility('water')">
+                    <i data-lucide="droplet"></i>
+                    <span>Water</span>
+                </button>
+                <button class="service-tab" ng-class="{active: vm.utilityType === 'gas'}" ng-click="vm.selectUtility('gas')">
+                    <i data-lucide="flame"></i>
+                    <span>Gas</span>
+                </button>
+            </div>
+        </div>
 
     <div class="simulator-layout">
         <!-- Input Panel -->
-        <div class="enhanced-card simulator-input-panel">
-            <div class="panel-header">
-                <h3>
+        <div class="card enhanced simulator-input-panel">
+            <div class="card-header">
+                <h3 style="margin: 0; font-size: 1.15rem;">
                     <span class="icon">🎛️</span>
                     Consumption Parameters
                 </h3>
             </div>
-
+            <div class="card-body">
             <form ng-submit="vm.calculateBill()">
                 <!-- Service Provider -->
                 <div class="form-group enhanced">
@@ -152,15 +155,16 @@
                     High
                 </button>
             </div>
+            </div>
         </div>
 
         <!-- Results Panel -->
         <div class="simulator-results-panel">
             <!-- Bill Amount Card -->
-            <div class="enhanced-card bill-result-card" ng-class="{calculated: vm.hasCalculated}">
-                <div class="result-header">
-                    <h3><span class="icon">💰</span> Estimated Bill</h3>
-                    <span class="calculation-date" ng-if="vm.hasCalculated">
+            <div class="card enhanced bill-result-card" ng-class="{calculated: vm.hasCalculated}">
+                <div class="card-header" style="justify-content: space-between; border-bottom: none; padding-bottom: 0;">
+                    <h3 style="margin: 0; font-size: 1.15rem; color: white;"><span class="icon">💰</span> Estimated Bill</h3>
+                    <span class="calculation-date" ng-if="vm.hasCalculated" style="color: rgba(255,255,255,0.9);">
                         <i data-lucide="calendar"></i>
                         {{vm.calculationDate}}
                     </span>
@@ -187,11 +191,14 @@
             </div>
 
             <!-- Breakdown Card -->
-            <div class="enhanced-card breakdown-card" ng-if="vm.hasCalculated">
-                <h3>
-                    <span class="icon">📋</span>
-                    Bill Breakdown
-                </h3>
+            <div class="card enhanced breakdown-card" ng-if="vm.hasCalculated">
+                <div class="card-header" style="border-bottom: 1px solid #f3f4f6;">
+                    <h3 style="margin: 0; font-size: 1.15rem;">
+                        <span class="icon">📋</span>
+                        Bill Breakdown
+                    </h3>
+                </div>
+                <div class="card-body">
                 <div class="breakdown-list">
                     <div class="breakdown-item">
                         <div class="item-label">
@@ -230,12 +237,19 @@
                 </div>
             </div>
 
+                </div>
+                </div>
+            </div>
+
             <!-- Savings Tips Card -->
-            <div class="enhanced-card tips-card" ng-if="vm.hasCalculated">
-                <h3>
-                    <span class="icon">💡</span>
-                    Savings Tips
-                </h3>
+            <div class="card enhanced tips-card" ng-if="vm.hasCalculated">
+                <div class="card-header" style="border-bottom: 1px solid #f3f4f6;">
+                    <h3 style="margin: 0; font-size: 1.15rem;">
+                        <span class="icon">💡</span>
+                        Savings Tips
+                    </h3>
+                </div>
+                <div class="card-body">
                 <div class="tips-list">
                     <div class="tip-item" ng-repeat="tip in vm.savingsTips">
                         <div class="tip-icon">
@@ -246,6 +260,7 @@
                             <p ng-bind="tip.description"></p>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
 
@@ -258,9 +273,9 @@
     </div>
 
     <!-- Tariff Structure Section -->
-    <div class="enhanced-card tariff-section">
-        <div class="section-header">
-            <h3>
+    <div class="card enhanced tariff-section" style="margin-top: 2rem;">
+        <div class="card-header" style="justify-content: space-between; border-bottom: 1px solid #f3f4f6;">
+            <h3 style="margin: 0; font-size: 1.15rem;">
                 <span class="icon">📊</span>
                 Current Tariff Structure
             </h3>
@@ -270,6 +285,7 @@
             </button>
         </div>
 
+        <div class="card-body">
         <div class="tariff-slabs-grid">
             <div class="tariff-slab-card" ng-repeat="slab in vm.tariffSlabs">
                 <div class="slab-header" ng-class="slab.class">
@@ -290,14 +306,19 @@
                 </div>
             </div>
         </div>
+        </div>
+        </div>
     </div>
 
     <!-- Comparison Chart -->
-    <div class="enhanced-card comparison-chart" ng-if="vm.hasCalculated">
-        <h3>
-            <span class="icon">📊</span>
-            Consumption Comparison
-        </h3>
+    <div class="card enhanced comparison-chart" ng-if="vm.hasCalculated" style="margin-top: 2rem; margin-bottom: 2rem;">
+        <div class="card-header" style="border-bottom: 1px solid #f3f4f6;">
+            <h3 style="margin: 0; font-size: 1.15rem;">
+                <span class="icon">📊</span>
+                Consumption Comparison
+            </h3>
+        </div>
+        <div class="card-body">
         <div class="comparison-bars">
             <div class="comparison-bar-item">
                 <div class="bar-label">Your Consumption</div>
@@ -325,6 +346,8 @@
                 </div>
             </div>
         </div>
+        </div>
+        </div>
     </div>
 
     <!-- Initialize Lucide Icons -->
@@ -335,4 +358,5 @@
             }, 100);
         }
     </script>
+    </div> <!-- /.dashboard-container -->
 </div> <!-- /.main-content -->

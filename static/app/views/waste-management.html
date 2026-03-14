@@ -1,13 +1,10 @@
 <div class="main-content">
     <div class="dashboard-container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="page-title-group">
-                <h1 class="page-title">
-                    <span class="icon">♻️</span>
-                    Waste Management
-                </h1>
-                <p class="page-subtitle">Track collection, report issues & stay clean</p>
+        <!-- Welcome Header -->
+        <div class="page-header-welcome">
+            <div class="welcome-left">
+                <h1 class="welcome-title">Welcome, {{vm.userData.username || 'Citizen'}} 👋</h1>
+                <p class="welcome-subtitle">Waste Management - Track collection, report issues & stay clean</p>
             </div>
         </div>
 
@@ -77,9 +74,96 @@
                 </div>
             </section>
 
+            <!-- Live Tracking Wide Card -->
+            <section class="dashboard-section">
+                <div class="card enhanced" style="overflow: hidden; border: 1px solid #e5e7eb; box-shadow: 0 8px 30px rgba(0,0,0,0.06);">
+                    <div class="card-header" style="background: white; border-bottom: 1px solid #e5e7eb;">
+                        <h3 style="margin: 0; font-size: 1.15rem;"><span class="icon">📍</span> Live Waste Collection Tracking</h3>
+                    </div>
+                    <div class="card-body" style="padding: 0; display: flex; flex-direction: column;">
+                        <div style="display: flex; flex-wrap: wrap;">
+                            <!-- Map Area -->
+                            <div style="flex: 1 1 500px; min-height: 320px; background: #f3f4f6; position: relative;">
+                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14013.921313364239!2d77.2415128!3d28.5355161!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce151aaaaaaab%3A0x6a5aa2ab6841113!2sKalkaji%2C%20New%20Delhi!5e0!3m2!1sen!2sin!4v1700000000000" width="100%" height="100%" style="border:0; position: absolute; top:0; left:0;" allowfullscreen="" loading="lazy"></iframe>
+                            </div>
+                            <!-- Info Area -->
+                            <div style="flex: 1 1 300px; padding: 1.5rem; background: white; display: flex; flex-direction: column;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                                    <div>
+                                        <h4 style="margin: 0 0 0.25rem 0; font-size: 1.25rem; color: #111827;">Truck {{vm.liveServiceData.truckId}}</h4>
+                                        <span style="color: #6b7280; font-size: 0.85rem;">Municipal Waste Collection Service</span>
+                                    </div>
+                                    <span class="status-badge pulse" style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;">{{vm.liveServiceData.truckStatus}}</span>
+                                </div>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 1rem; flex-grow: 1;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="color: #4b5563; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="map" style="width: 16px; height: 16px;"></i> Distance</span>
+                                        <strong style="color: #111827;">{{vm.liveServiceData.distance}}</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="color: #4b5563; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="clock" style="width: 16px; height: 16px;"></i> Projected Time (ETA)</span>
+                                        <strong style="color: #111827;">{{vm.liveServiceData.eta}}</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="color: #4b5563; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="user" style="width: 16px; height: 16px;"></i> Driver</span>
+                                        <strong style="color: #111827;">{{vm.liveServiceData.driverName}}</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: #4b5563; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="battery-charging" style="width: 16px; height: 16px;"></i> Capacity</span>
+                                        <strong style="color: #111827;">{{vm.liveServiceData.capacity}}</strong>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+                                    <button class="btn-primary" disabled style="width: 100%; justify-content: center; padding: 0.75rem; opacity: 0.6; cursor: not-allowed;">
+                                        <i data-lucide="check-circle"></i> Validate Waste Collection
+                                    </button>
+                                    <p style="font-size: 0.8rem; color: #6b7280; margin: 0; text-align: center; font-style: italic;">
+                                        ✓ Validation will happen automatically once the driver confirms collection
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weekly Impact Report -->
+            <section class="dashboard-section">
+                <div class="waste-impact-card">
+                    <div class="waste-impact-icon">🌍</div>
+                    <div class="waste-impact-content">
+                        <h3 class="waste-impact-title">Your Weekly Waste Impact</h3>
+                        <p class="waste-impact-description">
+                            Your waste was successfully transported to the <strong>Okhla Waste-to-Energy Plant</strong>. 
+                            Because your waste was <strong>very well segregated</strong>, it was utilized highly efficiently 
+                            and helped reduce landfill burden.
+                        </p>
+                        <div class="impact-metrics">
+                            <div class="impact-metric">
+                                <span class="metric-icon">⚡</span>
+                                <span class="metric-value">45 kWh</span>
+                                <span class="metric-label">Energy Generated</span>
+                            </div>
+                            <div class="impact-metric">
+                                <span class="metric-icon">🌱</span>
+                                <span class="metric-value">12 kg</span>
+                                <span class="metric-label">Compost Created</span>
+                            </div>
+                            <div class="impact-metric">
+                                <span class="metric-icon">⭐</span>
+                                <span class="metric-value">+5 Points</span>
+                                <span class="metric-label">Bonus Awarded</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Quick Actions Section -->
             <section class="dashboard-section">
-                <div class="policy-banner-grid">
+                <div class="policy-banner-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
                     <!-- Report Issue Card -->
                     <div class="policy-card policy-report" ng-click="vm.showReportForm = !vm.showReportForm">
                         <div class="policy-card-body">
@@ -94,20 +178,6 @@
                         </div>
                     </div>
 
-                    <!-- Live Tracking Card -->
-                    <div class="policy-card policy-track" ng-click="vm.openLiveService()">
-                        <div class="policy-card-body">
-                            <div class="policy-icon live">
-                                <i data-lucide="map-pin"></i>
-                            </div>
-                            <div class="policy-content">
-                                <h3><span class="icon">📍</span> Live Tracking</h3>
-                                <p>Track your waste truck now</p>
-                            </div>
-                            <div class="policy-btn-primary">Track →</div>
-                        </div>
-                    </div>
-
                     <!-- Ask AI About Waste Card -->
                     <div class="policy-card policy-ai" ng-click="vm.showAiWasteHelper = !vm.showAiWasteHelper">
                         <div class="policy-card-body">
@@ -115,7 +185,7 @@
                                 <i data-lucide="brain"></i>
                             </div>
                             <div class="policy-content">
-                                <h3><span class="icon">🤖</span> Ask AI Waste Helper</h3>
+                                <h3><span class="icon">🤖</span> Swachh Bandhu</h3>
                                 <p>Identify waste type with photo</p>
                             </div>
                             <div class="policy-btn-primary">Ask AI →</div>
@@ -214,9 +284,9 @@
             </div>
 
             <!-- AI Waste Helper Modal -->
-            <div class="modal-overlay" ng-show="vm.showAiWasteHelper" ng-click="vm.showAiWasteHelper = false"></div>
+            <div class="modal-overlay" ng-show="vm.showAiWasteHelper" ng-click="vm.showAiWasteHelper = false" style="z-index: 1000;"></div>
 
-            <div class="waste-guide-modal" ng-show="vm.showAiWasteHelper" style="z-index:1001;">
+            <div class="waste-guide-modal" ng-show="vm.showAiWasteHelper" style="z-index: 1001;">
                 <div class="waste-guide-content" style="max-width:640px;">
                     <div class="waste-guide-header" style="background:linear-gradient(135deg, #1D70B8, #3B8FD8); color:white;">
                         <h2 style="color:white;">
@@ -402,90 +472,7 @@
                 </div>
             </div>
 
-            <!-- Live Service Modal -->
-            <div class="modal-overlay" ng-show="vm.showLiveService" ng-click="vm.closeLiveService()"></div>
 
-            <div class="utility-modal" ng-show="vm.showLiveService">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">
-                            <i data-lucide="map-pin"></i>
-                            Live Waste Service Tracking
-                        </h2>
-                        <button class="modal-close" ng-click="vm.closeLiveService()">
-                            <i data-lucide="x"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Map Container -->
-                        <div class="map-section">
-                            <div class="map-container">
-                                <div class="map-grid"></div>
-                                <div class="map-marker truck">
-                                    <span class="marker-label">🚛 Truck {{vm.liveServiceData.truckId}}</span>
-                                    <span class="marker-icon">🚗</span>
-                                </div>
-                                <div class="map-marker user">
-                                    <span class="marker-label">📍 Your Location</span>
-                                    <span class="marker-icon">📍</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Truck Info -->
-                        <div class="truck-info-card">
-                            <div class="truck-header">
-                                <div class="truck-details">
-                                    <h3>Truck {{vm.liveServiceData.truckId}}</h3>
-                                    <p>Municipal Waste Collection Service</p>
-                                </div>
-                                <span class="status-badge pulse">{{vm.liveServiceData.truckStatus}}</span>
-                            </div>
-
-                            <div class="truck-metrics">
-                                <div class="metric">
-                                    <span class="metric-label">Distance</span>
-                                    <span class="metric-value">{{vm.liveServiceData.distance}}</span>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">ETA</span>
-                                    <span class="metric-value">{{vm.liveServiceData.eta}}</span>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Capacity</span>
-                                    <span class="metric-value">{{vm.liveServiceData.capacity}}</span>
-                                </div>
-                            </div>
-
-                            <div class="truck-details-grid">
-                                <div class="detail-item">
-                                    <span class="detail-label">Driver</span>
-                                    <span class="detail-value">{{vm.liveServiceData.driverName}}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Waste Type</span>
-                                    <span class="detail-value">{{vm.liveServiceData.wasteType}}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Next Stop</span>
-                                    <span class="detail-value">{{vm.liveServiceData.nextStop}}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Areas Completed</span>
-                                    <span class="detail-value">{{vm.liveServiceData.areasCompleted}}</span>
-                                </div>
-                            </div>
-
-                            <button class="btn-primary" ng-click="vm.refreshLocation()" ng-disabled="vm.isRefreshing"
-                                style="width: 100%; margin-top: 1.5rem;">
-                                <i data-lucide="refresh-cw" ng-hide="vm.isRefreshing"></i>
-                                <span ng-if="!vm.isRefreshing">Refresh Location</span>
-                                <span ng-if="vm.isRefreshing">Updating...</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Waste Guidelines Section -->
             <section class="dashboard-section">
