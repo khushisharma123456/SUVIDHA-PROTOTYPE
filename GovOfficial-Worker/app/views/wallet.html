@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="workerApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wallet - Suvidha Field Agent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <link rel="stylesheet" href="../../css/worker-style.css">
+    <style>
+        /* ── Keyframes ─────────────────────────────── */
+        @keyframes modalScale {
+            from { transform: scale(0.8); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse-ring {
+            0%   { box-shadow: 0 0 0 0 rgba(37,99,235,0.35); }
+            70%  { box-shadow: 0 0 0 10px rgba(37,99,235,0); }
+            100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -400px 0; }
+            100% { background-position:  400px 0; }
+        }
+
+
+
+        /* ── Layout ──────────────────────────────────── */
+        .worker-content {
+            padding: 2rem 2.5rem 2.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* ── Compact Points Hero ──────────────────── */
+        .wallet-hero {
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.28);
+            position: relative;
+            overflow: hidden;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            animation: fadeSlideUp 0.4s ease both;
+        }
+
+        .wallet-hero::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -8%;
+            width: 260px;
+            height: 260px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .wallet-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: 30%;
+            width: 180px;
+            height: 180px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-left { flex: 1; min-width: 200px; }
+
+        .hero-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.75;
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+        }
+
+        .hero-points {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.1;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+        .hero-points .pts-label {
+            font-size: 1rem;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        .hero-inr {
+            margin-top: 0.4rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .hero-motivation {
+            margin-top: 0.55rem;
+            font-size: 0.78rem;
+            opacity: 0.75;
+            font-style: italic;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero-solid {
+            background: white;
+            color: #1d4ed8;
+            border: none;
+            padding: 0.65rem 1.3rem;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            animation: pulse-ring 2.5s infinite;
+        }
+        .btn-hero-solid:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .btn-hero-solid:active { transform: scale(0.96); }
+
+        .btn-hero-outline {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1.5px solid rgba(255,255,255,0.5);
+            padding: 0.65rem 1.3rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-hero-outline:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+        .btn-hero-outline:active { transform: scale(0.96); }
+
+        /* ── Section Title ────────────────────────── */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        /* ── Filter Pills ─────────────────────────── */
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .filter-pill {
+            padding: 0.42rem 1rem;
+            border-radius: 20px;
+            border: 1.5px solid #e2e8f0;
+            background: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-pill:hover { border-color: #2563eb; color: #2563eb; }
+        .filter-pill.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+        }
+        .filter-pill:active { transform: scale(0.95); }
+
+        /* ── Section Card Wrapper ─────────────────── */
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            animation: fadeSlideUp 0.4s ease both;
+        }
+        .section-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        /* ── Weekly Insight ───────────────────────── */
+        .weekly-insight {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1.5px solid #bbf7d0;
+            border-radius: 14px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: fadeSlideUp 0.45s ease both;
+        }
+        .wi-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+        .wi-label {
+            font-size: 0.72rem;
+            color: #166534;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .wi-value {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #15803d;
+        }
+        .wi-sub {
+            font-size: 0.78rem;
+            color: #16a34a;
+            font-weight: 500;
+            margin-top: 0.1rem;
+        }
+
+        /* ── Redemption Grid ──────────────────────── */
+        .redemption-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .redeem-card {
+            background: white;
+            padding: 1.25rem 1rem;
+            border-radius: 14px;
+            border: 1.5px solid #e2e8f0;
+            text-align: center;
+            transition: transform 0.25s cubic-bezier(0.175,0.885,0.32,1.275),
+                        border-color 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .redeem-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: #2563eb;
+            box-shadow: 0 12px 28px rgba(37,99,235,0.12);
+        }
+        .redeem-card:active {
+            transform: scale(0.97);
+            box-shadow: none;
+        }
+
+        /* Shimmer on hover */
+        .redeem-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            transition: left 0.4s;
+        }
+        .redeem-card:hover::after { left: 150%; }
+
+        .redeem-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 10px;
+        }
+        .badge-best  { background: #fef9c3; color: #854d0e; }
+        .badge-top   { background: #ede9fe; color: #5b21b6; }
+
+        .redeem-icon {
+            width: 54px;
+            height: 54px;
+            background: #f8fafc;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            transition: background 0.25s, transform 0.25s;
+        }
+        .redeem-card:hover .redeem-icon {
+            background: #2563eb;
+            transform: rotate(6deg) scale(1.1);
+        }
+
+        .redeem-name {
+            font-weight: 800;
+            color: #1e293b;
+            font-size: 0.88rem;
+            line-height: 1.2;
+        }
+
+        .redeem-cost {
+            font-size: 0.78rem;
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .redeem-btn {
+            margin-top: 0.25rem;
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            border: none;
+            background: #eff6ff;
+            color: #2563eb;
+            font-weight: 800;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            width: 100%;
+        }
+        .redeem-btn:hover { background: #2563eb; color: white; }
+        .redeem-btn:active { transform: scale(0.95); }
+
+        /* ── Transactions ─────────────────────────── */
+        .txn-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .txn-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid transparent;
+            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+            cursor: default;
+        }
+        .txn-row:hover {
+            background: white;
+            border-color: #e2e8f0;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .txn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .txn-info { flex: 1; min-width: 0; }
+        .txn-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .txn-meta {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 1px;
+        }
+
+        .txn-type-pill {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 1px 7px;
+            border-radius: 8px;
+        }
+        .pill-earn { background: #dcfce7; color: #166534; }
+        .pill-spend { background: #fee2e2; color: #991b1b; }
+
+        .txn-amount {
+            font-size: 0.95rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-shrink: 0;
+        }
+        .txn-amount.credit { color: #059669; }
+        .txn-amount.debit  { color: #dc2626; }
+
+        .txn-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-green { background: #22c55e; }
+        .dot-red   { background: #ef4444; }
+
+        /* ── Download Button ──────────────────────── */
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.25rem;
+            border-radius: 10px;
+            border: 1.5px solid #2563eb;
+            background: white;
+            color: #2563eb;
+            font-weight: 800;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-download:hover {
+            background: #2563eb;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37,99,235,0.25);
+        }
+        .btn-download:active { transform: scale(0.96); }
+
+        /* ── Modal ────────────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 420px;
+            padding: 2rem;
+            text-align: center;
+            animation: modalScale 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+        .confirm-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+        .confirm-btn {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 12px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            font-size: 0.95rem;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .confirm-btn:hover  { background: #1d4ed8; }
+        .confirm-btn:active { transform: scale(0.97); }
+        .cancel-btn {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 0.6rem;
+            transition: background 0.15s;
+        }
+        .cancel-btn:hover { background: #f8fafc; }
+    </style>
+</head>
+
+<body ng-controller="WalletController">
+    <!-- Sidebar -->
+    <div ng-include="'../components/sidebar.html'"></div>
+
+    <!-- Main Content -->
+    <main class="worker-main-content">
+    <div ng-include="'../components/topbar.html'"></div>
+
+        <div class="worker-content">
+
+        <!-- ① Points Hero Card (compact) -->
+        <div class="wallet-hero">
+            <div class="hero-left">
+                <div class="hero-label">🏅 Your Rewards Balance</div>
+                <div class="hero-points">
+                    {{points}} <span class="pts-label">Points</span>
+                </div>
+                <div class="hero-inr">
+                    💵 ₹{{(points * 0.5).toFixed(0)}} Suvidha Credit
+                </div>
+                <div class="hero-motivation">
+                    Keep going — you're only {{200 - (points % 200)}} pts from your next milestone! 🚀
+                </div>
+            </div>
+            <div class="hero-actions">
+                <button class="btn-hero-solid" ng-click="scrollToRewards()">💰 Redeem Now</button>
+                <button class="btn-hero-outline" ng-click="scrollToHistory()">📜 History</button>
+            </div>
+        </div>
+
+        <!-- ② Weekly Insight -->
+        <div class="weekly-insight">
+            <div class="wi-icon">📈</div>
+            <div>
+                <div class="wi-label">Weekly Summary</div>
+                <div class="wi-value">+{{weekEarned}} Points This Week</div>
+                <div class="wi-sub">Spent {{weekSpent}} pts · Net gain {{weekEarned + weekSpent}} pts</div>
+            </div>
+        </div>
+
+        <!-- ③ Rewards Section -->
+        <div class="section-card" id="rewards-section">
+            <div class="section-card-header">
+                <span class="section-title">✨ Redeem Your Points</span>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="filter-bar">
+                <button class="filter-pill"
+                    ng-repeat="cat in rewardCategories"
+                    ng-class="{active: activeCategory === cat.key}"
+                    ng-click="setCategory(cat.key)">
+                    {{cat.label}}
+                </button>
+            </div>
+
+            <div class="redemption-grid">
+                <div class="redeem-card"
+                    ng-repeat="opt in filteredRewards()"
+                    ng-click="confirmRedeem(opt)">
+                    <!-- Badge -->
+                    <span class="redeem-badge badge-best" ng-if="opt.badge === 'best'">🔥 Best Value</span>
+                    <span class="redeem-badge badge-top"  ng-if="opt.badge === 'top'">⭐ Most Used</span>
+                    <div class="redeem-icon">{{opt.icon}}</div>
+                    <div class="redeem-name">{{opt.name}}</div>
+                    <div class="redeem-cost">{{opt.cost}} Points</div>
+                    <button class="redeem-btn" ng-click="$event.stopPropagation(); confirmRedeem(opt)">Redeem</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ④ Transactions Section -->
+        <div class="section-card" id="history-section">
+            <div class="section-card-header">
+                <span class="section-title">📜 Transactions</span>
+                <button class="btn-download" ng-click="downloadPDF()">
+                    ⬇ Download Statement
+                </button>
+            </div>
+
+            <!-- Transaction Filters -->
+            <div class="filter-bar">
+                <button class="filter-pill"
+                    ng-repeat="tf in txnFilters"
+                    ng-class="{active: activeTxnFilter === tf.key}"
+                    ng-click="setTxnFilter(tf.key)">
+                    {{tf.label}}
+                </button>
+            </div>
+
+            <div class="txn-list">
+                <div class="txn-row" ng-repeat="txn in filteredTransactions()">
+                    <div class="txn-icon" ng-style="{'background': txn.bg}">{{txn.icon}}</div>
+                    <div class="txn-info">
+                        <div class="txn-title">{{txn.title}}</div>
+                        <div class="txn-meta">
+                            <span>{{txn.date}}</span>
+                            <span>·</span>
+                            <span class="txn-type-pill" ng-class="txn.amount > 0 ? 'pill-earn' : 'pill-spend'">
+                                {{txn.amount > 0 ? 'Earned' : 'Spent'}}
+                            </span>
+                            <span style="color:#cbd5e1">#TXN-{{10293 + $index}}</span>
+                        </div>
+                    </div>
+                    <div class="txn-amount" ng-class="txn.amount > 0 ? 'credit' : 'debit'">
+                        <span>{{txn.amount > 0 ? '+' : ''}}{{txn.amount}} pts</span>
+                        <div class="txn-dot" ng-class="txn.amount > 0 ? 'dot-green' : 'dot-red'"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+    </main>
+
+    <!-- Redemption Confirmation Modal -->
+    <div class="modal-overlay" ng-if="showModal">
+        <div class="modal-content">
+            <div class="confirm-icon">{{selectedOpt.icon}}</div>
+            <h2 style="font-weight: 900; margin-bottom: 0.5rem;">Confirm Redemption</h2>
+            <p style="color: #64748b; font-weight: 500; font-size: 0.92rem;">
+                Redeem <strong>{{selectedOpt.cost}} Points</strong> for <strong>{{selectedOpt.name}}</strong>?<br>
+                <span style="font-size:0.82rem; color:#94a3b8;">Equivalent to ₹{{(selectedOpt.cost * 0.5).toFixed(0)}} in credits</span>
+            </p>
+            <button class="confirm-btn" ng-click="processRedeem()">✅ Yes, Redeem Now</button>
+            <button class="cancel-btn" ng-click="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" ng-if="showSuccess">
+        <div class="modal-content">
+            <div class="confirm-icon">🎉</div>
+            <h2 style="font-weight: 900; margin-bottom: 0.5rem;">Redeemed Successfully!</h2>
+            <p style="color: #64748b; font-weight: 500; font-size: 0.92rem;">
+                Your points have been deducted and the credit has been applied to your Suvidha ID.
+            </p>
+            <button class="confirm-btn" ng-click="closeSuccess()">Perfect 🙌</button>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('workerApp', []);
+        app.controller('WalletController', function($scope, $timeout) {
+            $scope.pageTitle    = "Government Rewards";
+            $scope.pageSubtitle = "Track your earnings and redeem for essential services";
+            $scope.points       = 450;
+            $scope.showModal    = false;
+            $scope.showSuccess  = false;
+            $scope.selectedOpt  = null;
+
+            // Header data
+            $scope.user     = { name: 'Vikram Singh', initials: 'VS', category: 'Field Agent' };
+            $scope.area     = { state: 'Delhi', ward: 'Ward 9', locality: 'Block A, Greenview' };
+            $scope.greeting = (new Date().getHours() < 12) ? 'Morning' : (new Date().getHours() < 17 ? 'Afternoon' : 'Evening');
+            $scope.currentDate = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+            $scope.selectedLang  = 'EN';
+            $scope.showLangMenu  = false;
+            $scope.languages = [
+                { code: 'EN', name: 'English' }, { code: 'HI', name: 'Hindi' },
+                { code: 'TA', name: 'Tamil' },   { code: 'TE', name: 'Telugu' },
+                { code: 'KN', name: 'Kannada' }, { code: 'BN', name: 'Bengali' },
+                { code: 'MR', name: 'Marathi' }, { code: 'GU', name: 'Gujarati' },
+                { code: 'ML', name: 'Malayalam' }, { code: 'PA', name: 'Punjabi' }
+            ];
+            $scope.notificationsCount = 3;
+            $scope.showNotifications  = false;
+            $scope.govMessages = [
+                { id: 1, sender: 'Admin Office', text: 'Please complete the Block A survey by 5 PM today.', time: '10 mins ago', unread: true },
+                { id: 2, sender: 'Supervisor',   text: 'Accuracy score improved by 15%! Keep it up.',      time: '2 hours ago',  unread: true },
+                { id: 3, sender: 'Gov Portal',   text: 'System maintenance scheduled for 11 PM tonight.',  time: '5 hours ago',  unread: false }
+            ];
+            $scope.toggleLangMenu       = function($e) { $e.stopPropagation(); $scope.showLangMenu = !$scope.showLangMenu; $scope.showNotifications = false; };
+            $scope.selectLang           = function(l)  { $scope.selectedLang = l.code; $scope.showLangMenu = false; };
+            $scope.toggleNotifications  = function($e) { if ($e) $e.stopPropagation(); $scope.showNotifications = !$scope.showNotifications; $scope.showLangMenu = false; };
+            $scope.markAsRead           = function(m)  { if (m.unread) { m.unread = false; $scope.notificationsCount--; } };
+            $scope.logout               = function()   { if (confirm('Log out?')) window.location.href = '/static/app/views/landing.html'; };
+            document.addEventListener('click', function() { $scope.$apply(function() { $scope.showLangMenu = false; $scope.showNotifications = false; }); });
+
+            // ── Reward Categories & Options ───────────────────────────────
+            $scope.activeCategory = 'all';
+            $scope.rewardCategories = [
+                { key: 'all',       label: 'All' },
+                { key: 'transport', label: '🚌 Transport' },
+                { key: 'bills',     label: '🧾 Bills' },
+                { key: 'essentials',label: '🛒 Essentials' }
+            ];
+
+            $scope.redeemOptions = [
+                { id: 'metro',    name: 'Metro Credits',   icon: '🚇', cost: 50,  category: 'transport', badge: 'top' },
+                { id: 'taxi',     name: 'Govt Taxi',       icon: '🚕', cost: 80,  category: 'transport' },
+                { id: 'fuel',     name: 'Fuel Coupon',     icon: '⛽', cost: 150, category: 'transport', badge: 'best' },
+                { id: 'ration',   name: 'Ration Store',    icon: '🌾', cost: 100, category: 'essentials' },
+                { id: 'fees',     name: 'School Fees',     icon: '🎓', cost: 300, category: 'essentials' },
+                { id: 'clothes',  name: 'Govt Clothes',    icon: '👕', cost: 120, category: 'essentials' },
+                { id: 'bills',    name: 'Utility Bills',   icon: '🧾', cost: 75,  category: 'bills',     badge: 'top' },
+                { id: 'recharge', name: 'Mobile Recharge', icon: '📱', cost: 40,  category: 'bills' }
+            ];
+
+            $scope.setCategory = function(key) { $scope.activeCategory = key; };
+            $scope.filteredRewards = function() {
+                if ($scope.activeCategory === 'all') return $scope.redeemOptions;
+                return $scope.redeemOptions.filter(function(o) { return o.category === $scope.activeCategory; });
+            };
+
+            // ── Transactions ──────────────────────────────────────────────
+            $scope.activeTxnFilter = 'all';
+            $scope.txnFilters = [
+                { key: 'all',   label: 'All' },
+                { key: 'earn',  label: '🟢 Earned' },
+                { key: 'spend', label: '🔴 Spent' }
+            ];
+
+            $scope.transactions = [
+                { title: 'Task Completed (H-104)', date: 'Today, 2:30 PM',  amount:  25,  icon: '🏠', bg: 'rgba(139,92,246,0.1)' },
+                { title: 'Daily Bonus',            date: 'Yesterday',        amount:  50,  icon: '⭐', bg: 'rgba(245,158,11,0.1)' },
+                { title: 'Metro Recharge',         date: '15 Mar 2026',      amount: -50,  icon: '🚇', bg: 'rgba(239,68,68,0.08)'  },
+                { title: 'Weekly Milestone',       date: '14 Mar 2026',      amount: 100,  icon: '🎯', bg: 'rgba(16,185,129,0.1)'  },
+                { title: 'Ration Store',           date: '12 Mar 2026',      amount: -100, icon: '🌾', bg: 'rgba(239,68,68,0.08)'  }
+            ];
+
+            $scope.setTxnFilter = function(key) { $scope.activeTxnFilter = key; };
+            $scope.filteredTransactions = function() {
+                if ($scope.activeTxnFilter === 'earn')  return $scope.transactions.filter(function(t){ return t.amount > 0; });
+                if ($scope.activeTxnFilter === 'spend') return $scope.transactions.filter(function(t){ return t.amount < 0; });
+                return $scope.transactions;
+            };
+
+            // ── Weekly Insight ────────────────────────────────────────────
+            $scope.weekEarned = $scope.transactions.filter(function(t){ return t.amount > 0; }).reduce(function(s,t){ return s + t.amount; }, 0);
+            $scope.weekSpent  = $scope.transactions.filter(function(t){ return t.amount < 0; }).reduce(function(s,t){ return s + t.amount; }, 0);
+
+            // ── Scroll helpers ────────────────────────────────────────────
+            $scope.scrollToRewards = function() {
+                var el = document.getElementById('rewards-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+            $scope.scrollToHistory = function() {
+                var el = document.getElementById('history-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
+            // ── Redeem flow ───────────────────────────────────────────────
+            $scope.confirmRedeem = function(opt) {
+                if ($scope.points < opt.cost) {
+                    alert("Insufficient points! Keep working to earn more.");
+                    return;
+                }
+                $scope.selectedOpt = opt;
+                $scope.showModal    = true;
+            };
+
+            $scope.processRedeem = function() {
+                $scope.points -= $scope.selectedOpt.cost;
+                $scope.transactions.unshift({
+                    title: $scope.selectedOpt.name,
+                    date:  'Just Now',
+                    amount: -$scope.selectedOpt.cost,
+                    icon:   $scope.selectedOpt.icon,
+                    bg:    'rgba(239,68,68,0.08)'
+                });
+                // Recalculate weekly spent
+                $scope.weekSpent = $scope.transactions.filter(function(t){ return t.amount < 0; }).reduce(function(s,t){ return s + t.amount; }, 0);
+                $scope.showModal   = false;
+                $scope.showSuccess = true;
+            };
+
+            $scope.closeModal   = function() { $scope.showModal   = false; };
+            $scope.closeSuccess = function() { $scope.showSuccess = false; };
+
+            // ── Download Statement ────────────────────────────────────────
+            $scope.downloadPDF = function() {
+                var lines = [
+                    'SUVIDHA WALLET — E-STATEMENT',
+                    '='.repeat(36),
+                    'Agent : ' + $scope.user.name,
+                    'Date  : ' + new Date().toLocaleDateString('en-IN'),
+                    'Balance: ' + $scope.points + ' Points  (₹' + ($scope.points * 0.5).toFixed(0) + ' Credits)',
+                    '='.repeat(36),
+                    'TRANSACTIONS',
+                    '-'.repeat(36)
+                ];
+                $scope.transactions.forEach(function(t, i) {
+                    lines.push((t.amount > 0 ? '+' : '') + t.amount + ' pts  | ' + t.title + '  (' + t.date + ')  #TXN-' + (10293 + i));
+                });
+                var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+                var url  = URL.createObjectURL(blob);
+                var a    = document.createElement('a');
+                a.href = url;  a.download = 'Suvidha_Wallet_Statement.txt';
+                a.click();  URL.revokeObjectURL(url);
+            };
+        });
+
+        app.controller('SidebarController', ['$scope', function($scope) {
+            var stored = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+            if (stored) {
+                var n = stored.full_name || stored.name || 'Vikram Singh';
+                $scope.user = { name: n, initials: n.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2), role: stored.category || 'Field Agent' };
+            } else {
+                $scope.user = { name: 'Vikram Singh', initials: 'VS', role: 'Electric Meter Reader' };
+            }
+            $scope.isCurrentPage = function(p) { return window.location.href.indexOf(p + '.html') !== -1; };
+            $scope.logout = function() { if (confirm('Log out?')) { localStorage.removeItem('suvidhaUser'); window.location.href = '/'; } };
+        }]);
+    </script>
+
+</body>
+
+</html>

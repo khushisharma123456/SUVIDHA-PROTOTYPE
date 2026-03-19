@@ -107,7 +107,8 @@ html {
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, rgba(26, 54, 93, 0.05) 0%, rgba(44, 82, 130, 0.03) 100%),
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%),
+        linear-gradient(135deg, rgba(26, 54, 93, 0.05) 0%, rgba(44, 82, 130, 0.03) 100%),
         url('/static/images/backdrop.png');
     background-size: cover;
     background-position: center;
@@ -507,6 +508,64 @@ body {
 
 .logout-btn:hover {
     background: rgba(239, 68, 68, 0.25);
+}
+
+/* Status Checklist */
+.status-checklist {
+    margin: 1rem 0;
+    padding: 0.75rem 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+}
+
+.status-checklist .status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    color: #000000;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-checklist .status-item.ready {
+    color: var(--gov-success);
+}
+
+.status-checklist .status-item.ready .status-check {
+    color: var(--gov-success);
+    font-weight: 700;
+}
+
+.status-checklist .status-item.online {
+    color: var(--gov-info);
+}
+
+.status-checklist .status-item.online .status-icon {
+    color: var(--gov-info);
+}
+
+.status-checklist .status-item.gps {
+    color: var(--gov-danger);
+}
+
+.status-checklist .status-item.gps .status-icon {
+    color: var(--gov-danger);
+}
+
+.status-checklist .status-item.battery {
+    color: var(--gov-success);
+}
+
+.status-checklist .status-item.battery .status-check {
+    color: var(--gov-success);
+    font-weight: 700;
+}
+
+.status-check,
+.status-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
 }
 
 /* ============================================

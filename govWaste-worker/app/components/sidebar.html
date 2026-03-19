@@ -1,0 +1,48 @@
+<!-- Sidebar Component for Suvidha Waste Collection Worker -->
+<aside class="worker-sidebar" ng-controller="SidebarController">
+    <div class="sidebar-header">
+        <a href="#/" class="sidebar-brand">
+            <div class="brand-logo">
+                <img src="/static/images/suvidha Logo.jpg" alt="Suvidha Logo" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+            </div>
+            <div class="brand-text">
+                <h1>Suvidha</h1>
+                <span class="brand-subtitle">WASTE COLLECTOR</span>
+            </div>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="#/" class="nav-item" ng-class="{active: isActive('/')}">
+            <span class="nav-icon-wrapper">🚛</span>
+            <span class="nav-text">Today's Route</span>
+        </a>
+        <a href="#/summary" class="nav-item" ng-class="{active: isActive('/summary')}">
+            <span class="nav-icon-wrapper">📊</span>
+            <span class="nav-text">Daily Summary</span>
+        </a>
+        <a href="#/wallet" class="nav-item" ng-class="{active: isActive('/wallet')}">
+            <span class="nav-icon-wrapper">💳</span>
+            <span class="nav-text">My Wallet</span>
+        </a>
+        <a href="#/settings" class="nav-item" ng-class="{active: isActive('/settings')}">
+            <span class="nav-icon-wrapper">⚙️</span>
+            <span class="nav-text">Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">{{user.initials || 'RK'}}</div>
+            <div class="user-info">
+                <h4>{{user.name || 'Ravi Kumar'}}</h4>
+                <p>{{user.role || 'Waste Collector'}}</p>
+            </div>
+        </div>
+
+        <button class="logout-btn" ng-click="logout()">
+            <span>🚪</span>
+            <span>Logout</span>
+        </button>
+    </div>
+</aside>

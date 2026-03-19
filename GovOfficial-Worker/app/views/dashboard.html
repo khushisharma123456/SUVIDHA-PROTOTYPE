@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="../../css/worker-style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <style>
+        /* Match Report Page background - use absolute path like worker-style.css */
+        body {
+            background: url('/static/images/backdrop.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
         /* Worker Content Spacing Override */
         .worker-content {
             display: flex;
@@ -128,6 +136,116 @@
             padding: 1.5rem;
             border: 1px solid var(--gov-gray-200);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Map Marker Styles */
+        .map-container {
+            position: relative;
+            overflow: hidden;
+            background-color: #f8f9fa;
+        }
+
+        .performance-dialog-box {
+            animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes pulse-ai {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.5); }
+            70% { box-shadow: 0 0 0 20px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+
+        .listening-ai {
+            animation: pulse-ai 1.5s infinite !important;
+            background: #1e40af !important;
+        }
+        .map-marker {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            z-index: 10;
+        }
+
+        .map-marker:hover {
+            transform: scale(1.5) translateY(-5px);
+            z-index: 100;
+        }
+
+        .map-marker.pulse::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: rgba(139, 92, 246, 0.4);
+            border-radius: 50%;
+            animation: pulse-ring 1.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+
+        /* Refined Wallet Styles */
+        .wallet-card-premium {
+            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-card-premium::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .utility-btn-premium {
+            background: white;
+            border: 1px solid var(--gov-gray-200);
+            padding: 1rem 0.5rem;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .utility-btn-premium:hover {
+            transform: translateY(-4px);
+            border-color: #8b5cf6;
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.1);
+            background: rgba(139, 92, 246, 0.02);
+        }
+
+        .utility-btn-premium .icon-box {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--gov-gray-50);
+            transition: all 0.3s ease;
+        }
+
+        .utility-btn-premium:hover .icon-box {
+            background: #8b5cf6;
+            color: white;
+            transform: rotate(5deg);
         }
 
         .area-header {
@@ -1239,531 +1357,1441 @@
                 gap: 0.75rem;
             }
         }
+        
+        /* ── BACKGROUND OVERLAY ── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.65);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ══════════════════════════════════════════
+           HERO TASK CARD
+        ══════════════════════════════════════════ */
+        .hero-task-card {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #3b82f6 100%);
+            border-radius: var(--radius-xl);
+            padding: 2rem 2.5rem;
+            color: white;
+            box-shadow: 0 8px 32px rgba(37,99,235,0.35);
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-task-card::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 200px; height: 200px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 50%;
+        }
+
+        .hero-task-card::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; right: 120px;
+            width: 160px; height: 160px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .hero-task-icon {
+            font-size: 3rem;
+            background: rgba(255,255,255,0.15);
+            width: 70px; height: 70px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            backdrop-filter: blur(4px);
+        }
+
+        .hero-task-body {
+            flex: 1;
+        }
+
+        .hero-task-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .hero-task-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+
+        .hero-task-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.15);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+        }
+
+        .hero-progress-wrap {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            margin-bottom: 0.4rem;
+        }
+
+        .hero-progress-fill {
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 8px rgba(255,255,255,0.5);
+        }
+
+        .hero-progress-label {
+            font-size: 0.82rem;
+            opacity: 0.85;
+            font-weight: 600;
+        }
+
+        .hero-task-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .hero-btn {
+            padding: 0.85rem 1.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border: none;
+        }
+
+        .hero-btn.primary {
+            background: white;
+            color: #1d4ed8;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .hero-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .hero-btn.outline {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+
+        .hero-btn.outline:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+
+        /* ══════════════════════════════════════════
+           TWO-COLUMN GRID
+        ══════════════════════════════════════════ */
+        .two-col-grid {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 1.5rem;
+        }
+
+        .left-col, .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        /* ── SECTION CARD ── */
+        .section-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gov-gray-200);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        .sc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gov-gray-100);
+            background: var(--gov-gray-50);
+        }
+
+        .sc-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--gov-gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .sc-body {
+            padding: 1.25rem;
+        }
+
+        /* ── MAP PREVIEW ── */
+        .map-preview {
+            height: 220px;
+            background: #e8f0e8 url('https://i.imgur.com/G5YOn8S.png') center/cover no-repeat;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-blur-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .map-preview-marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .map-preview-marker:hover {
+            transform: translate(-50%, -50%) scale(1.3);
+        }
+
+        .marker-dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .marker-dot.done { background: #10b981; }
+        .marker-dot.pending { background: #f59e0b; }
+        .marker-dot.current { background: #2563eb; }
+
+        .map-current-me {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            animation: bob 2s ease-in-out infinite;
+        }
+
+        @keyframes bob {
+            0%, 100% { transform: translate(-50%, -50%); }
+            50% { transform: translate(-50%, calc(-50% - 6px)); }
+        }
+
+        .map-open-btn {
+            position: absolute;
+            bottom: 12px; right: 12px;
+            background: white;
+            color: var(--gov-primary);
+            border: 1px solid var(--gov-gray-200);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .map-open-btn:hover {
+            background: var(--gov-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* ── ASSIGNED AREA CARD ── */
+        .area-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .area-chip-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--gov-gray-50);
+            border: 1px solid var(--gov-gray-100);
+            border-radius: 12px;
+            padding: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .area-chip-item:hover {
+            background: var(--gov-info-light);
+            border-color: rgba(59,130,246,0.2);
+        }
+
+        .area-chip-emoji {
+            font-size: 1.2rem;
+            width: 32px; height: 32px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+
+        .area-chip-text { display: flex; flex-direction: column; }
+
+        .area-chip-lbl {
+            font-size: 0.62rem;
+            color: var(--gov-gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-weight: 700;
+        }
+
+        .area-chip-val {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--gov-gray-800);
+        }
+
+        /* ── PERFORMANCE CARD ── */
+        .perf-score-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .perf-score-big {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--gov-gray-800);
+            line-height: 1;
+        }
+
+        .perf-score-big span {
+            font-size: 1.2rem;
+            color: var(--gov-gray-400);
+            font-weight: 500;
+        }
+
+        .perf-badge {
+            background: rgba(16,185,129,0.12);
+            color: #059669;
+            padding: 0.4rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .perf-metric-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .perf-metric-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            background: var(--gov-gray-50);
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+
+        .perf-metric-item:hover {
+            background: var(--gov-gray-100);
+        }
+
+        .perf-metric-icon {
+            font-size: 1rem;
+            width: 30px; height: 30px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+
+        .perf-metric-label {
+            flex: 1;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--gov-gray-700);
+        }
+
+        .perf-metric-value {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--gov-gray-800);
+        }
+
+        .perf-metric-bar {
+            width: 60px; height: 4px;
+            background: var(--gov-gray-200);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .perf-metric-fill {
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        /* Insights Toggle */
+        .insights-toggle-btn {
+            background: var(--gov-gray-100);
+            border: 1px solid var(--gov-gray-200);
+            color: var(--gov-gray-600);
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .insights-toggle-btn:hover {
+            background: var(--gov-info-light);
+            color: var(--gov-info);
+            border-color: rgba(59,130,246,0.25);
+        }
+
+        .insights-panel {
+            margin-top: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.875rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .insight-item.warn {
+            background: rgba(245,158,11,0.08);
+            color: #92400e;
+            border: 1px solid rgba(245,158,11,0.2);
+        }
+
+        .insight-item.good {
+            background: rgba(16,185,129,0.08);
+            color: #065f46;
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+
+        .insight-item.info {
+            background: rgba(59,130,246,0.08);
+            color: #1e40af;
+            border: 1px solid rgba(59,130,246,0.2);
+        }
+
+        /* ── COVERAGE CARD ── */
+        .coverage-count {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--gov-gray-800);
+            line-height: 1;
+            margin-bottom: 0.75rem;
+        }
+
+        .coverage-count span {
+            font-size: 1.1rem;
+            color: var(--gov-gray-400);
+            font-weight: 500;
+        }
+
+        .coverage-bar-wrap {
+            background: var(--gov-gray-100);
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 0.6rem;
+        }
+
+        .coverage-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .coverage-stats-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+
+        .cov-tag {
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .cov-tag.pending { background: var(--gov-warning-light); color: var(--gov-warning); }
+        .cov-tag.skipped { background: var(--gov-danger-light); color: var(--gov-danger); }
+        .cov-tag.done    { background: var(--gov-success-light); color: var(--gov-success); }
+
+        .motivation-line {
+            font-size: 0.82rem;
+            color: var(--gov-info);
+            font-weight: 700;
+            background: var(--gov-info-light);
+            padding: 0.5rem 0.875rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* ══════════════════════════════════════════
+           QUICK ACTIONS
+        ══════════════════════════════════════════ */
+        .quick-actions-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .qa-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .qa-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.15);
+        }
+
+        .qa-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .qa-btn.green {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+        }
+
+        .qa-btn.green:hover { box-shadow: 0 10px 24px rgba(16,185,129,0.4); }
+
+        .qa-btn.blue {
+            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+            color: white;
+        }
+
+        .qa-btn.blue:hover { box-shadow: 0 10px 24px rgba(37,99,235,0.4); }
+
+        .qa-btn.orange {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: white;
+        }
+
+        .qa-btn.orange:hover { box-shadow: 0 10px 24px rgba(245,158,11,0.4); }
+
+        /* ══════════════════════════════════════════
+           WALLET SECTION (REDESIGNED)
+        ══════════════════════════════════════════ */
+        .wallet-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 0;
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            border: 1px solid var(--gov-gray-200);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .wallet-balance-panel {
+            background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1rem;
+            border-right: 1px solid rgba(16,185,129,0.15);
+        }
+
+        .wallet-coin {
+            font-size: 2.5rem;
+            width: 60px; height: 60px;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(16,185,129,0.15);
+        }
+
+        .wallet-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #065f46;
+            margin-bottom: 0.15rem;
+        }
+
+        .wallet-pts {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #059669;
+            line-height: 1;
+        }
+
+        .wallet-pts span {
+            font-size: 1rem;
+            color: #6ee7b7;
+            font-weight: 600;
+        }
+
+        .wallet-progress-wrap {
+            width: 100%;
+            height: 8px;
+            background: rgba(16,185,129,0.15);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .wallet-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(16,185,129,0.4);
+        }
+
+        .wallet-goal {
+            font-size: 0.78rem;
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        .wallet-redeem-panel {
+            padding: 1.75rem 2rem;
+        }
+
+        .redeem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .redeem-title {
+            font-size: 0.82rem;
+            color: var(--gov-gray-600);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .redeem-link {
+            font-size: 0.8rem;
+            color: #8b5cf6;
+            font-weight: 700;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .redeem-link:hover { opacity: 0.7; }
+
+        .redeem-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .redeem-btn {
+            background: white;
+            border: 1.5px solid var(--gov-gray-200);
+            padding: 1rem 0.5rem;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .redeem-btn:hover {
+            transform: translateY(-5px);
+            border-color: #8b5cf6;
+            box-shadow: 0 10px 22px rgba(139,92,246,0.12);
+            background: rgba(139,92,246,0.02);
+        }
+
+        .redeem-btn:hover .redeem-icon-box {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .redeem-icon-box {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: var(--gov-gray-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            transition: all 0.25s ease;
+        }
+
+        .redeem-name {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--gov-gray-700);
+        }
+
+        /* ══════════════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════════════ */
+        @media (max-width: 1100px) {
+            .two-col-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-task-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero-task-actions {
+                flex-direction: row;
+                width: 100%;
+            }
+            .hero-btn { flex: 1; justify-content: center; }
+            .quick-actions-strip { grid-template-columns: 1fr 1fr; }
+            .wallet-row { grid-template-columns: 1fr; }
+            .redeem-grid { grid-template-columns: repeat(2, 1fr); }
+            .area-chips-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 500px) {
+            .hero-task-card { padding: 1.5rem; gap: 1rem; }
+            .quick-actions-strip { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 
 <body ng-controller="DashboardController">
     <!-- Sidebar -->
-    <aside class="worker-sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-brand">
-                <div class="brand-logo">
-                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='⚡'">
-                </div>
-                <div class="brand-text">
-                    <h1>Suvidha</h1>
-                    <span class="brand-subtitle">FIELD AGENT</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Agent Status Indicator -->
-        <div class="agent-status-card">
-            <div class="status-indicator" ng-class="{'online': agentStatus === 'online', 'busy': agentStatus === 'on_task', 'offline': agentStatus === 'offline'}">
-                <span class="status-dot"></span>
-                <span class="status-text">{{agentStatus === 'online' ? 'Available' : agentStatus === 'on_task' ? 'On Task' : 'Offline'}}</span>
-            </div>
-        </div>
-
-        <nav class="sidebar-nav">
-            <!-- Flat menu - no section titles -->
-            <a href="dashboard.html" class="nav-item active">
-                <span class="nav-icon-wrapper"><span class="nav-icon">📊</span></span>
-                <span class="nav-text">Dashboard</span>
-                <span class="nav-badge" ng-if="stats.pending > 0">{{stats.pending}}</span>
-            </a>
-            <a href="search.html" class="nav-item">
-                <span class="nav-icon-wrapper"><span class="nav-icon">🏠</span></span>
-                <span class="nav-text">Households</span>
-            </a>
-            <a href="report.html" class="nav-item">
-                <span class="nav-icon-wrapper"><span class="nav-icon">⚠️</span></span>
-                <span class="nav-text">Report Issue</span>
-            </a>
-            <a href="settings.html" class="nav-item">
-                <span class="nav-icon-wrapper"><span class="nav-icon">⚙️</span></span>
-                <span class="nav-text">Settings</span>
-            </a>
-        </nav>
-        <div class="sidebar-footer">
-            <div class="user-profile">
-                <div class="user-avatar">{{user.initials}}</div>
-                <div class="user-info">
-                    <h4>{{user.name}}</h4>
-                    <p class="user-category">{{user.category || 'Meter Reader'}}</p>
-                    <p class="user-ward">{{area.ward}}</p>
-                </div>
-            </div>
-            
-            <!-- GPS/Offline indicator at bottom -->
-            <div class="gps-offline-indicator" style="display: flex; justify-content: center; gap: 1rem; padding: 0.75rem; margin: 0.75rem 0; background: var(--gov-gray-50); border-radius: 8px;">
-                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem;" ng-class="{'color: var(--gov-success)': gpsEnabled, 'color: var(--gov-danger)': !gpsEnabled}">
-                    <span>📍</span>
-                    <span style="font-weight: 500;">GPS {{gpsEnabled ? 'Active' : 'Off'}}</span>
-                </div>
-                <div style="width: 1px; background: var(--gov-gray-300);"></div>
-                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--gov-gray-600);">
-                    <span>📶</span>
-                    <span style="font-weight: 500;">{{networkStatus || 'Online'}}</span>
-                </div>
-            </div>
-            
-            <button class="logout-btn" ng-click="logout()">
-                <span>🚪</span>
-                <span>Logout</span>
-            </button>
-        </div>
-    </aside>
+    <div ng-include="'../components/sidebar.html'"></div>
 
     <!-- Main Content -->
     <main class="worker-main-content">
         <header class="worker-header">
             <div class="header-left">
-                <h2>Good {{greeting}}, {{user.name.split(' ')[0]}}!</h2>
-                <p>{{currentDate}} • {{area.locality}}, {{area.ward}}</p>
+                <h2>Good {{greeting}}, Vikram</h2>
+                <p>{{currentDate}}</p>
+                <p>Assigned Area: {{area.state}} | {{area.ward}}</p>
             </div>
             <div class="header-right">
-                <button class="topbar-btn sync-btn" ng-click="refresh()" title="Refresh Data">
-                    🔄
-                </button>
-                
-                <!-- Improved Language Dropdown -->
-                <div class="lang-dropdown" style="position: relative;">
-                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-weight: 500;">
-                        🌐 <span>{{selectedLang}}</span> 
-                        <span style="font-size: 0.7rem; transition: transform 0.2s;" ng-style="{'transform': showLangMenu ? 'rotate(180deg)' : 'rotate(0deg)'}">▼</span>
-                    </button>
-                    <div class="lang-dropdown-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()" style="position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border: 1px solid var(--gov-gray-200); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); min-width: 180px; max-height: 300px; overflow-y: auto; z-index: 1000;">
-                        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gov-gray-100); font-size: 0.75rem; font-weight: 600; color: var(--gov-gray-500); text-transform: uppercase;">Select Language</div>
-                        <a href="#" class="lang-option" ng-repeat="lang in languages"
-                            ng-class="{active: selectedLang === lang.code}"
-                            ng-click="selectLang(lang, $event)"
-                            style="display: flex; align-items: center; padding: 0.75rem 1rem; text-decoration: none; color: var(--gov-gray-700); transition: all 0.15s; border-bottom: 1px solid var(--gov-gray-50);"
-                            ng-style="{'background': selectedLang === lang.code ? 'var(--gov-info-light)' : 'transparent', 'font-weight': selectedLang === lang.code ? '600' : '400'}">
-                            <span style="margin-right: 0.5rem;" ng-if="selectedLang === lang.code">✓</span>
-                            {{lang.name}}
-                        </a>
+                <div class="lang-dropdown" style="position:relative;">
+                    <button class="lang-btn" ng-click="toggleLangMenu($event)">🌐 <span>{{selectedLang}}</span> <span style="font-size:0.65rem;display:inline-block;transition:transform 0.2s;margin-left:0.2rem;" ng-style="{'transform':showLangMenu?'rotate(180deg)':'rotate(0deg)'}">▼</span></button>
+                    <div class="lang-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()">
+                        <button class="lang-option" ng-repeat="lang in languages" ng-class="{active:selectedLang===lang.code}" ng-click="selectLang(lang)"><span ng-if="selectedLang===lang.code" style="margin-right:0.3rem;">✓</span>{{lang.name}}</button>
                     </div>
                 </div>
-                
-                <!-- Improved Notifications Dropdown -->
-                <div class="notification-dropdown" style="position: relative;">
-                    <button class="topbar-btn notification-btn" ng-click="toggleNotifications($event)" title="Notifications" style="position: relative; padding: 0.5rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-size: 1.25rem;">
-                        🔔
-                        <span class="notification-badge" ng-if="houseAllocations.length > 0" style="position: absolute; top: -5px; right: -5px; background: var(--gov-danger); color: white; font-size: 0.7rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">{{houseAllocations.length}}</span>
-                    </button>
-                    <div class="notification-panel" ng-show="showNotifications" ng-click="$event.stopPropagation()" style="position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border: 1px solid var(--gov-gray-200); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); width: 350px; max-height: 400px; overflow: hidden; z-index: 1000;">
-                        <div style="padding: 1rem; border-bottom: 1px solid var(--gov-gray-100); display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="font-size: 1rem; font-weight: 600; color: var(--gov-gray-800);">📋 House Allocations</h4>
-                            <span style="font-size: 0.75rem; color: var(--gov-gray-500);">{{houseAllocations.length}} allocated</span>
-                        </div>
-                        <div style="max-height: 300px; overflow-y: auto;">
-                            <div ng-repeat="allocation in houseAllocations" style="padding: 1rem; border-bottom: 1px solid var(--gov-gray-50); cursor: pointer; transition: background 0.15s;" ng-click="viewHouseDetail(allocation)" onmouseover="this.style.background='var(--gov-gray-50)'" onmouseout="this.style.background='transparent'">
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <div style="width: 40px; height: 40px; background: var(--gov-info-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">🏠</div>
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 600; color: var(--gov-gray-800); font-size: 0.9rem;">House No. {{allocation.houseNo}} allocated</div>
-                                        <div style="font-size: 0.8rem; color: var(--gov-gray-500);">{{allocation.address}}</div>
-                                        <div style="font-size: 0.75rem; color: var(--gov-info); margin-top: 0.25rem;">{{allocation.area}} • {{allocation.ward}}</div>
-                                    </div>
-                                    <span style="font-size: 0.7rem; color: var(--gov-gray-400);">{{allocation.time}}</span>
-                                </div>
+                <div style="position:relative;">
+                    <button class="notification-btn" ng-click="toggleNotifications($event)" title="Notifications">🔔<span class="notif-badge" ng-if="notificationsCount>0">{{notificationsCount}}</span></button>
+                    <div ng-show="showNotifications" ng-click="$event.stopPropagation()" style="position:absolute;top:calc(100% + 0.5rem);right:0;background:white;border:1px solid var(--gov-gray-200);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.15);z-index:1000;width:300px;overflow:hidden;">
+                        <div style="padding:0.875rem 1rem;border-bottom:1px solid var(--gov-gray-100);font-size:0.75rem;font-weight:700;color:var(--gov-gray-600);display:flex;justify-content:space-between;align-items:center;background:var(--gov-gray-50);"><span>GOVERNMENT MESSAGES</span><button ng-click="showNotifications=false" style="background:none;border:none;cursor:pointer;color:var(--gov-gray-500);">✕</button></div>
+                        <div style="max-height:340px;overflow-y:auto;">
+                            <div ng-repeat="msg in govMessages" ng-click="markAsRead(msg)" style="padding:0.875rem 1rem;border-bottom:1px solid var(--gov-gray-50);cursor:pointer;" ng-style="{'background':msg.unread?'rgba(37,99,235,0.05)':'white'}">
+                                <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem;"><span style="font-weight:700;font-size:0.75rem;color:var(--gov-primary);">{{msg.sender}}</span><span style="font-size:0.7rem;color:var(--gov-gray-500);">{{msg.time}}</span></div>
+                                <div style="font-size:0.85rem;color:var(--gov-gray-700);line-height:1.4;">{{msg.text}}</div>
                             </div>
-                            <div ng-if="houseAllocations.length === 0" style="padding: 2rem; text-align: center; color: var(--gov-gray-500);">
-                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📭</div>
-                                <div>No new allocations</div>
-                            </div>
+                            <div ng-if="!govMessages||govMessages.length===0" style="padding:2rem;text-align:center;color:var(--gov-gray-400);">No new messages</div>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div class="worker-content">
-            <!-- Day Complete Banner (Innovation 2) -->
-            <div class="day-complete-banner" ng-if="isDayComplete">
-                <div class="day-complete-icon">🎉</div>
-                <div class="day-complete-title">All Assigned Houses Covered for Today!</div>
-                <div class="day-complete-text">Great work! Your readings have been synced to the government dashboard.
+        <div class="worker-content" style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- ══ HERO TASK ══ -->
+            <div class="hero-task-card">
+                <div class="hero-task-icon">📋</div>
+                <div class="hero-task-body">
+                    <div class="hero-task-label">Today's Assignment</div>
+                    <div class="hero-task-title">{{stats.assigned || 35}} Houses to Cover</div>
+                    <div class="hero-task-meta">
+                        <div class="hero-meta-item">🏠 {{stats.assigned || 35}} Total</div>
+                        <div class="hero-meta-item">⏱️ {{countdownTimer || '03:45:00'}} Left</div>
+                    </div>
+                    <div class="hero-progress-wrap">
+                        <div class="hero-progress-fill" ng-style="{'width': getPercent(stats.covered, stats.assigned) + '%'}"></div>
+                    </div>
+                    <div class="hero-progress-label">{{stats.covered || 0}} of {{stats.assigned || 35}} completed ({{getPercent(stats.covered, stats.assigned)}}%)</div>
+                </div>
+                <div class="hero-task-actions">
+                    <button class="hero-btn primary" ng-click="startWork()">▶ Start Work</button>
+                    <button class="hero-btn outline" ng-click="openFullMap()">📍 View Route</button>
                 </div>
             </div>
 
-            <!-- Quick Status Bar -->
-            <div class="quick-status-bar" ng-if="!isDayComplete">
-                <div class="status-item online">
-                    <span class="status-icon">✓</span>
-                    <span>Field Ready</span>
-                </div>
-                <div class="status-item" ng-class="{'success': networkStatus === 'stable', 'warning': networkStatus === 'weak'}">
-                    <span class="status-icon">📶</span>
-                    <span>Network: {{networkStatus || 'Stable'}}</span>
-                </div>
-                <div class="status-item" ng-class="{'success': gpsEnabled, 'danger': !gpsEnabled}">
-                    <span class="status-icon">📍</span>
-                    <span>GPS: {{gpsEnabled ? 'Active' : 'Off'}}</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-icon">🔋</span>
-                    <span>Battery: {{batteryLevel || '85%'}}</span>
-                </div>
-            </div>
+            <!-- ══ TWO-COLUMN GRID: LEFT(Map+Area) | RIGHT(Performance+Coverage) ══ -->
+            <div class="two-col-grid">
 
-            <!-- My Performance Score Card (Moved to Dashboard) -->
-            <div class="my-score-card" style="background: linear-gradient(135deg, rgba(56, 161, 105, 0.1) 0%, rgba(49, 130, 206, 0.1) 100%); border: 2px solid rgba(56, 161, 105, 0.2); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; display: flex; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 1rem; min-width: 180px;">
-                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--gov-success) 0%, #2f855a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);">
-                        <span style="font-size: 1.8rem; font-weight: 800; color: white;">{{performanceScore || 85}}</span>
-                    </div>
-                    <div>
-                        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--gov-gray-800);">My Score</h3>
-                        <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--gov-gray-600);">Performance Rating</p>
-                        <span style="display: inline-block; margin-top: 0.35rem; padding: 0.2rem 0.6rem; background: var(--gov-success-light); color: var(--gov-success); font-size: 0.7rem; font-weight: 600; border-radius: 12px;">
-                            {{performanceScore >= 90 ? 'Excellent' : performanceScore >= 70 ? 'Good' : performanceScore >= 50 ? 'Average' : 'Needs Improvement'}}
-                        </span>
-                    </div>
-                </div>
-                <div style="flex: 1; min-width: 250px;">
-                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.85rem; font-weight: 600; color: var(--gov-gray-700);">📊 How to Improve Your Score:</h4>
-                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                        <div ng-repeat="tip in improvementTips track by $index" style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.8rem; color: var(--gov-gray-600);">
-                            <span style="color: var(--gov-warning);">💡</span>
-                            <span>{{tip}}</span>
+                <!-- ── LEFT COLUMN ── -->
+                <div class="left-col">
+
+                    <!-- MAP PREVIEW -->
+                    <div class="section-card">
+                        <div class="sc-header">
+                            <div class="sc-title">📍 Route Preview</div>
+                            <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;">
+                                <span style="display:flex;align-items:center;gap:0.3rem;font-weight:700;color:var(--gov-success);">● Done</span>
+                                <span style="display:flex;align-items:center;gap:0.3rem;font-weight:700;color:var(--gov-warning);">● Pending</span>
+                                <span style="display:flex;align-items:center;gap:0.3rem;font-weight:700;color:#2563eb;">● You</span>
+                            </div>
+                        </div>
+                        <!-- LIVE MAP -->
+                        <div id="liveMap" style="height:260px;width:100%;background:#e8f0e8;"></div>
+                        <div style="padding:0.75rem 1.25rem;display:flex;justify-content:flex-end;">
+                            <button ng-click="openFullMap()" style="background:#2563eb;color:white;border:none;padding:0.5rem 1.25rem;border-radius:20px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:0.4rem;transition:all 0.2s;box-shadow:0 3px 10px rgba(37,99,235,0.3);">🗺 Open Full Map</button>
                         </div>
                     </div>
-                </div>
-                <div style="min-width: 180px;" ng-if="laggingAreas.length > 0">
-                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.85rem; font-weight: 600; color: var(--gov-danger);">⚠️ Areas Needing Focus:</h4>
-                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                        <div ng-repeat="area in laggingAreas track by $index" style="display: flex; justify-content: space-between; font-size: 0.8rem; padding: 0.3rem 0.5rem; background: rgba(229, 62, 62, 0.08); border-radius: 4px;">
-                            <span style="color: var(--gov-gray-700);">{{area.area}}</span>
-                            <span style="color: var(--gov-danger); font-weight: 600;">{{area.current}} → {{area.target}}</span>
+
+                    <!-- ASSIGNED AREA -->
+                    <div class="section-card">
+                        <div class="sc-header">
+                            <div class="sc-title">📍 Assigned Area</div>
+                        </div>
+                        <div class="sc-body">
+                            <div class="area-chips-grid">
+                                <div class="area-chip-item">
+                                    <div class="area-chip-emoji">🏙️</div>
+                                    <div class="area-chip-text">
+                                        <span class="area-chip-lbl">City</span>
+                                        <span class="area-chip-val">{{area.district || 'New Delhi'}}</span>
+                                    </div>
+                                </div>
+                                <div class="area-chip-item">
+                                    <div class="area-chip-emoji">🗺️</div>
+                                    <div class="area-chip-text">
+                                        <span class="area-chip-lbl">Ward</span>
+                                        <span class="area-chip-val">{{area.ward || 'Ward 9'}}</span>
+                                    </div>
+                                </div>
+                                <div class="area-chip-item">
+                                    <div class="area-chip-emoji">🏢</div>
+                                    <div class="area-chip-text">
+                                        <span class="area-chip-lbl">Locality</span>
+                                        <span class="area-chip-val">{{area.locality || 'Greenview Apts'}}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Assigned Area Overview Card -->
-            <div class="area-card">
-                <div class="area-header">
-                    <div class="area-title">
-                        <span class="area-icon">⚙️</span>
-                        <span>Assigned Area Overview</span>
-                    </div>
-                    <!-- Day Selector Dropdown -->
-                    <div class="day-dropdown">
-                        <button class="day-selector-btn" ng-click="toggleDayMenu($event)">
-                            On {{selectedDay.label}} <span>›</span>
-                        </button>
-                        <div class="day-dropdown-menu" ng-show="showDayMenu">
-                            <button class="day-dropdown-item" ng-repeat="day in dayOptions"
-                                ng-class="{active: selectedDay.id === day.id}" ng-click="selectDay(day)">
-                                {{day.label}}
+                </div><!-- /left-col -->
+
+                <!-- ── RIGHT COLUMN ── -->
+                <div class="right-col">
+
+                    <!-- PERFORMANCE -->
+                    <div class="section-card">
+                        <div class="sc-header">
+                            <div class="sc-title">🏆 Performance</div>
+                            <button class="insights-toggle-btn" ng-click="showInsights = !showInsights">
+                                {{showInsights ? '▲' : '▼'}} Insights
                             </button>
                         </div>
-                    </div>
-                </div>
-                <div class="area-chips">
-                    <div class="area-chip">
-                        <span class="area-chip-icon">📍</span>
-                        <div class="area-chip-content">
-                            <span class="area-chip-label">STATE</span>
-                            <span class="area-chip-value">{{area.state}}</span>
+                        <div class="sc-body">
+                            <div class="perf-score-bar">
+                                <div>
+                                    <div style="font-size:0.72rem;color:var(--gov-gray-500);font-weight:700;text-transform:uppercase;margin-bottom:0.2rem;">Overall Score</div>
+                                    <div class="perf-score-big">{{performanceScore || 85}}<span>/100</span></div>
+                                </div>
+                                <div class="perf-badge">↑ +5 today</div>
+                            </div>
+                            <div class="perf-metric-row">
+                                <div class="perf-metric-item">
+                                    <div class="perf-metric-icon">🎯</div>
+                                    <div class="perf-metric-label">Accuracy</div>
+                                    <div class="perf-metric-bar"><div class="perf-metric-fill" style="width:92%;background:#10b981;"></div></div>
+                                    <div class="perf-metric-value">92%</div>
+                                </div>
+                                <div class="perf-metric-item">
+                                    <div class="perf-metric-icon">⚡</div>
+                                    <div class="perf-metric-label">Speed</div>
+                                    <div class="perf-metric-bar"><div class="perf-metric-fill" style="width:88%;background:#2563eb;"></div></div>
+                                    <div class="perf-metric-value">88%</div>
+                                </div>
+                                <div class="perf-metric-item">
+                                    <div class="perf-metric-icon">⭐</div>
+                                    <div class="perf-metric-label">Feedback</div>
+                                    <div class="perf-metric-bar"><div class="perf-metric-fill" style="width:70%;background:#f59e0b;"></div></div>
+                                    <div class="perf-metric-value">70%</div>
+                                </div>
+                            </div>
+                            <!-- Collapsible Insights -->
+                            <div class="insights-panel" ng-show="showInsights">
+                                <div style="margin-top:0.5rem;"></div>
+                                <div class="insight-item warn">⚠ Block A accuracy issue — revisit meter readings</div>
+                                <div class="insight-item good">🚀 Top 10% speed today — keep it up!</div>
+                                <div class="insight-item info">🧭 Switch Ward 9 → Ward 10 for a faster route</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="area-chip">
-                        <span class="area-chip-icon">🏛️</span>
-                        <div class="area-chip-content">
-                            <span class="area-chip-label">DISTRICT</span>
-                            <span class="area-chip-value">{{area.district}}</span>
-                        </div>
-                    </div>
-                    <div class="area-chip">
-                        <span class="area-chip-icon">🏠</span>
-                        <div class="area-chip-content">
-                            <span class="area-chip-label">WARD</span>
-                            <span class="area-chip-value">{{area.ward}}</span>
-                        </div>
-                    </div>
-                    <div class="area-chip">
-                        <span class="area-chip-icon">🏢</span>
-                        <div class="area-chip-content">
-                            <span class="area-chip-label">LOCALITY</span>
-                            <span class="area-chip-value">{{area.locality}}</span>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- KPI Cards inside Area Card -->
-                <div class="kpi-grid">
-                    <div class="kpi-card primary">
-                        <div class="kpi-card-header">
-                            <span class="kpi-card-icon">🏠</span>
-                            <span class="kpi-card-title">Houses assigned</span>
+                    <!-- COVERAGE -->
+                    <div class="section-card">
+                        <div class="sc-header">
+                            <div class="sc-title">📊 Today's Coverage</div>
                         </div>
-                        <div class="kpi-card-value">{{stats.assigned}}</div>
-                    </div>
-                    <div class="kpi-card success">
-                        <div class="kpi-card-header">
-                            <span class="kpi-card-icon">✓</span>
-                            <span class="kpi-card-title">Houses covered</span>
-                        </div>
-                        <div class="kpi-card-value">{{stats.covered}}</div>
-                        <div class="kpi-card-progress">
-                            <div class="kpi-card-progress-bar" ng-style="{'width': stats.coveredPercent + '%'}"></div>
-                        </div>
-                        <div class="kpi-card-percent">{{stats.coveredPercent}}%</div>
-                    </div>
-                    <div class="kpi-card warning">
-                        <div class="kpi-card-header">
-                            <span class="kpi-card-icon">⏳</span>
-                            <span class="kpi-card-title">Houses pending</span>
-                        </div>
-                        <div class="kpi-card-value">{{stats.pending}}</div>
-                        <div class="kpi-card-progress">
-                            <div class="kpi-card-progress-bar" ng-style="{'width': stats.pendingPercent + '%'}"></div>
+                        <div class="sc-body">
+                            <div class="coverage-count">
+                                {{stats.covered || 0}}<span> / {{stats.assigned || 35}}</span>
+                            </div>
+                            <div class="coverage-bar-wrap">
+                                <div class="coverage-bar-fill" ng-style="{'width': getPercent(stats.covered, stats.assigned) + '%'}"></div>
+                            </div>
+                            <div class="coverage-stats-row">
+                                <span class="cov-tag done">✓ Done: {{stats.covered || 0}}</span>
+                                <span class="cov-tag pending">⏳ Pending: {{stats.pending || 35}}</span>
+                                <span class="cov-tag skipped">✕ Skipped: {{stats.skipped || 0}}</span>
+                            </div>
+                            <div class="motivation-line">🎯 {{motivationMsg || '5 more houses to reach your bonus!'}}</div>
                         </div>
                     </div>
-                    <div class="kpi-card danger">
-                        <div class="kpi-card-header">
-                            <span class="kpi-card-icon">⚠️</span>
-                            <span class="kpi-card-title">Houses skipped</span>
-                        </div>
-                        <div class="kpi-card-value">{{stats.skipped}}</div>
-                    </div>
-                    <div class="kpi-card info">
-                        <div class="kpi-card-header">
-                            <span class="kpi-card-icon">📊</span>
-                            <span class="kpi-card-title">Easily granged</span>
-                        </div>
-                        <div class="kpi-card-value">{{stats.avgTime}}</div>
+
+                </div><!-- /right-col -->
+            </div><!-- /two-col-grid -->
+
+            <!-- ══ QUICK ACTIONS ══ -->
+            <div class="section-card">
+                <div class="sc-header">
+                    <div class="sc-title">⚡ Quick Actions</div>
+                </div>
+                <div class="sc-body" style="padding-top:1rem;">
+                    <div class="quick-actions-strip">
+                        <button class="qa-btn green" ng-click="startWork()">▶ Start Next House</button>
+                        <button class="qa-btn blue" ng-click="openFullMap()">📍 Open Map</button>
+                        <button class="qa-btn orange" ng-click="uiControl.showEmergencyModal = true">⚠ Report Issue</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Pace Status Card (GAP 3 Fix) -->
-            <div class="pace-card">
-                <div class="pace-left">
-                    <div class="pace-icon" ng-class="paceStatus.class">
-                        {{paceStatus.icon}}
+            <!-- ══ WALLET ══ -->
+            <div class="wallet-row">
+                <div class="wallet-balance-panel">
+                    <div class="wallet-coin">🪙</div>
+                    <div>
+                        <div class="wallet-label">Wallet Balance</div>
+                        <div class="wallet-pts">{{walletPoints || 450}}<span> pts</span></div>
                     </div>
-                    <div class="pace-info">
-                        <h4>Schedule Status</h4>
-                        <p>Based on time elapsed and houses remaining</p>
+                    <div class="wallet-progress-wrap">
+                        <div class="wallet-progress-fill" ng-style="{'width': ((walletPoints || 450) / 1000 * 100) + '%'}"></div>
                     </div>
+                    <div class="wallet-goal">🎯 Goal: 1000 pts for Gold Bonus</div>
                 </div>
-                <span class="pace-status" ng-class="paceStatus.class">
-                    {{paceStatus.text}}
-                </span>
-            </div>
-
-            <!-- Main Dashboard Grid -->
-            <div class="dashboard-grid">
-                <!-- Main Column -->
-                <div class="dashboard-main">
-                    <!-- Progress Section -->
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <span class="progress-title">📊 Today's Coverage Progress</span>
-                            <div class="progress-actions">
-                                <button class="progress-btn secondary" ng-click="refresh()">
-                                    🔄 Refresh
-                                </button>
-                                <button class="progress-btn primary" ng-click="startMeterReading()"
-                                    ng-disabled="isDayComplete">
-                                    ▶️ Start Meter Reading
-                                </button>
-                            </div>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-segment completed" ng-style="{'width': stats.coveredPercent + '%'}"
-                                ng-if="stats.coveredPercent > 0">
-                                {{stats.coveredPercent}}%
-                            </div>
-                            <div class="progress-segment pending" ng-style="{'width': stats.pendingPercent + '%'}"
-                                ng-if="stats.pendingPercent > 0">
-                                {{stats.pendingPercent}}%
-                            </div>
-                            <div class="progress-segment skipped" ng-style="{'width': stats.skippedPercent + '%'}"
-                                ng-if="stats.skippedPercent > 0">
-                                {{stats.skippedPercent}}%
-                            </div>
-                        </div>
-                        <div class="progress-legend">
-                            <div class="legend-item">
-                                <span class="legend-dot completed"></span>
-                                <span>Completed ({{stats.covered}})</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-dot pending"></span>
-                                <span>Pending ({{stats.pending}})</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-dot skipped"></span>
-                                <span>Skipped ({{stats.skipped}})</span>
-                            </div>
-                        </div>
+                <div class="wallet-redeem-panel">
+                    <div class="redeem-header">
+                        <div class="redeem-title">Redeem Points For</div>
+                        <a href="#/wallet" class="redeem-link">View History →</a>
                     </div>
-
-                    <!-- Task List -->
-                    <div class="task-section">
-                        <div class="task-header">
-                            <span class="task-title">📋 Today's Task List</span>
-                            <!-- Route Toggle (GAP 1 Fix) -->
-                            <div class="route-toggle">
-                                <span>🔀 Sort by:</span>
-                                <button class="route-toggle-btn" ng-class="{active: sortBy === 'route'}"
-                                    ng-click="setSortBy('route')">Distance</button>
-                                <button class="route-toggle-btn" ng-class="{active: sortBy === 'status'}"
-                                    ng-click="setSortBy('status')">Status</button>
-                            </div>
-                        </div>
-                        <div class="task-list">
-                            <div class="task-item" ng-repeat="task in sortedTasks track by task.id"
-                                ng-class="task.status" style="position: relative;">
-                                <div class="task-checkbox" ng-click="viewHouseDetail(task)" style="cursor: pointer;">
-                                    <span ng-if="task.status === 'completed'" style="color: var(--gov-success);">✓</span>
-                                    <span ng-if="task.status === 'skipped'" style="color: var(--gov-danger);">✕</span>
-                                    <span ng-if="task.status === 'pending'" style="color: var(--gov-warning);">○</span>
-                                </div>
-                                <div class="task-info" ng-click="viewHouseDetail(task)" style="cursor: pointer; flex: 1;">
-                                    <div class="task-name">
-                                        House {{task.houseNo}} - {{task.name}}
-                                        <!-- Route Tags (GAP 1 Fix) -->
-                                        <span class="route-tag next" ng-if="task.routeTag === 'next'">⭐ Next</span>
-                                        <span class="route-tag nearby" ng-if="task.routeTag === 'nearby'">📍
-                                            Nearby</span>
-                                        <span class="route-tag far" ng-if="task.routeTag === 'far'">🚶 Far</span>
-                                    </div>
-                                    <div class="task-address">{{task.address}}</div>
-                                    <div class="task-distance" ng-if="task.distance" style="font-size: 0.75rem; color: var(--gov-gray-500); margin-top: 0.2rem;">
-                                        📏 {{task.distance}}m away
-                                    </div>
-                                </div>
-                                <div class="task-right" style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; min-width: 100px;">
-                                    <!-- Status Badge (Clear & Visible) -->
-                                    <span class="task-status-badge" ng-class="task.status" style="padding: 0.3rem 0.75rem; border-radius: 15px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;"
-                                        ng-style="{'background': task.status === 'completed' ? 'var(--gov-success-light)' : task.status === 'skipped' ? 'var(--gov-danger-light)' : 'var(--gov-warning-light)', 
-                                                   'color': task.status === 'completed' ? 'var(--gov-success)' : task.status === 'skipped' ? 'var(--gov-danger)' : 'var(--gov-warning)'}">
-                                        {{task.status === 'completed' ? 'Completed' : task.status === 'skipped' ? 'Skipped' : 'Pending'}}
-                                    </span>
-                                    <!-- Skip Reason with Icons (GAP 2 Fix) -->
-                                    <span class="skip-reason" ng-if="task.status === 'skipped'" style="font-size: 0.7rem; color: var(--gov-gray-600);">
-                                        <span class="skip-reason-icon">{{task.skipIcon}}</span>
-                                        <span>{{task.skipReason}}</span>
-                                    </span>
-                                    <span class="task-time" ng-if="task.status === 'completed'" style="font-size: 0.7rem; color: var(--gov-gray-500);">{{task.time}}</span>
-                                </div>
-                                <!-- Action Buttons -->
-                                <div class="task-actions" style="display: flex; gap: 0.5rem; margin-left: 0.75rem;">
-                                    <!-- For Pending Tasks -->
-                                    <button class="task-action-btn primary" ng-if="task.status === 'pending'" ng-click="openStartReadingModal(task, $event)"
-                                        title="Start Reading" style="padding: 0.5rem 0.75rem; background: var(--gov-success); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 0.3rem;">
-                                        ▶️ Start
-                                    </button>
-                                    <button class="task-action-btn warning" ng-if="task.status === 'pending'" ng-click="openSkipModal(task, $event)"
-                                        title="Skip" style="padding: 0.5rem 0.75rem; background: var(--gov-warning); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">
-                                        ⏭️ Skip
-                                    </button>
-                                    <!-- For Completed Tasks -->
-                                    <button class="task-action-btn info" ng-if="task.status === 'completed' || task.status === 'skipped'" ng-click="viewSubmission(task, $event)"
-                                        title="View Submission" style="padding: 0.5rem 0.75rem; background: var(--gov-info); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">
-                                        👁️ View
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sidebar Column -->
-                <div class="dashboard-sidebar">
-                    <!-- Smart Route Assist -->
-                    <div class="sidebar-card">
-                        <div class="sidebar-card-header">
-                            🧭 Smart Route Assist
-                            <span class="sidebar-card-badge">AI</span>
-                        </div>
-                        <div class="sidebar-card-body">
-                            <div class="smart-route-content">
-                                <div class="smart-route-icon">🗺️</div>
-                                <div class="smart-route-text">
-                                    Complete <strong>House {{nextHouse.houseNo}}</strong> → <strong>House
-                                        {{nextHouse.nextHouseNo}}</strong> next for optimal route.
-                                </div>
-                                <div class="smart-route-savings">
-                                    ⏱️ Save ~{{nextHouse.timeSaved}} min
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Upload Confidence Check -->
-                    <div class="sidebar-card">
-                        <div class="sidebar-card-header">
-                            📤 Upload Confidence Check
-                        </div>
-                        <div class="sidebar-card-body">
-                            <div class="confidence-list">
-                                <div class="confidence-item-row">
-                                    <span class="confidence-label">📷 Camera</span>
-                                    <span class="confidence-status ready">✓ Ready</span>
-                                </div>
-                                <div class="confidence-item-row">
-                                    <span class="confidence-label">📍 GPS</span>
-                                    <span class="confidence-status ready">✓ Active</span>
-                                </div>
-                                <div class="confidence-item-row">
-                                    <span class="confidence-label">🕐 Timestamp</span>
-                                    <span class="confidence-status ready">✓ Synced</span>
-                                </div>
-                            </div>
-                            <div class="all-systems-ready">
-                                ✓ All Systems Ready
-                            </div>
-                            <!-- Quality Hint (Innovation 3) -->
-                            <div class="quality-hint">
-                                <span class="quality-hint-icon">💡</span>
-                                <span>Tip: Hold camera steady for clearer readings.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Daily Summary -->
-                    <div class="sidebar-card">
-                        <div class="sidebar-card-header">
-                            📊 Daily Summary
-                        </div>
-                        <div class="sidebar-card-body">
-                            <div class="summary-grid">
-                                <div class="summary-item">
-                                    <div class="summary-value">{{summary.readings}}</div>
-                                    <div class="summary-label">Readings Uploaded</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="summary-value">{{summary.issues}}</div>
-                                    <div class="summary-label">Issues Reported</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="summary-value">{{summary.timeActive}}</div>
-                                    <div class="summary-label">Time Active</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="summary-value">{{summary.meters}}</div>
-                                    <div class="summary-label">Meters (E/W/G)</div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="redeem-grid">
+                        <button class="redeem-btn" ng-click="showWalletDialog('metro','🚇','Metro Pass',50)">
+                            <div class="redeem-icon-box">🚇</div>
+                            <span class="redeem-name">Metro</span>
+                        </button>
+                        <button class="redeem-btn" ng-click="showWalletDialog('bills','🧾','Utility Bills',75)">
+                            <div class="redeem-icon-box">🧾</div>
+                            <span class="redeem-name">Bills</span>
+                        </button>
+                        <button class="redeem-btn" ng-click="showWalletDialog('taxi','🚕','Taxi Ride',80)">
+                            <div class="redeem-icon-box">🚕</div>
+                            <span class="redeem-name">Taxi</span>
+                        </button>
+                        <button class="redeem-btn" ng-click="showWalletDialog('recharge','⚡','Mobile Recharge',40)">
+                            <div class="redeem-icon-box">⚡</div>
+                            <span class="redeem-name">Recharge</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Government Visibility Footer (GAP 4 Fix) -->
-            <div class="gov-visibility-footer">
-                <span class="gov-visibility-icon">👁️</span>
-                <span>Your progress is visible to ward supervisors in real time.</span>
-            </div>
-        </div>
+        </div><!-- /worker-content -->
     </main>
+
+    <!-- ═══════ LIVE MAP SCRIPT ═══════ -->
+    <script>
+        // Leaflet CSS
+        (function() {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            document.head.appendChild(link);
+        })();
+
+        function initDashboardMap() {
+            if (typeof L === 'undefined') {
+                setTimeout(initDashboardMap, 300);
+                return;
+            }
+            var mapEl = document.getElementById('liveMap');
+            if (!mapEl || mapEl._leaflet_id) return;
+
+            var map = L.map('liveMap', {
+                zoomControl: true,
+                scrollWheelZoom: false,
+                attributionControl: false
+            }).setView([28.6139, 77.2090], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OSM'
+            }).addTo(map);
+
+            // Current location marker
+            var youIcon = L.divIcon({
+                className: '',
+                html: '<div style="font-size:1.6rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));">🛵</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+            L.marker([28.6139, 77.2090], { icon: youIcon }).addTo(map).bindPopup('<b>You are here</b>').openPopup();
+
+            // Sample houses along the route
+            var houses = [
+                { lat: 28.6155, lng: 77.2070, status: 'done',    label: 'House 101' },
+                { lat: 28.6148, lng: 77.2105, status: 'done',    label: 'House 102' },
+                { lat: 28.6125, lng: 77.2115, status: 'pending', label: 'House 103 (Next)' },
+                { lat: 28.6118, lng: 77.2080, status: 'pending', label: 'House 104' },
+                { lat: 28.6130, lng: 77.2050, status: 'pending', label: 'House 105' }
+            ];
+
+            var colorMap = { done: '#10b981', pending: '#f59e0b' };
+            var routePoints = [[28.6139, 77.2090]];
+
+            houses.forEach(function(h) {
+                routePoints.push([h.lat, h.lng]);
+                var icon = L.divIcon({
+                    className: '',
+                    html: '<div style="width:14px;height:14px;border-radius:50%;background:' + colorMap[h.status] + ';border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.35);"></div>',
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 7]
+                });
+                L.marker([h.lat, h.lng], { icon: icon }).addTo(map).bindPopup('<b>' + h.label + '</b>');
+            });
+
+            // Draw route path
+            L.polyline(routePoints, {
+                color: '#2563eb',
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '8 5'
+            }).addTo(map);
+        }
+
+        // Load Leaflet JS then init map
+        var leafletScript = document.createElement('script');
+        leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        leafletScript.onload = function() { initDashboardMap(); };
+        document.head.appendChild(leafletScript);
+    </script>
+
+    <!-- OLD CONTENT START (being removed) -->
+    <div style="display:none" aria-hidden="true">
+            <div class="performance-dialog-box-removed" style="background: white; border: 1px solid var(--gov-gray-200); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-top: 5px solid #2563eb;">
+                <div style="background: rgba(37, 99, 235, 0.05); padding: 1.25rem 2rem; border-bottom: 1px solid var(--gov-gray-100); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; flex-direction: column;">
+                        <h2 style="margin: 0; color: #1e40af; font-size: 1.4rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="background: #2563eb; color: white; width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🏆</span> 
+                            Today's Performance
+                        </h2>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.8rem; color: #1d4ed8; font-weight: 700; text-transform: uppercase;">Current Standing</div>
+                            <div style="font-size: 0.9rem; color: var(--gov-success); font-weight: 800;">↑ +5 today</div>
+                        </div>
+                        <div style="background: #2563eb; color: white; padding: 0.6rem 1.5rem; border-radius: 12px; font-weight: 900; font-size: 1.4rem; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);">
+                            {{performanceScore}}/100
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 2.5rem; display: flex; gap: 4rem; flex-wrap: wrap; background: linear-gradient(to bottom, #ffffff 0%, #f0f7ff 100%);">
+                    <!-- Left: Score breakdown -->
+                    <div style="flex: 1; min-width: 320px; display: flex; flex-direction: column; align-items: center; border-right: 1px solid rgba(0,0,0,0.05); padding-right: 2.5rem;">
+                        <div class="score-pie-container" style="position: relative; width: 180px; height: 180px;">
+                            <div class="score-pie-chart" style="width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(#38a169 0% 40%, #2563eb 40% 70%, #ecc94b 70% 85%, #e53e3e 85% 100%); box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+                            </div>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 130px; height: 130px; background: white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);">
+                                <span style="font-size: 2.5rem; font-weight: 900; color: var(--gov-gray-800); line-height: 1;">{{performanceScore}}</span>
+                                <span style="font-size: 0.7rem; color: var(--gov-success); font-weight: 800; text-transform: uppercase; margin-top: 0.25rem;">Good Goal</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; width: 100%; display: flex; flex-direction: column; gap: 0.85rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(56, 161, 105, 0.05); border-radius: 12px; border: 1px solid rgba(56, 161, 105, 0.1);">
+                                <div style="display: flex; align-items: center; gap: 0.6rem; font-weight: 600; color: var(--gov-gray-700);">
+                                    <span style="width: 10px; height: 10px; border-radius: 2px; background: #38a169;"></span> Accuracy: 92%
+                                </div>
+                                <span style="font-size: 0.75rem; color: var(--gov-warning); font-weight: 700;">↓ Improve slightly</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(37, 99, 235, 0.05); border-radius: 12px; border: 1px solid rgba(37, 99, 235, 0.1);">
+                                <div style="display: flex; align-items: center; gap: 0.6rem; font-weight: 600; color: var(--gov-gray-700);">
+                                    <span style="width: 10px; height: 10px; border-radius: 2px; background: #2563eb;"></span> Speed: 88%
+                                </div>
+                                <span style="font-size: 0.75rem; color: var(--gov-success); font-weight: 700;">👍 Good</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(236, 201, 75, 0.05); border-radius: 12px; border: 1px solid rgba(236, 201, 75, 0.1);">
+                                <div style="display: flex; align-items: center; gap: 0.6rem; font-weight: 600; color: var(--gov-gray-700);">
+                                    <span style="width: 10px; height: 10px; border-radius: 2px; background: #ecc94b;"></span> Feedback: 70%
+                                </div>
+                                <span style="font-size: 0.75rem; color: var(--gov-warning); font-weight: 700;">⚠ Needs focus</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(229, 62, 62, 0.05); border-radius: 12px; border: 1px solid rgba(229, 62, 62, 0.1);">
+                                <div style="display: flex; align-items: center; gap: 0.6rem; font-weight: 600; color: var(--gov-gray-700);">
+                                    <span style="width: 10px; height: 10px; border-radius: 2px; background: #e53e3e;"></span> Issues: 65%
+                                </div>
+                                <span style="font-size: 0.75rem; color: var(--gov-danger); font-weight: 700;">❗ Critical</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Actionable SMART Insights -->
+                    <div style="flex: 1.5; min-width: 350px;">
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Card 1: Accuracy -->
+                            <div style="background: white; border: 1px solid #fed7d7; border-left: 5px solid #e53e3e; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                        <span style="font-size: 1rem;">⚠</span>
+                                        <h4 style="margin: 0; color: #9b2c2c; font-size: 0.95rem; font-weight: 700;">Improve Accuracy</h4>
+                                    </div>
+                                    <p style="margin: 0; font-size: 0.85rem; color: var(--gov-gray-600);">Block A → Meter mismatch detected</p>
+                                </div>
+                                <button ng-click="navigateToBlockA()" style="background: #e53e3e; color: white; border: none; padding: 0.5rem 0.75rem; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem;">Revisit</button>
+                            </div>
+
+                            <!-- Card 2: Speed -->
+                            <div style="background: white; border: 1px solid #c6f6d5; border-left: 5px solid #38a169; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                        <span style="font-size: 1rem;">🚀</span>
+                                        <h4 style="margin: 0; color: #276749; font-size: 0.95rem; font-weight: 700;">Great Speed</h4>
+                                    </div>
+                                    <p style="margin: 0; font-size: 0.85rem; color: var(--gov-gray-600);">Top 10% today. You are efficient!</p>
+                                </div>
+                                <button ng-click="uiControl.showImprovementModal = true" style="background: #c6f6d5; color: #22543d; padding: 0.4rem 0.6rem; border-radius: 6px; font-weight: 800; font-size: 0.7rem; border: none; cursor: pointer;">KEEP IT UP</button>
+                            </div>
+
+                            <!-- Card 3: Route -->
+                            <div style="background: white; border: 1px solid #bee3f8; border-left: 5px solid #2563eb; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                        <span style="font-size: 1rem;">🧭</span>
+                                        <h4 style="margin: 0; color: #2c5282; font-size: 0.95rem; font-weight: 700;">Optimize Route</h4>
+                                    </div>
+                                    <p style="margin: 0; font-size: 0.85rem; color: var(--gov-gray-600);">Ward 9 → Ward 10 inefficient travel</p>
+                                </div>
+                                <button ng-click="useSmartRoute()" style="background: #2563eb; color: white; border: none; padding: 0.5rem 0.75rem; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem;">Use Smart Route</button>
+                            </div>
+
+                            <!-- Contextual AI CTA -->
+                            <div style="margin-top: 1rem; background: rgba(37, 99, 235, 0.03); padding: 1.5rem; border-radius: 16px; border: 1px dashed rgba(37, 99, 235, 0.3); text-align: center;">
+                                <div style="font-size: 0.85rem; color: var(--gov-gray-600); margin-bottom: 1rem; font-weight: 600;">📈 What will increase your score fastest?</div>
+                                <div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap;">
+                                    <span style="background: #ebf8ff; color: #2b6cb0; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid #bee3f8;">+5 Fix Accuracy</span>
+                                    <span style="background: #ebf8ff; color: #2b6cb0; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid #bee3f8;">+3 Route Logic</span>
+                                </div>
+                                <button ng-click="startVoiceRequest()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem; background: #2563eb; color: white; border: none; padding: 1rem; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transition: all 0.2s;" ng-class="{'listening-ai': isListening}">
+                                    <span>{{isListening ? '🎙️' : '🤖'}}</span> {{isListening ? 'Listening...' : 'Ask AI Bandhu'}}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. TODAY'S TO-DO TASK BANNER -->
+            <div class="todo-banner" style="background: #f6e05e; border: 2px solid #d69e2e; border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <div style="width: 60px; height: 60px; background: rgba(214, 158, 46, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem;">📝</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 900; color: #744210; font-size: 1.3rem; margin-bottom: 0.35rem; text-transform: uppercase;">Today's To-Do Task</div>
+                        <div style="color: #936a2e; font-weight: 600; font-size: 1rem;">
+                            Assigned: <strong>{{stats.assigned}} Households</strong> 
+                            <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem;">
+                                <span>🎁 Reward: <strong>+20 pts</strong> / extra house</span>
+                                <span>⏱️ Bonus: <strong>+10 pts</strong> for timing</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: right; background: rgba(214, 158, 46, 0.1); padding: 0.75rem 1.25rem; border-radius: 12px; border: 1px solid rgba(214, 158, 46, 0.2);">
+                        <div style="font-size: 0.75rem; color: #975a16; font-weight: 800; text-transform: uppercase; margin-bottom: 0.25rem;">Time Remaining</div>
+                        <div style="font-size: 1.8rem; font-weight: 900; color: #744210; font-family: monospace;">{{countdownTimer || '03:45:22'}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ASSIGNED AREA & TODAY'S COVERAGE -->
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                <div style="flex: 2; min-width: 400px; background: white; border: 1px solid var(--gov-gray-200); border-radius: var(--radius-lg); padding: 1.5rem;">
+                    <h3 style="margin: 0 0 1.25rem; color: var(--gov-gray-800); font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>📍</span> Assigned Area To You
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div style="background: var(--gov-gray-50); padding: 1rem; border-radius: 12px; border: 1px solid var(--gov-gray-100);">
+                            <div style="font-size: 0.65rem; color: var(--gov-gray-500); font-weight: 800; text-transform: uppercase;">City</div>
+                            <div style="font-weight: 700; color: var(--gov-gray-800); margin-top: 0.25rem;">{{area.district || 'New Delhi'}}</div>
+                        </div>
+                        <div style="background: var(--gov-gray-50); padding: 1rem; border-radius: 12px; border: 1px solid var(--gov-gray-100);">
+                            <div style="font-size: 0.65rem; color: var(--gov-gray-500); font-weight: 800; text-transform: uppercase;">Ward</div>
+                            <div style="font-weight: 700; color: var(--gov-gray-800); margin-top: 0.25rem;">{{area.ward}}</div>
+                        </div>
+                        <div style="background: var(--gov-gray-50); padding: 1rem; border-radius: 12px; border: 1px solid var(--gov-gray-100);">
+                            <div style="font-size: 0.65rem; color: var(--gov-gray-500); font-weight: 800; text-transform: uppercase;">Locality</div>
+                            <div style="font-weight: 700; color: var(--gov-gray-800); margin-top: 0.25rem;">{{area.locality}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="flex: 1.2; min-width: 280px; background: white; border: 1px solid var(--gov-gray-200); border-radius: var(--radius-lg); padding: 1.5rem;">
+                    <h3 style="margin: 0 0 1rem; color: var(--gov-gray-800); font-size: 1.1rem; font-weight: 800;">📊 Today's Total Coverage</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 700;">
+                            <span>Progress</span>
+                            <span>{{stats.covered}} / {{stats.assigned}}</span>
+                        </div>
+                        <div style="width: 100%; height: 10px; background: var(--gov-gray-100); border-radius: 10px; overflow: hidden;">
+                            <div style="height: 100%; background: var(--gov-success); transition: width 0.5s;" ng-style="{'width': stats.coveredPercent + '%'}"></div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                            <span style="background: var(--gov-warning-light); color: var(--gov-warning); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">Pending: {{stats.pending}}</span>
+                            <span style="background: var(--gov-danger-light); color: var(--gov-danger); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">Skipped: {{stats.skipped}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. MY PERFORMANCE (MAP) -->
+            <div class="map-performance-card" style="background: white; border: 1px solid var(--gov-gray-200); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div style="padding: 1.25rem 1.5rem; background: var(--gov-gray-50); border-bottom: 1px solid var(--gov-gray-200); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <h3 style="margin: 0; color: var(--gov-gray-800); font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.75rem;">
+                            <span>🌍</span> My Performance Map
+                        </h3>
+                        <div style="background: #e9d5ff; color: #5b21b6; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #8b5cf6; box-shadow: 0 0 5px #8b5cf6;"></span>
+                            {{recommendations.length}} Smart Route Suggestions Found
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 700;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #38a169; border: 2px solid white; box-shadow: 0 0 0 1px #38a169;"></span> Covered</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 700;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #ecc94b; border: 2px solid white; box-shadow: 0 0 0 1px #ecc94b;"></span> Pending</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 700;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #e53e3e; border: 2px solid white; box-shadow: 0 0 0 1px #e53e3e;"></span> Skipped</div>
+                    </div>
+                </div>
+                <div class="map-container" style="height: 400px; background-image: url('https://i.imgur.com/G5YOn8S.png'); background-size: cover; background-position: center; position: relative;">
+                    <!-- SVG Overlay for Route Paths -->
+                    <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                        <path ng-if="recommendations.length > 1" 
+                              ng-attr-d="{{getRoutePath()}}" 
+                              fill="none" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="8 4" stroke-opacity="0.6">
+                        </path>
+                    </svg>
+
+                    <!-- Dynamic Markers -->
+                    <div ng-repeat="task in tasks" class="map-marker" 
+                         ng-style="{'top': task.y + '%', 'left': task.x + '%'}"
+                         ng-class="{'pulse': task.id === currentTask.id}"
+                         ng-click="viewHouseDetail(task)">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"
+                             ng-style="{'background': getMarkerColor(task)}">
+                        </div>
+                        <div ng-if="task.routeIndex" style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); background: #8b5cf6; color: white; font-size: 10px; padding: 1px 5px; border-radius: 8px; font-weight: 900; white-space: nowrap;">
+                            Next #{{task.routeIndex}}
+                        </div>
+                    </div>
+
+                    <!-- Current Location -->
+                    <div class="map-marker pulse" style="top: 45%; left: 50%; z-index: 50;">
+                        <div style="font-size: 1.5rem;">🛵</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. WALLET SECTION -->
+            <div class="wallet-card-premium" style="border-radius: var(--radius-lg); overflow: hidden; display: flex; box-shadow: 0 15px 35px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05);">
+                <div style="flex: 1; padding: 2.5rem; background: linear-gradient(135deg, rgba(56, 161, 105, 0.05) 0%, rgba(56, 161, 105, 0.1) 100%); border-right: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1.25rem;">
+                        <div style="width: 65px; height: 65px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 8px 20px rgba(56, 161, 105, 0.15);">🪙</div>
+                        <div>
+                            <div style="font-size: 0.8rem; color: var(--gov-gray-500); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Wallet Balance</div>
+                            <div style="font-size: 2.5rem; font-weight: 900; color: #059669; line-height: 1.1;">
+                                {{walletPoints || 450}} <span style="font-size: 1rem; color: var(--gov-gray-400); font-weight: 700;">Points</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: rgba(56, 161, 105, 0.1); border-radius: 10px; margin-top: 0.5rem;">
+                        <div style="height: 100%; background: #10b981; width: 45%; border-radius: 10px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);"></div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #065f46; font-weight: 700;">Goal: 1000 Pts for Gold Bonus</div>
+                </div>
+                <div style="flex: 1.8; padding: 2rem 2.5rem; background: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <div style="font-size: 0.85rem; color: var(--gov-gray-600); font-weight: 800; text-transform: uppercase;">Redeem Points For</div>
+                        <a href="wallet.html" style="font-size: 0.8rem; color: #8b5cf6; font-weight: 700; text-decoration: none;">View History →</a>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem;">
+                        <button class="utility-btn-premium" ng-click="showWalletDialog('metro', '🚇', 'Metro Pass', 50)">
+                            <div class="icon-box">🚇</div>
+                            <span style="font-size: 0.85rem; font-weight: 800; color: var(--gov-gray-700);">Metro</span>
+                        </button>
+                        <button class="utility-btn-premium" ng-click="showWalletDialog('bills', '🧾', 'Utility Bills', 75)">
+                            <div class="icon-box">🧾</div>
+                            <span style="font-size: 0.85rem; font-weight: 800; color: var(--gov-gray-700);">Bills</span>
+                        </button>
+                        <button class="utility-btn-premium" ng-click="showWalletDialog('taxi', '🚕', 'Taxi Ride', 80)">
+                            <div class="icon-box">🚕</div>
+                            <span style="font-size: 0.85rem; font-weight: 800; color: var(--gov-gray-700);">Taxi</span>
+                        </button>
+                        <button class="utility-btn-premium" ng-click="showWalletDialog('recharge', '⚡', 'Mobile Recharge', 40)">
+                            <div class="icon-box">⚡</div>
+                            <span style="font-size: 0.85rem; font-weight: 800; color: var(--gov-gray-700);">Recharge</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+    </div><!-- /OLD CONTENT END -->
+
+    <!-- NEW Modals -->
+    <div class="modal-overlay" ng-if="uiControl.showEmergencyModal" ng-click="uiControl.showEmergencyModal = false">
+        <div class="modal-content" style="max-width: 450px;" ng-click="$event.stopPropagation()">
+            <div class="modal-header" style="border-bottom: 1px solid var(--gov-gray-200); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+                <div class="modal-header-icon" style="background: var(--gov-danger); color: white; font-size: 1.5rem;">⚠️</div>
+                <div class="modal-header-text">
+                    <h3 style="color: var(--gov-danger); margin:0;">Emergency Types</h3>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+                <label ng-repeat="option in ['Unsafe Area', 'Threat from Residents', 'Electrical Hazard', 'Water Leakage Risk', 'Animal Threat', 'Other']" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; background: var(--gov-gray-50); font-weight: 600; font-size: 0.95rem;">
+                    <input type="radio" name="emergencyOption" value="{{option}}"> {{option}}
+                </label>
+            </div>
+            <textarea placeholder="Description..." rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gov-gray-300); border-radius: 8px; font-family: inherit; font-size: 0.95rem; margin-bottom: 1rem; resize: none;"></textarea>
+            <div style="border: 1px dashed var(--gov-gray-400); background: var(--gov-gray-50); padding: 1rem; text-align: center; border-radius: 8px; color: var(--gov-gray-600); margin-bottom: 1.25rem; cursor: pointer;">
+                📷 Optional photo upload
+            </div>
+            <button ng-click="uiControl.showEmergencyModal = false" style="width: 100%; background: var(--gov-danger); color: white; border: none; padding: 1rem; border-radius: 8px; font-weight: 700; font-size: 1.05rem; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                Send Report to Supervisor
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" ng-if="uiControl.showImprovementModal" ng-click="uiControl.showImprovementModal = false">
+        <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 450px;">
+            <div class="modal-header">
+                <div class="modal-header-icon" style="background: var(--gov-success-light); font-size: 1.5rem;">📈</div>
+                <div class="modal-header-text">
+                    <h3 style="margin:0;">Performance Insights</h3>
+                </div>
+            </div>
+            <ul style="color: var(--gov-gray-700); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.5rem; padding-left: 1.5rem;">
+                <li><strong>Complete More Houses:</strong> Every house above your target earns you 20 bonus points.</li>
+                <li><strong>Reduce Average Time:</strong> Aim for under 3 minutes per household.</li>
+                <li><strong>Punctuality:</strong> Completing your full shift on time adds 10 points.</li>
+            </ul>
+
+            <!-- AI Insights Sub-section -->
+            <div style="background: rgba(37, 99, 235, 0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(37, 99, 235, 0.2);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                    <span style="font-size: 1.2rem;">✨</span>
+                    <h4 style="margin: 0; color: #2563eb; font-size: 1rem;">AI Performance Insights</h4>
+                </div>
+                <div style="font-size: 0.9rem; color: var(--gov-gray-700); line-height: 1.5;">
+                    <p ng-show="!uiControl.loadingAi" style="margin: 0;">"Your area has high cluster density. Move north-to-south to save 15% route time."</p>
+                    <div ng-show="uiControl.loadingAi" class="loading-dots">Thinking...</div>
+                </div>
+                <button ng-click="regenerateAiInsights()" style="margin-top: 1rem; background: #2563eb; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">
+                    Refresh AI Insights
+                </button>
+            </div>
+
+            <button ng-click="uiControl.showImprovementModal = false" style="margin-top: 1.5rem; width: 100%; background: var(--gov-gray-200); color: var(--gov-gray-800); border: none; padding: 0.75rem; border-radius: 8px; font-weight: 700; cursor: pointer;">
+                Close
+            </button>
+        </div>
+    </div>
+
 
     <!-- Issue Report Modal -->
     <div class="modal-overlay" ng-if="showIssueModal" ng-click="closeModal()">
@@ -1908,7 +2936,7 @@
             
             <div class="modal-footer" style="display: flex; gap: 0.75rem;">
                 <button ng-click="closeStartReadingModal()" style="flex: 1; padding: 0.875rem; background: var(--gov-gray-100); border: 1px solid var(--gov-gray-200); border-radius: 10px; font-weight: 600; cursor: pointer;">Cancel</button>
-                <button ng-click="submitReading()" ng-disabled="!readingSubmission.photoData || !readingSubmission.meterReading" style="flex: 2; padding: 0.875rem; background: var(--gov-success); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; opacity: {{(!readingSubmission.photoData || !readingSubmission.meterReading) ? '0.5' : '1'}};">✓ Submit Reading</button>
+                <button ng-click="submitReading()" ng-disabled="!readingSubmission.photoData || !readingSubmission.meterReading" style="flex: 2; padding: 0.875rem; background: var(--gov-success); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;" ng-style="{'opacity': (!readingSubmission.photoData || !readingSubmission.meterReading) ? '0.5' : '1'}">✓ Submit Reading</button>
             </div>
         </div>
     </div>
@@ -1930,7 +2958,10 @@
                     Why are you skipping this house? <span style="color: var(--gov-danger);">*</span>
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    <label ng-repeat="reason in skipReasons" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1rem; background: {{skipSubmission.reason === reason.id ? 'var(--gov-warning-light)' : 'var(--gov-gray-50)'}}; border: 2px solid {{skipSubmission.reason === reason.id ? 'var(--gov-warning)' : 'transparent'}}; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+                    <label ng-repeat="reason in skipReasons" 
+                           style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1rem; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent;"
+                           ng-style="{'background': skipSubmission.reason === reason.id ? 'var(--gov-warning-light)' : 'var(--gov-gray-50)', 
+                                      'border-color': skipSubmission.reason === reason.id ? 'var(--gov-warning)' : 'transparent'}">
                         <input type="radio" ng-model="skipSubmission.reason" ng-value="reason.id" style="width: 18px; height: 18px;">
                         <span style="font-size: 1.25rem;">{{reason.icon}}</span>
                         <span style="font-weight: 500; color: var(--gov-gray-700);">{{reason.label}}</span>
@@ -1964,7 +2995,7 @@
             
             <div class="modal-footer" style="display: flex; gap: 0.75rem;">
                 <button ng-click="closeSkipModal()" style="flex: 1; padding: 0.875rem; background: var(--gov-gray-100); border: 1px solid var(--gov-gray-200); border-radius: 10px; font-weight: 600; cursor: pointer;">Cancel</button>
-                <button ng-click="submitSkip()" ng-disabled="!skipSubmission.reason" style="flex: 2; padding: 0.875rem; background: var(--gov-warning); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; opacity: {{!skipSubmission.reason ? '0.5' : '1'}};">⏭️ Skip House</button>
+                <button ng-click="submitSkip()" ng-disabled="!skipSubmission.reason" style="flex: 2; padding: 0.875rem; background: var(--gov-warning); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;" ng-style="{'opacity': !skipSubmission.reason ? '0.5' : '1'}">⏭️ Skip House</button>
             </div>
         </div>
     </div>
@@ -2032,947 +3063,240 @@
         var app = angular.module('workerApp', []);
 
         app.controller('DashboardController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
-            var API_BASE = '/api';
 
-            // User Info (will be loaded from API)
+            // ── USER ──
+            var stored = {};
+            try { stored = JSON.parse(localStorage.getItem('suvidhaUser') || '{}'); } catch(e) {}
+            var n = stored.full_name || stored.name || 'Vikram Singh';
             $scope.user = {
-                name: 'Vikram Singh',
-                initials: 'VS',
-                category: 'Field Agent'
+                name: n,
+                initials: n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2),
+                role: stored.category || 'Field Agent'
             };
-            $scope.agentId = 1;  // Default agent ID
+            $scope.agentId = stored.id || 1;
 
-            // Greeting based on time
-            var hour = new Date().getHours();
-            if (hour < 12) $scope.greeting = 'Morning';
-            else if (hour < 17) $scope.greeting = 'Afternoon';
-            else $scope.greeting = 'Evening';
-
-            // Agent Status
-            $scope.agentStatus = 'offline';
-            $scope.gpsEnabled = false;
-            $scope.networkStatus = 'Stable';
-            $scope.batteryLevel = '85%';
-            $scope.performanceScore = 0;
-
-            // Date & Language
-            $scope.currentDate = new Date().toLocaleDateString('en-IN', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-            $scope.selectedLang = 'EN';
-            $scope.showLangMenu = false;
-            $scope.languages = [
-                { code: 'EN', name: 'English' },
-                { code: 'HI', name: 'हिन्दी' },
-                { code: 'TA', name: 'தமிழ்' },
-                { code: 'TE', name: 'తెలుగు' },
-                { code: 'KN', name: 'ಕನ್ನಡ' },
-                { code: 'MR', name: 'मराठी' },
-                { code: 'BN', name: 'বাংলা' },
-                { code: 'GU', name: 'ગુજરાતી' },
-                { code: 'PA', name: 'ਪੰਜਾਬੀ' }
-            ];
-            $scope.notifications = 3;
-            
-            // House Allocations for Notifications
-            $scope.showNotifications = false;
-            $scope.houseAllocations = [
-                { houseNo: '101', name: 'Sharma Residence', address: 'Block A, Flat 101', area: 'Greenview Apartments', ward: 'Ward 9', time: '10 min ago' },
-                { houseNo: '104', name: 'Singh Residence', address: 'Block A, Flat 104', area: 'Greenview Apartments', ward: 'Ward 9', time: '25 min ago' },
-                { houseNo: '106', name: 'Verma Residence', address: 'Block B, Flat 106', area: 'Greenview Apartments', ward: 'Ward 9', time: '1 hr ago' }
-            ];
-            
-            // House Detail Modal
-            $scope.showHouseDetailModal = false;
-            $scope.selectedHouse = null;
-
-            // Start Reading Modal
-            $scope.showStartReadingModal = false;
-            $scope.readingTask = null;
-            $scope.readingSubmission = {
-                photoData: null,
-                meterReading: null,
-                notes: ''
+            // ── DEFAULTS ──
+            $scope.loading = true;
+            $scope.area = { district: 'New Delhi', ward: 'Ward 9', locality: 'Greenview Apts', state: 'Delhi' };
+            $scope.stats = { assigned: 35, covered: 0, pending: 35, skipped: 0, coveredPercent: 0 };
+            $scope.motivationMsg = '5 more houses to reach your bonus!';
+            $scope.showInsights = false;
+            $scope.walletPoints = 450;
+            $scope.performanceScore = 85;
+            $scope.uiControl = {
+                showEmergencyModal: false,
+                showSkipModal: false,
+                showRevisitModal: false,
+                showLogoutModal: false,
+                showViewSubmissionModal: false,
+                showAiBandhuModal: false,
+                showImprovementModal: false,
+                showSmartRouteModal: false,
+                showWalletModal: false,
+                walletItem: null,
+                loadingAi: false
             };
 
-            // Skip Modal
-            $scope.showSkipModal = false;
-            $scope.skipTask = null;
-            $scope.skipSubmission = {
-                reason: null,
-                photoData: null,
-                notes: ''
-            };
-            $scope.skipReasons = [
-                { id: 'locked', label: 'House Locked / No Response', icon: '🔒' },
-                { id: 'access_denied', label: 'Access Denied by Resident', icon: '🚫' },
-                { id: 'meter_damaged', label: 'Meter Damaged / Not Readable', icon: '🔧' },
-                { id: 'meter_inaccessible', label: 'Meter Not Accessible', icon: '⚠️' },
-                { id: 'wrong_address', label: 'Wrong Address / Relocated', icon: '📍' },
-                { id: 'other', label: 'Other Reason', icon: '📋' }
-            ];
-
-            // View Submission Modal
-            $scope.showViewSubmissionModal = false;
-            $scope.viewSubmissionTask = null;
-            $scope.viewSubmissionData = {};
-
-            // My Score Improvement Tips
-            $scope.improvementTips = [];
-            $scope.laggingAreas = [];
-
-            // Day Selector
-            $scope.showDayMenu = false;
-            $scope.dayOptions = [
-                { id: 'today', label: 'Today' },
-                { id: 'yesterday', label: 'Yesterday' },
-                { id: 'day_before', label: 'Day Before Yesterday' }
-            ];
-            $scope.selectedDay = $scope.dayOptions[0]; // Default: Today
-
-            // Day-wise Data
-            var dayData = {
-                today: {
-                    stats: {
-                        assigned: 35,
-                        covered: 12,
-                        pending: 22,
-                        skipped: 1,
-                        coveredPercent: 34,
-                        pendingPercent: 63,
-                        skippedPercent: 3,
-                        avgTime: '3.8 min'
-                    },
-                    tasks: [
-                        { id: 1, houseNo: '101', name: 'Sharma Residence', address: 'Block A, Flat 101', status: 'pending', statusLabel: 'Pending', time: '--', routeTag: 'next', distance: 0 },
-                        { id: 2, houseNo: '102', name: 'Gupta Family', address: 'Block A, Flat 102', status: 'completed', statusLabel: 'Completed', time: '45 min ago', routeTag: 'nearby', distance: 50 },
-                        { id: 3, houseNo: '103', name: 'Patel House', address: 'Block A, Flat 103', status: 'completed', statusLabel: 'Completed', time: '1 hr ago', routeTag: 'nearby', distance: 75 },
-                        { id: 4, houseNo: '104', name: 'Singh Residence', address: 'Block A, Flat 104', status: 'pending', statusLabel: 'Pending', time: '--', routeTag: 'nearby', distance: 100 },
-                        { id: 5, houseNo: '105', name: 'Kumar Family', address: 'Block A, Flat 105', status: 'skipped', statusLabel: 'Skipped', skipReason: 'House locked', skipIcon: '🔒', routeTag: 'far', distance: 200 },
-                        { id: 6, houseNo: '106', name: 'Verma Residence', address: 'Block B, Flat 106', status: 'pending', statusLabel: 'Pending', time: '--', routeTag: 'far', distance: 300 },
-                        { id: 7, houseNo: '107', name: 'Reddy House', address: 'Block B, Flat 107', status: 'pending', statusLabel: 'Pending', time: '--', routeTag: 'far', distance: 350 },
-                        { id: 8, houseNo: '108', name: 'Joshi Family', address: 'Block B, Flat 108', status: 'pending', statusLabel: 'Pending', time: '--', routeTag: 'far', distance: 400 }
-                    ],
-                    summary: { readings: 12, issues: 1, timeActive: '2h 15m', meters: '10/1/1' }
-                },
-                yesterday: {
-                    stats: {
-                        assigned: 30,
-                        covered: 28,
-                        pending: 0,
-                        skipped: 2,
-                        coveredPercent: 93,
-                        pendingPercent: 0,
-                        skippedPercent: 7,
-                        avgTime: '4.1 min'
-                    },
-                    tasks: [
-                        { id: 1, houseNo: '201', name: 'Mehta Residence', address: 'Block C, Flat 201', status: 'completed', statusLabel: 'Completed', time: 'Yesterday', routeTag: 'nearby', distance: 0 },
-                        { id: 2, houseNo: '202', name: 'Agarwal Family', address: 'Block C, Flat 202', status: 'completed', statusLabel: 'Completed', time: 'Yesterday', routeTag: 'nearby', distance: 50 },
-                        { id: 3, houseNo: '203', name: 'Kapoor House', address: 'Block C, Flat 203', status: 'completed', statusLabel: 'Completed', time: 'Yesterday', routeTag: 'nearby', distance: 75 },
-                        { id: 4, houseNo: '204', name: 'Malhotra Residence', address: 'Block C, Flat 204', status: 'completed', statusLabel: 'Completed', time: 'Yesterday', routeTag: 'nearby', distance: 100 },
-                        { id: 5, houseNo: '205', name: 'Bhatia Family', address: 'Block C, Flat 205', status: 'skipped', statusLabel: 'Skipped', skipReason: 'Access denied', skipIcon: '🚫', routeTag: 'far', distance: 200 },
-                        { id: 6, houseNo: '206', name: 'Chopra Residence', address: 'Block D, Flat 206', status: 'skipped', statusLabel: 'Skipped', skipReason: 'Meter damaged', skipIcon: '🔧', routeTag: 'far', distance: 300 }
-                    ],
-                    summary: { readings: 28, issues: 2, timeActive: '6h 45m', meters: '24/2/2' }
-                },
-                day_before: {
-                    stats: {
-                        assigned: 28,
-                        covered: 25,
-                        pending: 0,
-                        skipped: 3,
-                        coveredPercent: 89,
-                        pendingPercent: 0,
-                        skippedPercent: 11,
-                        avgTime: '4.5 min'
-                    },
-                    tasks: [
-                        { id: 1, houseNo: '301', name: 'Arora Residence', address: 'Block E, Flat 301', status: 'completed', statusLabel: 'Completed', time: '2 days ago', routeTag: 'nearby', distance: 0 },
-                        { id: 2, houseNo: '302', name: 'Jain Family', address: 'Block E, Flat 302', status: 'completed', statusLabel: 'Completed', time: '2 days ago', routeTag: 'nearby', distance: 50 },
-                        { id: 3, houseNo: '303', name: 'Bansal House', address: 'Block E, Flat 303', status: 'skipped', statusLabel: 'Skipped', skipReason: 'House locked', skipIcon: '🔒', routeTag: 'nearby', distance: 75 },
-                        { id: 4, houseNo: '304', name: 'Goel Residence', address: 'Block E, Flat 304', status: 'completed', statusLabel: 'Completed', time: '2 days ago', routeTag: 'nearby', distance: 100 },
-                        { id: 5, houseNo: '305', name: 'Mittal Family', address: 'Block E, Flat 305', status: 'skipped', statusLabel: 'Skipped', skipReason: 'Safety hazard', skipIcon: '⚠️', routeTag: 'far', distance: 200 }
-                    ],
-                    summary: { readings: 25, issues: 3, timeActive: '5h 30m', meters: '20/3/2' }
-                }
+            // ── HELPERS ──
+            $scope.getPercent = function(value, total) {
+                if (!total || total === 0) return 0;
+                return Math.round((value / total) * 100);
             };
 
-            // Day Selection Functions
-            $scope.toggleDayMenu = function ($event) {
-                $event.stopPropagation();
-                $scope.showDayMenu = !$scope.showDayMenu;
+            $scope.isActive = function(path) {
+                return window.location.pathname.indexOf(path) !== -1;
             };
 
-            $scope.selectDay = function (day) {
-                $scope.selectedDay = day;
-                $scope.showDayMenu = false;
-                loadDayData(day.id);
-            };
-
-            function loadDayData(dayId) {
-                var data = dayData[dayId];
-                if (data) {
-                    $scope.stats = data.stats;
-                    $scope.tasks = data.tasks;
-                    $scope.summary = data.summary;
-                    sortTasks();
-                    checkDayComplete();
-                    calculatePace();
-                    $scope.loadImprovementTips();
-                }
-            }
-
-            // API: Load Agent Data
-            function loadAgentData() {
-                // Try to get agent ID from localStorage or use agent 1 as demo
-                var storedAgentId = localStorage.getItem('workerAgentId') || 1;
-                $scope.agentId = parseInt(storedAgentId);
-
-                $http.get(API_BASE + '/field-agents/' + $scope.agentId).then(function(response) {
-                    if (response.data.success) {
-                        var agent = response.data.agent;
-                        $scope.user = {
-                            name: agent.full_name,
-                            initials: agent.full_name.split(' ').map(function(n) { return n[0]; }).join(''),
-                            category: formatCategory(agent.category)
-                        };
-                        $scope.agentStatus = agent.status;
-                        $scope.gpsEnabled = agent.gps_enabled;
-                        $scope.performanceScore = Math.round(agent.performance_score);
-                        $scope.area = {
-                            state: agent.assigned_state || 'Delhi NCT',
-                            district: agent.assigned_district || 'South East Delhi',
-                            ward: agent.assigned_ward || 'Ward 9',
-                            locality: agent.current_address || 'Assigned Area'
-                        };
-                        $scope.loadImprovementTips();
-                    }
-                }).catch(function(error) {
-                    console.error('Error loading agent data:', error);
-                    $scope.loadImprovementTips();
-                });
-            }
-
-            function formatCategory(cat) {
-                var categoryMap = {
-                    'electric_meter': 'Electric Meter Reader',
-                    'water_meter': 'Water Meter Reader',
-                    'gas_cylinder': 'Gas Cylinder Delivery',
-                    'rwa_work': 'RWA Worker'
+            // ── API ──
+            $http.get('/api/dashboard').then(function(response) {
+                $scope.loading = false;
+                var data = response.data;
+                $scope.area = {
+                    district: data.user.city || 'New Delhi',
+                    ward: data.user.ward || 'Ward 9',
+                    locality: data.user.locality || 'Greenview Apts',
+                    state: data.user.state || 'Delhi'
                 };
-                return categoryMap[cat] || cat;
-            }
+                $scope.stats = {
+                    assigned: data.reports.total || 35,
+                    covered: data.reports.resolved || 0,
+                    pending: data.reports.open || 35,
+                    skipped: 0,
+                    coveredPercent: 0
+                };
+                $scope.stats.coveredPercent = $scope.getPercent($scope.stats.covered, $scope.stats.assigned);
+                var toBonus = Math.max(0, 5 - $scope.stats.covered);
+                $scope.motivationMsg = toBonus > 0
+                    ? toBonus + ' more houses to reach your bonus!'
+                    : 'Bonus unlocked! Keep going \uD83C\uDF89';
+                $scope.walletPoints = data.wallet_points || 450;
+                $scope.performanceScore = data.performance_score || 85;
+            }).catch(function() {
+                $scope.loading = false;
+                $scope.area = { district: 'New Delhi', ward: 'Ward 9', locality: 'Greenview Apts', state: 'Delhi' };
+                $scope.stats = { assigned: 35, covered: 0, pending: 35, skipped: 0, coveredPercent: 0 };
+            });
 
-            // API: Load Tasks for Agent
-            function loadAgentTasks() {
-                if (!$scope.agentId) return;
-
-                $http.get(API_BASE + '/tasks', { params: { agent_id: $scope.agentId } }).then(function(response) {
-                    if (response.data.success) {
-                        var apiTasks = response.data.tasks;
-                        
-                        // Update day data with real tasks
-                        var completed = apiTasks.filter(function(t) { return t.status === 'completed'; });
-                        var pending = apiTasks.filter(function(t) { return t.status === 'pending' || t.status === 'in_progress'; });
-                        var skipped = apiTasks.filter(function(t) { return t.status === 'failed'; });
-
-                        // Override today's stats
-                        dayData.today.stats = {
-                            assigned: apiTasks.length,
-                            covered: completed.length,
-                            pending: pending.length,
-                            skipped: skipped.length,
-                            coveredPercent: apiTasks.length > 0 ? Math.round((completed.length / apiTasks.length) * 100) : 0,
-                            pendingPercent: apiTasks.length > 0 ? Math.round((pending.length / apiTasks.length) * 100) : 0,
-                            skippedPercent: apiTasks.length > 0 ? Math.round((skipped.length / apiTasks.length) * 100) : 0,
-                            avgTime: '4 min'
-                        };
-
-                        // Convert API tasks to display format
-                        dayData.today.tasks = apiTasks.map(function(task, index) {
-                            return {
-                                id: task.id,
-                                houseNo: task.house_number,
-                                name: task.resident_name || 'Resident',
-                                address: task.ward + ', ' + task.house_number,
-                                status: task.status === 'failed' ? 'skipped' : task.status,
-                                statusLabel: task.status === 'completed' ? 'Completed' : (task.status === 'failed' ? 'Skipped' : 'Pending'),
-                                time: task.completed_at ? timeAgo(new Date(task.completed_at)) : '--',
-                                routeTag: index === 0 ? 'next' : (index < 3 ? 'nearby' : 'far'),
-                                distance: index * 50,
-                                skipReason: task.problem_description,
-                                skipIcon: '❌'
-                            };
-                        });
-
-                        dayData.today.summary = {
-                            readings: completed.length,
-                            issues: apiTasks.filter(function(t) { return t.problem_raised; }).length,
-                            timeActive: '2h 30m',
-                            meters: completed.length + '/' + skipped.length + '/' + pending.length
-                        };
-
-                        // Reload current day view
-                        loadDayData($scope.selectedDay.id);
-                    }
-                }).catch(function(error) {
-                    console.error('Error loading tasks:', error);
-                });
-            }
-
-            function timeAgo(date) {
-                var seconds = Math.floor((new Date() - date) / 1000);
-                if (seconds < 60) return 'Just now';
-                var minutes = Math.floor(seconds / 60);
-                if (minutes < 60) return minutes + ' min ago';
-                var hours = Math.floor(minutes / 60);
-                if (hours < 24) return hours + 'h ago';
-                return 'Yesterday';
-            }
-
-            // API: Update Task Status
-            $scope.updateTaskStatus = function(task, newStatus) {
-                $http.put(API_BASE + '/tasks/' + task.id + '/status', { status: newStatus }).then(function(response) {
-                    if (response.data.success) {
-                        loadAgentTasks();  // Refresh tasks
-                    }
-                }).catch(function(error) {
-                    console.error('Error updating task status:', error);
-                });
+            // ── ACTIONS ──
+            $scope.startWork = function() {
+                alert('Starting next house visit. GPS tracking active.');
             };
 
-            // API: Update GPS Location
-            function updateGPSLocation() {
-                if (!$scope.agentId || !$scope.gpsEnabled) return;
-                
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        $http.post(API_BASE + '/field-agents/' + $scope.agentId + '/location', {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude,
-                            address: 'Current Location'
-                        });
-                    }, function(error) {
-                        console.log('GPS error:', error);
-                    });
-                }
-            }
+            $scope.openFullMap = function() {
+                window.location.href = '/GovOfficial-Worker/app/views/search.html';
+            };
 
-            // Initialize API data loading
+            $scope.showWalletDialog = function(type, icon, name, cost) {
+                if ($scope.walletPoints >= cost) {
+                    if (confirm('Redeem ' + cost + ' pts for ' + name + '?')) {
+                        $scope.walletPoints -= cost;
+                        alert(icon + ' ' + name + ' redeemed!');
+                    }
+                } else {
+                    alert('Need ' + cost + ' pts. You have ' + $scope.walletPoints + '.');
+                }
+            };
+
+            $scope.closeViewSubmissionModal = function() { $scope.uiControl.showViewSubmissionModal = false; };
+            $scope.cancelLogout = function() { $scope.uiControl.showLogoutModal = false; };
+            $scope.confirmLogout = function() {
+                if (confirm('Logout?')) { localStorage.removeItem('suvidhaUser'); window.location.href = '/'; }
+            };
+
+            // ── MAP ──
             $timeout(function() {
-                loadAgentData();
-                $timeout(function() {
-                    loadAgentTasks();
-                }, 500);
-                
-                // Update GPS every 30 seconds
-                setInterval(updateGPSLocation, 30000);
-                
-                // Refresh data every 60 seconds
-                setInterval(function() {
-                    loadAgentTasks();
-                }, 60000);
-            }, 100);
-
-            // Assigned Area
-            $scope.area = {
-                state: 'Delhi NCT',
-                district: 'South East Delhi',
-                ward: 'Ward 9',
-                locality: 'Greenview Apartments'
-            };
-
-            // Initial Stats (Today)
-            $scope.stats = dayData.today.stats;
-
-            // Pace Status (GAP 3 Fix)
-            $scope.paceStatus = {
-                text: 'On Track',
-                class: 'on-track',
-                icon: '✓'
-            };
-
-            // Calculate pace based on time and remaining houses
-            function calculatePace() {
-                var currentHour = new Date().getHours();
-                var pendingPercent = $scope.stats.pendingPercent;
-
-                // Work hours: 9 AM - 6 PM
-                var hoursWorked = Math.max(0, currentHour - 9);
-                var hoursRemaining = Math.max(0, 18 - currentHour);
-
-                if (pendingPercent === 0) {
-                    $scope.paceStatus = { text: 'Completed', class: 'on-track', icon: '🎉' };
-                } else if (pendingPercent <= 30 || hoursRemaining > 4) {
-                    $scope.paceStatus = { text: 'On Track', class: 'on-track', icon: '✓' };
-                } else if (pendingPercent <= 50) {
-                    $scope.paceStatus = { text: 'Behind Schedule', class: 'behind', icon: '⚠' };
-                } else {
-                    $scope.paceStatus = { text: 'Critical Delay', class: 'critical', icon: '⚡' };
-                }
-            }
-
-            // Task List - Load from day data
-            $scope.tasks = dayData.today.tasks;
-
-            $scope.sortBy = 'route';
-            $scope.sortedTasks = [];
-
-            function sortTasks() {
-                var tasks = angular.copy($scope.tasks);
-                if ($scope.sortBy === 'route') {
-                    // Sort by distance (pending first, then by distance)
-                    tasks.sort(function (a, b) {
-                        var statusOrder = { 'pending': 0, 'skipped': 1, 'completed': 2 };
-                        if (statusOrder[a.status] !== statusOrder[b.status]) {
-                            return statusOrder[a.status] - statusOrder[b.status];
-                        }
-                        return a.distance - b.distance;
-                    });
-                } else {
-                    // Sort by status
-                    var statusOrder = { 'pending': 0, 'skipped': 1, 'completed': 2 };
-                    tasks.sort(function (a, b) {
-                        return statusOrder[a.status] - statusOrder[b.status];
-                    });
-                }
-
-                // Update route tags based on sort
-                var pendingCount = 0;
-                tasks.forEach(function (task) {
-                    if (task.status === 'pending') {
-                        if (pendingCount === 0) {
-                            task.routeTag = 'next';
-                        } else if (pendingCount <= 2) {
-                            task.routeTag = 'nearby';
-                        } else {
-                            task.routeTag = 'far';
-                        }
-                        pendingCount++;
-                    }
-                });
-
-                $scope.sortedTasks = tasks;
-            }
-
-            $scope.setSortBy = function (sort) {
-                $scope.sortBy = sort;
-                sortTasks();
-            };
-
-            // Day Complete Check (Innovation 2)
-            $scope.isDayComplete = false;
-            function checkDayComplete() {
-                $scope.isDayComplete = $scope.stats.pending === 0;
-            }
-
-            // Smart Route
-            $scope.nextHouse = {
-                houseNo: '101',
-                nextHouseNo: '104',
-                timeSaved: 8
-            };
-
-            // Daily Summary - Load from day data
-            $scope.summary = dayData.today.summary;
-
-            // Issue Modal
-            $scope.showIssueModal = false;
-            $scope.selectedTask = null;
-            $scope.selectedIssue = null;
-            $scope.issueOptions = [
-                { id: 'locked', icon: '🔒', label: 'House locked' },
-                { id: 'damaged', icon: '🔧', label: 'Meter damaged' },
-                { id: 'denied', icon: '🚫', label: 'Access denied' },
-                { id: 'safety', icon: '⚠️', label: 'Safety hazard' },
-                { id: 'other', icon: '📝', label: 'Other issue' }
-            ];
-
-            // Functions
-            $scope.toggleLangMenu = function ($event) {
-                $event.stopPropagation();
-                $scope.showLangMenu = !$scope.showLangMenu;
-                $scope.showNotifications = false;
-            };
-
-            $scope.selectLang = function (lang, $event) {
-                $event.preventDefault();
-                $scope.selectedLang = lang.code;
-                $scope.showLangMenu = false;
-            };
-            
-            // Notifications Toggle
-            $scope.toggleNotifications = function ($event) {
-                $event.stopPropagation();
-                $scope.showNotifications = !$scope.showNotifications;
-                $scope.showLangMenu = false;
-            };
-            
-            // View House Detail from notification or task
-            $scope.viewHouseDetail = function (item) {
-                // If called from notification, find the task
-                var task = item;
-                if (item.houseNo && !item.id) {
-                    // From notification - find matching task
-                    task = $scope.tasks.find(function(t) { return t.houseNo === item.houseNo; }) || item;
-                }
-                
-                $scope.selectedHouse = {
-                    houseNo: task.houseNo || item.houseNo,
-                    name: task.name || item.name,
-                    address: task.address || item.address,
-                    fullAddress: (item.area || 'Greenview Apartments') + ', ' + (item.ward || $scope.area.ward) + ', ' + $scope.area.district + ', ' + $scope.area.state,
-                    status: task.status || 'pending',
-                    statusLabel: task.statusLabel || 'Pending',
-                    meterType: 'Electric Meter',
-                    residents: [
-                        { name: task.name ? task.name.replace(' Residence', '').replace(' Family', '').replace(' House', '') : 'Resident', initials: task.name ? task.name.charAt(0) : 'R', relation: 'Head of House' },
-                        { name: 'Family Member', initials: 'FM', relation: 'Member' }
-                    ]
-                };
-                $scope.showHouseDetailModal = true;
-                $scope.showNotifications = false;
-            };
-            
-            // Close House Detail Modal
-            $scope.closeHouseDetailModal = function () {
-                $scope.showHouseDetailModal = false;
-                $scope.selectedHouse = null;
-            };
-
-            // ===== START READING MODAL FUNCTIONS =====
-            $scope.openStartReadingModal = function (task, $event) {
-                if ($event) $event.stopPropagation();
-                $scope.showHouseDetailModal = false;
-                $scope.readingTask = task;
-                $scope.readingSubmission = {
-                    photoData: null,
-                    meterReading: null,
-                    notes: ''
-                };
-                $scope.showStartReadingModal = true;
-            };
-
-            $scope.closeStartReadingModal = function () {
-                $scope.showStartReadingModal = false;
-                $scope.readingTask = null;
-                $scope.readingSubmission = { photoData: null, meterReading: null, notes: '' };
-            };
-
-            $scope.openMeterCamera = function () {
-                document.getElementById('meterPhotoInput').click();
-            };
-
-            $scope.handleMeterPhoto = function (input) {
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        $scope.$apply(function () {
-                            $scope.readingSubmission.photoData = e.target.result;
-                        });
-                    };
-                    reader.readAsDataURL(input.files[0]);
-                }
-            };
-
-            $scope.removeMeterPhoto = function () {
-                $scope.readingSubmission.photoData = null;
-                document.getElementById('meterPhotoInput').value = '';
-            };
-
-            $scope.submitReading = function () {
-                if (!$scope.readingSubmission.photoData || !$scope.readingSubmission.meterReading) {
-                    alert('Please capture a photo and enter the meter reading.');
-                    return;
-                }
-
-                // Find and update the task
-                var task = $scope.tasks.find(function(t) { return t.houseNo === $scope.readingTask.houseNo; });
-                if (task) {
-                    task.status = 'completed';
-                    task.statusLabel = 'Completed';
-                    task.time = 'Just now';
-                    task.submissionData = {
-                        photoData: $scope.readingSubmission.photoData,
-                        meterReading: $scope.readingSubmission.meterReading,
-                        notes: $scope.readingSubmission.notes,
-                        submittedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-                    };
-
-                    // Update stats
-                    if ($scope.stats.pending > 0) {
-                        $scope.stats.pending--;
-                        $scope.stats.covered++;
-                        $scope.stats.coveredPercent = Math.round(($scope.stats.covered / $scope.stats.assigned) * 100);
-                        $scope.stats.pendingPercent = Math.round(($scope.stats.pending / $scope.stats.assigned) * 100);
-                    }
-
-                    sortTasks();
-                    checkDayComplete();
-                    calculatePace();
-                }
-
-                // API call to save submission (if backend available)
-                try {
-                    $http.post('/api/submissions', {
-                        agent_id: $scope.agentId || 1,
-                        household_id: task.id,
-                        meter_reading: $scope.readingSubmission.meterReading,
-                        photo_data: $scope.readingSubmission.photoData,
-                        notes: $scope.readingSubmission.notes,
-                        status: 'completed'
-                    }).then(function(response) {
-                        console.log('Reading saved:', response.data);
-                    }).catch(function(err) {
-                        console.log('Offline mode - saving locally');
-                    });
-                } catch (e) {
-                    console.log('API not available');
-                }
-
-                $scope.closeStartReadingModal();
-                alert('✅ Reading Submitted Successfully!\n\nHouse: ' + task.houseNo + '\nReading: ' + task.submissionData.meterReading + ' kWh');
-            };
-
-            // ===== SKIP MODAL FUNCTIONS =====
-            $scope.openSkipModal = function (task, $event) {
-                if ($event) $event.stopPropagation();
-                $scope.showHouseDetailModal = false;
-                $scope.skipTask = task;
-                $scope.skipSubmission = {
-                    reason: null,
-                    photoData: null,
-                    notes: ''
-                };
-                $scope.showSkipModal = true;
-            };
-
-            $scope.closeSkipModal = function () {
-                $scope.showSkipModal = false;
-                $scope.skipTask = null;
-                $scope.skipSubmission = { reason: null, photoData: null, notes: '' };
-            };
-
-            $scope.openSkipCamera = function () {
-                document.getElementById('skipPhotoInput').click();
-            };
-
-            $scope.handleSkipPhoto = function (input) {
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        $scope.$apply(function () {
-                            $scope.skipSubmission.photoData = e.target.result;
-                        });
-                    };
-                    reader.readAsDataURL(input.files[0]);
-                }
-            };
-
-            $scope.removeSkipPhoto = function () {
-                $scope.skipSubmission.photoData = null;
-                document.getElementById('skipPhotoInput').value = '';
-            };
-
-            $scope.submitSkip = function () {
-                if (!$scope.skipSubmission.reason) {
-                    alert('Please select a reason for skipping.');
-                    return;
-                }
-
-                // Find the reason details
-                var reasonObj = $scope.skipReasons.find(function(r) { return r.id === $scope.skipSubmission.reason; });
-
-                // Find and update the task
-                var task = $scope.tasks.find(function(t) { return t.houseNo === $scope.skipTask.houseNo; });
-                if (task) {
-                    task.status = 'skipped';
-                    task.statusLabel = 'Skipped';
-                    task.time = 'Just now';
-                    task.skipReason = reasonObj.label;
-                    task.skipIcon = reasonObj.icon;
-                    task.submissionData = {
-                        photoData: $scope.skipSubmission.photoData,
-                        skipReason: reasonObj.label,
-                        skipIcon: reasonObj.icon,
-                        notes: $scope.skipSubmission.notes,
-                        submittedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-                    };
-
-                    // Update stats
-                    if ($scope.stats.pending > 0) {
-                        $scope.stats.pending--;
-                        $scope.stats.skipped++;
-                        $scope.stats.pendingPercent = Math.round(($scope.stats.pending / $scope.stats.assigned) * 100);
-                        $scope.stats.skippedPercent = Math.round(($scope.stats.skipped / $scope.stats.assigned) * 100);
-                    }
-
-                    sortTasks();
-                    checkDayComplete();
-                    calculatePace();
-                }
-
-                // API call
-                try {
-                    $http.post('/api/submissions', {
-                        agent_id: $scope.agentId || 1,
-                        household_id: task.id,
-                        photo_data: $scope.skipSubmission.photoData,
-                        skip_reason: reasonObj.label,
-                        notes: $scope.skipSubmission.notes,
-                        status: 'skipped'
-                    }).then(function(response) {
-                        console.log('Skip saved:', response.data);
-                    }).catch(function(err) {
-                        console.log('Offline mode - saving locally');
-                    });
-                } catch (e) {
-                    console.log('API not available');
-                }
-
-                $scope.closeSkipModal();
-                alert('⏭️ House Skipped\n\nHouse: ' + task.houseNo + '\nReason: ' + reasonObj.icon + ' ' + reasonObj.label);
-            };
-
-            // ===== VIEW SUBMISSION MODAL FUNCTIONS =====
-            $scope.viewSubmission = function (task, $event) {
-                if ($event) $event.stopPropagation();
-                $scope.viewSubmissionTask = task;
-                $scope.viewSubmissionData = task.submissionData || {
-                    photoData: null,
-                    meterReading: task.reading || null,
-                    skipReason: task.skipReason || null,
-                    skipIcon: task.skipIcon || null,
-                    submittedAt: task.time,
-                    notes: task.notes || null
-                };
-                $scope.showViewSubmissionModal = true;
-            };
-
-            $scope.closeViewSubmissionModal = function () {
-                $scope.showViewSubmissionModal = false;
-                $scope.viewSubmissionTask = null;
-                $scope.viewSubmissionData = {};
-            };
-
-            // ===== LOAD IMPROVEMENT TIPS =====
-            $scope.loadImprovementTips = function () {
-                // Calculate tips based on performance
-                $scope.improvementTips = [];
-                $scope.laggingAreas = [];
-
-                // Check skip rate
-                var skipRate = ($scope.stats.skipped / $scope.stats.assigned) * 100;
-                if (skipRate > 5) {
-                    $scope.laggingAreas.push({
-                        area: 'Skip Rate',
-                        issue: 'High skip rate (' + Math.round(skipRate) + '%)',
-                        tip: 'Try to reduce skips by visiting houses at different times'
-                    });
-                }
-
-                // Check coverage
-                var coverageRate = ($scope.stats.covered / $scope.stats.assigned) * 100;
-                if (coverageRate < 80 && $scope.selectedDay.id === 'today') {
-                    $scope.improvementTips.push('Complete more readings to reach daily target');
-                }
-
-                // General tips
-                if ($scope.performanceScore < 70) {
-                    $scope.improvementTips.push('Take clear meter photos to avoid re-visits');
-                    $scope.improvementTips.push('Double-check readings before submitting');
-                    $scope.laggingAreas.push({
-                        area: 'Accuracy',
-                        issue: 'Reading errors detected',
-                        tip: 'Ensure meter display is fully visible in photos'
-                    });
-                }
-
-                if ($scope.performanceScore >= 70 && $scope.performanceScore < 90) {
-                    $scope.improvementTips.push('Great progress! Maintain consistency');
-                    $scope.improvementTips.push('Optimize your route to cover more houses');
-                }
-
-                if ($scope.performanceScore >= 90) {
-                    $scope.improvementTips.push('Excellent work! Keep up the great performance');
-                }
-
-                // Default if no issues
-                if ($scope.improvementTips.length === 0) {
-                    $scope.improvementTips.push('You\'re doing great! Keep maintaining high standards');
-                }
-            };
-            
-            // Toggle Task Status (checkbox click)
-            $scope.toggleTaskStatus = function (task, $event) {
-                $event.stopPropagation();
-                
-                if (task.status === 'pending') {
-                    // Mark as completed
-                    task.status = 'completed';
-                    task.statusLabel = 'Completed';
-                    task.time = 'Just now';
-                    
-                    // Update stats
-                    if ($scope.stats.pending > 0) {
-                        $scope.stats.pending--;
-                        $scope.stats.covered++;
-                        $scope.stats.coveredPercent = Math.round(($scope.stats.covered / $scope.stats.assigned) * 100);
-                        $scope.stats.pendingPercent = Math.round(($scope.stats.pending / $scope.stats.assigned) * 100);
-                    }
-                } else if (task.status === 'completed') {
-                    // Mark as pending
-                    task.status = 'pending';
-                    task.statusLabel = 'Pending';
-                    task.time = '--';
-                    
-                    // Update stats
-                    $scope.stats.pending++;
-                    $scope.stats.covered--;
-                    $scope.stats.coveredPercent = Math.round(($scope.stats.covered / $scope.stats.assigned) * 100);
-                    $scope.stats.pendingPercent = Math.round(($scope.stats.pending / $scope.stats.assigned) * 100);
-                }
-                
-                sortTasks();
-                checkDayComplete();
-                calculatePace();
-            };
-            
-            // Mark as Completed from House Detail Modal
-            $scope.markAsCompleted = function (house) {
-                var task = $scope.tasks.find(function(t) { return t.houseNo === house.houseNo; });
-                if (task) {
-                    task.status = 'completed';
-                    task.statusLabel = 'Completed';
-                    task.time = 'Just now';
-                    
-                    // Update stats
-                    if ($scope.stats.pending > 0) {
-                        $scope.stats.pending--;
-                        $scope.stats.covered++;
-                        $scope.stats.coveredPercent = Math.round(($scope.stats.covered / $scope.stats.assigned) * 100);
-                        $scope.stats.pendingPercent = Math.round(($scope.stats.pending / $scope.stats.assigned) * 100);
-                    }
-                    
-                    sortTasks();
-                    checkDayComplete();
-                    calculatePace();
-                }
-                $scope.closeHouseDetailModal();
-            };
-            
-            // Report Issue from House Detail Modal
-            $scope.reportIssueFromDetail = function (house) {
-                $scope.closeHouseDetailModal();
-                var task = $scope.tasks.find(function(t) { return t.houseNo === house.houseNo; });
-                if (task) {
-                    $scope.selectedTask = task;
-                    $scope.selectedIssue = null;
-                    $scope.showIssueModal = true;
-                }
-            };
-
-            $scope.refresh = function () {
-                alert('Dashboard refreshed successfully!\n\nLast sync: ' + new Date().toLocaleTimeString('en-IN'));
-            };
-
-            $scope.startMeterReading = function () {
-                if ($scope.isDayComplete) return;
-                var nextPending = $scope.sortedTasks.find(function (t) { return t.status === 'pending'; });
-                if (nextPending) {
-                    alert('Starting meter reading for:\n\nHouse ' + nextPending.houseNo + ' - ' + nextPending.name + '\n' + nextPending.address + '\n\n📷 Camera ready\n📍 GPS active\n🕐 Timestamp synced');
-                }
-            };
-
-            $scope.openTask = function (task) {
-                if (task.status === 'pending') {
-                    alert('Opening meter reading for:\n\nHouse ' + task.houseNo + ' - ' + task.name);
-                } else if (task.status === 'completed') {
-                    alert('Viewing completed reading for:\n\nHouse ' + task.houseNo + ' - ' + task.name + '\n\n(Read-only view)');
-                }
-            };
-
-            $scope.reportIssue = function (task, $event) {
-                $event.stopPropagation();
-                $scope.selectedTask = task;
-                $scope.selectedIssue = null;
-                $scope.showIssueModal = true;
-            };
-
-            $scope.selectIssue = function (issueId) {
-                $scope.selectedIssue = issueId;
-            };
-
-            $scope.closeModal = function () {
-                $scope.showIssueModal = false;
-                $scope.selectedTask = null;
-            };
-
-            $scope.submitIssue = function () {
-                if (!$scope.selectedIssue) return;
-
-                var issueOption = $scope.issueOptions.find(function (o) {
-                    return o.id === $scope.selectedIssue;
-                });
-
-                // Update task
-                var task = $scope.tasks.find(function (t) {
-                    return t.id === $scope.selectedTask.id;
-                });
-
-                if (task) {
-                    task.status = 'skipped';
-                    task.statusLabel = 'Skipped';
-                    task.skipReason = issueOption.label;
-                    task.skipIcon = issueOption.icon;
-
-                    // Update stats
-                    if ($scope.stats.pending > 0) {
-                        $scope.stats.pending--;
-                        $scope.stats.skipped++;
-                        $scope.stats.pendingPercent = Math.round(($scope.stats.pending / $scope.stats.assigned) * 100);
-                        $scope.stats.skippedPercent = Math.round(($scope.stats.skipped / $scope.stats.assigned) * 100);
-                    }
-
-                    sortTasks();
-                    checkDayComplete();
-                    calculatePace();
-                }
-
-                alert('Issue reported for House ' + $scope.selectedTask.houseNo + ':\n\n' +
-                    '• Reason: ' + issueOption.label + '\n' +
-                    '• Status: Marked as Skipped\n' +
-                    '• Visible to ward supervisors\n' +
-                    '• Logged with timestamp and GPS');
-
-                $scope.closeModal();
-            };
-
-            $scope.logout = function () {
-                if (confirm('Are you sure you want to logout?')) {
-                    window.location.href = '/static/app/views/landing.html';
-                }
-            };
-
-            // Initialize
-            sortTasks();
-            checkDayComplete();
-            calculatePace();
-
-            // Close menus on outside click
-            document.addEventListener('click', function () {
-                $scope.$apply(function () {
-                    $scope.showLangMenu = false;
-                    $scope.showDayMenu = false;
-                    $scope.showNotifications = false;
-                });
-            });
+                if (typeof initDashboardMap === 'function') initDashboardMap();
+            }, 700);
         }]);
     </script>
+
+    <!-- REVISIT MODAL -->
+    <div class="modal-overlay" ng-if="uiControl.showRevisitModal" ng-click="uiControl.showRevisitModal = false">
+        <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 420px; background: white; border-radius: 16px; padding: 1.75rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--gov-gray-200); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+                <div style="width: 50px; height: 50px; background: rgba(229, 62, 62, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">📍</div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--gov-gray-800);">Navigate to Block A</h3>
+                    <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: var(--gov-gray-500);">Retry incomplete meter readings</p>
+                </div>
+                <button ng-click="uiControl.showRevisitModal = false" style="margin-left: auto; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--gov-gray-500);">✕</button>
+            </div>
+            <div style="background: var(--gov-gray-50); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.8rem; color: var(--gov-gray-500); font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem;">Pending Houses in Block A</div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--gov-gray-700);">
+                        <span>🏠 H-104 — Priya Singh</span><span style="color: #e53e3e; font-weight: 600;">Pending</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--gov-gray-700);">
+                        <span>🏠 H-108 — Anjali Gupta</span><span style="color: #e53e3e; font-weight: 600;">Pending</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--gov-gray-700);">
+                        <span>🏠 H-111 — Manish Pandey</span><span style="color: #e53e3e; font-weight: 600;">Pending</span>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button ng-click="uiControl.showRevisitModal = false" style="flex: 1; padding: 0.875rem; background: var(--gov-gray-100); border: 1px solid var(--gov-gray-200); border-radius: 10px; font-weight: 600; cursor: pointer; color: var(--gov-gray-700);">Cancel</button>
+                <button ng-click="uiControl.showRevisitModal = false" style="flex: 2; padding: 0.875rem; background: #e53e3e; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer;">📍 Open Map Route</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SMART ROUTE MODAL -->
+    <div class="modal-overlay" ng-if="uiControl.showSmartRouteModal" ng-click="uiControl.showSmartRouteModal = false">
+        <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 440px; background: white; border-radius: 16px; padding: 1.75rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--gov-gray-200); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+                <div style="width: 50px; height: 50px; background: rgba(37, 99, 235, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🗺️</div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--gov-gray-800);">Smart Route Activated</h3>
+                    <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: #2563eb;">AI-optimized path for today</p>
+                </div>
+                <button ng-click="uiControl.showSmartRouteModal = false" style="margin-left: auto; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--gov-gray-500);">✕</button>
+            </div>
+            <div style="background: rgba(37, 99, 235, 0.05); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.8rem; color: #2563eb; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem;">📍 Optimized Path</div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.9rem; font-weight: 600; color: var(--gov-gray-800);">
+                    <span>H-108</span><span style="color: #2563eb;">→</span>
+                    <span>H-112</span><span style="color: #2563eb;">→</span>
+                    <span>H-115</span><span style="color: #2563eb;">→</span>
+                    <span>H-121</span>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                <div style="background: var(--gov-success-light); border-radius: 10px; padding: 0.875rem; text-align: center;">
+                    <div style="font-size: 0.75rem; color: var(--gov-success); font-weight: 600; text-transform: uppercase;">Time Saved</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--gov-success); margin-top: 0.25rem;">18 min</div>
+                </div>
+                <div style="background: var(--gov-info-light, rgba(49,130,206,0.1)); border-radius: 10px; padding: 0.875rem; text-align: center;">
+                    <div style="font-size: 0.75rem; color: var(--gov-primary); font-weight: 600; text-transform: uppercase;">Distance</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--gov-primary); margin-top: 0.25rem;">2.4 km</div>
+                </div>
+            </div>
+            <button ng-click="uiControl.showSmartRouteModal = false" style="width: 100%; padding: 0.875rem; background: #2563eb; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 1rem;">✓ Got It — Follow Route</button>
+        </div>
+    </div>
+
+    <!-- AI BANDHU MODAL -->
+    <div class="modal-overlay" ng-if="uiControl.showAiBandhuModal" ng-click="!isListening && (uiControl.showAiBandhuModal = false)">
+        <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 420px; background: white; border-radius: 16px; padding: 1.75rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--gov-gray-200); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+                <div style="width: 50px; height: 50px; background: rgba(37, 99, 235, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">✨</div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--gov-gray-800);">AI Bandhu</h3>
+                    <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: var(--gov-gray-500);">Your intelligent field assistant</p>
+                </div>
+                <button ng-if="!isListening" ng-click="uiControl.showAiBandhuModal = false" style="margin-left: auto; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--gov-gray-500);">✕</button>
+            </div>
+            <!-- Listening state -->
+            <div ng-if="isListening" style="text-align: center; padding: 1.5rem 0;">
+                <div style="width: 72px; height: 72px; background: rgba(37, 99, 235, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1rem; animation: pulse 1.5s infinite;">🎙️</div>
+                <div style="font-size: 1rem; font-weight: 600; color: var(--gov-gray-700);">Analyzing your performance...</div>
+                <div style="font-size: 0.85rem; color: var(--gov-gray-500); margin-top: 0.25rem;">Please wait</div>
+            </div>
+            <!-- Response state -->
+            <div ng-if="!isListening && aiBandhuResponse">
+                <div style="background: rgba(37, 99, 235, 0.05); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; gap: 0.75rem;">
+                        <span style="font-size: 1.25rem;">✨</span>
+                        <div style="font-size: 0.95rem; color: var(--gov-gray-800); line-height: 1.6; font-style: italic;">{{aiBandhuResponse}}</div>
+                    </div>
+                </div>
+                <button ng-click="uiControl.showAiBandhuModal = false" style="width: 100%; padding: 0.875rem; background: #2563eb; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer;">Got It — Thanks!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WALLET QUICK REDEEM MODAL -->
+    <div class="modal-overlay" ng-if="uiControl.showWalletModal" ng-click="uiControl.showWalletModal = false">
+        <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 380px; background: white; border-radius: 16px; padding: 1.75rem; text-align: center;">
+            <button ng-click="uiControl.showWalletModal = false" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--gov-gray-500);">✕</button>
+            <div style="font-size: 3rem; margin-bottom: 0.75rem;">{{uiControl.walletItem.icon}}</div>
+            <h3 style="margin: 0 0 0.35rem; font-size: 1.2rem; color: var(--gov-gray-800);">{{uiControl.walletItem.name}}</h3>
+            <p style="color: var(--gov-gray-500); font-size: 0.9rem; margin-bottom: 1.25rem;">Redeem your earned points for {{uiControl.walletItem.name | lowercase}}.</p>
+            <div style="background: var(--gov-gray-50); border-radius: 10px; padding: 0.875rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--gov-gray-600); font-size: 0.9rem; font-weight: 600;">Points Required</span>
+                <span style="font-size: 1.1rem; font-weight: 800; color: #8b5cf6;">{{uiControl.walletItem.pts}} pts</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button ng-click="uiControl.showWalletModal = false" style="flex: 1; padding: 0.875rem; background: var(--gov-gray-100); border: 1px solid var(--gov-gray-200); border-radius: 10px; font-weight: 600; cursor: pointer; color: var(--gov-gray-700);">Cancel</button>
+                <a href="wallet.html" style="flex: 2; padding: 0.875rem; background: #8b5cf6; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center;">Go to Wallet →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGOUT CONFIRMATION MODAL -->
+    <div class="modal-overlay" ng-if="uiControl.showLogoutModal" ng-click="cancelLogout()">
+        <div class="modal-content" ng-click="$event.stopPropagation()" style="max-width: 380px; background: white; border-radius: 16px; padding: 1.75rem; text-align: center;">
+            <div style="width: 64px; height: 64px; background: rgba(229, 62, 62, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto 1rem;">🚪</div>
+            <h3 style="font-size: 1.2rem; color: var(--gov-gray-800); margin-bottom: 0.5rem;">Confirm Logout</h3>
+            <p style="font-size: 0.9rem; color: var(--gov-gray-500); margin-bottom: 1.5rem; line-height: 1.5;">Are you sure you want to logout? Make sure all your data is synced before logging out.</p>
+            <div style="display: flex; gap: 0.75rem;">
+                <button ng-click="cancelLogout()" style="flex: 1; padding: 0.875rem; background: var(--gov-gray-100); border: 1px solid var(--gov-gray-200); border-radius: 10px; font-weight: 600; cursor: pointer; color: var(--gov-gray-700);">Cancel</button>
+                <button ng-click="confirmLogout()" style="flex: 1; padding: 0.875rem; background: #e53e3e; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer;">Logout</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

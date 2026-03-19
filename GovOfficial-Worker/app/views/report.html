@@ -7,999 +7,344 @@
     <title>Report an Issue - Field Agent | Suvidha</title>
     <link rel="stylesheet" href="../../css/worker-style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="/static/js/image-verification.service.js"></script>
     <style>
-        /* Wider Form Layout (60-65%) */
-        .report-page-container {
-            width: 100%;
-            max-width: 850px;
-            margin: 0 auto;
+        /* PAGE CONTAINER */
+        .report-page-container { width: 100%; max-width: 1000px; margin: 0 auto; }
+
+        /* SMART SUGGESTION BANNER */
+        .smart-banner {
+            display: flex; align-items: center; gap: 1rem;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #93c5fd; border-radius: 14px;
+            padding: 0.875rem 1.25rem; margin-bottom: 0.875rem;
+        }
+        .smart-banner-icon { font-size: 1.4rem; flex-shrink: 0; }
+        .smart-banner-text { flex: 1; font-size: 0.9rem; color: #1e40af; }
+        .smart-banner-text strong { font-weight: 700; }
+        .smart-banner-apply {
+            padding: 0.45rem 1rem; background: #2563eb; color: white;
+            border: none; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+            cursor: pointer; white-space: nowrap; transition: background 0.2s;
+        }
+        .smart-banner-apply:hover { background: #1d4ed8; }
+        .smart-banner-dismiss {
+            background: none; border: none; color: #93c5fd;
+            font-size: 1rem; cursor: pointer; padding: 0; line-height: 1;
         }
 
-        /* Context Header (Hackathon Gold) */
-        .context-header {
-            background: linear-gradient(135deg, rgba(26, 54, 93, 0.08) 0%, rgba(26, 54, 93, 0.03) 100%);
-            border: 1px solid rgba(26, 54, 93, 0.15);
-            border-radius: var(--radius-lg);
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+        /* QUICK REPORT BAR */
+        .quick-report-bar {
+            display: flex; align-items: center; gap: 0.75rem;
+            background: rgba(255,255,255,0.92); border: 1px solid var(--gov-gray-200);
+            border-radius: 14px; padding: 0.75rem 1.25rem; margin-bottom: 1.25rem; flex-wrap: wrap;
         }
-
-        .context-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--gov-primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            color: white;
-            flex-shrink: 0;
+        .quick-bar-label {
+            font-size: 0.8rem; font-weight: 700; color: var(--gov-gray-500);
+            text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
         }
-
-        .context-text {
-            font-size: 0.9rem;
-            color: var(--gov-gray-700);
-            line-height: 1.5;
+        .quick-btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.45rem 1rem; background: var(--gov-warning-light);
+            border: 1.5px solid rgba(245,158,11,0.4); border-radius: 20px;
+            font-size: 0.82rem; font-weight: 600; color: #92400e;
+            cursor: pointer; transition: all 0.2s;
         }
+        .quick-btn:hover { background: rgba(245,158,11,0.25); transform: translateY(-1px); }
+        .quick-btn.info { background: var(--gov-info-light); border-color: rgba(59,130,246,0.4); color: #1e3a8a; }
+        .quick-btn.info:hover { background: rgba(59,130,246,0.2); }
 
-        .context-text strong {
-            color: var(--gov-primary);
-        }
+        /* TWO-COLUMN LAYOUT */
+        .report-two-col { display: grid; grid-template-columns: 3fr 2fr; gap: 1.5rem; align-items: start; }
+        .report-form-col { min-width: 0; }
+        .report-help-col { display: flex; flex-direction: column; gap: 1rem; }
 
-        /* Reporter Identity Card (Read-Only) */
+        /* REPORTER IDENTITY CARD */
         .reporter-identity-card {
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            background: rgba(255,255,255,0.92); border-radius: 14px;
+            padding: 1rem 1.25rem; margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
         }
-
-        .reporter-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--gov-gray-200);
+        .reporter-id-left { display: flex; align-items: center; gap: 0.75rem; }
+        .reporter-avatar {
+            width: 42px; height: 42px; background: var(--gov-primary); color: white;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
         }
-
-        .reporter-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            color: var(--gov-gray-700);
-            font-size: 0.95rem;
-        }
-
+        .reporter-name { font-weight: 700; color: var(--gov-gray-800); font-size: 0.95rem; }
+        .reporter-sub { font-size: 0.78rem; color: var(--gov-gray-500); margin-top: 0.1rem; }
+        .reporter-id-right { display: flex; gap: 1.25rem; }
+        .reporter-chip { display: flex; flex-direction: column; align-items: flex-end; }
+        .reporter-chip-label { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--gov-gray-400); margin-bottom: 0.1rem; }
+        .reporter-chip-value { font-size: 0.82rem; font-weight: 600; color: var(--gov-gray-700); }
         .reporter-badge {
-            background: var(--gov-success-light);
-            color: var(--gov-success);
-            padding: 0.25rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
+            background: var(--gov-success-light); color: var(--gov-success);
+            padding: 0.2rem 0.55rem; border-radius: 10px; font-size: 0.68rem; font-weight: 700; white-space: nowrap;
         }
 
-        .reporter-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-        }
-
-        .reporter-item {
-            padding: 0.75rem;
-            background: var(--gov-gray-50);
-            border-radius: var(--radius-md);
-        }
-
-        .reporter-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--gov-gray-500);
-            margin-bottom: 0.25rem;
-        }
-
-        .reporter-value {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--gov-gray-800);
-        }
-
-        /* Main Report Card */
+        /* MAIN FORM CARD */
         .report-card {
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            background: rgba(255,255,255,0.92); border-radius: 16px;
+            overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column;
         }
-
         .report-card-header {
-            background: linear-gradient(135deg, rgba(221, 107, 32, 0.1) 0%, rgba(221, 107, 32, 0.05) 100%);
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid rgba(221, 107, 32, 0.15);
-            text-align: center;
+            background: linear-gradient(135deg, rgba(221,107,32,0.1) 0%, rgba(221,107,32,0.04) 100%);
+            padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(221,107,32,0.15);
+            display: flex; align-items: center; gap: 0.875rem;
         }
+        .report-card-header-icon { font-size: 1.5rem; }
+        .report-card-title { font-size: 1.1rem; font-weight: 700; color: var(--gov-gray-800); }
+        .report-card-subtitle { font-size: 0.82rem; color: var(--gov-gray-500); margin-top: 0.15rem; }
+        .report-card-body { padding: 1.5rem 1.75rem; padding-bottom: 0.5rem; }
 
-        .report-card-icon {
-            width: 56px;
-            height: 56px;
-            background: var(--gov-warning-light);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            margin: 0 auto 0.75rem;
+        /* NUMBERED SECTION HEADER */
+        .section-header {
+            display: flex; align-items: center; gap: 0.65rem;
+            margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1.5px solid var(--gov-gray-100);
         }
-
-        .report-card-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--gov-gray-800);
-            margin-bottom: 0.35rem;
+        .section-number {
+            width: 26px; height: 26px; background: var(--gov-primary); color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 800; flex-shrink: 0;
         }
+        .section-title { font-weight: 700; font-size: 0.95rem; color: var(--gov-gray-800); }
+        .section-emoji { font-size: 1rem; }
+        .section-required { font-size: 0.72rem; color: var(--gov-danger); margin-left: auto; font-weight: 600; }
+        .form-section { margin-bottom: 1.75rem; }
 
-        .report-card-subtitle {
-            font-size: 0.9rem;
-            color: var(--gov-gray-500);
-        }
-
-        .report-card-body {
-            padding: 2rem;
-        }
-
-        /* Smart Suggestion Card (Prominent) */
-        .smart-suggestion {
-            background: linear-gradient(135deg, rgba(49, 130, 206, 0.1) 0%, rgba(49, 130, 206, 0.05) 100%);
-            border: 2px solid rgba(49, 130, 206, 0.25);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-
-        .smart-suggestion-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--gov-info);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .smart-suggestion-content {
-            flex: 1;
-        }
-
-        .smart-suggestion-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.35rem;
-        }
-
-        .smart-suggestion-title {
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--gov-info);
-        }
-
-        .smart-suggestion-badge {
-            background: var(--gov-info);
-            color: white;
-            padding: 0.15rem 0.5rem;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-
-        .smart-suggestion-text {
-            font-size: 0.9rem;
-            color: var(--gov-gray-700);
-            line-height: 1.5;
-        }
-
-        .smart-suggestion-action {
-            padding: 0.5rem 1rem;
-            background: var(--gov-info);
-            color: white;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 0.75rem;
-            transition: all 0.2s;
-        }
-
-        .smart-suggestion-action:hover {
-            background: #2b6cb0;
-        }
-
-        /* Form Groups */
-        .form-group {
-            margin-bottom: 1.75rem;
-        }
-
-        .form-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--gov-gray-700);
-            margin-bottom: 0.75rem;
-        }
-
-        .form-label .required {
-            color: var(--gov-danger);
-        }
-
-        .form-label-icon {
-            font-size: 1.1rem;
-        }
-
-        /* Dropdown Select */
+        /* HOUSE SELECT */
         .form-select {
-            width: 100%;
-            padding: 0.9rem 1rem;
-            border: 2px solid var(--gov-gray-200);
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-family: inherit;
-            background: white;
-            cursor: pointer;
-            transition: all 0.2s;
-            appearance: none;
+            width: 100%; padding: 0.875rem 1rem; border: 2px solid var(--gov-gray-200);
+            border-radius: 10px; font-size: 1rem; font-family: inherit; background: white;
+            cursor: pointer; transition: all 0.2s; appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
+            background-repeat: no-repeat; background-position: right 1rem center;
         }
+        .form-select:focus { outline: none; border-color: var(--gov-primary); box-shadow: 0 0 0 4px rgba(26,54,93,0.08); }
 
-        .form-select:focus {
-            outline: none;
-            border-color: var(--gov-primary);
-            box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.08);
-        }
-
-        /* Issue Type Cards Grid */
-        .issue-types-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.875rem;
-        }
-
+        /* ISSUE TYPE CARDS */
+        .issue-types-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
         .issue-type-card {
-            padding: 1.25rem 1rem;
-            border: 2px solid var(--gov-gray-200);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            background: white;
-            position: relative;
+            padding: 1.25rem 0.875rem; border: 2px solid var(--gov-gray-200); border-radius: 12px;
+            cursor: pointer; transition: all 0.2s; text-align: center; background: white; position: relative;
         }
-
-        .issue-type-card:hover {
-            border-color: var(--gov-gray-300);
-            background: var(--gov-gray-50);
-            transform: translateY(-2px);
+        .issue-type-card:hover { border-color: var(--gov-gray-300); background: var(--gov-gray-50); transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+        .issue-type-card.selected { border-color: var(--gov-warning); background: rgba(245,158,11,0.07); box-shadow: 0 6px 18px rgba(245,158,11,0.2); transform: translateY(-3px); }
+        .issue-type-card .check-mark {
+            position: absolute; top: 8px; right: 8px; width: 20px; height: 20px;
+            background: var(--gov-warning); color: white; border-radius: 50%;
+            font-size: 0.7rem; display: none; align-items: center; justify-content: center; font-weight: 700;
         }
-
-        .issue-type-card.selected {
-            border-color: var(--gov-warning);
-            background: var(--gov-warning-light);
-            box-shadow: 0 4px 12px rgba(221, 107, 32, 0.15);
-        }
-
+        .issue-type-card.selected .check-mark { display: flex; }
         .issue-type-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--gov-gray-100);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin: 0 auto 0.6rem;
-            transition: all 0.2s;
+            width: 52px; height: 52px; background: var(--gov-gray-100); border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; margin: 0 auto 0.6rem; transition: all 0.2s;
         }
-
-        .issue-type-card.selected .issue-type-icon {
-            background: rgba(221, 107, 32, 0.2);
+        .issue-type-card.selected .issue-type-icon { background: rgba(245,158,11,0.18); }
+        .issue-type-name { font-weight: 700; font-size: 0.88rem; color: var(--gov-gray-800); margin-bottom: 0.25rem; }
+        .issue-type-tap { font-size: 0.68rem; color: var(--gov-gray-400); }
+        .issue-type-card.selected .issue-type-tap { color: #b45309; font-weight: 600; }
+        .severity-pill {
+            position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+            padding: 0.18rem 0.65rem; border-radius: 10px; font-size: 0.62rem;
+            font-weight: 700; text-transform: uppercase; white-space: nowrap; display: none;
         }
+        .issue-type-card.selected .severity-pill { display: inline-block; }
+        .severity-pill.low    { background: var(--gov-info-light);    color: var(--gov-info);    }
+        .severity-pill.medium { background: var(--gov-warning-light);  color: var(--gov-warning); }
+        .severity-pill.high   { background: var(--gov-danger-light);   color: var(--gov-danger);  }
 
-        .issue-type-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--gov-gray-800);
-            margin-bottom: 0.2rem;
+        /* SEVERITY STRIP */
+        .severity-strip {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 1rem; border-radius: 10px; margin-top: 0.875rem; border-left: 4px solid; font-size: 0.85rem;
         }
+        .severity-strip.low    { border-color: var(--gov-info);    background: rgba(59,130,246,0.06);   }
+        .severity-strip.medium { border-color: var(--gov-warning);  background: rgba(245,158,11,0.06);   }
+        .severity-strip.high   { border-color: var(--gov-danger);   background: rgba(239,68,68,0.06);    }
+        .severity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .severity-dot.low    { background: var(--gov-info);    }
+        .severity-dot.medium { background: var(--gov-warning); }
+        .severity-dot.high   { background: var(--gov-danger);  }
+        .severity-strip-label { font-weight: 700; }
+        .severity-strip-label.low    { color: var(--gov-info);    }
+        .severity-strip-label.medium { color: var(--gov-warning); }
+        .severity-strip-label.high   { color: var(--gov-danger);  }
+        .severity-strip-desc { color: var(--gov-gray-600); }
 
-        .issue-type-desc {
-            font-size: 0.75rem;
-            color: var(--gov-gray-500);
-            line-height: 1.3;
-        }
-
-        /* Severity Badge (Auto-Generated) */
-        .severity-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            padding: 0.25rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            display: none;
-        }
-
-        .issue-type-card.selected .severity-badge {
-            display: block;
-        }
-
-        .severity-badge.low {
-            background: var(--gov-info-light);
-            color: var(--gov-info);
-        }
-
-        .severity-badge.medium {
-            background: var(--gov-warning-light);
-            color: var(--gov-warning);
-        }
-
-        .severity-badge.high {
-            background: var(--gov-danger-light);
-            color: var(--gov-danger);
-        }
-
-        /* Selected Severity Display */
-        .selected-severity {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.875rem 1rem;
-            background: var(--gov-gray-50);
-            border-radius: var(--radius-md);
-            margin-top: 1rem;
-            border-left: 4px solid;
-        }
-
-        .selected-severity.low {
-            border-color: var(--gov-info);
-            background: rgba(49, 130, 206, 0.05);
-        }
-
-        .selected-severity.medium {
-            border-color: var(--gov-warning);
-            background: rgba(221, 107, 32, 0.05);
-        }
-
-        .selected-severity.high {
-            border-color: var(--gov-danger);
-            background: rgba(229, 62, 62, 0.05);
-        }
-
-        .severity-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-
-        .severity-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .severity-dot.low {
-            background: var(--gov-info);
-        }
-
-        .severity-dot.medium {
-            background: var(--gov-warning);
-        }
-
-        .severity-dot.high {
-            background: var(--gov-danger);
-        }
-
-        .severity-label {
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .severity-label.low {
-            color: var(--gov-info);
-        }
-
-        .severity-label.medium {
-            color: var(--gov-warning);
-        }
-
-        .severity-label.high {
-            color: var(--gov-danger);
-        }
-
-        .severity-desc {
-            font-size: 0.8rem;
-            color: var(--gov-gray-600);
-        }
-
-        /* Textarea */
+        /* TEXTAREA */
         .form-textarea {
-            width: 100%;
-            padding: 0.9rem 1rem;
-            border: 2px solid var(--gov-gray-200);
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-family: inherit;
-            min-height: 120px;
-            resize: vertical;
-            transition: all 0.2s;
+            width: 100%; padding: 0.875rem 1rem; border: 2px solid var(--gov-gray-200);
+            border-radius: 10px; font-size: 0.95rem; font-family: inherit; min-height: 110px;
+            resize: vertical; transition: all 0.2s;
         }
+        .form-textarea:focus { outline: none; border-color: var(--gov-primary); box-shadow: 0 0 0 4px rgba(26,54,93,0.08); }
+        .char-count { text-align: right; font-size: 0.74rem; color: var(--gov-gray-500); margin-top: 0.3rem; }
+        .char-count.warning { color: var(--gov-warning); }
 
-        .form-textarea:focus {
-            outline: none;
-            border-color: var(--gov-primary);
-            box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.08);
+        /* PHOTO UPLOAD */
+        .photo-upload-layout { display: flex; gap: 0.875rem; align-items: stretch; }
+        .photo-primary-btn {
+            flex: 1; padding: 1.5rem 1rem;
+            border: 2px solid var(--gov-primary); border-radius: 12px;
+            background: linear-gradient(135deg, rgba(26,54,93,0.07) 0%, rgba(26,54,93,0.02) 100%);
+            cursor: pointer; text-align: center; transition: all 0.2s; font-family: inherit;
         }
-
-        .char-count {
-            text-align: right;
-            font-size: 0.75rem;
-            color: var(--gov-gray-500);
-            margin-top: 0.35rem;
+        .photo-primary-btn:hover { background: linear-gradient(135deg, rgba(26,54,93,0.14) 0%, rgba(26,54,93,0.06) 100%); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(26,54,93,0.15); }
+        .photo-primary-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+        .photo-primary-label { font-weight: 700; font-size: 0.95rem; color: var(--gov-primary); margin-bottom: 0.2rem; }
+        .photo-primary-hint { font-size: 0.75rem; color: var(--gov-gray-500); }
+        .photo-secondary-btn {
+            padding: 1rem 1.25rem; border: 2px dashed var(--gov-gray-300); border-radius: 12px;
+            background: white; cursor: pointer; text-align: center; transition: all 0.2s; font-family: inherit;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem; min-width: 110px;
         }
-
-        .char-count.warning {
-            color: var(--gov-warning);
+        .photo-secondary-btn:hover { border-color: var(--gov-gray-400); background: var(--gov-gray-50); }
+        .photo-secondary-icon { font-size: 1.5rem; }
+        .photo-secondary-label { font-size: 0.78rem; font-weight: 600; color: var(--gov-gray-600); }
+        .photo-meta-chips { display: flex; gap: 0.4rem; margin-top: 0.75rem; flex-wrap: wrap; }
+        .photo-meta-chip {
+            display: inline-flex; align-items: center; gap: 0.25rem;
+            padding: 0.2rem 0.55rem; background: rgba(16,185,129,0.1);
+            border-radius: 10px; font-size: 0.7rem; color: var(--gov-success); font-weight: 600;
         }
-
-        /* Photo Upload */
-        .photo-upload-area {
-            border: 2px dashed var(--gov-gray-300);
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: var(--gov-gray-50);
-        }
-
-        .photo-upload-area:hover {
-            border-color: var(--gov-primary);
-            background: white;
-        }
-
-        .photo-upload-icon {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .photo-upload-text {
-            font-size: 0.95rem;
-            color: var(--gov-gray-600);
-            margin-bottom: 0.25rem;
-        }
-
-        .photo-upload-hint {
-            font-size: 0.8rem;
-            color: var(--gov-gray-500);
-        }
-
-        .photo-metadata {
-            display: flex;
-            justify-content: center;
-            gap: 1.25rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px dashed var(--gov-gray-200);
-        }
-
-        .metadata-item {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            font-size: 0.75rem;
-            color: var(--gov-success);
-            font-weight: 500;
-        }
-
-        .photo-preview-grid {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
+        .photo-preview-grid { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
         .photo-preview-item {
-            width: 80px;
-            height: 80px;
-            border-radius: var(--radius-md);
-            background: var(--gov-gray-200);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            position: relative;
-            border: 2px solid var(--gov-gray-300);
+            width: 80px; height: 80px; border-radius: 10px; overflow: hidden;
+            position: relative; border: 2px solid var(--gov-gray-200); flex-shrink: 0;
         }
-
+        .photo-preview-item img { width: 100%; height: 100%; object-fit: cover; }
         .photo-remove-btn {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 24px;
-            height: 24px;
-            background: var(--gov-danger);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: absolute; top: 3px; right: 3px; width: 20px; height: 20px;
+            background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%;
+            cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center;
+        }
+        .camera-preview-container {
+            background: linear-gradient(135deg, rgba(49,130,206,0.05) 0%, rgba(56,161,105,0.05) 100%);
+            border: 2px solid rgba(49,130,206,0.2); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;
+        }
+        .photo-action-btn {
+            padding: 0.8rem 1.1rem; border: none; border-radius: 10px;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;
         }
 
-        /* Trust Signal */
+        /* TRUST SIGNAL */
         .trust-signal {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            background: rgba(56, 161, 105, 0.08);
-            border-radius: var(--radius-md);
-            margin-bottom: 1.25rem;
-            font-size: 0.8rem;
-            color: var(--gov-gray-600);
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.65rem; background: rgba(16,185,129,0.07); border-radius: 8px;
+            font-size: 0.78rem; color: var(--gov-gray-600);
         }
 
-        .trust-signal-icon {
-            color: var(--gov-success);
+        /* STICKY SUBMIT BAR */
+        .submit-sticky-bar {
+            position: sticky; bottom: 0; background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(8px); padding: 1rem 1.75rem;
+            border-top: 1px solid var(--gov-gray-100); margin-top: 1.25rem;
         }
-
-        /* Submit Button */
         .submit-btn {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            background: linear-gradient(135deg, var(--gov-warning) 0%, #c05621 100%);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(221, 107, 32, 0.3);
+            width: 100%; padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+            color: white; border: none; border-radius: 12px;
+            font-size: 1.05rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            transition: all 0.2s; box-shadow: 0 4px 15px rgba(221,107,32,0.35); letter-spacing: 0.01em;
         }
+        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(221,107,32,0.45); }
+        .submit-btn:disabled { background: var(--gov-gray-300); box-shadow: none; cursor: not-allowed; transform: none; }
 
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(221, 107, 32, 0.4);
+        /* STEPPER */
+        .stepper-card { background: rgba(255,255,255,0.92); border-radius: 16px; padding: 1.25rem 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+        .stepper-card-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--gov-gray-800); font-size: 0.95rem; margin-bottom: 1.25rem; }
+        .stepper-list { display: flex; flex-direction: column; }
+        .stepper-step { display: flex; gap: 1rem; }
+        .stepper-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        .stepper-circle {
+            width: 38px; height: 38px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 1.1rem;
+            border: 3px solid; background: white; flex-shrink: 0;
         }
+        .stepper-step:nth-child(1) .stepper-circle { border-color: var(--gov-warning); background: rgba(245,158,11,0.12); }
+        .stepper-step:nth-child(2) .stepper-circle { border-color: var(--gov-info);    background: rgba(59,130,246,0.12); }
+        .stepper-step:nth-child(3) .stepper-circle { border-color: var(--gov-success); background: rgba(16,185,129,0.12); }
+        .stepper-line { width: 3px; flex: 1; min-height: 24px; margin: 3px 0; border-radius: 2px; }
+        .stepper-step:nth-child(1) .stepper-line { background: rgba(245,158,11,0.25); }
+        .stepper-step:nth-child(2) .stepper-line { background: rgba(59,130,246,0.25); }
+        .stepper-step:nth-child(3) .stepper-line { display: none; }
+        .stepper-content { padding-bottom: 1.25rem; padding-top: 0.3rem; }
+        .stepper-step:nth-child(3) .stepper-content { padding-bottom: 0; }
+        .stepper-step-num { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gov-gray-400); margin-bottom: 0.1rem; }
+        .stepper-step-label { font-weight: 700; font-size: 0.88rem; color: var(--gov-gray-800); margin-bottom: 0.2rem; }
+        .stepper-step-desc { font-size: 0.78rem; color: var(--gov-gray-500); line-height: 1.4; }
 
-        .submit-btn:disabled {
-            background: var(--gov-gray-300);
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-        }
+        /* TIPS CARD */
+        .tips-card { background: rgba(255,255,255,0.92); border-radius: 16px; padding: 1.25rem 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+        .tips-card-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--gov-gray-800); font-size: 0.9rem; margin-bottom: 0.875rem; }
+        .tip-item { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.8rem; color: var(--gov-gray-600); line-height: 1.45; padding: 0.4rem 0; border-bottom: 1px solid var(--gov-gray-100); }
+        .tip-item:last-child { border-bottom: none; }
+        .tip-dot { font-size: 0.7rem; margin-top: 0.2rem; flex-shrink: 0; }
 
-        /* What Happens Next Flow */
-        .next-steps-card {
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-        }
+        /* RECENT REPORTS */
+        .recent-reports-card { background: rgba(255,255,255,0.92); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+        .recent-reports-header { padding: 1rem 1.5rem; background: var(--gov-gray-50); border-bottom: 1px solid var(--gov-gray-200); display: flex; align-items: center; justify-content: space-between; }
+        .recent-reports-header-left { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--gov-gray-800); font-size: 0.92rem; }
+        .recent-count-badge { background: var(--gov-primary); color: white; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.7rem; font-weight: 700; }
+        .recent-reports-table { overflow-x: auto; }
+        .rr-table { width: 100%; border-collapse: collapse; }
+        .rr-table th { padding: 0.65rem 1.25rem; background: var(--gov-gray-50); border-bottom: 1px solid var(--gov-gray-200); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--gov-gray-500); text-align: left; }
+        .rr-table td { padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--gov-gray-50); vertical-align: middle; }
+        .rr-table tr:last-child td { border-bottom: none; }
+        .rr-house-cell { display: flex; align-items: center; gap: 0.6rem; }
+        .rr-house-icon { width: 34px; height: 34px; background: var(--gov-warning-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+        .rr-house-num { font-weight: 700; font-size: 0.88rem; color: var(--gov-gray-800); }
+        .rr-house-loc { font-size: 0.73rem; color: var(--gov-gray-400); }
+        .rr-issue-cell { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; color: var(--gov-gray-700); font-weight: 500; }
+        .rr-issue-icon { font-size: 1rem; }
+        .rr-date { font-size: 0.83rem; color: var(--gov-gray-600); }
+        .rr-time { font-size: 0.73rem; color: var(--gov-gray-400); }
+        .status-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+        .status-badge.pending      { background: var(--gov-warning-light); color: #92400e; }
+        .status-badge.resolved     { background: var(--gov-success-light);  color: #065f46; }
+        .status-badge.under-review { background: var(--gov-info-light);    color: #1e3a8a; }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; }
+        .status-badge.pending      .status-dot { background: var(--gov-warning); }
+        .status-badge.resolved     .status-dot { background: var(--gov-success); }
+        .status-badge.under-review .status-dot { background: var(--gov-info); }
 
-        .next-steps-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            color: var(--gov-gray-700);
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-        }
+        /* SUCCESS MODAL */
+        .success-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .success-modal { background: white; border-radius: 18px; padding: 2rem; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .success-icon { width: 70px; height: 70px; background: var(--gov-success-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.25rem; margin: 0 auto 1rem; }
+        .success-title { font-size: 1.2rem; font-weight: 700; color: var(--gov-gray-800); margin-bottom: 0.5rem; }
+        .success-message { font-size: 0.88rem; color: var(--gov-gray-600); margin-bottom: 1.25rem; line-height: 1.5; }
+        .success-details { background: var(--gov-gray-50); border-radius: 10px; padding: 0.875rem 1rem; margin-bottom: 1.25rem; text-align: left; }
+        .success-detail-item { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.84rem; }
+        .success-detail-label { color: var(--gov-gray-500); }
+        .success-detail-value { font-weight: 700; color: var(--gov-gray-800); }
+        .success-btn { width: 100%; padding: 0.875rem; background: var(--gov-success); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .success-btn:hover { background: #2f855a; }
 
-        .next-steps-flow {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        .next-steps-flow::before {
-            content: '';
-            position: absolute;
-            top: 24px;
-            left: 60px;
-            right: 60px;
-            height: 3px;
-            background: var(--gov-gray-200);
-            z-index: 0;
-        }
-
-        .step-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .step-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-            background: white;
-            border: 3px solid;
-        }
-
-        .step-item:nth-child(1) .step-icon {
-            border-color: var(--gov-warning);
-            background: var(--gov-warning-light);
-        }
-
-        .step-item:nth-child(2) .step-icon {
-            border-color: var(--gov-info);
-            background: var(--gov-info-light);
-        }
-
-        .step-item:nth-child(3) .step-icon {
-            border-color: var(--gov-success);
-            background: var(--gov-success-light);
-        }
-
-        .step-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--gov-gray-700);
-        }
-
-        .step-desc {
-            font-size: 0.7rem;
-            color: var(--gov-gray-500);
-        }
-
-        /* Recent Reports Section */
-        .recent-reports-card {
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-        }
-
-        .recent-reports-header {
-            padding: 1rem 1.5rem;
-            background: var(--gov-gray-50);
-            border-bottom: 1px solid var(--gov-gray-200);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            color: var(--gov-gray-700);
-        }
-
-        .recent-reports-list {
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .recent-report-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--gov-gray-100);
-        }
-
-        .recent-report-item:last-child {
-            border-bottom: none;
-        }
-
-        .recent-report-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--gov-warning-light);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            margin-right: 1rem;
-        }
-
-        .recent-report-info {
-            flex: 1;
-        }
-
-        .recent-report-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--gov-gray-800);
-            margin-bottom: 0.15rem;
-        }
-
-        .recent-report-meta {
-            font-size: 0.8rem;
-            color: var(--gov-gray-500);
-        }
-
-        .recent-report-status {
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .recent-report-status.pending {
-            background: var(--gov-warning-light);
-            color: var(--gov-warning);
-        }
-
-        .recent-report-status.resolved {
-            background: var(--gov-success-light);
-            color: var(--gov-success);
-        }
-
-        .recent-report-status.under-review {
-            background: var(--gov-info-light);
-            color: var(--gov-info);
-        }
-
-        /* Success Modal */
-        .success-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            animation: fadeIn 0.2s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .success-modal {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            width: 90%;
-            max-width: 420px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .success-icon {
-            width: 72px;
-            height: 72px;
-            background: var(--gov-success-light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            margin: 0 auto 1rem;
-        }
-
-        .success-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--gov-gray-800);
-            margin-bottom: 0.5rem;
-        }
-
-        .success-message {
-            font-size: 0.9rem;
-            color: var(--gov-gray-600);
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
-        }
-
-        .success-details {
-            background: var(--gov-gray-50);
-            border-radius: var(--radius-md);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        .success-detail-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.35rem 0;
-            font-size: 0.85rem;
-        }
-
-        .success-detail-label {
-            color: var(--gov-gray-500);
-        }
-
-        .success-detail-value {
-            font-weight: 600;
-            color: var(--gov-gray-800);
-        }
-
-        .success-btn {
-            width: 100%;
-            padding: 0.875rem;
-            background: var(--gov-success);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .success-btn:hover {
-            background: #2f855a;
-        }
-
-        /* Responsive */
+        /* RESPONSIVE */
         @media (max-width: 768px) {
-            .issue-types-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .report-card-body {
-                padding: 1.5rem;
-            }
-
-            .reporter-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .next-steps-flow {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .next-steps-flow::before {
-                display: none;
-            }
-
-            .photo-metadata {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
+            .report-two-col { grid-template-columns: 1fr; }
+            .report-help-col { position: static; }
+            .issue-types-grid { grid-template-columns: repeat(2, 1fr); }
+            .reporter-id-right { display: none; }
+            .photo-upload-layout { flex-direction: column; }
+            .rr-table th:nth-child(3), .rr-table td:nth-child(3) { display: none; }
         }
     </style>
 </head>
 
 <body ng-controller="ReportController">
-    <!-- Hidden file input for camera -->
-    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="angular.element(this).scope().handlePhotoCapture(this)">
-    
-    <!-- Sidebar -->
-    <aside class="worker-sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-brand">
-                <div class="brand-logo">
-                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha Logo" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
-                </div>
-                <div class="brand-text">
-                    <h1>Suvidha</h1>
-                    <span class="brand-subtitle">FIELD AGENT</span>
-                </div>
-            </div>
-        </div>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;"
+        onchange="angular.element(this).scope().handlePhotoCapture(this)">
 
-        <!-- Agent Status Indicator -->
-        <div class="agent-status-card">
-            <div class="status-indicator" ng-class="{'online': agentStatus === 'online', 'busy': agentStatus === 'on_task', 'offline': agentStatus === 'offline'}">
-                <span class="status-dot"></span>
-                <span class="status-text">{{agentStatus === 'online' ? 'Available' : agentStatus === 'on_task' ? 'On Task' : 'Offline'}}</span>
-            </div>
-        </div>
+    <div ng-include="'../components/sidebar.html'"></div>
 
-        <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item">
-                <span class="nav-icon-wrapper"><span class="nav-icon">📊</span></span>
-                <span class="nav-text">Dashboard</span>
-            </a>
-            <a href="search.html" class="nav-item">
-                <span class="nav-icon-wrapper"><span class="nav-icon">🏠</span></span>
-                <span class="nav-text">Households</span>
-            </a>
-            <a href="report.html" class="nav-item active">
-                <span class="nav-icon-wrapper"><span class="nav-icon">⚠️</span></span>
-                <span class="nav-text">Report Issue</span>
-            </a>
-            <a href="settings.html" class="nav-item">
-                <span class="nav-icon-wrapper"><span class="nav-icon">⚙️</span></span>
-                <span class="nav-text">Settings</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <div class="user-profile">
-                <div class="user-avatar">{{user.initials}}</div>
-                <div class="user-info">
-                    <h4>{{user.name}}</h4>
-                    <p class="user-category">{{user.category || 'Field Agent'}}</p>
-                    <p class="user-ward">{{area.ward}}</p>
-                </div>
-            </div>
-            
-            <!-- GPS/Offline indicator -->
-            <div class="gps-offline-indicator" style="display: flex; justify-content: center; gap: 1rem; padding: 0.75rem; margin: 0.75rem 0; background: var(--gov-gray-50); border-radius: 8px;">
-                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem;" ng-class="{'color: var(--gov-success)': gpsEnabled, 'color: var(--gov-danger)': !gpsEnabled}">
-                    <span>📍</span>
-                    <span style="font-weight: 500;">GPS {{gpsEnabled ? 'Active' : 'Off'}}</span>
-                </div>
-                <div style="width: 1px; background: var(--gov-gray-300);"></div>
-                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--gov-gray-600);">
-                    <span>📶</span>
-                    <span style="font-weight: 500;">{{networkStatus || 'Online'}}</span>
-                </div>
-            </div>
-            
-            <button class="logout-btn" ng-click="logout()">
-                <span>🚪</span>
-                <span>Logout</span>
-            </button>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
     <main class="worker-main-content">
         <header class="worker-header">
             <div class="header-left">
@@ -1007,259 +352,402 @@
                 <p>Document field issues for billing accuracy and safety</p>
             </div>
             <div class="header-right">
-                <button class="topbar-btn sync-btn" ng-click="syncNow()" title="Refresh Data">
-                    🔄
-                </button>
-                
-                <!-- Improved Language Dropdown -->
-                <div class="lang-dropdown" style="position: relative;">
-                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-weight: 500;">
-                        🌐 <span>{{selectedLang}}</span> 
-                        <span style="font-size: 0.7rem; transition: transform 0.2s;" ng-style="{'transform': showLangMenu ? 'rotate(180deg)' : 'rotate(0deg)'}">▼</span>
+                <div class="lang-dropdown" style="position:relative;">
+                    <button class="lang-btn" ng-click="toggleLangMenu($event)">
+                        &#127760; <span>{{selectedLang}}</span>
+                        <span style="font-size:0.65rem;display:inline-block;transition:transform 0.2s;margin-left:0.2rem;"
+                            ng-style="{'transform':showLangMenu?'rotate(180deg)':'rotate(0deg)'}">&#9660;</span>
                     </button>
-                    <div class="lang-dropdown-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()" style="position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border: 1px solid var(--gov-gray-200); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); min-width: 180px; max-height: 300px; overflow-y: auto; z-index: 1000;">
-                        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gov-gray-100); font-size: 0.75rem; font-weight: 600; color: var(--gov-gray-500); text-transform: uppercase;">Select Language</div>
-                        <a href="#" class="lang-option" ng-repeat="lang in languages"
-                            ng-class="{active: selectedLang === lang.code}"
-                            ng-click="selectLang(lang, $event)"
-                            style="display: flex; align-items: center; padding: 0.75rem 1rem; text-decoration: none; color: var(--gov-gray-700); transition: all 0.15s; border-bottom: 1px solid var(--gov-gray-50);"
-                            ng-style="{'background': selectedLang === lang.code ? 'var(--gov-info-light)' : 'transparent', 'font-weight': selectedLang === lang.code ? '600' : '400'}">
-                            <span style="margin-right: 0.5rem;" ng-if="selectedLang === lang.code">✓</span>
-                            {{lang.name}}
-                        </a>
+                    <div class="lang-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()">
+                        <button class="lang-option" ng-repeat="lang in languages"
+                            ng-class="{active:selectedLang===lang.code}"
+                            ng-click="selectLang(lang)">
+                            <span ng-if="selectedLang===lang.code" style="margin-right:0.3rem;">&#10003;</span>{{lang.name}}
+                        </button>
                     </div>
                 </div>
-                
-                <button class="topbar-btn notification-btn" title="Notifications" ng-click="toggleNotifications()" style="position: relative; padding: 0.5rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-size: 1.25rem;">
-                    🔔<span class="notification-badge" ng-if="notifications > 0" style="position: absolute; top: -5px; right: -5px; background: var(--gov-danger); color: white; font-size: 0.7rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">{{notifications}}</span>
-                </button>
+                <div style="position:relative;">
+                    <button class="notification-btn" ng-click="toggleNotifications($event)" title="Notifications">
+                        &#128276;<span class="notif-badge" ng-if="notificationsCount>0">{{notificationsCount}}</span>
+                    </button>
+                    <div ng-show="showNotifications" ng-click="$event.stopPropagation()"
+                        style="position:absolute;top:calc(100% + 0.5rem);right:0;background:white;border:1px solid var(--gov-gray-200);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.15);z-index:1000;width:300px;overflow:hidden;">
+                        <div style="padding:0.875rem 1rem;border-bottom:1px solid var(--gov-gray-100);font-size:0.75rem;font-weight:700;color:var(--gov-gray-600);display:flex;justify-content:space-between;align-items:center;background:var(--gov-gray-50);">
+                            <span>GOVERNMENT MESSAGES</span>
+                            <button ng-click="showNotifications=false" style="background:none;border:none;cursor:pointer;color:var(--gov-gray-500);">&#10005;</button>
+                        </div>
+                        <div style="max-height:320px;overflow-y:auto;">
+                            <div ng-repeat="msg in govMessages" ng-click="markAsRead(msg)"
+                                style="padding:0.875rem 1rem;border-bottom:1px solid var(--gov-gray-50);cursor:pointer;"
+                                ng-style="{'background':msg.unread?'rgba(37,99,235,0.05)':'white'}">
+                                <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem;">
+                                    <span style="font-weight:700;font-size:0.75rem;color:var(--gov-primary);">{{msg.sender}}</span>
+                                    <span style="font-size:0.7rem;color:var(--gov-gray-500);">{{msg.time}}</span>
+                                </div>
+                                <div style="font-size:0.85rem;color:var(--gov-gray-700);line-height:1.4;">{{msg.text}}</div>
+                            </div>
+                            <div ng-if="!govMessages||govMessages.length===0"
+                                style="padding:2rem;text-align:center;color:var(--gov-gray-400);">No new messages</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
         <div class="worker-content">
             <div class="report-page-container">
-                <!-- Context Header (Hackathon Gold) -->
-                <div class="context-header">
-                    <div class="context-icon">📋</div>
-                    <div class="context-text">
-                        <strong>This report helps ensure billing accuracy, worker safety, and transparent resolution of
-                            on-ground issues.</strong>
-                        All submissions are reviewed by authorized officials.
-                    </div>
+
+                <!-- SMART SUGGESTION BANNER -->
+                <div class="smart-banner" ng-if="smartSuggestion.show">
+                    <span class="smart-banner-icon">&#128161;</span>
+                    <span class="smart-banner-text">
+                        Last time at <strong>House {{smartSuggestion.house}}</strong>:
+                        you reported <strong>"{{smartSuggestion.type}}"</strong> &mdash; apply it again?
+                    </span>
+                    <button class="smart-banner-apply" ng-click="applySuggestion()">&#10003; Apply</button>
+                    <button class="smart-banner-dismiss" ng-click="smartSuggestion.show = false">&#10005;</button>
                 </div>
 
-                <!-- Reporter Identity Card (Read-Only) -->
-                <div class="reporter-identity-card">
-                    <div class="reporter-header">
-                        <span class="reporter-title">
-                            👤 Reported By
-                        </span>
-                        <span class="reporter-badge">✓ Auto-filled</span>
-                    </div>
-                    <div class="reporter-grid">
-                        <div class="reporter-item">
-                            <div class="reporter-label">Name</div>
-                            <div class="reporter-value">{{reporter.name}}</div>
-                        </div>
-                        <div class="reporter-item">
-                            <div class="reporter-label">Worker ID</div>
-                            <div class="reporter-value">{{reporter.workerId}}</div>
-                        </div>
-                        <div class="reporter-item">
-                            <div class="reporter-label">Assigned Ward</div>
-                            <div class="reporter-value">{{reporter.ward}}</div>
-                        </div>
-                        <div class="reporter-item">
-                            <div class="reporter-label">Timestamp</div>
-                            <div class="reporter-value">{{reporter.timestamp}}</div>
-                        </div>
-                    </div>
+                <!-- QUICK REPORT BAR -->
+                <div class="quick-report-bar">
+                    <span class="quick-bar-label">&#9889; Quick Report</span>
+                    <button class="quick-btn"      ng-click="quickReport('locked')">&#128274; House Locked</button>
+                    <button class="quick-btn"      ng-click="quickReport('damaged')">&#128295; Meter Damaged</button>
+                    <button class="quick-btn"      ng-click="quickReport('denied')">&#128683; Access Denied</button>
+                    <button class="quick-btn info" ng-click="quickReport('safety')">&#9888; Safety Hazard</button>
                 </div>
 
-                <!-- Main Report Form Card -->
-                <div class="report-card">
-                    <div class="report-card-header">
-                        <div class="report-card-icon">⚠️</div>
-                        <h2 class="report-card-title">Report a Field Issue</h2>
-                        <p class="report-card-subtitle">Document on-ground problems with evidence for official review.
-                        </p>
-                    </div>
+                <!-- TWO-COLUMN GRID -->
+                <div class="report-two-col">
 
-                    <div class="report-card-body">
-                        <!-- Smart Suggestion (Prominent) -->
-                        <div class="smart-suggestion" ng-if="smartSuggestion.show">
-                            <div class="smart-suggestion-icon">🤖</div>
-                            <div class="smart-suggestion-content">
-                                <div class="smart-suggestion-header">
-                                    <span class="smart-suggestion-title">System Suggestion</span>
-                                    <span class="smart-suggestion-badge">Optional</span>
+                    <!-- LEFT FORM COLUMN -->
+                    <div class="report-form-col">
+
+                        <!-- Reporter Identity -->
+                        <div class="reporter-identity-card">
+                            <div class="reporter-id-left">
+                                <div class="reporter-avatar">&#128100;</div>
+                                <div>
+                                    <div class="reporter-name">{{reporter.name}}</div>
+                                    <div class="reporter-sub">{{reporter.workerId}} &middot; {{reporter.ward}}</div>
                                 </div>
-                                <div class="smart-suggestion-text">
-                                    Based on your last attempt at <strong>House {{smartSuggestion.house}}</strong>,
-                                    you may want to report: <strong>"{{smartSuggestion.type}}"</strong>
+                            </div>
+                            <div class="reporter-id-right">
+                                <div class="reporter-chip">
+                                    <span class="reporter-chip-label">Timestamp</span>
+                                    <span class="reporter-chip-value">{{reporter.timestamp}}</span>
                                 </div>
-                                <button class="smart-suggestion-action" ng-click="applySuggestion()">
-                                    ✓ Apply Suggestion
+                                <span class="reporter-badge">&#10003; Auto-filled</span>
+                            </div>
+                        </div>
+
+                        <!-- Main Form Card -->
+                        <div class="report-card">
+                            <div class="report-card-header">
+                                <span class="report-card-header-icon">&#9888;</span>
+                                <div>
+                                    <div class="report-card-title">Report a Field Issue</div>
+                                    <div class="report-card-subtitle">Document on-ground problems with evidence for official review</div>
+                                </div>
+                            </div>
+
+                            <div class="report-card-body">
+
+                                <!-- SECTION 1: Select House -->
+                                <div class="form-section">
+                                    <div class="section-header">
+                                        <span class="section-number">1</span>
+                                        <span class="section-emoji">&#127968;</span>
+                                        <span class="section-title">Select House</span>
+                                        <span class="section-required">Required</span>
+                                    </div>
+                                    <select class="form-select" ng-model="report.houseNo" required>
+                                        <option value="">Choose assigned house&hellip;</option>
+                                        <option ng-repeat="house in assignedHouses" value="{{house.no}}">
+                                            H-{{house.no}} &middot; {{house.locality}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- SECTION 2: Issue Type -->
+                                <div class="form-section">
+                                    <div class="section-header">
+                                        <span class="section-number">2</span>
+                                        <span class="section-emoji">&#128203;</span>
+                                        <span class="section-title">Issue Type</span>
+                                        <span class="section-required">Required</span>
+                                    </div>
+                                    <div class="issue-types-grid">
+                                        <div class="issue-type-card"
+                                            ng-repeat="type in issueTypes"
+                                            ng-class="{selected: report.issueType === type.id}"
+                                            ng-click="selectIssueType(type)">
+                                            <span class="severity-pill" ng-class="type.severity">{{type.severityLabel}}</span>
+                                            <span class="check-mark">&#10003;</span>
+                                            <div class="issue-type-icon">{{type.icon}}</div>
+                                            <div class="issue-type-name">{{type.name}}</div>
+                                            <div class="issue-type-tap" ng-if="report.issueType !== type.id">Tap to select</div>
+                                            <div class="issue-type-tap" ng-if="report.issueType === type.id">&#10003; Selected</div>
+                                        </div>
+                                    </div>
+                                    <div class="severity-strip" ng-class="selectedSeverity.level" ng-if="report.issueType">
+                                        <span class="severity-dot" ng-class="selectedSeverity.level"></span>
+                                        <span class="severity-strip-label" ng-class="selectedSeverity.level">{{selectedSeverity.label}} Priority</span>
+                                        <span class="severity-strip-desc">&mdash; {{selectedSeverity.description}}</span>
+                                    </div>
+                                </div>
+
+                                <!-- SECTION 3: Description -->
+                                <div class="form-section">
+                                    <div class="section-header">
+                                        <span class="section-number">3</span>
+                                        <span class="section-emoji">&#128221;</span>
+                                        <span class="section-title">Description</span>
+                                        <span class="section-required">Required &middot; min 20 chars</span>
+                                    </div>
+                                    <textarea class="form-textarea"
+                                        ng-model="report.description"
+                                        placeholder="Describe the issue — include observations that will help officials understand the situation…"
+                                        ng-minlength="20" required></textarea>
+                                    <div class="char-count" ng-class="{'warning': report.description.length < 20}">
+                                        {{report.description.length || 0}} / 500
+                                        <span ng-if="(report.description.length || 0) < 20"> — {{20 - (report.description.length||0)}} more to go</span>
+                                    </div>
+                                </div>
+
+                                <!-- SECTION 4: Add Photo -->
+                                <div class="form-section">
+                                    <div class="section-header">
+                                        <span class="section-number">4</span>
+                                        <span class="section-emoji">&#128248;</span>
+                                        <span class="section-title">Add Photo</span>
+                                        <span class="section-required" style="color:var(--gov-gray-400);">Recommended</span>
+                                    </div>
+
+                                    <div class="photo-upload-layout"
+                                        ng-if="!cameraActive && !showCameraPreview && report.photos.length < 3">
+                                        <button class="photo-primary-btn" ng-click="openCamera()">
+                                            <div class="photo-primary-icon">&#128247;</div>
+                                            <div class="photo-primary-label">Take Photo</div>
+                                            <div class="photo-primary-hint">Open device camera</div>
+                                        </button>
+                                        <button class="photo-secondary-btn" ng-click="triggerFileUpload()">
+                                            <span class="photo-secondary-icon">&#128193;</span>
+                                            <span class="photo-secondary-label">Upload</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="photo-meta-chips"
+                                        ng-if="!cameraActive && !showCameraPreview && report.photos.length < 3">
+                                        <span class="photo-meta-chip">&#10003; Geo-tagged</span>
+                                        <span class="photo-meta-chip">&#10003; Timestamped</span>
+                                        <span class="photo-meta-chip">&#10003; Worker ID</span>
+                                    </div>
+
+                                    <input type="file" id="photoUploadInput" accept="image/*" style="display:none;"
+                                        onchange="angular.element(this).scope().handlePhotoUpload(this)">
+
+                                    <div class="camera-preview-container" ng-if="showCameraPreview">
+                                        <div style="text-align:center;margin-bottom:1rem;">
+                                            <div style="font-size:2.5rem;margin-bottom:0.4rem;">&#128248;</div>
+                                            <div style="font-size:1rem;font-weight:700;color:var(--gov-gray-800);">
+                                                {{cameraActive ? "Capture Photo" : "Photo Captured"}}</div>
+                                            <div style="font-size:0.82rem;color:var(--gov-gray-500);">
+                                                {{cameraActive ? "Position the object and capture" : "Review and confirm"}}</div>
+                                        </div>
+                                        <div style="background:var(--gov-gray-100);border-radius:10px;padding:0.75rem;margin-bottom:1rem;text-align:center;">
+                                            <div id="cameraPreview"
+                                                style="width:100%;height:260px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:0.9rem;overflow:hidden;">
+                                                <video id="videoElement"
+                                                    style="width:100%;height:100%;object-fit:cover;border-radius:8px;"
+                                                    ng-if="cameraActive" autoplay playsinline></video>
+                                                <div ng-if="capturedPhotoPreview && !cameraActive"
+                                                    style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;border-radius:8px;">
+                                                    <img ng-src="{{capturedPhotoPreview}}"
+                                                        style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div ng-if="cameraActive" style="display:flex;gap:0.75rem;">
+                                            <button class="photo-action-btn" ng-click="closeCamera()"
+                                                style="background:var(--gov-gray-200);color:var(--gov-gray-700);flex:1;">&#10005; Cancel</button>
+                                            <button class="photo-action-btn" ng-click="capturePhotoManually()"
+                                                style="background:var(--gov-primary);color:white;flex:2;font-weight:700;">&#128248; Capture</button>
+                                        </div>
+                                        <div ng-if="capturedPhotoPreview && !cameraActive" style="display:flex;gap:0.75rem;">
+                                            <button class="photo-action-btn" ng-click="retakePhoto()"
+                                                style="background:var(--gov-gray-200);color:var(--gov-gray-700);flex:1;">&#128260; Retake</button>
+                                            <button class="photo-action-btn" ng-click="acceptPhoto()"
+                                                style="background:var(--gov-success);color:white;flex:2;font-weight:700;">&#9989; Submit Photo</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="photo-preview-grid" ng-if="report.photos.length > 0">
+                                        <div class="photo-preview-item" ng-repeat="photo in report.photos" style="position:relative;">
+                                            <img ng-src="{{photo.dataUrl}}" alt="Photo" ng-if="photo.dataUrl">
+                                            <span ng-if="!photo.dataUrl"
+                                                style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">&#128444;</span>
+                                            <button class="photo-remove-btn"
+                                                ng-click="removePhoto($index, $event)">&#215;</button>
+                                            <!-- Verification badge -->
+                                            <span ng-if="photo.verifying" style="position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,0.6);color:#fbbf24;font-size:0.55rem;padding:1px 5px;border-radius:8px;font-weight:700;">&#8987;</span>
+                                            <span ng-if="photo.verification && photo.verification.status === 'Verified'" style="position:absolute;bottom:3px;left:3px;background:rgba(16,185,129,0.9);color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:8px;font-weight:700;">&#10003; Verified</span>
+                                            <span ng-if="photo.verification && photo.verification.status === 'Acceptable'" style="position:absolute;bottom:3px;left:3px;background:rgba(245,158,11,0.9);color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:8px;font-weight:700;">&#9888; Acceptable</span>
+                                            <span ng-if="photo.verification && photo.verification.status === 'Suspicious'" style="position:absolute;bottom:3px;left:3px;background:rgba(239,68,68,0.9);color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:8px;font-weight:700;">&#9888; Suspicious</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div><!-- /card-body -->
+
+                            <!-- STICKY SUBMIT BAR -->
+                            <div class="submit-sticky-bar">
+                                <div class="trust-signal" style="margin-bottom:0.75rem;">
+                                    <span>&#128274;</span>
+                                    <span>All reports are geo-tagged and reviewed by authorized government officials.</span>
+                                </div>
+                                <button class="submit-btn" ng-click="submitReport()" ng-disabled="!isFormValid()">
+                                    &#128640; Submit Issue
                                 </button>
                             </div>
-                        </div>
 
-                        <!-- House Selection -->
-                        <div class="form-group">
-                            <label class="form-label">
-                                <span class="form-label-icon">🏠</span>
-                                House Number <span class="required">*</span>
-                            </label>
-                            <select class="form-select" ng-model="report.houseNo" required>
-                                <option value="">Select assigned house...</option>
-                                <option ng-repeat="house in assignedHouses" value="{{house.no}}">
-                                    House {{house.no}} • {{house.locality}}
-                                </option>
-                            </select>
-                        </div>
+                        </div><!-- /report-card -->
+                    </div><!-- /form-col -->
 
-                        <!-- Issue Type Selection -->
-                        <div class="form-group">
-                            <label class="form-label">
-                                <span class="form-label-icon">📋</span>
-                                Issue Type <span class="required">*</span>
-                            </label>
-                            <div class="issue-types-grid">
-                                <div class="issue-type-card" ng-repeat="type in issueTypes"
-                                    ng-class="{selected: report.issueType === type.id}"
-                                    ng-click="selectIssueType(type)">
-                                    <span class="severity-badge" ng-class="type.severity">{{type.severityLabel}}</span>
-                                    <div class="issue-type-icon">{{type.icon}}</div>
-                                    <div class="issue-type-name">{{type.name}}</div>
-                                    <div class="issue-type-desc">{{type.description}}</div>
+                    <!-- RIGHT HELP COLUMN -->
+                    <div class="report-help-col">
+
+                        <!-- What Happens Next Stepper -->
+                        <div class="stepper-card">
+                            <div class="stepper-card-title">
+                                <span>&#128205;</span>
+                                <span>What Happens Next?</span>
+                            </div>
+                            <div class="stepper-list">
+                                <div class="stepper-step">
+                                    <div class="stepper-left">
+                                        <div class="stepper-circle">&#128228;</div>
+                                        <div class="stepper-line"></div>
+                                    </div>
+                                    <div class="stepper-content">
+                                        <div class="stepper-step-num">Step 1</div>
+                                        <div class="stepper-step-label">Submitted</div>
+                                        <div class="stepper-step-desc">Report is logged instantly with geo-tag, timestamp &amp; photos.</div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <!-- Selected Severity Display -->
-                            <div class="selected-severity" ng-class="selectedSeverity.level" ng-if="report.issueType">
-                                <div class="severity-indicator">
-                                    <span class="severity-dot" ng-class="selectedSeverity.level"></span>
-                                    <span class="severity-label"
-                                        ng-class="selectedSeverity.level">{{selectedSeverity.label}} Priority</span>
+                                <div class="stepper-step">
+                                    <div class="stepper-left">
+                                        <div class="stepper-circle">&#128065;</div>
+                                        <div class="stepper-line"></div>
+                                    </div>
+                                    <div class="stepper-content">
+                                        <div class="stepper-step-num">Step 2</div>
+                                        <div class="stepper-step-label">Reviewed</div>
+                                        <div class="stepper-step-desc">Department officials assess priority and assign resolution team.</div>
+                                    </div>
                                 </div>
-                                <span class="severity-desc">{{selectedSeverity.description}}</span>
-                            </div>
-                        </div>
-
-                        <!-- Description -->
-                        <div class="form-group">
-                            <label class="form-label">
-                                <span class="form-label-icon">📝</span>
-                                Description <span class="required">*</span>
-                            </label>
-                            <textarea class="form-textarea" ng-model="report.description"
-                                placeholder="Describe the issue in detail. Include observations that will help officials understand the situation..."
-                                ng-minlength="20" required></textarea>
-                            <div class="char-count" ng-class="{'warning': report.description.length < 20}">
-                                {{report.description.length || 0}} / 500 characters
-                                <span ng-if="report.description.length < 20"> (minimum 20 required)</span>
-                            </div>
-                        </div>
-
-                        <!-- Photo Evidence -->
-                        <div class="form-group">
-                            <label class="form-label">
-                                <span class="form-label-icon">📷</span>
-                                Photo Evidence <span style="color: var(--gov-gray-500); font-weight: 400;">(strongly
-                                    recommended)</span>
-                            </label>
-                            <div class="photo-upload-area" ng-click="openCamera()">
-                                <div class="photo-upload-icon">📸</div>
-                                <div class="photo-upload-text">Tap to open camera and capture photo</div>
-                                <div class="photo-upload-hint">Camera will open • Photo auto-tagged with location</div>
-                                <div class="photo-metadata">
-                                    <span class="metadata-item">✓ Timestamp</span>
-                                    <span class="metadata-item">✓ GPS Location</span>
-                                    <span class="metadata-item">✓ Worker ID</span>
-                                    <span class="metadata-item">✓ Device ID</span>
-                                </div>
-                            </div>
-                            <div class="photo-preview-grid" ng-if="report.photos.length > 0">
-                                <div class="photo-preview-item" ng-repeat="photo in report.photos" style="position: relative; width: 80px; height: 80px; border-radius: 8px; overflow: hidden;">
-                                    <img ng-src="{{photo.dataUrl}}" alt="Captured photo" style="width: 100%; height: 100%; object-fit: cover;" ng-if="photo.dataUrl">
-                                    <span ng-if="!photo.dataUrl">🖼️</span>
-                                    <button class="photo-remove-btn" ng-click="removePhoto($index, $event)" style="position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border-radius: 50%; border: none; background: rgba(0,0,0,0.6); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;">×</button>
+                                <div class="stepper-step">
+                                    <div class="stepper-left">
+                                        <div class="stepper-circle">&#9989;</div>
+                                        <div class="stepper-line"></div>
+                                    </div>
+                                    <div class="stepper-content">
+                                        <div class="stepper-step-num">Step 3</div>
+                                        <div class="stepper-step-label">Resolved</div>
+                                        <div class="stepper-step-desc">Status updated on your dashboard with full resolution details.</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Trust Signal -->
-                        <div class="trust-signal">
-                            <span class="trust-signal-icon">🔒</span>
-                            <span>All reports are logged, geo-tagged, and reviewed by authorized government
-                                officials.</span>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button class="submit-btn" ng-click="submitReport()" ng-disabled="!isFormValid()">
-                            📤 Submit Issue Report
-                        </button>
-                    </div>
-                </div>
-
-                <!-- What Happens Next Flow -->
-                <div class="next-steps-card">
-                    <div class="next-steps-title">
-                        <span>📍</span>
-                        <span>What Happens Next?</span>
-                    </div>
-                    <div class="next-steps-flow">
-                        <div class="step-item">
-                            <div class="step-icon">📤</div>
-                            <span class="step-label">Issue Submitted</span>
-                            <span class="step-desc">Report logged with evidence</span>
-                        </div>
-                        <div class="step-item">
-                            <div class="step-icon">👁️</div>
-                            <span class="step-label">Reviewed by Department</span>
-                            <span class="step-desc">Officials assess priority</span>
-                        </div>
-                        <div class="step-item">
-                            <div class="step-icon">✓</div>
-                            <span class="step-label">Status Updated</span>
-                            <span class="step-desc">Resolution on your dashboard</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Reports Section -->
-                <div class="recent-reports-card">
-                    <div class="recent-reports-header">
-                        <span>📋</span>
-                        <span>Your Recent Reports</span>
-                    </div>
-                    <div class="recent-reports-list">
-                        <div class="recent-report-item" ng-repeat="report in recentReports">
-                            <div class="recent-report-icon">{{report.icon}}</div>
-                            <div class="recent-report-info">
-                                <div class="recent-report-title">House {{report.houseNo}} • {{report.issueType}}</div>
-                                <div class="recent-report-meta">{{report.date}} • {{report.time}}</div>
+                        <!-- Recent Reports (in right column) -->
+                        <div class="recent-reports-card">
+                            <div class="recent-reports-header">
+                                <div class="recent-reports-header-left">
+                                    <span>&#128203;</span>
+                                    <span>Your Recent Reports</span>
+                                    <span class="recent-count-badge">{{recentReports.length}}</span>
+                                </div>
                             </div>
-                            <span class="recent-report-status" ng-class="report.statusClass">{{report.status}}</span>
+                            <div class="recent-reports-table">
+                                <table class="rr-table">
+                                    <thead>
+                                        <tr>
+                                            <th>House</th>
+                                            <th>Issue</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="r in recentReports">
+                                            <td>
+                                                <div class="rr-house-cell">
+                                                    <div class="rr-house-icon">{{r.icon}}</div>
+                                                    <div>
+                                                        <div class="rr-house-num">H-{{r.houseNo}}</div>
+                                                        <div class="rr-house-loc">{{r.date}}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="rr-issue-cell">
+                                                    <span class="rr-issue-icon">&#8594;</span>
+                                                    <span>{{r.issueType}}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge" ng-class="r.statusClass">
+                                                    <span class="status-dot"></span>
+                                                    {{r.status}}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="recentReports.length === 0">
+                                            <td colspan="3" style="text-align:center;padding:1.5rem;color:var(--gov-gray-400);">No reports yet</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="recent-report-item" ng-if="recentReports.length === 0"
-                            style="justify-content: center; color: var(--gov-gray-500);">
-                            No reports submitted yet
+
+                        <!-- Tips Card -->
+                        <div class="tips-card">
+                            <div class="tips-card-title">
+                                <span>&#128172;</span>
+                                <span>Tips for a Good Report</span>
+                            </div>
+                            <div class="tip-item">
+                                <span class="tip-dot">&#128248;</span>
+                                <span>Add at least one photo — reports with photos are resolved 3x faster.</span>
+                            </div>
+                            <div class="tip-item">
+                                <span class="tip-dot">&#128221;</span>
+                                <span>Be specific: mention meter number, door condition, or resident comments.</span>
+                            </div>
+                            <div class="tip-item">
+                                <span class="tip-dot">&#128308;</span>
+                                <span>Mark tampering or safety issues — these are escalated immediately.</span>
+                            </div>
+                            <div class="tip-item">
+                                <span class="tip-dot">&#128205;</span>
+                                <span>Your GPS location is auto-attached. Stay on-site when submitting.</span>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+                    </div><!-- /help-col -->
+                </div><!-- /two-col -->
+
+            </div><!-- /report-page-container -->
+        </div><!-- /worker-content -->
     </main>
 
-    <!-- Success Modal -->
+    <!-- SUCCESS MODAL -->
     <div class="success-modal-overlay" ng-if="showSuccessModal">
         <div class="success-modal">
-            <div class="success-icon">✓</div>
-            <h3 class="success-title">Issue Reported Successfully</h3>
+            <div class="success-icon">&#9989;</div>
+            <h3 class="success-title">Issue Reported!</h3>
             <p class="success-message">
-                Your report has been submitted and logged. The house status has been updated to "Skipped (Issue
-                Reported)".
+                Your report has been submitted. House status updated to "Skipped (Issue Reported)".
             </p>
             <div class="success-details">
                 <div class="success-detail-item">
@@ -1268,23 +756,18 @@
                 </div>
                 <div class="success-detail-item">
                     <span class="success-detail-label">House</span>
-                    <span class="success-detail-value">{{submittedReport.houseNo}}</span>
+                    <span class="success-detail-value">H-{{submittedReport.houseNo}}</span>
                 </div>
                 <div class="success-detail-item">
-                    <span class="success-detail-label">Issue Type</span>
+                    <span class="success-detail-label">Issue</span>
                     <span class="success-detail-value">{{submittedReport.issueType}}</span>
                 </div>
                 <div class="success-detail-item">
                     <span class="success-detail-label">Priority</span>
-                    <span class="success-detail-value"
-                        ng-class="{'color: var(--gov-danger)': submittedReport.severity === 'high', 'color: var(--gov-warning)': submittedReport.severity === 'medium', 'color: var(--gov-info)': submittedReport.severity === 'low'}">
-                        {{submittedReport.severityLabel}}
-                    </span>
+                    <span class="success-detail-value">{{submittedReport.severityLabel}}</span>
                 </div>
             </div>
-            <button class="success-btn" ng-click="closeSuccessModal()">
-                Done
-            </button>
+            <button class="success-btn" ng-click="closeSuccessModal()">Done &#10003;</button>
         </div>
     </div>
 
@@ -1292,60 +775,50 @@
         var app = angular.module('workerApp', []);
 
         app.controller('ReportController', ['$scope', '$timeout', function ($scope, $timeout) {
-            // User Info
-            $scope.user = {
-                name: 'Vikram Singh',
-                initials: 'VS',
-                category: 'Electric Meter Reader'
-            };
 
-            // Agent Status
-            $scope.agentStatus = 'on_task';
-            $scope.gpsEnabled = true;
-            $scope.performanceScore = 92;
-
-            // Reporter Identity (Read-Only)
             $scope.reporter = {
                 name: 'Vikram Singh',
                 workerId: 'FA-2026-00147',
                 ward: 'Ward 45, Saket',
                 timestamp: new Date().toLocaleString('en-IN', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    day: 'numeric', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
                 })
             };
 
-            // Date & Language
-            $scope.currentDate = new Date().toLocaleDateString('en-IN', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
             $scope.selectedLang = 'EN';
             $scope.showLangMenu = false;
             $scope.languages = [
                 { code: 'EN', name: 'English' },
-                { code: 'HI', name: 'हिन्दी' },
-                { code: 'TA', name: 'தமிழ்' },
-                { code: 'TE', name: 'తెలుగు' },
-                { code: 'BN', name: 'বাংলা' },
-                { code: 'MR', name: 'मराठी' }
+                { code: 'HI', name: 'Hindi' },
+                { code: 'TA', name: 'Tamil' },
+                { code: 'TE', name: 'Telugu' },
+                { code: 'BN', name: 'Bengali' },
+                { code: 'MR', name: 'Marathi' }
             ];
-            $scope.notifications = 2;
 
-            // Report Form
-            $scope.report = {
-                houseNo: '',
-                issueType: '',
-                description: '',
-                photos: []
+            $scope.notificationsCount = 2;
+            $scope.showNotifications = false;
+            $scope.govMessages = [
+                { id: 1, sender: 'Admin Office',  text: 'Complete Block A survey by 5 PM today.', time: '10 min ago', unread: true  },
+                { id: 2, sender: 'Supervisor',    text: 'Accuracy score improved by 15%! Keep it up.', time: '2 hours ago', unread: true  },
+                { id: 3, sender: 'Gov Portal',    text: 'System maintenance scheduled for 11 PM tonight.', time: '5 hours ago', unread: false }
+            ];
+
+            $scope.toggleNotifications = function ($event) {
+                if ($event) $event.stopPropagation();
+                $scope.showNotifications = !$scope.showNotifications;
+                $scope.showLangMenu = false;
+            };
+            $scope.markAsRead = function (msg) {
+                if (msg.unread) {
+                    msg.unread = false;
+                    $scope.notificationsCount = Math.max(0, $scope.notificationsCount - 1);
+                }
             };
 
-            // Assigned Houses
+            $scope.report = { houseNo: '', issueType: '', description: '', photos: [] };
+
             $scope.assignedHouses = [
                 { no: '101', locality: 'Block A, Saket' },
                 { no: '102', locality: 'Block A, Saket' },
@@ -1357,52 +830,38 @@
                 { no: '108', locality: 'Block B, Saket' }
             ];
 
-            // Issue Types with Auto-Generated Severity
             $scope.issueTypes = [
-                { id: 'locked', icon: '🔒', name: 'House Locked', description: 'No one available', severity: 'low', severityLabel: 'Low' },
-                { id: 'damaged', icon: '🔧', name: 'Meter Damaged', description: 'Physical damage', severity: 'medium', severityLabel: 'Medium' },
-                { id: 'denied', icon: '🚫', name: 'Access Denied', description: 'Resident refused', severity: 'medium', severityLabel: 'Medium' },
-                { id: 'safety', icon: '⚠️', name: 'Safety Hazard', description: 'Unsafe conditions', severity: 'high', severityLabel: 'High' },
-                { id: 'tampering', icon: '🔴', name: 'Tampering', description: 'Meter manipulation', severity: 'high', severityLabel: 'High' },
-                { id: 'other', icon: '📝', name: 'Other Issue', description: 'Other problems', severity: 'low', severityLabel: 'Low' }
+                { id: 'locked',    icon: '\uD83D\uDD12', name: 'House Locked',  severity: 'low',    severityLabel: 'Low'    },
+                { id: 'damaged',   icon: '\uD83D\uDD27', name: 'Meter Damaged', severity: 'medium', severityLabel: 'Medium' },
+                { id: 'denied',    icon: '\uD83D\uDEAB', name: 'Access Denied', severity: 'medium', severityLabel: 'Medium' },
+                { id: 'safety',    icon: '\u26A0\uFE0F', name: 'Safety Hazard', severity: 'high',   severityLabel: 'High'   },
+                { id: 'tampering', icon: '\uD83D\uDD34', name: 'Tampering',     severity: 'high',   severityLabel: 'High'   },
+                { id: 'other',     icon: '\uD83D\uDCDD', name: 'Other Issue',   severity: 'low',    severityLabel: 'Low'    }
             ];
 
-            // Selected Severity
-            $scope.selectedSeverity = null;
-
-            // Smart Suggestion
-            $scope.smartSuggestion = {
-                show: true,
-                house: '104',
-                type: 'House Locked'
+            var severityDescriptions = {
+                low:    'Does not block billing process',
+                medium: 'Blocks billing — requires department action',
+                high:   'Safety/Tampering — immediate attention required'
             };
 
-            // Recent Reports
+            $scope.selectedSeverity = null;
+            $scope.smartSuggestion = { show: true, house: '104', type: 'House Locked' };
+
             $scope.recentReports = [
-                { houseNo: '107', issueType: 'Access Denied', date: 'Today', time: '9:15 AM', status: 'Pending', statusClass: 'pending', icon: '🚫' },
-                { houseNo: '95', issueType: 'Meter Damaged', date: 'Yesterday', time: '3:45 PM', status: 'Under Review', statusClass: 'under-review', icon: '🔧' },
-                { houseNo: '82', issueType: 'House Locked', date: '6 Feb 2026', time: '11:20 AM', status: 'Resolved', statusClass: 'resolved', icon: '🔒' }
+                { houseNo: '107', issueType: 'Access Denied', date: 'Today',      time: '9:15 AM',  status: 'Pending',      statusClass: 'pending',      icon: '\uD83D\uDEAB', locality: 'Block B, Saket' },
+                { houseNo: '95',  issueType: 'Meter Damaged', date: 'Yesterday',  time: '3:45 PM',  status: 'Under Review', statusClass: 'under-review', icon: '\uD83D\uDD27', locality: 'Block A, Saket' },
+                { houseNo: '82',  issueType: 'House Locked',  date: '6 Feb 2026', time: '11:20 AM', status: 'Resolved',     statusClass: 'resolved',     icon: '\uD83D\uDD12', locality: 'Block A, Saket' }
             ];
 
-            // Modal
             $scope.showSuccessModal = false;
             $scope.submittedReport = {};
 
-            // Severity Descriptions
-            var severityDescriptions = {
-                low: 'Informational - Does not block billing process',
-                medium: 'Blocks billing - Requires department action',
-                high: 'Safety/Tampering - Immediate attention required'
-            };
-
-            // Functions
             $scope.toggleLangMenu = function ($event) {
                 $event.stopPropagation();
                 $scope.showLangMenu = !$scope.showLangMenu;
             };
-
-            $scope.selectLang = function (lang, $event) {
-                $event.preventDefault();
+            $scope.selectLang = function (lang) {
                 $scope.selectedLang = lang.code;
                 $scope.showLangMenu = false;
             };
@@ -1418,67 +877,168 @@
 
             $scope.applySuggestion = function () {
                 $scope.report.houseNo = $scope.smartSuggestion.house;
-                var lockedType = $scope.issueTypes.find(function (t) { return t.id === 'locked'; });
-                $scope.selectIssueType(lockedType);
+                var t = $scope.issueTypes.find(function (x) { return x.id === 'locked'; });
+                $scope.selectIssueType(t);
                 $scope.smartSuggestion.show = false;
             };
 
-            // Open device camera
+            $scope.quickReport = function (typeId) {
+                var type = $scope.issueTypes.find(function (t) { return t.id === typeId; });
+                if (type) { $scope.selectIssueType(type); }
+                var el = document.querySelector('.report-form-col');
+                if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            };
+
+            /* ---- Camera / Photo ---- */
+            $scope.cameraActive = false;
+            $scope.showCameraPreview = false;
+            $scope.capturedPhotoPreview = null;
+            var videoElement = null;
+            var stream = null;
+
             $scope.openCamera = function () {
                 document.getElementById('cameraInput').click();
             };
-            
-            // Handle photo capture from camera
+
+            $scope.capturePhoto = function () {
+                if (videoElement && videoElement.readyState >= 2) {
+                    var canvas = document.createElement('canvas');
+                    canvas.width  = videoElement.videoWidth;
+                    canvas.height = videoElement.videoHeight;
+                    canvas.getContext('2d').drawImage(videoElement, 0, 0);
+                    $scope.$apply(function () {
+                        $scope.capturedPhotoPreview = canvas.toDataURL('image/jpeg', 0.8);
+                        $scope.cameraActive = false;
+                    });
+                } else {
+                    alert('Camera stream not ready. Please try again.');
+                }
+            };
+
+            $scope.capturePhotoManually = function () { $scope.capturePhoto(); };
+
+            $scope.closeCamera = function () {
+                if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+                $scope.cameraActive = false;
+                $scope.showCameraPreview = false;
+                $scope.capturedPhotoPreview = null;
+            };
+
+            // ── Image Verification helper ──
+            function runVerification(photo) {
+                photo.verifying = true;
+                photo.verification = null;
+                window.verifyImage(
+                    photo.dataUrl,
+                    'gov_worker_report',
+                    '',
+                    $scope.reporter.workerId || ''
+                ).then(function (result) {
+                    $scope.$apply(function () {
+                        photo.verifying = false;
+                        photo.verification = result;
+                    });
+                });
+            }
+
+            $scope.acceptPhoto = function () {
+                if (!$scope.capturedPhotoPreview) { $scope.capturePhoto(); return; }
+                if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+                if ($scope.report.photos.length < 3) {
+                    var photo = {
+                        id: Date.now(),
+                        name: 'photo_' + ($scope.report.photos.length + 1) + '.jpg',
+                        dataUrl: $scope.capturedPhotoPreview,
+                        timestamp: new Date().toISOString()
+                    };
+                    $scope.report.photos.push(photo);
+                    runVerification(photo);
+                }
+                $scope.showCameraPreview = false;
+                $scope.capturedPhotoPreview = null;
+                $scope.cameraActive = false;
+            };
+
+            $scope.retakePhoto = function () {
+                if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+                $scope.cameraActive = true;
+                $scope.capturedPhotoPreview = null;
+                setTimeout(function () {
+                    videoElement = document.getElementById('videoElement');
+                    if (videoElement && !stream) {
+                        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                            .then(function (ms) { stream = ms; videoElement.srcObject = stream; videoElement.play(); })
+                            .catch(function () { alert('Camera access denied.'); });
+                    }
+                }, 100);
+            };
+
+            $scope.triggerFileUpload = function () {
+                document.getElementById('photoUploadInput').click();
+            };
+
             $scope.handlePhotoCapture = function (input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $scope.$apply(function () {
+                            $scope.capturedPhotoPreview = e.target.result;
+                            $scope.cameraActive = false;
+                            $scope.showCameraPreview = true;
+                        });
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            };
+
+            $scope.handlePhotoUpload = function (input) {
                 if (input.files && input.files[0]) {
                     var file = input.files[0];
                     var reader = new FileReader();
-                    
                     reader.onload = function (e) {
                         $scope.$apply(function () {
-                            $scope.report.photos.push({
-                                id: Date.now(),
-                                timestamp: new Date().toISOString(),
-                                gps: '28.5245° N, 77.1855° E',
-                                dataUrl: e.target.result,
-                                fileName: file.name
-                            });
+                            if ($scope.report.photos.length < 3) {
+                                var photo = {
+                                    id: Date.now(),
+                                    name: file.name,
+                                    dataUrl: e.target.result,
+                                    timestamp: new Date().toISOString()
+                                };
+                                $scope.report.photos.push(photo);
+                                runVerification(photo);
+                            } else {
+                                alert('Maximum 3 photos allowed.');
+                            }
+                            input.value = '';
                         });
                     };
-                    
                     reader.readAsDataURL(file);
-                    
-                    // Reset input so same file can be selected again
-                    input.value = '';
                 }
-            };
-            
-            // Legacy function for backwards compatibility
-            $scope.capturePhoto = function () {
-                $scope.openCamera();
             };
 
             $scope.removePhoto = function (index, $event) {
                 $event.stopPropagation();
                 $scope.report.photos.splice(index, 1);
+                if ($scope.cameraActive && stream) {
+                    stream.getTracks().forEach(function (t) { t.stop(); });
+                    stream = null;
+                    $scope.cameraActive = false;
+                    $scope.showCameraPreview = false;
+                    $scope.capturedPhotoPreview = null;
+                }
             };
 
             $scope.isFormValid = function () {
                 return $scope.report.houseNo &&
-                    $scope.report.issueType &&
-                    $scope.report.description &&
-                    $scope.report.description.length >= 20;
+                       $scope.report.issueType &&
+                       $scope.report.description &&
+                       $scope.report.description.length >= 20;
             };
 
             $scope.submitReport = function () {
                 if (!$scope.isFormValid()) return;
-
-                var issueType = $scope.issueTypes.find(function (t) {
-                    return t.id === $scope.report.issueType;
-                });
-
-                var reportId = 'RPT-' + Date.now().toString(36).toUpperCase();
-
+                var issueType = $scope.issueTypes.find(function (t) { return t.id === $scope.report.issueType; });
+                var reportId  = 'RPT-' + Date.now().toString(36).toUpperCase();
                 $scope.submittedReport = {
                     id: reportId,
                     houseNo: $scope.report.houseNo,
@@ -1486,8 +1046,6 @@
                     severity: issueType.severity,
                     severityLabel: issueType.severityLabel + ' Priority'
                 };
-
-                // Add to recent reports
                 $scope.recentReports.unshift({
                     houseNo: $scope.report.houseNo,
                     issueType: issueType.name,
@@ -1495,37 +1053,43 @@
                     time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
                     status: 'Pending',
                     statusClass: 'pending',
-                    icon: issueType.icon
+                    icon: issueType.icon,
+                    locality: 'Block A, Saket'
                 });
-
                 $scope.showSuccessModal = true;
-
-                // Reset form
-                $scope.report = {
-                    houseNo: '',
-                    issueType: '',
-                    description: '',
-                    photos: []
-                };
+                $scope.report = { houseNo: '', issueType: '', description: '', photos: [] };
                 $scope.selectedSeverity = null;
             };
 
-            $scope.closeSuccessModal = function () {
-                $scope.showSuccessModal = false;
-            };
+            $scope.closeSuccessModal = function () { $scope.showSuccessModal = false; };
 
+            document.addEventListener('click', function () {
+                $scope.$apply(function () { $scope.showLangMenu = false; });
+            });
+        }]);
+
+        app.controller('SidebarController', ['$scope', function ($scope) {
+            var stored = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+            if (stored) {
+                var n = stored.full_name || stored.name || 'Vikram Singh';
+                $scope.user = {
+                    name: n,
+                    initials: n.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase().slice(0, 2),
+                    role: stored.category || 'Field Agent'
+                };
+            } else {
+                $scope.user = { name: 'Vikram Singh', initials: 'VS', role: 'Electric Meter Reader' };
+            }
+            $scope.isCurrentPage = function (p) {
+                return window.location.pathname.indexOf(p + '.html') !== -1 ||
+                       window.location.href.indexOf(p + '.html') !== -1;
+            };
             $scope.logout = function () {
                 if (confirm('Are you sure you want to logout?')) {
-                    window.location.href = '/static/app/views/landing.html';
+                    localStorage.removeItem('suvidhaUser');
+                    window.location.href = '/';
                 }
             };
-
-            // Close language menu on outside click
-            document.addEventListener('click', function () {
-                $scope.$apply(function () {
-                    $scope.showLangMenu = false;
-                });
-            });
         }]);
     </script>
 </body>

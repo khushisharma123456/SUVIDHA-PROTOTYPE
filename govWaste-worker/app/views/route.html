@@ -1,0 +1,166 @@
+<!-- Today's Route View -->
+
+<!-- Greeting Bar -->
+<div class="route-greeting-bar">
+    <div class="greeting-info">
+        <div class="greeting-name"><span class="wave">👋</span> Good Morning, {{userName}}</div>
+        <div class="greeting-ward"><span>📍</span> {{ward}}</div>
+        <div class="points-chip">
+            <span class="pts-star">⭐</span>
+            <span class="pts-count">{{todayPoints}} pts today</span>
+        </div>
+    </div>
+    <div class="greeting-right-col">
+        <div class="greeting-clock">
+            <div class="clock-time">{{currentTime}}</div>
+            <div class="clock-date">{{currentDate}}</div>
+        </div>
+        <div class="deadline-chip" ng-class="{'deadline-ok': !deadlinePast, 'deadline-late': deadlinePast}">
+            <span>🕓</span>
+            <span>Deadline: {{deadline}}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Houses Left + Progress CTA -->
+<div class="progress-cta-card">
+    <div class="houses-remaining-block">
+        <div class="houses-remaining-number">{{stats.pending}}</div>
+        <div class="houses-remaining-label">Houses Left</div>
+    </div>
+    <div class="progress-divider"></div>
+    <div class="progress-stats-block">
+        <div class="pstat-row">
+            <span class="pstat-dot done-dot"></span>
+            <span class="pstat-val">{{stats.completed}}</span>
+            <span class="pstat-lbl">Done</span>
+        </div>
+        <div class="pstat-row" ng-if="stats.issues > 0">
+            <span class="pstat-dot issue-dot"></span>
+            <span class="pstat-val">{{stats.issues}}</span>
+            <span class="pstat-lbl">Issues</span>
+        </div>
+        <div class="pstat-row">
+            <span class="pstat-dot total-dot"></span>
+            <span class="pstat-val">{{stats.total}}</span>
+            <span class="pstat-lbl">Total</span>
+        </div>
+    </div>
+    <button class="btn-start-next-big" ng-click="startNextHouse()">
+        <span class="btn-next-icon">▶</span>
+        <span>{{stats.pending > 0 ? 'Next House' : 'View Summary'}}</span>
+    </button>
+</div>
+
+<!-- Inline Progress Bar (part of the route flow) -->
+<div class="route-progress-track" style="margin-top:-1.5rem; border-radius:0 0 var(--r-xl) var(--r-xl); height:7px; background:rgba(37,99,235,0.15); box-shadow:0 5px 16px rgba(37,99,235,0.2); overflow:hidden; position:relative; z-index:0;">
+    <div class="route-progress-fill" ng-style="{'width': stats.percent + '%'}" style="background:rgba(255,255,255,0.75); border-radius:0;"></div>
+    <div class="route-progress-issues" ng-style="{'width': (stats.issues / stats.total * 100) + '%', 'left': (stats.completed / stats.total * 100) + '%'}" style="background:rgba(252,165,165,0.8);"></div>
+</div>
+
+<!-- 🔥 Current House Card -->
+<div class="current-house-card" ng-if="currentHouse">
+    <div class="chc-badge">🔥 NEXT UP</div>
+    <div class="chc-main">
+        <div class="chc-house-icon">🏠</div>
+        <div class="chc-info">
+            <div class="chc-id">{{currentHouse.id}}</div>
+            <div class="chc-addr">📍 {{currentHouse.address}} &middot; {{currentHouse.distance}}</div>
+        </div>
+    </div>
+    <div class="chc-actions">
+        <button class="chc-btn-done" ng-click="quickDone()">&#10004; Mark Done</button>
+        <button class="chc-btn-skip" ng-click="quickSkip()">⏭ Skip</button>
+        <button class="chc-btn-issue" ng-click="quickIssue()">⚠ Issue</button>
+    </div>
+</div>
+<div class="current-house-card chc-finished" ng-if="!currentHouse">
+    <div class="chc-done-big">🎉 All houses done!</div>
+    <button class="chc-btn-done" ng-click="startNextHouse()">📊 See Summary</button>
+</div>
+<div class="route-map-section">
+    <div class="route-map-header">
+        <div class="route-map-title">🗺️ Live Route Map</div>
+        <div class="map-legend-row">
+            <div class="map-legend-item">
+                <span class="map-dot" style="background:#10b981"></span> Done ({{stats.completed}})
+            </div>
+            <div class="map-legend-item">
+                <span class="map-dot" style="background:#f59e0b"></span> Pending ({{stats.pending}})
+            </div>
+            <div class="map-legend-item" ng-if="stats.issues > 0">
+                <span class="map-dot" style="background:#ef4444"></span> Issues ({{stats.issues}})
+            </div>
+            <div class="map-legend-item">🚛 You</div>
+        </div>
+    </div>
+    <div id="route-map" class="route-map-canvas" style="height:165px"></div>
+</div>
+
+<!-- House List -->
+<div class="house-list-section">
+    <div class="house-list-header">
+        <div class="house-list-title"><span>🏘️</span> Houses</div>
+        <div class="house-filter-group">
+            <button class="house-filter-btn" ng-class="{active: filter === 'all'}" ng-click="setFilter('all')">All</button>
+            <button class="house-filter-btn" ng-class="{active: filter === 'pending'}" ng-click="setFilter('pending')">Pending</button>
+            <button class="house-filter-btn" ng-class="{active: filter === 'completed'}" ng-click="setFilter('completed')">Done</button>
+            <button class="house-filter-btn" ng-class="{active: filter === 'issue'}" ng-click="setFilter('issue')">Issues</button>
+        </div>
+    </div>
+
+    <div class="house-compact-list">
+        <div class="compact-house-row"
+             ng-repeat="house in filteredHouses()"
+             ng-class="{'chrow-current': currentHouse && house.id === currentHouse.id}"
+             ng-click="selectHouse(house)">
+
+            <div class="chrow-dot"
+                 ng-class="{'chrow-dot-pending':   house.status === 'pending',
+                             'chrow-dot-completed': house.status === 'completed',
+                             'chrow-dot-issue':     house.status === 'issue',
+                             'chrow-dot-current':   currentHouse && house.id === currentHouse.id}"></div>
+
+            <div class="chrow-id">{{house.id}}</div>
+
+            <span class="chrow-tag chrow-tag-current"
+                  ng-if="currentHouse && house.id === currentHouse.id">Current</span>
+            <span class="chrow-tag chrow-tag-done"    ng-if="house.status === 'completed'">Done</span>
+            <span class="chrow-tag chrow-tag-issue"   ng-if="house.status === 'issue'">Issue</span>
+
+            <span class="chrow-dist">{{house.distance}}</span>
+            <span class="chrow-arrow">›</span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Done Toast -->
+<div class="quick-done-toast" ng-if="quickDoneFeedback">
+    <span>{{quickDoneFeedback}}</span>
+</div>
+
+
+<!-- Issue Modal -->
+<div class="issue-modal-wrap" ng-if="showIssueSheet" ng-click="closeIssueSheet()">
+    <div class="issue-modal" ng-click="$event.stopPropagation()">
+        <div class="issue-modal-title">
+            ⚠️ Report Issue
+            <span class="issue-sheet-house" ng-if="issueTargetHouse"> — {{issueTargetHouse.id}}</span>
+        </div>
+        <div class="issue-opts-grid">
+            <div class="issue-opt"
+                 ng-repeat="t in issueTypes"
+                 ng-class="{selected: selectedIssue === t.id}"
+                 ng-click="selectIssue(t.id)">
+                <span class="issue-opt-icon">{{t.icon}}</span>
+                <span class="issue-opt-label">{{t.label}}</span>
+            </div>
+        </div>
+        <div class="issue-sheet-btns">
+            <button class="issue-submit-btn" ng-click="submitIssue()" ng-disabled="!selectedIssue">
+                📤 Submit &amp; Next House
+            </button>
+            <button class="issue-cancel-btn" ng-click="closeIssueSheet()">Cancel</button>
+        </div>
+    </div>
+</div>

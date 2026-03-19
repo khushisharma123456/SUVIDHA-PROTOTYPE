@@ -6,11 +6,13 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import nyckel
 import requests
+import base64
+from image_verification import verify_image, clear_session_hashes
 from models import (db, User, Vendor, Community, CommunityStats, Bill, ServiceReport,
                     GovOfficial, Grievance, MeterReading, RWAProject, AuditLog, 
                     FieldOperation, WardStats, ParticipationScheme, Redemption,
                     FieldAgent, TaskAssignment, AgentLocationHistory, AgentPerformance,
-                    Household, MeterSubmission)
+                    Household, MeterSubmission, ImageHash)
 
 # Import admin blueprint
 from admin_routes import admin_bp, init_admin_models
@@ -130,6 +132,11 @@ def login_page():
 @app.route('/signup')
 def signup_page():
     return render_template('signup.html')
+
+@app.route('/waste-worker')
+@app.route('/govWaste-worker/')
+def waste_worker_portal():
+    return send_from_directory('govWaste-worker', 'index.html')
 
 @app.route('/<path:path>')
 def catch_all(path):
@@ -2761,6 +2768,74 @@ def _local_intent_match(text):
         'fulfillmentText': "Sorry, I didn't understand that command.",
         'confidence': 0
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  IMAGE VERIFICATION API
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@app.route('/api/verify-image', methods=['POST'])
+def api_verify_image():
+    """Verify an uploaded image — used by GovOfficial-Worker and govWaste-worker."""
+    try:
+        data = request.get_json()
+        if not data or 'image' not in data:
+            return jsonify({'success': False, 'message': 'No image provided'}), 400
+
+        # Decode base64 image (strip data URI prefix if present)
+        image_b64 = data['image']
+        if ',' in image_b64:
+            image_b64 = image_b64.split(',', 1)[1]
+        image_bytes = base64.b64decode(image_b64)
+
+        # Current GPS from device
+        current_gps = None
+        if data.get('latitude') is not None and data.get('longitude') is not None:
+            current_gps = (float(data['latitude']), float(data['longitude']))
+
+        # Current timestamp
+        current_timestamp = datetime.utcnow()
+        if data.get('timestamp'):
+            try:
+                current_timestamp = datetime.fromisoformat(data['timestamp'].replace('Z', '+00:00')).replace(tzinfo=None)
+            except (ValueError, AttributeError):
+                pass
+
+        # Source context (which portal, what kind of upload)
+        source = data.get('source', 'unknown')
+        source_ref = data.get('source_ref', '')
+        uploaded_by = data.get('uploaded_by', '')
+
+        # Fetch existing hashes from DB for this source category
+        db_hash_rows = ImageHash.query.filter_by(source=source).all()
+        db_hashes = [row.phash for row in db_hash_rows]
+
+        # Run verification pipeline
+        result = verify_image(
+            image_bytes=image_bytes,
+            current_timestamp=current_timestamp,
+            current_gps=current_gps,
+            db_hashes=db_hashes
+        )
+
+        # Persist the new hash to DB
+        new_hash = ImageHash(
+            phash=result['phash'],
+            source=source,
+            source_ref=source_ref,
+            uploaded_by=uploaded_by,
+            verification_score=result['score'],
+            verification_status=result['status']
+        )
+        db.session.add(new_hash)
+        db.session.commit()
+
+        result['success'] = True
+        return jsonify(result), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 if __name__ == '__main__':

@@ -1,0 +1,187 @@
+﻿<!-- Daily Summary Screen -->
+<div class="summary-screen">
+
+    <!-- Back -->
+    <button class="btn-back" ng-click="goBack()">← Back to Route</button>
+
+    <!-- ① Hero — persona embedded, no separate card -->
+    <div class="summary-hero">
+        <div class="summary-hero-left">
+            <div class="summary-hero-emoji">{{heroEmoji}}</div>
+            <h2 class="summary-hero-heading">{{heroHeading}}</h2>
+            <p class="summary-hero-sub">{{heroSub}}</p>
+            <div class="sh-persona-row">
+                <div class="sh-avatar">{{worker.initials}}</div>
+                <div class="sh-names">
+                    <span class="sh-name">{{worker.name}}</span>
+                    <div class="sh-meta">
+                        <span class="sh-badge">{{worker.employeeId}}</span>
+                        <span class="sh-badge sh-ward">{{worker.ward}}</span>
+                    </div>
+                </div>
+                <div class="sh-tier-pill" ng-class="worker.tierClass">{{worker.tierIcon}} {{worker.tier}}</div>
+            </div>
+        </div>
+        <div class="summary-hero-right">
+            <div class="summary-big-pct">{{stats.percent}}%</div>
+            <div class="summary-big-lbl">Complete</div>
+            <div class="sh-date">{{todayDate}}</div>
+        </div>
+    </div>
+
+    <!-- ② Continue Route CTA (only when pending) -->
+    <button class="btn-continue-route" ng-if="stats.pending > 0" ng-click="continueRoute()">
+        ▶ Continue Route — {{stats.pending}} houses left
+    </button>
+
+    <!-- ③ Tier progress strip (slim, full width — no heavy card) -->
+    <div class="summary-tier-strip">
+        <span class="sts-icon">{{worker.tierIcon}}</span>
+        <span class="sts-tier">{{worker.tier}}</span>
+        <div class="sts-bar-wrap">
+            <div class="sts-bar-fill" ng-class="worker.tierClass" ng-style="{'width': tierProgressPct + '%'}"></div>
+        </div>
+        <span class="sts-pts">{{worker.totalPoints}} pts</span>
+        <span class="sts-next" ng-if="tierNext">→ {{tierPtsToNext}} to {{tierNext}}</span>
+        <span class="sts-next sts-gold" ng-if="!tierNext">⭐ Max Tier</span>
+    </div>
+
+    <!-- ④ 2-column body grid -->
+    <div class="summary-body-grid">
+
+        <!-- LEFT: KPI chips + Points breakdown -->
+        <div class="summary-col">
+
+            <!-- KPI chips row (replaces heavy white boxes) -->
+            <div class="summary-kpi-chips">
+                <div class="skpi-chip skpi-success">
+                    <div class="skpi-icon">✅</div>
+                    <div class="skpi-val">{{stats.completed}}</div>
+                    <div class="skpi-lbl">Done</div>
+                </div>
+                <div class="skpi-chip skpi-warning">
+                    <div class="skpi-icon">⚠️</div>
+                    <div class="skpi-val">{{stats.issues}}</div>
+                    <div class="skpi-lbl">Issues</div>
+                </div>
+                <div class="skpi-chip skpi-info">
+                    <div class="skpi-icon">🏠</div>
+                    <div class="skpi-val">{{stats.pending}}</div>
+                    <div class="skpi-lbl">Left</div>
+                </div>
+            </div>
+
+            <!-- Points breakdown card -->
+            <div class="points-today-card">
+                <div class="ptc-header">
+                    <div class="ptc-title">⭐ Points Earned Today</div>
+                    <div class="ptc-total" ng-class="{'positive': totalPointsToday >= 0, 'negative': totalPointsToday < 0}">
+                        {{totalPointsToday >= 0 ? '+' : ''}}{{totalPointsToday}} pts
+                    </div>
+                </div>
+                <div class="ptc-rows">
+                    <div class="ptc-row" ng-if="onTimeBonus > 0">
+                        <div class="ptc-row-icon bonus">🏆</div>
+                        <div class="ptc-row-info">
+                            <div class="ptc-row-label">On-Time Bonus</div>
+                            <div class="ptc-row-desc">Done before {{deadline}}</div>
+                        </div>
+                        <div class="ptc-row-pts positive">+{{onTimeBonus}}</div>
+                    </div>
+                    <div class="ptc-row" ng-if="lateDeduction !== 0">
+                        <div class="ptc-row-icon penalty">⏰</div>
+                        <div class="ptc-row-info">
+                            <div class="ptc-row-label">Late Deduction</div>
+                            <div class="ptc-row-desc">After {{deadline}}</div>
+                        </div>
+                        <div class="ptc-row-pts negative">{{lateDeduction}}</div>
+                    </div>
+                    <div class="ptc-row">
+                        <div class="ptc-row-icon houses">🏠</div>
+                        <div class="ptc-row-info">
+                            <div class="ptc-row-label">Houses Collected</div>
+                            <div class="ptc-row-desc">{{stats.completed}} of {{stats.total}}</div>
+                        </div>
+                        <div class="ptc-row-pts positive">+{{stats.completed}}</div>
+                    </div>
+                </div>
+                <a href="#/wallet" class="btn-view-wallet">💳 View My Wallet →</a>
+            </div>
+
+        </div>
+
+        <!-- RIGHT: Gauge ring + Issue log -->
+        <div class="summary-col">
+
+            <!-- Gauge card — vertical (gauge centred, insights below) -->
+            <div class="gauge-card gauge-card--col">
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 160 160">
+                        <circle class="gauge-bg" cx="80" cy="80" r="65"></circle>
+                        <circle class="gauge-fill"
+                                cx="80" cy="80" r="65"
+                                ng-attr-stroke="{{gaugeColor}}"
+                                ng-attr-stroke-dasharray="{{gaugeCircumference}}"
+                                ng-attr-stroke-dashoffset="{{gaugeDashoffset}}">
+                        </circle>
+                    </svg>
+                    <div class="gauge-text">
+                        <div class="gauge-pct">{{stats.percent}}%</div>
+                        <div class="gauge-lbl">Done</div>
+                    </div>
+                </div>
+                <div class="gauge-insights">
+                    <div class="gauge-insight-item" ng-if="smartInsight">
+                        <div class="gi-icon">⏱</div>
+                        <div class="gi-text">{{smartInsight}}</div>
+                    </div>
+                    <div class="gauge-insight-item" ng-if="avgMinPerHouse">
+                        <div class="gi-icon">🏃</div>
+                        <div class="gi-text">Avg {{avgMinPerHouse}} min / house</div>
+                    </div>
+                    <div class="gauge-insight-item">
+                        <div class="gi-icon">📋</div>
+                        <div class="gi-text">{{stats.completed}} / {{stats.total}} houses done</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issue log / zero-state -->
+            <div class="issue-log-card" ng-if="issueList.length === 0">
+                <div class="issue-zero-state">
+                    <div class="izs-emoji">🎉</div>
+                    <div class="izs-title">Zero Issues Today!</div>
+                    <div class="izs-sub">Great job keeping the route clean.</div>
+                </div>
+            </div>
+
+            <div class="issue-log-card issue-log-card--has-issues" ng-if="issueList.length > 0">
+                <div class="card-header">
+                    <div class="card-title">⚠️ Issues ({{issueList.length}})</div>
+                </div>
+                <div class="issue-log-item" ng-repeat="item in issueList">
+                    <div class="issue-log-dot"></div>
+                    <div>
+                        <div class="issue-log-house">{{item.houseId}}</div>
+                        <div class="issue-log-type">{{item.typeLabel}}</div>
+                    </div>
+                    <div class="issue-log-time">{{item.timeStr}}</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ⑤ Motivation — full width -->
+    <div class="motivation-card">
+        <div class="motivation-emoji">{{motivationEmoji}}</div>
+        <div class="motivation-title">{{motivationTitle}}</div>
+        <div class="motivation-text">{{motivationText}}</div>
+        <button class="btn-continue-route mcard" ng-if="stats.pending > 0" ng-click="continueRoute()">
+            ▶ Continue Route
+        </button>
+        <button class="btn-finish-day" ng-if="stats.pending === 0" ng-click="finishDay()">✔ Finish Day</button>
+    </div>
+
+</div>

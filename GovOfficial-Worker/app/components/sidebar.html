@@ -1,90 +1,52 @@
-<!-- Sidebar Component -->
-<aside class="worker-sidebar">
+<!-- Unified Sidebar Component for Suvidha Field Agent -->
+<aside class="worker-sidebar" ng-controller="SidebarController">
     <div class="sidebar-header">
-        <div class="sidebar-brand">
+        <a href="dashboard.html" class="sidebar-brand" style="text-decoration: none; display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
             <div class="brand-logo">
-                <span class="brand-icon-wrapper">⚡</span>
+                <img src="/static/images/suvidha Logo.jpg" alt="Suvidha Logo" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
             </div>
             <div class="brand-text">
-                <h1>Suvidha</h1>
-                <span class="brand-subtitle">Field Agent</span>
+                <h1 style="margin: 0; font-size: 1.1rem;">Suvidha</h1>
+                <span class="brand-subtitle" style="font-size: 0.7rem; display: block;">FIELD AGENT</span>
             </div>
-        </div>
-    </div>
-
-    <!-- Agent Status Indicator -->
-    <div class="agent-status-card">
-        <div class="status-indicator" ng-class="{'online': agentStatus === 'online', 'busy': agentStatus === 'on_task', 'offline': agentStatus === 'offline'}">
-            <span class="status-dot"></span>
-            <span class="status-text">{{agentStatus === 'online' ? 'Available' : agentStatus === 'on_task' ? 'On Task' : 'Offline'}}</span>
-        </div>
-        <div class="gps-indicator" ng-class="{'active': gpsEnabled}">
-            <span class="gps-icon">📍</span>
-            <span>GPS {{gpsEnabled ? 'Active' : 'Off'}}</span>
-        </div>
+        </a>
     </div>
 
     <nav class="sidebar-nav">
-        <div class="nav-section">
-            <span class="nav-section-title">Main</span>
-            <a href="#!/dashboard" class="nav-item" ng-class="{active: isActive('/dashboard') || isActive('/')}">
-                <span class="nav-icon-wrapper"><span class="nav-icon">📊</span></span>
-                <span class="nav-text">Dashboard</span>
-                <span class="nav-badge" ng-if="pendingTasks > 0">{{pendingTasks}}</span>
-            </a>
-            <a href="#!/search" class="nav-item" ng-class="{active: isActive('/search')}">
-                <span class="nav-icon-wrapper"><span class="nav-icon">🏠</span></span>
-                <span class="nav-text">Households</span>
-            </a>
-        </div>
-
-        <div class="nav-section">
-            <span class="nav-section-title">Tasks</span>
-            <a href="#!/tasks" class="nav-item" ng-class="{active: isActive('/tasks')}">
-                <span class="nav-icon-wrapper"><span class="nav-icon">📋</span></span>
-                <span class="nav-text">My Tasks</span>
-                <span class="nav-badge warning" ng-if="urgentTasks > 0">{{urgentTasks}}</span>
-            </a>
-            <a href="#!/report" class="nav-item" ng-class="{active: isActive('/report')}">
-                <span class="nav-icon-wrapper"><span class="nav-icon">⚠️</span></span>
-                <span class="nav-text">Report Issue</span>
-            </a>
-        </div>
-
-        <div class="nav-section">
-            <span class="nav-section-title">Performance</span>
-            <a href="#!/performance" class="nav-item" ng-class="{active: isActive('/performance')}">
-                <span class="nav-icon-wrapper"><span class="nav-icon">📈</span></span>
-                <span class="nav-text">My Score</span>
-                <span class="nav-score">{{performanceScore}}</span>
-            </a>
-            <a href="#!/history" class="nav-item" ng-class="{active: isActive('/history')}">
-                <span class="nav-icon-wrapper"><span class="nav-icon">📜</span></span>
-                <span class="nav-text">Task History</span>
-            </a>
-        </div>
-
-        <div class="nav-section">
-            <span class="nav-section-title">Account</span>
-            <a href="#!/settings" class="nav-item" ng-class="{active: isActive('/settings')}">
-                <span class="nav-icon-wrapper"><span class="nav-icon">⚙️</span></span>
-                <span class="nav-text">Settings</span>
-            </a>
-        </div>
+        <a href="dashboard.html" class="nav-item" ng-class="{active: isCurrentPage('dashboard')}">
+            <span class="nav-icon-wrapper">📊</span>
+            <span class="nav-text">Dashboard</span>
+        </a>
+        <a href="wallet.html" class="nav-item" ng-class="{active: isCurrentPage('wallet')}">
+            <span class="nav-icon-wrapper">💰</span>
+            <span class="nav-text">My Wallet</span>
+        </a>
+        <a href="search.html" class="nav-item" ng-class="{active: isCurrentPage('search')}">
+            <span class="nav-icon-wrapper">🏠</span>
+            <span class="nav-text">Households</span>
+        </a>
+        <a href="report.html" class="nav-item" ng-class="{active: isCurrentPage('report')}">
+            <span class="nav-icon-wrapper">⚠️</span>
+            <span class="nav-text">Report Issue</span>
+        </a>
+        <a href="settings.html" class="nav-item" ng-class="{active: isCurrentPage('settings')}">
+            <span class="nav-icon-wrapper">⚙️</span>
+            <span class="nav-text">Settings</span>
+        </a>
     </nav>
 
     <div class="sidebar-footer">
         <div class="user-profile">
-            <div class="user-avatar">{{user.initials}}</div>
+            <div class="user-avatar">{{user.initials || 'VS'}}</div>
             <div class="user-info">
-                <h4>{{user.name}}</h4>
-                <p class="user-category">{{user.category || 'Field Agent'}}</p>
-                <p class="user-ward">{{user.assignedWard || 'Ward 15'}}</p>
+                <h4>{{user.name || 'Vikram Singh'}}</h4>
+                <p>{{user.role || 'Electric Meter Reader'}}</p>
             </div>
         </div>
+
         <button class="logout-btn" ng-click="logout()">
             <span>🚪</span>
-            <span>End Shift</span>
+            <span>Logout</span>
         </button>
     </div>
 </aside>

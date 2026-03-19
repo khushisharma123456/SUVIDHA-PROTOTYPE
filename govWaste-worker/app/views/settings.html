@@ -1,0 +1,300 @@
+﻿<!-- Settings Screen -->
+<div class="set-screen">
+
+    <!-- ① Hero -->
+    <div class="set-hero">
+        <div class="set-hero-left">
+            <div class="set-hero-avatar">{{worker.initials}}</div>
+            <div class="set-hero-info">
+                <div class="set-hero-name">{{worker.name}}</div>
+                <div class="set-hero-role">🚛 {{worker.role}}</div>
+                <div class="set-hero-badges">
+                    <span class="set-hero-badge">{{worker.employeeId}}</span>
+                    <span class="set-hero-badge">{{worker.ward}}</span>
+                    <span class="set-hero-tier" ng-class="worker.tierClass">{{worker.tierIcon}} {{worker.tier}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="set-hero-right">
+            <div class="set-hero-pts">{{worker.totalPoints}}</div>
+            <div class="set-hero-pts-lbl">Total Points</div>
+            <a href="#/wallet" class="set-hero-wallet-btn">💳 My Wallet</a>
+        </div>
+    </div>
+
+    <!-- ② Tier strip -->
+    <div class="set-tier-strip">
+        <span class="set-tier-icon">{{worker.tierIcon}}</span>
+        <span class="set-tier-name">{{worker.tier}}</span>
+        <div class="set-tier-bar-wrap">
+            <div class="set-tier-bar-fill" ng-class="worker.tierClass" ng-style="{'width': tierProgressPct + '%'}"></div>
+        </div>
+        <span class="set-tier-pts">{{worker.totalPoints}} pts</span>
+        <span class="set-tier-next" ng-if="tierNext">→ {{tierPtsToNext}} pts to {{tierNext}}</span>
+        <span class="set-tier-next set-tier-gold" ng-if="!tierNext">⭐ Max Tier</span>
+    </div>
+
+    <!-- ③ 2-column body -->
+    <div class="set-body-grid">
+
+        <!-- LEFT column -->
+        <div class="set-col">
+
+            <!-- Profile card -->
+            <div class="set-card">
+                <div class="set-card-head">👤 Profile</div>
+
+                <!-- Display Name -->
+                <div class="set-row" ng-if="!editingName">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:var(--primary-sub);color:var(--primary)">✏️</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Display Name</div>
+                            <div class="set-row-val">{{worker.name}}</div>
+                        </div>
+                    </div>
+                    <button class="set-btn-edit" ng-click="startEditName()">Edit</button>
+                </div>
+                <div class="set-row set-row--edit" ng-if="editingName">
+                    <div class="set-edit-wrap">
+                        <label class="set-edit-lbl">Display Name</label>
+                        <div class="set-edit-row">
+                            <input class="set-input" type="text" ng-model="editNameVal" placeholder="Your name" maxlength="40" />
+                            <button class="set-btn-save" ng-click="saveName()">Save</button>
+                            <button class="set-btn-cancel" ng-click="editingName=false">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee ID -->
+                <div class="set-row">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(245,158,11,0.1);color:var(--warning)">🪪</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Employee ID</div>
+                            <div class="set-row-val">{{worker.employeeId}}</div>
+                        </div>
+                    </div>
+                    <span class="set-readonly-badge">Official</span>
+                </div>
+
+                <!-- Ward -->
+                <div class="set-row">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(16,185,129,0.1);color:var(--success)">📍</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Ward Assignment</div>
+                            <div class="set-row-val">{{worker.ward}}</div>
+                        </div>
+                    </div>
+                    <span class="set-readonly-badge">Assigned</span>
+                </div>
+
+                <!-- Role -->
+                <div class="set-row set-row--last">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(37,99,235,0.08);color:var(--primary)">🚛</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Role</div>
+                            <div class="set-row-val">{{worker.role}}</div>
+                        </div>
+                    </div>
+                    <span class="set-readonly-badge">Active</span>
+                </div>
+            </div>
+
+            <!-- About & Support card -->
+            <div class="set-card">
+                <div class="set-card-head">ℹ️ About & Support</div>
+
+                <div class="set-row">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(37,99,235,0.08);color:var(--primary)">📱</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">App Version</div>
+                            <div class="set-row-val">Suvidha Waste Worker v2.0</div>
+                        </div>
+                    </div>
+                    <span class="set-readonly-badge set-badge-green">Stable</span>
+                </div>
+
+                <div class="set-row set-row--link" ng-click="contactSupervisor()">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(16,185,129,0.1);color:var(--success)">📞</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Contact Supervisor</div>
+                            <div class="set-row-muted">Raise a query or issue</div>
+                        </div>
+                    </div>
+                    <span class="set-chevron">›</span>
+                </div>
+
+                <div class="set-row set-row--link set-row--last" ng-click="openHelp()">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(245,158,11,0.1);color:var(--warning)">❓</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Help & FAQ</div>
+                            <div class="set-row-muted">How to use the app</div>
+                        </div>
+                    </div>
+                    <span class="set-chevron">›</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT column -->
+        <div class="set-col">
+
+            <!-- Preferences card -->
+            <div class="set-card">
+                <div class="set-card-head">⚙️ Preferences</div>
+
+                <div class="set-row">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(37,99,235,0.08);color:var(--primary)">🔔</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Notifications</div>
+                            <div class="set-row-muted">Route updates, alerts & reminders</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ng-model="prefs.notifications" ng-change="savePrefs()" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="set-row">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(16,185,129,0.1);color:var(--success)">🔊</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Sound Effects</div>
+                            <div class="set-row-muted">Play sounds on collection / issue</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ng-model="prefs.sound" ng-change="savePrefs()" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="set-row">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(245,158,11,0.1);color:var(--warning)">⏰</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Deadline Reminder</div>
+                            <div class="set-row-muted">Alert before 4:00 PM cutoff</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ng-model="prefs.deadlineReminder" ng-change="savePrefs()" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="set-row set-row--last">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(239,68,68,0.1);color:var(--danger)">🌐</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Language</div>
+                            <div class="set-row-val">{{selectedLangLabel}}</div>
+                        </div>
+                    </div>
+                    <div class="set-select-wrap">
+                        <select class="set-select" ng-model="prefs.language" ng-change="onLangChange()">
+                            <option value="EN">English</option>
+                            <option value="HI">हिन्दी</option>
+                            <option value="BN">বাংলা</option>
+                            <option value="TE">తెలుగు</option>
+                            <option value="MR">मराठी</option>
+                            <option value="TA">தமிழ்</option>
+                            <option value="GU">ગુજરાતી</option>
+                            <option value="KN">ಕನ್ನಡ</option>
+                            <option value="ML">മലയാളം</option>
+                            <option value="PA">ਪੰਜਾਬੀ</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Route Preferences card -->
+            <div class="set-card">
+                <div class="set-card-head">🚛 Route Preferences</div>
+
+                <div class="set-row">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(37,99,235,0.08);color:var(--primary)">🗺️</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Show Map on Route</div>
+                            <div class="set-row-muted">Display map on home screen</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ng-model="prefs.showMap" ng-change="savePrefs()" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="set-row">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(16,185,129,0.1);color:var(--success)">📏</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Show House Distances</div>
+                            <div class="set-row-muted">Distance tags in route list</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ng-model="prefs.showDistances" ng-change="savePrefs()" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="set-row set-row--last">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(245,158,11,0.1);color:var(--warning)">⏭️</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Auto-advance to Next House</div>
+                            <div class="set-row-muted">Jump to next after collection</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ng-model="prefs.autoAdvance" ng-change="savePrefs()" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Account / Danger card -->
+            <div class="set-card set-card--danger">
+                <div class="set-card-head">🔐 Account</div>
+
+                <div class="set-row set-row--link" ng-click="clearData()">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(245,158,11,0.1);color:var(--warning)">🗑️</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl">Clear Local Data</div>
+                            <div class="set-row-muted">Reset cached route & points data</div>
+                        </div>
+                    </div>
+                    <span class="set-chevron">›</span>
+                </div>
+
+                <div class="set-row set-row--link set-row--logout set-row--last" ng-click="logout()">
+                    <div class="set-row-left">
+                        <div class="set-row-icon" style="background:rgba(239,68,68,0.1);color:var(--danger)">🚪</div>
+                        <div class="set-row-text">
+                            <div class="set-row-lbl set-lbl-danger">Log Out</div>
+                            <div class="set-row-muted">Sign out of your account</div>
+                        </div>
+                    </div>
+                    <span class="set-chevron set-chevron--danger">›</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="settings-toast" ng-if="toastMessage">{{toastMessage}}</div>
+
+</div>

@@ -1,0 +1,126 @@
+﻿<!-- Wallet Screen -->
+<div class="wallet-screen wv2">
+
+    <!-- ① Points Hero Card -->
+    <div class="wallet-hero">
+        <div class="hero-left">
+            <div class="hero-label">🏅 Your Rewards Balance</div>
+            <div class="hero-points">
+                {{wallet.points}} <span class="pts-label">Points</span>
+            </div>
+            <div class="hero-inr">
+                💵 ₹{{wallet.balance}} Suvidha Credit
+            </div>
+            <div class="hero-motivation">
+                {{walletMotivation}}
+            </div>
+        </div>
+        <div class="hero-actions">
+            <button class="btn-hero-solid" ng-click="scrollToRewards()">💰 Redeem Now</button>
+            <button class="btn-hero-outline" ng-click="scrollToHistory()">📜 History</button>
+        </div>
+    </div>
+
+    <!-- ② Weekly Insight -->
+    <div class="weekly-insight">
+        <div class="wi-icon">📈</div>
+        <div>
+            <div class="wi-label">Weekly Summary</div>
+            <div class="wi-value">+{{weekEarned}} Points This Week</div>
+            <div class="wi-sub">Spent {{weekSpent}} pts · Net gain {{weekNet}} pts</div>
+        </div>
+    </div>
+
+    <!-- ③ Smart Insight / Continue Route Bar -->
+    <div class="wallet-insight-bar" ng-if="smartInsight">
+        <span class="wib-text">{{smartInsight}}</span>
+        <button class="btn-wib-action" ng-click="continueRoute()">Continue Route →</button>
+    </div>
+
+    <!-- ④ Rewards / Redeem Section -->
+    <div class="section-card" id="rewards-section">
+        <div class="section-card-header">
+            <span class="section-title">✨ Redeem Your Points</span>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="filter-bar">
+            <button class="filter-pill"
+                ng-repeat="cat in rewardCategories"
+                ng-class="{active: activeCategory === cat.key}"
+                ng-click="setCategory(cat.key)">
+                {{cat.label}}
+            </button>
+        </div>
+
+        <div class="redemption-grid">
+            <div class="redeem-card"
+                ng-repeat="opt in filteredRewards()"
+                ng-click="payBill(opt.id)">
+                <span class="redeem-badge badge-best" ng-if="opt.badge === 'best'">🔥 Best Value</span>
+                <span class="redeem-badge badge-top"  ng-if="opt.badge === 'top'">⭐ Most Used</span>
+                <div class="redeem-icon">{{opt.icon}}</div>
+                <div class="redeem-name">{{opt.name}}</div>
+                <div class="redeem-cost">{{opt.pts}} Points</div>
+                <button class="redeem-btn" ng-click="$event.stopPropagation(); payBill(opt.id)">Redeem</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑤ Transactions Section -->
+    <div class="section-card" id="history-section">
+        <div class="section-card-header">
+            <span class="section-title">📜 Transactions</span>
+        </div>
+
+        <!-- Transaction Filters -->
+        <div class="filter-bar">
+            <button class="filter-pill"
+                ng-repeat="tf in txnFilters"
+                ng-class="{active: txFilter === tf.key}"
+                ng-click="txFilter = tf.key">
+                {{tf.label}}
+            </button>
+        </div>
+
+        <div class="txn-list">
+            <div class="txn-row" ng-repeat="txn in filteredTransactions()">
+                <div class="txn-icon" ng-style="{'background': txn.bg || 'rgba(139,92,246,0.1)'}">{{txn.icon}}</div>
+                <div class="txn-info">
+                    <div class="txn-title">{{txn.label}}</div>
+                    <div class="txn-meta">
+                        <span>{{txn.date}}</span>
+                        <span>·</span>
+                        <span class="txn-type-pill" ng-class="txn.type === 'credit' ? 'pill-earn' : 'pill-spend'">
+                            {{txn.type === 'credit' ? 'Earned' : 'Spent'}}
+                        </span>
+                    </div>
+                </div>
+                <div class="txn-amount" ng-class="txn.type === 'credit' ? 'credit' : 'debit'">
+                    <span>{{txn.type === 'credit' ? '+' : '-'}}{{txn.pts}} pts</span>
+                    <div class="txn-dot" ng-class="txn.type === 'credit' ? 'dot-green' : 'dot-red'"></div>
+                </div>
+            </div>
+            <div class="txn-empty" ng-if="filteredTransactions().length === 0">
+                No transactions found.
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑥ Payment / Redemption Modal -->
+    <div class="wv2-modal-overlay" ng-if="showPayModal">
+        <div class="wv2-modal-content">
+            <div class="wv2-modal-icon">{{payModal.icon}}</div>
+            <h2 class="wv2-modal-title">{{payModal.name}}</h2>
+            <p class="wv2-modal-sub">Enter amount to pay (min ₹{{payModal.min}})</p>
+            <input class="wv2-modal-input"
+                type="number"
+                ng-model="payModal.amount"
+                min="{{payModal.min}}"
+                placeholder="Amount in ₹">
+            <button class="wv2-confirm-btn" ng-click="confirmPay()">✅ Confirm Payment</button>
+            <button class="wv2-cancel-btn"  ng-click="cancelPay()">Cancel</button>
+        </div>
+    </div>
+
+</div>

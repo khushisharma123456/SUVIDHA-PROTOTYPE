@@ -1,0 +1,77 @@
+<!-- Topbar Component for Waste Collection Worker -->
+<header class="worker-header">
+    <div class="header-left">
+        <h2>{{pageTitle}}</h2>
+        <p>{{pageSubtitle}}</p>
+    </div>
+
+    <div class="header-right">
+        <!-- Language Selector -->
+        <div class="lang-dropdown" style="position: relative;">
+            <button class="topbar-btn lang-toggle-btn" 
+                    ng-click="toggleLangMenu($event)"
+                    aria-label="Select language"
+                    aria-expanded="{{showLangMenu}}">
+                <span class="lang-icon">🌐</span>
+                <span class="lang-code">{{selectedLang}}</span>
+                <span style="font-size: 0.6rem; margin-left: 0.15rem; transition: transform 0.2s;" 
+                      ng-style="{'transform': showLangMenu ? 'rotate(180deg)' : 'rotate(0deg)'}">▼</span>
+            </button>
+
+            <!-- Language Menu -->
+            <div class="lang-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()">
+                <div class="menu-header">
+                    <span>Select Language</span>
+                </div>
+                <div style="max-height: 320px; overflow-y: auto;">
+                    <button class="menu-item" 
+                            ng-repeat="lang in languages"
+                            ng-class="{active: selectedLang === lang.code}"
+                            ng-click="selectLang(lang)">
+                        <span style="margin-right: 0.5rem;" ng-if="selectedLang === lang.code">✓</span>
+                        {{lang.name}}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="notification-wrapper" style="position: relative;">
+            <button class="topbar-btn notification-btn" 
+                    ng-click="toggleNotifications($event)"
+                    title="Notifications"
+                    aria-label="Show notifications">
+                <span class="notification-icon">🔔</span>
+                <span class="notification-badge" ng-if="notificationsCount > 0">{{notificationsCount}}</span>
+            </button>
+
+            <!-- Notifications Menu -->
+            <div class="notification-menu" ng-show="showNotifications" ng-click="$event.stopPropagation()">
+                <div class="menu-header">
+                    <span>Notifications</span>
+                    <button ng-click="showNotifications = false" style="background: none; border: none; cursor: pointer; color: #94a3b8;">✕</button>
+                </div>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <div ng-repeat="notif in notifications"
+                         class="menu-item notif-item"
+                         ng-class="{'notif-unread': notif.unread}"
+                         ng-click="markRead(notif)"
+                         style="padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9; cursor:pointer; position:relative;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                            <span style="font-weight: 800; font-size: 0.75rem; color: var(--primary);">{{notif.sender}}</span>
+                            <span style="font-size: 0.65rem; font-weight: 700; color: #94a3b8;">{{notif.time}}</span>
+                        </div>
+                        <div style="font-size: 0.83rem; color: #475569; line-height: 1.5; font-weight: 500;">{{notif.text}}</div>
+                        <span ng-if="notif.unread" class="notif-dot"></span>
+                    </div>
+                    <div ng-if="!notifications.length" style="padding: 3rem 1.5rem; text-align: center; color: #94a3b8; font-size: 0.9rem;">
+                        No new notifications
+                    </div>
+                </div>
+                <div style="padding: 0.65rem 1.25rem; border-top: 1px solid #f1f5f9; text-align:center;">
+                    <button ng-click="markAllRead()" style="background:none;border:none;font-size:0.78rem;color:var(--primary);font-weight:700;cursor:pointer;">✓ Mark all as read</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

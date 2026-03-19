@@ -1203,3 +1203,31 @@ class MeterSubmission(db.Model):
             'ai_confidence': self.ai_confidence,
             'submitted_at': self.submitted_at.isoformat() if self.submitted_at else None
         }
+
+
+# ============================================
+# IMAGE HASH TABLE (for duplicate detection)
+# ============================================
+class ImageHash(db.Model):
+    __tablename__ = 'image_hashes'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    phash = db.Column(db.String(64), nullable=False, index=True)
+    source = db.Column(db.String(50), nullable=False)          # 'gov_worker_report', 'waste_worker_collection', etc.
+    source_ref = db.Column(db.String(100), nullable=True)      # reference ID of the report/task
+    uploaded_by = db.Column(db.String(100), nullable=True)      # employee/worker ID
+    verification_score = db.Column(db.Integer, default=0)
+    verification_status = db.Column(db.String(20), default='Pending')  # Verified, Acceptable, Suspicious
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'phash': self.phash,
+            'source': self.source,
+            'source_ref': self.source_ref,
+            'uploaded_by': self.uploaded_by,
+            'verification_score': self.verification_score,
+            'verification_status': self.verification_status,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }

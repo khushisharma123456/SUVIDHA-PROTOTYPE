@@ -9,265 +9,242 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .policy-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .chart-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--gov-gray-200);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .chart-title {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 280px;
-        }
-
-        .policy-recommendations {
-            grid-column: span 2;
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--gov-gray-200);
-        }
-
-        .recommendation-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .recommendation-card {
-            padding: 1rem;
-            background: var(--gov-gray-50);
-            border-radius: var(--radius-md);
-            border-left: 4px solid transparent;
-        }
-
-        .recommendation-card.high {
-            border-left-color: var(--gov-danger);
-        }
-
-        .recommendation-card.medium {
-            border-left-color: var(--gov-warning);
-        }
-
-        .recommendation-card.low {
-            border-left-color: var(--gov-info);
-        }
-
-        .rec-priority {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .rec-priority.high {
-            color: var(--gov-danger);
-        }
-
-        .rec-priority.medium {
-            color: var(--gov-warning);
-        }
-
-        .rec-priority.low {
-            color: var(--gov-info);
-        }
-
-        .rec-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .rec-description {
-            font-size: 0.85rem;
-            color: var(--gov-gray-600);
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .rec-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: auto;
-        }
-
-        .rec-action-btn {
-            flex: 1;
-            padding: 0.5rem;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .rec-action-btn.primary {
-            background: var(--gov-primary);
-            color: white;
-        }
-
-        .rec-action-btn.primary:hover {
-            background: var(--gov-primary-dark);
-        }
-
-        .rec-action-btn.secondary {
-            background: var(--gov-gray-100);
-            color: var(--gov-gray-700);
-        }
-
-        .rec-action-btn.secondary:hover {
-            background: var(--gov-gray-200);
-        }
-
-        .recommendation-card {
-            padding: 1.25rem;
-            background: var(--gov-gray-50);
-            border-radius: var(--radius-md);
-            border-left: 4px solid transparent;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.2s ease;
-        }
-
-        .recommendation-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .rec-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .rec-icon {
-            font-size: 1.25rem;
-        }
-
-        .policy-recommendations {
-            grid-column: span 2;
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.5rem 2rem;
-            border: 1px solid var(--gov-gray-200);
-            margin-top: 1rem;
-        }
-
-        .policy-recommendations h3 {
-            margin-bottom: 1.25rem;
-        }
-
-        .section-header {
-            margin-bottom: 1rem;
-        }
-
-        .section-header h3 {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--gov-gray-800);
-        }
-
+        /* ── KPI ── */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 1.25rem;
-            margin-bottom: 2rem;
+            gap: 1.1rem;
+            margin-bottom: 1.4rem;
         }
-
         .kpi-card {
             background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--gov-gray-200);
+            border-radius: 12px;
+            padding: 1.1rem 1rem 0.9rem;
+            border: 1px solid #e2e8f0;
             text-align: center;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        .kpi-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
+        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.09); }
         .kpi-card::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--gov-primary), var(--gov-success));
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, #3182ce, #38a169);
         }
+        .kpi-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+        .kpi-value { font-size: 2rem; font-weight: 800; color: #1a365d; line-height: 1.1; }
+        .kpi-label { font-size: 0.78rem; color: #718096; margin-top: 0.3rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+        .kpi-trend {
+            font-size: 0.75rem; font-weight: 600; margin-top: 0.4rem;
+            padding: 0.18rem 0.55rem; border-radius: 20px; display: inline-block;
+        }
+        .kpi-trend.up   { color: #276749; background: #c6f6d5; }
+        .kpi-trend.down { color: #c53030; background: #fed7d7; }
+        .kpi-vs { font-size: 0.7rem; color: #a0aec0; margin-top: 0.15rem; }
 
-        .kpi-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
+        /* ── Summary Bar ── */
+        .summary-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin: 0 auto 0.75rem;
-            background: linear-gradient(135deg, var(--gov-gray-100), white);
+            gap: 1.25rem;
+            background: linear-gradient(135deg, #1a365d, #2c5282);
+            border-radius: 12px;
+            padding: 0.8rem 1.25rem;
+            margin-bottom: 1.4rem;
+            flex-wrap: wrap;
         }
-
-        .kpi-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--gov-primary);
-            line-height: 1.2;
+        .summary-label { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.7); flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-pill {
+            font-size: 0.78rem; font-weight: 600; padding: 0.22rem 0.7rem; border-radius: 20px; flex-shrink: 0;
         }
+        .summary-pill.good { background: #c6f6d5; color: #276749; }
+        .summary-pill.warn { background: #feebc8; color: #c05621; }
+        .summary-pill.crit { background: #fed7d7; color: #c53030; }
+        .summary-text { font-size: 0.78rem; color: rgba(255,255,255,0.8); }
+        .summary-divider { color: rgba(255,255,255,0.3); font-size: 0.9rem; }
 
-        .kpi-label {
-            font-size: 0.85rem;
-            color: var(--gov-gray-500);
-            margin-top: 0.5rem;
+        /* ── Charts Row ── */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 58fr 42fr;
+            gap: 1.25rem;
+            margin-bottom: 1.4rem;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.15rem 1.25rem 1rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+        }
+        .chart-title { font-weight: 700; font-size: 0.92rem; color: #1a365d; }
+        .chart-subtitle-txt { font-size: 0.72rem; color: #718096; margin-top: 2px; }
+        .chart-container { position: relative; height: 235px; }
+
+        .chart-toggle { display: flex; gap: 0.3rem; }
+        .ctoggle-btn {
+            padding: 0.22rem 0.6rem; border: 1px solid #e2e8f0; border-radius: 6px;
+            background: #f7fafc; font-size: 0.7rem; font-weight: 600; color: #4a5568;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .ctoggle-btn.active { background: #1a365d; color: white; border-color: #1a365d; }
+
+        .pie-insight {
+            margin-top: 0.7rem;
+            background: #fff8f0;
+            border-left: 3px solid #dd6b20;
+            border-radius: 0 6px 6px 0;
+            padding: 0.45rem 0.7rem;
+            font-size: 0.76rem;
+            color: #7b341e;
             font-weight: 500;
         }
 
-        .kpi-trend {
-            font-size: 0.8rem;
-            margin-top: 0.75rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            display: inline-block;
+        /* ── AI Recommendations ── */
+        .ai-section {
+            background: white;
+            border-radius: 14px;
+            padding: 1.5rem 1.75rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            margin-bottom: 1.4rem;
         }
-
-        .kpi-trend.up {
-            color: var(--gov-success);
-            background: rgba(40, 167, 69, 0.1);
+        .ai-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 2px solid #edf2f7;
         }
+        .ai-section-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #1a365d;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .ai-badge {
+            font-size: 0.68rem; font-weight: 700; padding: 0.22rem 0.65rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .ai-count-badge {
+            font-size: 0.75rem; font-weight: 600; color: #718096;
+        }
+        .rec-list { display: flex; flex-direction: column; gap: 1rem; }
+        .rec-card {
+            border-radius: 10px;
+            padding: 1.1rem 1.25rem;
+            border-left: 5px solid transparent;
+            display: flex; gap: 1rem; align-items: flex-start;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .rec-card:hover { transform: translateX(3px); box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+        .rec-card.high   { background: #fff5f5; border-left-color: #e53e3e; }
+        .rec-card.medium { background: #fffaf0; border-left-color: #dd6b20; }
+        .rec-card.low    { background: #ebf8ff; border-left-color: #3182ce; }
 
-        .kpi-trend.down {
-            color: var(--gov-danger);
-            background: rgba(220, 53, 69, 0.1);
+        .rec-card-icon { font-size: 1.9rem; flex-shrink: 0; margin-top: 2px; }
+        .rec-card-body { flex: 1; }
+        .rec-tags { display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+        .rec-priority-tag {
+            font-size: 0.66rem; font-weight: 700; text-transform: uppercase;
+            padding: 0.16rem 0.5rem; border-radius: 4px; letter-spacing: 0.5px;
+        }
+        .rec-priority-tag.high   { background: #fed7d7; color: #c53030; }
+        .rec-priority-tag.medium { background: #feebc8; color: #c05621; }
+        .rec-priority-tag.low    { background: #bee3f8; color: #2b6cb0; }
+        .rec-urgency-tag {
+            font-size: 0.66rem; font-weight: 600; padding: 0.16rem 0.5rem; border-radius: 4px;
+        }
+        .rec-urgency-tag.urgent    { background: #e53e3e; color: white; }
+        .rec-urgency-tag.moderate  { background: #dd6b20; color: white; }
+        .rec-urgency-tag.scheduled { background: #3182ce; color: white; }
+
+        .rec-card-title { font-size: 1rem; font-weight: 700; color: #1a202c; margin-bottom: 0.3rem; }
+        .rec-card-desc  { font-size: 0.82rem; color: #4a5568; line-height: 1.55; margin-bottom: 0.55rem; }
+        .rec-impact {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-size: 0.76rem; font-weight: 600; color: #c05621;
+            background: #fffaf0; padding: 0.18rem 0.55rem; border-radius: 6px;
+            border: 1px solid #feebc8; margin-bottom: 0.7rem;
+        }
+        .rec-card-actions { display: flex; gap: 0.55rem; flex-wrap: wrap; }
+        .rec-btn {
+            padding: 0.44rem 0.9rem; border: none; border-radius: 7px;
+            font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .rec-btn.action   { background: #1a365d; color: white; }
+        .rec-btn.action:hover   { background: #2c5282; transform: translateY(-1px); }
+        .rec-btn.detail   { background: #edf2f7; color: #2d3748; }
+        .rec-btn.detail:hover   { background: #e2e8f0; }
+        .rec-btn.escalate { background: #fed7d7; color: #c53030; }
+        .rec-btn.escalate:hover { background: #feb2b2; }
+
+        /* ── Bottom Row ── */
+        .bottom-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1rem;
+        }
+        .bottom-card {
+            background: white; border-radius: 12px; padding: 1.15rem 1.25rem;
+            border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .bottom-card-title {
+            font-size: 0.92rem; font-weight: 700; color: #1a365d;
+            margin-bottom: 0.9rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .top-area-item {
+            display: flex; align-items: center; gap: 0.7rem;
+            padding: 0.6rem 0.75rem; border-radius: 8px; margin-bottom: 0.5rem;
+            border-left: 4px solid transparent; background: #f7fafc;
+            transition: transform 0.15s;
+        }
+        .top-area-item:hover { transform: translateX(3px); }
+        .top-area-item.crit  { border-left-color: #e53e3e; background: #fff5f5; }
+        .top-area-item.warn  { border-left-color: #dd6b20; background: #fffaf0; }
+        .top-area-item.info  { border-left-color: #3182ce; background: #ebf8ff; }
+        .ta-rank {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: #1a365d; color: white;
+            font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .ta-body { flex: 1; }
+        .ta-name   { font-size: 0.85rem; font-weight: 700; color: #1a202c; }
+        .ta-detail { font-size: 0.73rem; color: #718096; margin-top: 1px; }
+        .ta-badge {
+            font-size: 0.7rem; font-weight: 600; padding: 0.16rem 0.52rem; border-radius: 20px; flex-shrink: 0;
+        }
+        .ta-badge.crit  { background: #fed7d7; color: #c53030; }
+        .ta-badge.warn  { background: #feebc8; color: #c05621; }
+        .ta-badge.info  { background: #bee3f8; color: #2b6cb0; }
+
+        .qa-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+        .qa-action-btn {
+            display: flex; align-items: center; gap: 0.7rem;
+            padding: 0.7rem 0.9rem; border: 2px solid #e2e8f0; border-radius: 9px;
+            background: #f7fafc; cursor: pointer; transition: all 0.2s;
+            font-size: 0.84rem; font-weight: 600; color: #2d3748; text-align: left; width: 100%;
+        }
+        .qa-action-btn:hover { border-color: #3182ce; background: #ebf8ff; color: #1a365d; transform: translateX(3px); }
+        .qa-action-btn.danger:hover { border-color: #e53e3e; background: #fff5f5; color: #c53030; }
+        .qa-icon { font-size: 1.15rem; flex-shrink: 0; }
+        .qa-action-text { display: flex; flex-direction: column; flex: 1; }
+        .qa-desc { font-size: 0.7rem; color: #718096; font-weight: 400; margin-top: 1px; }
+
+        @media (max-width: 900px) {
+            .kpi-grid   { grid-template-columns: 1fr 1fr; }
+            .charts-row { grid-template-columns: 1fr; }
+            .bottom-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -334,57 +311,137 @@
         </header>
 
         <div class="gov-content">
-            <!-- KPI Grid -->
-            <div class="section-header">
-                <h3><span class="icon">📊</span> Key Performance Indicators</h3>
+
+            <!-- Summary Bar -->
+            <div class="summary-bar">
+                <span class="summary-label">📋 This Month</span>
+                <span class="summary-pill good">📉 Complaints ↓ 12%</span>
+                <span class="summary-divider">|</span>
+                <span class="summary-pill crit">🔥 Gas ↑ Ward 22 — ACTION NEEDED</span>
+                <span class="summary-divider">|</span>
+                <span class="summary-pill good">✅ SLA 94% — On Track</span>
+                <span class="summary-divider">|</span>
+                <span class="summary-pill warn">💧 Water Pressure Low — Ward 9</span>
             </div>
+
+            <!-- KPI Grid -->
             <div class="kpi-grid">
                 <div class="kpi-card" ng-repeat="kpi in kpis">
                     <div class="kpi-icon">{{kpi.icon}}</div>
                     <div class="kpi-value">{{kpi.value}}</div>
                     <div class="kpi-label">{{kpi.label}}</div>
                     <div class="kpi-trend" ng-class="kpi.trendClass">{{kpi.trend}}</div>
+                    <div class="kpi-vs">vs last month</div>
                 </div>
             </div>
 
-            <!-- Charts Grid -->
-            <div class="policy-grid">
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <!-- Grievance Trends -->
                 <div class="chart-card">
                     <div class="chart-header">
-                        <span class="chart-title">📈 Grievance Trends</span>
+                        <div>
+                            <div class="chart-title">📈 Grievance Trends</div>
+                            <div class="chart-subtitle-txt">Complaints filed vs resolved over time</div>
+                        </div>
+                        <div class="chart-toggle">
+                            <button class="ctoggle-btn" ng-class="{active: chartView==='monthly'}" ng-click="setChartView('monthly')">Monthly</button>
+                            <button class="ctoggle-btn" ng-class="{active: chartView==='weekly'}"  ng-click="setChartView('weekly')">Weekly</button>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <canvas id="grievanceChart"></canvas>
                     </div>
                 </div>
+                <!-- Service Distribution -->
                 <div class="chart-card">
                     <div class="chart-header">
-                        <span class="chart-title">🎯 Service Distribution</span>
+                        <div>
+                            <div class="chart-title">🎯 Service Distribution</div>
+                            <div class="chart-subtitle-txt">Complaint share by utility type</div>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <canvas id="serviceChart"></canvas>
                     </div>
+                    <div class="pie-insight">⚠️ Gas complaints surged to <strong>18%</strong> — up from 12% last month. Immediate review recommended.</div>
                 </div>
             </div>
 
-            <!-- AI Recommendations -->
-            <div class="policy-recommendations">
-                <h3><span class="icon">🤖</span> AI Policy Recommendations</h3>
-                <div class="recommendation-list">
-                    <div class="recommendation-card" ng-repeat="rec in recommendations" ng-class="rec.priority">
-                        <div class="rec-header">
-                            <span class="rec-icon">{{rec.icon}}</span>
-                            <div class="rec-priority" ng-class="rec.priority">{{rec.priority}} Priority</div>
-                        </div>
-                        <div class="rec-title">{{rec.title}}</div>
-                        <div class="rec-description">{{rec.description}}</div>
-                        <div class="rec-actions">
-                            <button class="rec-action-btn secondary" ng-click="viewDetails(rec)">View Details</button>
-                            <button class="rec-action-btn primary" ng-click="takeAction(rec)">Take Action</button>
+            <!-- AI Recommendations (BIGGEST SECTION) -->
+            <div class="ai-section">
+                <div class="ai-section-header">
+                    <div class="ai-section-title">
+                        🤖 AI Policy Recommendations
+                        <span class="ai-badge">AI Powered</span>
+                    </div>
+                    <span class="ai-count-badge">{{recommendations.length}} active recommendations · sorted by urgency</span>
+                </div>
+                <div class="rec-list">
+                    <div class="rec-card" ng-repeat="rec in recommendations" ng-class="rec.priority">
+                        <div class="rec-card-icon">{{rec.icon}}</div>
+                        <div class="rec-card-body">
+                            <div class="rec-tags">
+                                <span class="rec-priority-tag" ng-class="rec.priority">{{rec.priority}} Priority</span>
+                                <span class="rec-urgency-tag" ng-class="rec.urgencyClass">{{rec.urgency}}</span>
+                                <span style="font-size:0.75rem; color:#718096;">{{rec.ward}}</span>
+                            </div>
+                            <div class="rec-card-title">{{rec.title}}</div>
+                            <div class="rec-card-desc">{{rec.description}}</div>
+                            <div class="rec-impact">{{rec.impactIcon}} {{rec.impact}}</div>
+                            <div class="rec-card-actions">
+                                <button class="rec-btn action"   ng-click="policyAction('assign', rec)">👷 Take Action</button>
+                                <button class="rec-btn escalate" ng-click="policyAction('escalate', rec)" ng-if="rec.priority === 'high'">🔺 Escalate</button>
+                                <button class="rec-btn detail"   ng-click="policyAction('detail', rec)">📄 View Details</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Bottom Row: Top Areas + Quick Actions -->
+            <div class="bottom-row">
+                <!-- Top Areas -->
+                <div class="bottom-card">
+                    <div class="bottom-card-title">🏙️ Top Problem Areas</div>
+                    <div ng-repeat="area in topAreas" class="top-area-item" ng-class="area.severity">
+                        <div class="ta-rank">{{$index + 1}}</div>
+                        <div class="ta-body">
+                            <div class="ta-name">{{area.ward}} — {{area.type}}</div>
+                            <div class="ta-detail">{{area.detail}}</div>
+                        </div>
+                        <span class="ta-badge" ng-class="area.severity">{{area.complaints}} cases</span>
+                    </div>
+                </div>
+                <!-- Quick Actions -->
+                <div class="bottom-card">
+                    <div class="bottom-card-title">⚡ Quick Actions</div>
+                    <div class="qa-grid">
+                        <button class="qa-action-btn" ng-click="policyAction('assign', null)">
+                            <span class="qa-icon">👷</span>
+                            <div class="qa-action-text">
+                                <span>Assign Field Team</span>
+                                <span class="qa-desc">Deploy workers to flagged wards</span>
+                            </div>
+                        </button>
+                        <button class="qa-action-btn danger" ng-click="policyAction('escalate', null)">
+                            <span class="qa-icon">🔺</span>
+                            <div class="qa-action-text">
+                                <span>Escalate to Senior</span>
+                                <span class="qa-desc">Flag critical issues upward</span>
+                            </div>
+                        </button>
+                        <button class="qa-action-btn" ng-click="policyAction('report', null)">
+                            <span class="qa-icon">📄</span>
+                            <div class="qa-action-text">
+                                <span>Generate Policy Report</span>
+                                <span class="qa-desc">Export monthly insights PDF</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -397,73 +454,172 @@
             $scope.notifications = 5;
 
             $scope.kpis = [
-                { icon: '✅', value: '94%', label: 'SLA Compliance', trend: '↑ 3% from last month', trendClass: 'up' },
-                { icon: '⏱️', value: '2.4h', label: 'Avg Resolution Time', trend: '↓ 0.5h improvement', trendClass: 'up' },
-                { icon: '😊', value: '87%', label: 'Citizen Satisfaction', trend: '↑ 5% increase', trendClass: 'up' },
-                { icon: '💰', value: '₹12.4L', label: 'Collection Efficiency', trend: '↑ 8% growth', trendClass: 'up' }
+                { icon: '✅', value: '94%',   label: 'SLA Compliance',       trend: '↑ 3%',  trendClass: 'up' },
+                { icon: '⏱️', value: '2.4h',  label: 'Avg Resolution Time',  trend: '↓ 0.5h', trendClass: 'up' },
+                { icon: '😊', value: '87%',   label: 'Citizen Satisfaction',  trend: '↑ 5%',  trendClass: 'up' },
+                { icon: '💰', value: '₹12.4L', label: 'Collection Efficiency', trend: '↑ 8%',  trendClass: 'up' }
             ];
 
             $scope.recommendations = [
-                { icon: '👷', priority: 'high', title: 'Increase Staff in Ward 22', description: 'Gas complaints have increased 40% in the last week. Consider deploying additional field agents.' },
-                { icon: '💧', priority: 'medium', title: 'Optimize Water Distribution', description: 'Pattern analysis suggests peak demand hours. Consider adjusting supply schedules.' },
-                { icon: '🔧', priority: 'low', title: 'Preventive Maintenance', description: 'Schedule preventive maintenance for electricity infrastructure in Ward 15 next month.' }
+                {
+                    icon: '🔥', priority: 'high', urgency: 'CRITICAL', urgencyClass: 'urgent',
+                    title: 'Ward 22 — Gas Surge Requires Immediate Action',
+                    description: 'Gas complaints have surged 40% over the last 7 days in Ward 22. Field data indicates potential infrastructure stress. Deploy additional inspection and maintenance teams immediately.',
+                    impact: '1,200 residents affected', impactIcon: '👥', ward: 'Ward 22 · Gas'
+                },
+                {
+                    icon: '💧', priority: 'medium', urgency: 'WARNING', urgencyClass: 'moderate',
+                    title: 'Ward 9 — Water Pressure Optimization',
+                    description: 'Pattern analysis shows peak demand‑hour under‑supply in Ward 9. Adjusting supply schedules by 1–2 hours can reduce complaint load by an estimated 30%.',
+                    impact: '680 households affected', impactIcon: '🏠', ward: 'Ward 9 · Water'
+                },
+                {
+                    icon: '🔧', priority: 'low', urgency: 'SCHEDULED', urgencyClass: 'scheduled',
+                    title: 'Ward 15 — Preventive Electricity Maintenance',
+                    description: 'Transformer age data suggests scheduling preventive maintenance for Ward 15 electrical infrastructure before next billing cycle to avoid potential outages.',
+                    impact: 'Prevents ~₹1.8L in reactive repair costs', impactIcon: '💡', ward: 'Ward 15 · Electricity'
+                }
             ];
 
-            $scope.viewDetails = function(rec) {
-                alert('Viewing details for: ' + rec.title);
+            $scope.topAreas = [
+                { ward: 'Ward 22', type: 'Gas',       detail: '↑ 40% spike — last 7 days',     complaints: 34, severity: 'crit' },
+                { ward: 'Ward 9',  type: 'Water',     detail: 'Pressure drop reported',          complaints: 19, severity: 'warn' },
+                { ward: 'Ward 12', type: 'Electricity', detail: 'Transformer stress indicator',  complaints: 14, severity: 'warn' },
+                { ward: 'Ward 5',  type: 'Sanitation', detail: 'Collection delay — 3 days',     complaints: 9,  severity: 'info' }
+            ];
+
+            $scope.chartView = 'monthly';
+            $scope.setChartView = function(v) { $scope.chartView = v; };
+
+            $scope.policyAction = function(action, rec) {
+                var msg = '';
+                if (action === 'assign')   msg = rec ? ('Assigning team to: ' + rec.title) : 'Assigning field team to flagged wards';
+                if (action === 'escalate') msg = rec ? ('Escalating: ' + rec.title) : 'Escalating critical issues to senior authority';
+                if (action === 'report')   msg = 'Generating monthly Policy Insights report…';
+                if (action === 'detail')   msg = 'Opening details for: ' + rec.title;
+                alert(msg);
             };
 
-            $scope.takeAction = function(rec) {
-                alert('Taking action on: ' + rec.title);
-            };
+            // Chart instances (held so they can be destroyed if needed)
+            var grievanceChartInstance = null;
+            var serviceChartInstance   = null;
 
-            // Initialize charts after DOM load
             $timeout(function () {
-                // Grievance Trends Chart
+                /* ── Grievance Trends (Line) ── */
                 var ctx1 = document.getElementById('grievanceChart');
                 if (ctx1) {
-                    new Chart(ctx1, {
+                    grievanceChartInstance = new Chart(ctx1, {
                         type: 'line',
                         data: {
                             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                            datasets: [{
-                                label: 'Complaints',
-                                data: [450, 520, 380, 410, 390, 340],
-                                borderColor: '#667eea',
-                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                                fill: true,
-                                tension: 0.4
-                            }, {
-                                label: 'Resolved',
-                                data: [420, 490, 360, 400, 380, 330],
-                                borderColor: '#38a169',
-                                backgroundColor: 'rgba(56, 161, 105, 0.1)',
-                                fill: true,
-                                tension: 0.4
-                            }]
+                            datasets: [
+                                {
+                                    label: 'Filed',
+                                    data: [450, 520, 380, 410, 510, 340],
+                                    borderColor: '#667eea',
+                                    borderWidth: 2.5,
+                                    backgroundColor: 'rgba(102,126,234,0.1)',
+                                    fill: true, tension: 0.4,
+                                    pointBackgroundColor: function(ctx) {
+                                        return ctx.dataIndex === 4 ? '#e53e3e' : '#667eea';
+                                    },
+                                    pointRadius: function(ctx) {
+                                        return ctx.dataIndex === 4 ? 7 : 4;
+                                    },
+                                    pointHoverRadius: function(ctx) {
+                                        return ctx.dataIndex === 4 ? 11 : 8;
+                                    },
+                                    pointHoverBackgroundColor: function(ctx) {
+                                        return ctx.dataIndex === 4 ? '#e53e3e' : '#667eea';
+                                    },
+                                    pointHoverBorderColor: '#fff',
+                                    pointHoverBorderWidth: 2.5
+                                },
+                                {
+                                    label: 'Resolved',
+                                    data: [420, 490, 360, 400, 475, 330],
+                                    borderColor: '#38a169',
+                                    borderWidth: 2.5,
+                                    backgroundColor: 'rgba(56,161,105,0.1)',
+                                    fill: true, tension: 0.4,
+                                    pointBackgroundColor: '#38a169',
+                                    pointRadius: 4,
+                                    pointHoverRadius: 8,
+                                    pointHoverBackgroundColor: '#38a169',
+                                    pointHoverBorderColor: '#fff',
+                                    pointHoverBorderWidth: 2.5
+                                }
+                            ]
                         },
-                        options: { responsive: true, maintainAspectRatio: false }
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false
+                            },
+                            plugins: {
+                                legend: { position: 'bottom', labels: { font: { size: 11 }, usePointStyle: true, pointStyleWidth: 10 } },
+                                tooltip: {
+                                    backgroundColor: 'rgba(26,54,93,0.92)',
+                                    titleColor: '#fff',
+                                    bodyColor: 'rgba(255,255,255,0.88)',
+                                    footerColor: '#fc8181',
+                                    padding: 11,
+                                    cornerRadius: 9,
+                                    displayColors: true,
+                                    boxPadding: 4,
+                                    callbacks: {
+                                        footer: function(items) {
+                                            if (items[0].dataIndex === 4) return '⚠️ Peak — Gas spike in May';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { grid: { display: false } },
+                                y: { grid: { color: '#f0f0f0' }, beginAtZero: false }
+                            }
+                        }
                     });
                 }
 
-                // Service Distribution Chart
+                /* ── Service Distribution (Doughnut) ── */
                 var ctx2 = document.getElementById('serviceChart');
                 if (ctx2) {
-                    new Chart(ctx2, {
+                    serviceChartInstance = new Chart(ctx2, {
                         type: 'doughnut',
                         data: {
-                            labels: ['Electricity', 'Water', 'Gas', 'Sanitation', 'Others'],
+                            labels: ['Electricity 35%', 'Water 28%', 'Gas 18%', 'Sanitation 12%', 'Others 7%'],
                             datasets: [{
                                 data: [35, 28, 18, 12, 7],
-                                backgroundColor: ['#667eea', '#38a169', '#dd6b20', '#3182ce', '#718096']
+                                backgroundColor: ['#667eea', '#3182ce', '#e53e3e', '#38a169', '#718096'],
+                                borderWidth: 2, borderColor: 'white'
                             }]
                         },
-                        options: { responsive: true, maintainAspectRatio: false }
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            cutout: '62%',
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { font: { size: 11 }, padding: 10 }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(ctx) {
+                                            return ' ' + ctx.label + ' of total complaints';
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     });
                 }
             }, 100);
 
-            $scope.logout = function () { if (confirm('Are you sure you want to logout?')) alert('Logged out successfully'); };
+            $scope.logout = function () {
+                if (confirm('Are you sure you want to logout?')) alert('Logged out successfully');
+            };
         }]);
     </script>
 </body>

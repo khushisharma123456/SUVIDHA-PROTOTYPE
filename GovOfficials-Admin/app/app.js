@@ -1161,17 +1161,41 @@ app.controller('DashboardController', ['$scope', '$timeout', 'ApiService', funct
     };
     
     // Chart period
-    $scope.chartPeriod = '7days';
-    $scope.chartSubtitle = 'Showing data for last 7 days';
+    $scope.chartPeriod = 'weekly';
+    $scope.chartSubtitle = $scope.getSelectedRegionName() + ' – Weekly | Forecasting & Stress Detection';
     
     $scope.setChartPeriod = function(period) {
         $scope.chartPeriod = period;
-        var subtitles = {
-            'today': 'Showing data for today',
-            '7days': 'Showing data for last 7 days',
-            '30days': 'Showing data for last 30 days'
-        };
-        $scope.chartSubtitle = subtitles[period];
+        var periodText = period === 'daily' ? 'Daily' : period === 'weekly' ? 'Weekly' : 'Monthly';
+        $scope.chartSubtitle = $scope.getSelectedRegionName() + ' – ' + periodText + ' | Forecasting & Stress Detection';
+        if (utilityChartInstance) {
+            var chartData = {
+                daily: {
+                    labels: ['6AM','8AM','10AM','12PM','2PM','4PM','6PM','8PM','10PM'],
+                    electricity: [40,55,72,78,80,75,65,52,42],
+                    water:       [28,35,42,45,44,40,36,30,25],
+                    gas:         [18,22,28,32,30,26,22,19,17]
+                },
+                weekly: {
+                    labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+                    electricity: [65,72,68,80,75,70,78],
+                    water:       [45,48,52,49,53,47,50],
+                    gas:         [30,32,28,35,33,31,34]
+                },
+                monthly: {
+                    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                    electricity: [70,68,75,80,82,78,85,88,80,72,68,65],
+                    water:       [50,48,52,55,58,56,60,62,55,50,47,45],
+                    gas:         [35,32,38,30,25,20,18,20,25,32,38,40]
+                }
+            };
+            var d = chartData[period];
+            utilityChartInstance.data.labels = d.labels;
+            utilityChartInstance.data.datasets[0].data = d.electricity;
+            utilityChartInstance.data.datasets[1].data = d.water;
+            utilityChartInstance.data.datasets[2].data = d.gas;
+            utilityChartInstance.update('active');
+        }
     };
     
     // Action alerts (for internal use)
@@ -1183,12 +1207,25 @@ app.controller('DashboardController', ['$scope', '$timeout', 'ApiService', funct
     
     // Priority alerts for dashboard display
     $scope.alerts = [
-        { type: 'critical', text: 'Complaint #8762 breached SLA > 24 hrs', location: 'Ward 12, South Delhi' },
-        { type: 'critical', text: 'Power transformer failure - 47 households affected', location: 'Ward 1, Rohini' },
-        { type: 'warning', text: 'Electricity load exceeding 80% capacity', location: 'Ward 5, Lajpat Nagar' },
-        { type: 'warning', text: 'Water pressure critically low', location: 'Sectors 12-15, Dwarka' },
-        { type: 'info', text: 'Billing sync delayed > 1 hour', location: 'District-level sync' }
+        { severity: 'critical', text: 'Transformer Failure',       impact: '47 homes affected, no power',              location: 'Ward 12, South Delhi' },
+        { severity: 'warning',  text: 'Low Water Pressure',        impact: 'Pressure at 42% — 30+ households',         location: 'Ward 9, Dwarka' },
+        { severity: 'info',     text: 'Billing Spike Detected',    impact: '↑ 23% unusual consumption spike',          location: 'District-level sync' }
     ];
+
+    // Top Issues by Ward
+    $scope.topIssues = [
+        { ward: 'Ward 12', type: 'High Complaints',  detail: 'Transformer failure + sustained power outage', complaints: 47, severity: 'critical' },
+        { ward: 'Ward 9',  type: 'Water Issue',      detail: 'Low pressure reported by 30+ households',     complaints: 31, severity: 'warning' },
+        { ward: 'Ward 5',  type: 'SLA Breach',       detail: 'Multiple complaints pending > 24 hrs',        complaints: 18, severity: 'warning' },
+        { ward: 'Ward 7',  type: 'Billing Anomaly',  detail: 'Unusual spike in metered consumption',        complaints: 12, severity: 'info' }
+    ];
+
+    // Quick Actions
+    $scope.quickAction = function(action) {
+        if (action === 'assign')           window.location.href = 'field-operations.html';
+        else if (action === 'complaints')  window.location.href = 'grievance.html';
+        else if (action === 'report')      alert('📄 Report generation started. You will receive a download link shortly.');
+    };
     
     // Infrastructure status
     $scope.infrastructure = {
@@ -2740,11 +2777,12 @@ app.controller('SettingsController', ['$scope', 'ApiService', function ($scope, 
 }]);
 
 // Chart Initialization Functions
+var utilityChartInstance = null;
 function initDashboardCharts() {
     // Utility Consumption Chart
     var utilityCtx = document.getElementById('utilityChart');
     if (utilityCtx) {
-        new Chart(utilityCtx, {
+        utilityChartInstance = new Chart(utilityCtx, {
             type: 'line',
             data: {
                 labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],

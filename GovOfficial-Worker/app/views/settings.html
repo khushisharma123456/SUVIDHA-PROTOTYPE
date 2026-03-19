@@ -10,7 +10,7 @@
     <style>
         /* Settings Page Styles */
         .settings-page-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
@@ -110,7 +110,7 @@
             background: white;
             border-radius: var(--radius-lg);
             border: 1px solid var(--gov-gray-200);
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.75rem;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
@@ -149,18 +149,18 @@
         }
 
         .profile-avatar {
-            width: 80px;
-            height: 80px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--gov-primary) 0%, var(--gov-primary-dark) 100%);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.75rem;
+            font-size: 2.25rem;
             font-weight: 700;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+            box-shadow: 0 6px 18px rgba(26, 54, 93, 0.3);
         }
 
         .profile-info {
@@ -240,7 +240,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 0;
+            padding: 1.1rem 0;
             border-bottom: 1px solid var(--gov-gray-100);
         }
 
@@ -274,8 +274,8 @@
         /* Toggle Switch */
         .toggle-switch {
             position: relative;
-            width: 52px;
-            height: 28px;
+            width: 60px;
+            height: 32px;
             flex-shrink: 0;
         }
 
@@ -294,20 +294,20 @@
             bottom: 0;
             background-color: var(--gov-gray-300);
             transition: 0.3s;
-            border-radius: 28px;
+            border-radius: 32px;
         }
 
         .toggle-slider:before {
             position: absolute;
             content: "";
-            height: 22px;
-            width: 22px;
+            height: 26px;
+            width: 26px;
             left: 3px;
             bottom: 3px;
             background-color: white;
             transition: 0.3s;
             border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
         }
 
         input:checked+.toggle-slider {
@@ -315,7 +315,7 @@
         }
 
         input:checked+.toggle-slider:before {
-            transform: translateX(24px);
+            transform: translateX(28px);
         }
 
         /* Select Dropdown */
@@ -363,15 +363,18 @@
         }
 
         .device-status-icon {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
-            background: var(--gov-gray-100);
+            font-size: 1.15rem;
         }
+        .device-status-icon.icon-ready  { background: rgba(56,161,105,0.12); }
+        .device-status-icon.icon-warning { background: rgba(237,137,54,0.12); }
+        .device-status-icon.icon-error   { background: rgba(229,62,62,0.12); }
+        .device-status-icon.icon-neutral { background: var(--gov-gray-100); }
 
         .device-status-label {
             font-size: 0.9rem;
@@ -496,12 +499,13 @@
         .quick-action-btn.danger {
             background: rgba(229, 62, 62, 0.1);
             color: var(--gov-danger);
-            border: 1px solid rgba(229, 62, 62, 0.3);
+            border: 1.5px solid rgba(229, 62, 62, 0.35);
         }
 
         .quick-action-btn.danger:hover {
             background: var(--gov-danger);
             color: white;
+            transform: translateY(-1px);
         }
 
         .action-row {
@@ -509,6 +513,21 @@
             grid-template-columns: 1fr 1fr;
             gap: 0.75rem;
         }
+
+        /* Save toast */
+        .save-toast {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            animation: fadeIn 0.3s ease;
+        }
+        .save-toast.success { background: rgba(56,161,105,0.12); color: var(--gov-success); border: 1px solid rgba(56,161,105,0.25); }
+        .save-toast.error   { background: rgba(229,62,62,0.08);  color: var(--gov-danger);  border: 1px solid rgba(229,62,62,0.2); }
 
         /* Audit Footer (Innovation 3) */
         .audit-footer {
@@ -674,75 +693,7 @@
 
 <body ng-controller="SettingsController">
     <!-- Sidebar -->
-    <aside class="worker-sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-brand">
-                <div class="brand-logo">
-                    <img src="/static/images/suvidha Logo.jpg" alt="Suvidha" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='⚡'">
-                </div>
-                <div class="brand-text">
-                    <h1>Suvidha</h1>
-                    <span class="brand-subtitle">FIELD AGENT</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Agent Status Indicator -->
-        <div class="agent-status-card">
-            <div class="status-indicator" ng-class="{'online': agentStatus === 'online', 'busy': agentStatus === 'on_task', 'offline': agentStatus === 'offline'}">
-                <span class="status-dot"></span>
-                <span class="status-text">{{agentStatus === 'online' ? 'Available' : agentStatus === 'on_task' ? 'On Task' : 'Offline'}}</span>
-            </div>
-        </div>
-
-        <nav class="sidebar-nav">
-            <!-- Flat menu - no section titles -->
-            <a href="dashboard.html" class="nav-item">
-                <span class="nav-icon-wrapper"><span class="nav-icon">📊</span></span>
-                <span class="nav-text">Dashboard</span>
-            </a>
-            <a href="search.html" class="nav-item">
-                <span class="nav-icon-wrapper"><span class="nav-icon">🏠</span></span>
-                <span class="nav-text">Households</span>
-            </a>
-            <a href="report.html" class="nav-item">
-                <span class="nav-icon-wrapper"><span class="nav-icon">⚠️</span></span>
-                <span class="nav-text">Report Issue</span>
-            </a>
-            <a href="settings.html" class="nav-item active">
-                <span class="nav-icon-wrapper"><span class="nav-icon">⚙️</span></span>
-                <span class="nav-text">Settings</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <div class="user-profile">
-                <div class="user-avatar">{{user.initials}}</div>
-                <div class="user-info">
-                    <h4>{{user.name}}</h4>
-                    <p class="user-category">{{user.category || 'Field Agent'}}</p>
-                </div>
-            </div>
-            
-            <!-- GPS/Offline indicator at bottom -->
-            <div class="gps-offline-indicator" style="display: flex; justify-content: center; gap: 1rem; padding: 0.75rem; margin: 0.75rem 0; background: var(--gov-gray-50); border-radius: 8px;">
-                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem;">
-                    <span>📍</span>
-                    <span style="font-weight: 500;">GPS {{gpsEnabled ? 'Active' : 'Off'}}</span>
-                </div>
-                <div style="width: 1px; background: var(--gov-gray-300);"></div>
-                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--gov-gray-600);">
-                    <span>📶</span>
-                    <span style="font-weight: 500;">Online</span>
-                </div>
-            </div>
-            
-            <button class="logout-btn" ng-click="logout()">
-                <span>🚪</span>
-                <span>Logout</span>
-            </button>
-        </div>
-    </aside>
+    <div ng-include="'../components/sidebar.html'"></div>
 
     <!-- Main Content -->
     <main class="worker-main-content">
@@ -752,56 +703,30 @@
                 <p>Manage your profile, preferences, and device settings</p>
             </div>
             <div class="header-right">
-                <button class="topbar-btn sync-btn" ng-click="syncNow()" title="Refresh Data">
-                    🔄
-                </button>
-                
-                <!-- Improved Language Dropdown -->
-                <div class="lang-dropdown" style="position: relative;">
-                    <button class="lang-toggle-btn" ng-click="toggleLangMenu($event)" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-weight: 500;">
-                        🌐 <span>{{selectedLang}}</span> 
-                        <span style="font-size: 0.7rem; transition: transform 0.2s;" ng-style="{'transform': showLangMenu ? 'rotate(180deg)' : 'rotate(0deg)'}">▼</span>
-                    </button>
-                    <div class="lang-dropdown-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()" style="position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border: 1px solid var(--gov-gray-200); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); min-width: 180px; max-height: 300px; overflow-y: auto; z-index: 1000;">
-                        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gov-gray-100); font-size: 0.75rem; font-weight: 600; color: var(--gov-gray-500); text-transform: uppercase;">Select Language</div>
-                        <a href="#" class="lang-option" ng-repeat="lang in languages"
-                            ng-class="{active: selectedLang === lang.code}"
-                            ng-click="selectLang(lang, $event)"
-                            style="display: flex; align-items: center; padding: 0.75rem 1rem; text-decoration: none; color: var(--gov-gray-700); transition: all 0.15s; border-bottom: 1px solid var(--gov-gray-50);"
-                            ng-style="{'background': selectedLang === lang.code ? 'var(--gov-info-light)' : 'transparent', 'font-weight': selectedLang === lang.code ? '600' : '400'}">
-                            <span style="margin-right: 0.5rem;" ng-if="selectedLang === lang.code">✓</span>
-                            {{lang.name}}
-                        </a>
+                <div class="lang-dropdown" style="position:relative;">
+                    <button class="lang-btn" ng-click="toggleLangMenu($event)">🌐 <span>{{selectedLang}}</span> <span style="font-size:0.65rem;display:inline-block;transition:transform 0.2s;margin-left:0.2rem;" ng-style="{'transform':showLangMenu?'rotate(180deg)':'rotate(0deg)'}">▼</span></button>
+                    <div class="lang-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()">
+                        <button class="lang-option" ng-repeat="lang in languages" ng-class="{active:selectedLang===lang.code}" ng-click="selectLang(lang)"><span ng-if="selectedLang===lang.code" style="margin-right:0.3rem;">✓</span>{{lang.name}}</button>
                     </div>
                 </div>
-                
-                <button class="topbar-btn notification-btn" title="Notifications" ng-click="toggleNotifications()" style="position: relative; padding: 0.5rem; background: rgba(255,255,255,0.9); border: 1px solid var(--gov-gray-200); border-radius: 8px; cursor: pointer; font-size: 1.25rem;">
-                    🔔<span class="notification-badge" ng-if="notifications > 0" style="position: absolute; top: -5px; right: -5px; background: var(--gov-danger); color: white; font-size: 0.7rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">{{notifications}}</span>
-                </button>
+                <div style="position:relative;">
+                    <button class="notification-btn" ng-click="toggleNotifications($event)" title="Notifications">🔔<span class="notif-badge" ng-if="notificationsCount>0">{{notificationsCount}}</span></button>
+                    <div ng-show="showNotifications" ng-click="$event.stopPropagation()" style="position:absolute;top:calc(100% + 0.5rem);right:0;background:white;border:1px solid var(--gov-gray-200);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.15);z-index:1000;width:300px;overflow:hidden;">
+                        <div style="padding:0.875rem 1rem;border-bottom:1px solid var(--gov-gray-100);font-size:0.75rem;font-weight:700;color:var(--gov-gray-600);display:flex;justify-content:space-between;align-items:center;background:var(--gov-gray-50);"><span>GOVERNMENT MESSAGES</span><button ng-click="showNotifications=false" style="background:none;border:none;cursor:pointer;color:var(--gov-gray-500);">✕</button></div>
+                        <div style="max-height:340px;overflow-y:auto;">
+                            <div ng-repeat="msg in govMessages" ng-click="markAsRead(msg)" style="padding:0.875rem 1rem;border-bottom:1px solid var(--gov-gray-50);cursor:pointer;" ng-style="{'background':msg.unread?'rgba(37,99,235,0.05)':'white'}">
+                                <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem;"><span style="font-weight:700;font-size:0.75rem;color:var(--gov-primary);">{{msg.sender}}</span><span style="font-size:0.7rem;color:var(--gov-gray-500);">{{msg.time}}</span></div>
+                                <div style="font-size:0.85rem;color:var(--gov-gray-700);line-height:1.4;">{{msg.text}}</div>
+                            </div>
+                            <div ng-if="!govMessages||govMessages.length===0" style="padding:2rem;text-align:center;color:var(--gov-gray-400);">No new messages</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
         <div class="worker-content">
             <div class="settings-page-container">
-                <!-- Readiness Score Banner (Innovation 1) -->
-                <div class="readiness-banner">
-                    <div class="readiness-left">
-                        <div class="readiness-icon"
-                            ng-class="{'warning': readiness.score < 80, 'danger': readiness.score < 50}">
-                            {{readiness.score >= 80 ? '✓' : (readiness.score >= 50 ? '⚠' : '✗')}}
-                        </div>
-                        <div class="readiness-text">
-                            <h3>Field Readiness</h3>
-                            <p>All systems checked for meter reading operations</p>
-                        </div>
-                    </div>
-                    <div class="readiness-score">
-                        <div class="score-circle" ng-style="{'--score-percent': readiness.score + '%'}">
-                            <span class="score-value">{{readiness.score}}%</span>
-                        </div>
-                        <div class="score-label">Ready</div>
-                    </div>
-                </div>
 
                 <!-- Profile Information Card -->
                 <div class="settings-card">
@@ -814,89 +739,35 @@
                             <div class="profile-avatar">{{user.initials}}</div>
                             <div class="profile-info">
                                 <div class="profile-name">{{user.name}}</div>
-                                <div class="profile-email">{{user.email}}</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Role & Work Type Display -->
-                        <div style="margin-bottom: 1.25rem; padding: 1.25rem; background: linear-gradient(135deg, rgba(56, 161, 105, 0.12) 0%, rgba(56, 161, 105, 0.04) 100%); border: 2px solid rgba(56, 161, 105, 0.3); border-radius: 12px;">
-                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                                <div style="width: 56px; height: 56px; background: var(--gov-success); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: white;">🏛️</div>
-                                <div>
-                                    <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--gov-gray-500); font-weight: 600; letter-spacing: 0.5px;">Your Role</div>
-                                    <div style="font-size: 1.35rem; font-weight: 700; color: var(--gov-success);">Field Agent</div>
-                                    <div style="font-size: 0.85rem; color: var(--gov-gray-600); margin-top: 0.15rem;">Suvidha Government Services</div>
+                                <div class="profile-email" ng-if="user.email">{{user.email}}</div>
+                                <!-- Role + Verified badge -->
+                                <div style="display:flex; align-items:center; gap:0.6rem; margin-top:0.5rem; flex-wrap:wrap;">
+                                    <span style="padding:0.3rem 0.8rem; background:rgba(56,161,105,0.1); color:var(--gov-success); border-radius:20px; font-size:0.8rem; font-weight:700;">🏛️ Field Agent</span>
+                                    <span style="padding:0.3rem 0.8rem; background:rgba(37,99,235,0.08); color:var(--gov-primary); border-radius:20px; font-size:0.8rem; font-weight:700;">✅ Verified</span>
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                                <span style="padding: 0.4rem 0.85rem; background: white; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--gov-gray-700); display: flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
-                                    <span>📋</span> Meter Reading
-                                </span>
-                                <span style="padding: 0.4rem 0.85rem; background: white; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--gov-gray-700); display: flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
-                                    <span>📍</span> Door-to-Door
-                                </span>
-                                <span style="padding: 0.4rem 0.85rem; background: white; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--gov-gray-700); display: flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
-                                    <span>📷</span> Photo Verification
-                                </span>
-                            </div>
                         </div>
-                        
-                        <!-- Meter Reading Type Selection -->
-                        <div style="margin-bottom: 1.25rem; padding: 1rem; background: linear-gradient(135deg, rgba(49, 130, 206, 0.08) 0%, rgba(49, 130, 206, 0.03) 100%); border: 1px solid rgba(49, 130, 206, 0.2); border-radius: 10px;">
-                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--gov-gray-500); font-weight: 600; margin-bottom: 0.75rem;">📊 Assigned Meter Reading Type</div>
-                            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
-                                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: white; border: 2px solid; border-radius: 10px; cursor: pointer; transition: all 0.2s;" ng-style="{'border-color': meterType === 'electric' ? 'var(--gov-warning)' : 'var(--gov-gray-200)', 'background': meterType === 'electric' ? 'var(--gov-warning-light)' : 'white'}">
-                                    <input type="radio" ng-model="meterType" value="electric" style="display: none;">
-                                    <span style="font-size: 1.25rem;">⚡</span>
-                                    <span style="font-weight: 600; color: var(--gov-gray-700);">Electric Meter</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: white; border: 2px solid; border-radius: 10px; cursor: pointer; transition: all 0.2s;" ng-style="{'border-color': meterType === 'water' ? 'var(--gov-info)' : 'var(--gov-gray-200)', 'background': meterType === 'water' ? 'var(--gov-info-light)' : 'white'}">
-                                    <input type="radio" ng-model="meterType" value="water" style="display: none;">
-                                    <span style="font-size: 1.25rem;">💧</span>
-                                    <span style="font-weight: 600; color: var(--gov-gray-700);">Water Meter</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: white; border: 2px solid; border-radius: 10px; cursor: pointer; transition: all 0.2s;" ng-style="{'border-color': meterType === 'gas' ? 'var(--gov-danger)' : 'var(--gov-gray-200)', 'background': meterType === 'gas' ? 'var(--gov-danger-light)' : 'white'}">
-                                    <input type="radio" ng-model="meterType" value="gas" style="display: none;">
-                                    <span style="font-size: 1.25rem;">🔥</span>
-                                    <span style="font-weight: 600; color: var(--gov-gray-700);">Gas Cylinder</span>
-                                </label>
-                            </div>
-                        </div>
-                        
+
                         <div class="profile-details-grid">
                             <div class="profile-detail-item">
                                 <div class="profile-detail-label">Agent ID</div>
                                 <div class="profile-detail-value">{{user.agentId}}</div>
                             </div>
                             <div class="profile-detail-item">
-                                <div class="profile-detail-label">Role</div>
-                                <div class="profile-detail-value" style="color: var(--gov-success); font-weight: 600;">Field Agent</div>
-                            </div>
-                            <div class="profile-detail-item">
-                                <div class="profile-detail-label">Work Type</div>
-                                <div class="profile-detail-value">{{meterTypeLabel || 'Electric Meter'}}</div>
-                            </div>
-                            <div class="profile-detail-item">
-                                <div class="profile-detail-label">Phone Number</div>
-                                <div class="profile-detail-value">{{user.phone}}</div>
+                                <div class="profile-detail-label">Phone</div>
+                                <div class="profile-detail-value">{{user.phone || '—'}}</div>
                             </div>
                             <div class="profile-detail-item">
                                 <div class="profile-detail-label">Assigned District</div>
-                                <div class="profile-detail-value">{{user.district}}</div>
+                                <div class="profile-detail-value">{{user.district || '—'}}</div>
                             </div>
                             <div class="profile-detail-item">
                                 <div class="profile-detail-label">Join Date</div>
-                                <div class="profile-detail-value">{{user.joinDate}}</div>
+                                <div class="profile-detail-value">{{user.joinDate || '—'}}</div>
                             </div>
                         </div>
-                        
-                        <!-- Verified Village moved down -->
-                        <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--gov-success-light); border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
-                            <span style="font-size: 1.1rem;">✅</span>
-                            <span style="font-weight: 600; color: var(--gov-success);">Verified Village Agent</span>
-                        </div>
-                        
-                        <div class="profile-notice">
+
+                        <div class="profile-notice" style="margin-top:1rem;">
                             <span class="profile-notice-icon">ℹ️</span>
                             <span>To update profile information, contact your supervisor.</span>
                         </div>
@@ -956,6 +827,20 @@
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
+                        <!-- Save Preferences Button -->
+                        <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+                            <button class="quick-action-btn primary" ng-click="savePreferences()" style="flex: 1;">
+                                💾 Save Preferences
+                            </button>
+                            <button class="quick-action-btn secondary" ng-click="resetPreferences()" style="flex: 1;">
+                                ↺ Reset
+                            </button>
+                        </div>
+                        <!-- Save Status Toast -->
+                        <div ng-if="preferencesSaveStatus" class="save-toast" ng-class="preferencesSaveStatus === 'success' ? 'success' : 'error'">
+                            <span style="font-size:1.1rem;">{{preferencesSaveStatus === 'success' ? '✅' : '❌'}}</span>
+                            <span>{{preferencesSaveMessage}}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -969,7 +854,7 @@
                         <div class="device-status-grid">
                             <div class="device-status-item">
                                 <div class="device-status-left">
-                                    <div class="device-status-icon">📷</div>
+                                    <div class="device-status-icon" ng-class="'icon-' + deviceStatus.camera.class">📷</div>
                                     <span class="device-status-label">Camera</span>
                                 </div>
                                 <span class="device-status-value" ng-class="deviceStatus.camera.class">
@@ -979,8 +864,8 @@
                             </div>
                             <div class="device-status-item">
                                 <div class="device-status-left">
-                                    <div class="device-status-icon">📍</div>
-                                    <span class="device-status-label">GPS Location</span>
+                                    <div class="device-status-icon" ng-class="'icon-' + deviceStatus.gps.class">📍</div>
+                                    <span class="device-status-label">GPS</span>
                                 </div>
                                 <span class="device-status-value" ng-class="deviceStatus.gps.class">
                                     <span class="status-dot" ng-class="deviceStatus.gps.class"></span>
@@ -989,8 +874,8 @@
                             </div>
                             <div class="device-status-item">
                                 <div class="device-status-left">
-                                    <div class="device-status-icon">📶</div>
-                                    <span class="device-status-label">Internet Connection</span>
+                                    <div class="device-status-icon" ng-class="'icon-' + deviceStatus.internet.class">📶</div>
+                                    <span class="device-status-label">Internet</span>
                                 </div>
                                 <span class="device-status-value" ng-class="deviceStatus.internet.class">
                                     <span class="status-dot" ng-class="deviceStatus.internet.class"></span>
@@ -999,25 +884,17 @@
                             </div>
                             <div class="device-status-item">
                                 <div class="device-status-left">
-                                    <div class="device-status-icon">💾</div>
-                                    <span class="device-status-label">Storage Available</span>
+                                    <div class="device-status-icon icon-neutral">💾</div>
+                                    <span class="device-status-label">Storage</span>
                                 </div>
-                                <span class="device-status-value ready">
+                                <span class="device-status-value" ng-class="deviceStatus.storage === '⚠ Low' ? 'warning' : 'ready'">
+                                    <span class="status-dot" ng-class="deviceStatus.storage === '⚠ Low' ? 'warning' : 'ready'"></span>
                                     {{deviceStatus.storage}}
                                 </span>
                             </div>
                             <div class="device-status-item">
                                 <div class="device-status-left">
-                                    <div class="device-status-icon">📦</div>
-                                    <span class="device-status-label">App Version</span>
-                                </div>
-                                <span class="device-status-value" style="color: var(--gov-gray-700);">
-                                    {{deviceStatus.appVersion}}
-                                </span>
-                            </div>
-                            <div class="device-status-item">
-                                <div class="device-status-left">
-                                    <div class="device-status-icon">🔄</div>
+                                    <div class="device-status-icon icon-neutral">🔄</div>
                                     <span class="device-status-label">Last Sync</span>
                                 </div>
                                 <span class="device-status-value" style="color: var(--gov-gray-700);">
@@ -1045,17 +922,17 @@
                     </div>
                     <div class="settings-card-body">
                         <div class="quick-actions-grid">
+                            <button class="quick-action-btn primary" ng-click="syncNow()" style="width:100%;">
+                                🔄 Sync Now
+                            </button>
                             <div class="action-row">
-                                <button class="quick-action-btn primary" ng-click="syncNow()">
-                                    🔄 Sync Now
-                                </button>
                                 <button class="quick-action-btn secondary" ng-click="clearCache()">
                                     🧹 Clear Cache
                                 </button>
+                                <button class="quick-action-btn danger" ng-click="showLogoutConfirm()">
+                                    🚪 Logout
+                                </button>
                             </div>
-                            <button class="quick-action-btn danger" ng-click="showLogoutConfirm()">
-                                🚪 Logout
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -1162,19 +1039,33 @@
                 { code: 'MR', name: 'मराठी' }
             ];
             $scope.notifications = 2;
+            $scope.notificationsCount = 2;
+            $scope.showNotifications = false;
+            $scope.govMessages = [
+                { id:1, sender:'Admin Office', text:'Complete Block A survey by 5 PM today.', time:'10 min ago', unread:true },
+                { id:2, sender:'Supervisor', text:'Accuracy score improved by 15%! Keep it up.', time:'2 hours ago', unread:true },
+                { id:3, sender:'Gov Portal', text:'System maintenance scheduled for 11 PM tonight.', time:'5 hours ago', unread:false }
+            ];
+            $scope.toggleNotifications = function($event) { if($event)$event.stopPropagation(); $scope.showNotifications=!$scope.showNotifications; $scope.showLangMenu=false; };
+            $scope.markAsRead = function(msg) { if(msg.unread){msg.unread=false;$scope.notificationsCount=Math.max(0,$scope.notificationsCount-1);} };
 
             // Readiness Score (Innovation 1)
             $scope.readiness = {
                 score: 92
             };
 
-            // App Preferences
-            $scope.preferences = {
+            // App Preferences - Load from localStorage
+            var savedPreferences = localStorage.getItem('workerPreferences');
+            $scope.preferences = savedPreferences ? JSON.parse(savedPreferences) : {
                 language: 'en',
                 notifications: true,
                 autoSync: true,
                 highQualityPhotos: false
             };
+
+            // Preferences save status
+            $scope.preferencesSaveStatus = null;
+            $scope.preferencesSaveMessage = '';
 
             // Device Status
             $scope.deviceStatus = {
@@ -1204,20 +1095,41 @@
                 $scope.showLangMenu = false;
             };
 
+            // Sync Modal
+            $scope.showSyncModal = false;
+            $scope.syncResult = null;
+            $scope.syncInProgress = false;
+
             $scope.syncNow = function () {
-                alert('Syncing data with server...\n\n✓ Readings synced: 17\n✓ Issues synced: 2\n✓ Profile updated\n\nLast sync: ' + new Date().toLocaleTimeString('en-IN'));
-                $scope.deviceStatus.lastSync = new Date().toLocaleTimeString('en-IN', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + ' today';
+                $scope.showSyncModal = true;
+                $scope.syncResult = null;
+                $scope.syncInProgress = true;
+                setTimeout(function() {
+                    $scope.$apply(function() {
+                        $scope.syncInProgress = false;
+                        $scope.syncResult = { readings: 17, issues: 2 };
+                        $scope.deviceStatus.lastSync = new Date().toLocaleTimeString('en-IN', {
+                            hour: '2-digit', minute: '2-digit'
+                        }) + ' today';
+                    });
+                }, 1500);
             };
+            $scope.closeSyncModal = function() { $scope.showSyncModal = false; };
+
+            // Clear Cache Modal
+            $scope.showClearCacheModal = false;
 
             $scope.clearCache = function () {
-                if (confirm('Clear app cache? This will remove temporary files but keep your readings.')) {
-                    alert('Cache cleared successfully.\n\nFreed: 156 MB\nCurrent storage: 2.5 GB free');
-                    $scope.deviceStatus.storage = '2.5 GB free';
-                }
+                $scope.showClearCacheModal = true;
             };
+            $scope.confirmClearCache = function() {
+                $scope.deviceStatus.storage = '2.5 GB free';
+                $scope.showClearCacheModal = false;
+            };
+            $scope.cancelClearCache = function() { $scope.showClearCacheModal = false; };
+
+            // Reset Preferences Modal
+            $scope.showResetPrefsModal = false;
 
             $scope.showLogoutConfirm = function () {
                 $scope.showLogoutModal = true;
@@ -1230,6 +1142,54 @@
             $scope.confirmLogout = function () {
                 window.location.href = '/static/app/views/landing.html';
             };
+
+            // Save Preferences to localStorage
+            $scope.savePreferences = function () {
+                try {
+                    localStorage.setItem('workerPreferences', JSON.stringify($scope.preferences));
+                    $scope.preferencesSaveStatus = 'success';
+                    $scope.preferencesSaveMessage = 'Preferences saved successfully!';
+                    
+                    // Clear status message after 3 seconds
+                    setTimeout(function() {
+                        $scope.$apply(function() {
+                            $scope.preferencesSaveStatus = null;
+                            $scope.preferencesSaveMessage = '';
+                        });
+                    }, 3000);
+                } catch (error) {
+                    $scope.preferencesSaveStatus = 'error';
+                    $scope.preferencesSaveMessage = 'Error saving preferences. Please try again.';
+                    console.error('Error saving preferences:', error);
+                }
+            };
+
+            // Reset Preferences to defaults
+            $scope.resetPreferences = function () {
+                $scope.showResetPrefsModal = true;
+            };
+
+            $scope.confirmResetPrefs = function () {
+                $scope.preferences = {
+                    language: 'en',
+                    notifications: true,
+                    autoSync: true,
+                    highQualityPhotos: false
+                };
+                localStorage.setItem('workerPreferences', JSON.stringify($scope.preferences));
+                $scope.preferencesSaveStatus = 'success';
+                $scope.preferencesSaveMessage = 'Preferences reset to default values.';
+                $scope.showResetPrefsModal = false;
+                
+                setTimeout(function() {
+                    $scope.$apply(function() {
+                        $scope.preferencesSaveStatus = null;
+                        $scope.preferencesSaveMessage = '';
+                    });
+                }, 3000);
+            };
+
+            $scope.cancelResetPrefs = function() { $scope.showResetPrefsModal = false; };
 
             // Calculate readiness score based on device status
             function calculateReadiness() {
@@ -1260,7 +1220,82 @@
                 });
             });
         }]);
+
+        app.controller('SidebarController', ['$scope', function($scope) {
+            var stored = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+            if (stored) {
+                var n = stored.full_name || stored.name || 'Vikram Singh';
+                $scope.user = { name: n, initials: n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2), role: stored.category || 'Field Agent' };
+            } else {
+                $scope.user = { name: 'Vikram Singh', initials: 'VS', role: 'Electric Meter Reader' };
+            }
+            $scope.isCurrentPage = function(p) {
+                return window.location.pathname.indexOf(p+'.html') !== -1 || window.location.href.indexOf(p+'.html') !== -1;
+            };
+            $scope.logout = function() {
+                if (confirm('Are you sure you want to logout?')) { localStorage.removeItem('suvidhaUser'); window.location.href = '/'; }
+            };
+        }]);
     </script>
+
+    <!-- Sync Modal -->
+    <div class="logout-modal-overlay" ng-if="showSyncModal" ng-click="!syncInProgress && closeSyncModal()">
+        <div class="logout-modal" ng-click="$event.stopPropagation()" style="text-align: left;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                <div style="width: 48px; height: 48px; background: rgba(56, 161, 105, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🔄</div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--gov-gray-800);">Sync Data</h3>
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--gov-gray-500);">Syncing with government servers</p>
+                </div>
+                <button ng-if="!syncInProgress" ng-click="closeSyncModal()" style="margin-left: auto; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--gov-gray-500);">✕</button>
+            </div>
+            <div ng-if="syncInProgress" style="text-align: center; padding: 1rem 0;">
+                <div style="font-size: 0.95rem; color: var(--gov-gray-600);">Syncing... please wait</div>
+            </div>
+            <div ng-if="!syncInProgress && syncResult">
+                <div style="background: var(--gov-success-light); border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+                    <div style="font-weight: 700; color: var(--gov-success); margin-bottom: 0.5rem;">✓ Sync Successful</div>
+                    <div style="font-size: 0.9rem; color: var(--gov-gray-700); display: flex; flex-direction: column; gap: 0.35rem;">
+                        <span>✓ Readings synced: {{syncResult.readings}}</span>
+                        <span>✓ Issues synced: {{syncResult.issues}}</span>
+                        <span>✓ Profile updated • Last sync: {{deviceStatus.lastSync}}</span>
+                    </div>
+                </div>
+                <button ng-click="closeSyncModal()" style="width: 100%; padding: 0.875rem; background: var(--gov-success); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer;">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Cache Confirmation Modal -->
+    <div class="logout-modal-overlay" ng-if="showClearCacheModal" ng-click="cancelClearCache()">
+        <div class="logout-modal" ng-click="$event.stopPropagation()">
+            <div class="logout-modal-icon" style="background: rgba(237, 137, 54, 0.1);">🧹</div>
+            <h3>Clear App Cache?</h3>
+            <p>This will remove temporary files but keep all your readings and data safe.</p>
+            <div class="logout-modal-sync" style="background: rgba(237, 137, 54, 0.1); color: #c05621;">
+                <span>ℹ️</span>
+                <span>Will free approximately 156 MB of storage</span>
+            </div>
+            <div class="logout-modal-actions">
+                <button class="logout-modal-btn cancel" ng-click="cancelClearCache()">Cancel</button>
+                <button class="logout-modal-btn confirm" style="background: #dd6b20;" ng-click="confirmClearCache()">Clear Cache</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Preferences Confirmation Modal -->
+    <div class="logout-modal-overlay" ng-if="showResetPrefsModal" ng-click="cancelResetPrefs()">
+        <div class="logout-modal" ng-click="$event.stopPropagation()">
+            <div class="logout-modal-icon" style="background: rgba(49, 130, 206, 0.1); font-size: 1.5rem;">↺</div>
+            <h3>Reset Preferences?</h3>
+            <p>This will reset all app preferences to their default values. Your saved data will not be affected.</p>
+            <div class="logout-modal-actions">
+                <button class="logout-modal-btn cancel" ng-click="cancelResetPrefs()">Cancel</button>
+                <button class="logout-modal-btn confirm" style="background: #3182ce;" ng-click="confirmResetPrefs()">Reset</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

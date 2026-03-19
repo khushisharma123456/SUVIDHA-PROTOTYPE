@@ -6,9 +6,11 @@
     <title>Waste Management Control Room - Suvidha Admin</title>
     <link rel="stylesheet" href="../../css/gov-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular-route.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         /* Control Room specific overrides */
         .control-room-layout {
@@ -29,6 +31,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            align-self: start;
         }
         
         .map-dominant .card-body {
@@ -425,6 +428,9 @@
             margin-bottom: 16px;
             border-left: 4px solid #f59e0b;
         }
+        .ai-recommendation.priority-high { border-left-color: #e53e3e; background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); }
+        .ai-recommendation.priority-medium { border-left-color: #f59e0b; }
+        .ai-recommendation.priority-low { border-left-color: #38a169; background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%); }
         
         .ai-recommendation .ai-badge {
             background: #f59e0b;
@@ -436,18 +442,105 @@
             margin-bottom: 8px;
             display: inline-block;
         }
+        .ai-badge.high { background: #e53e3e; }
+        .ai-badge.medium { background: #f59e0b; }
+        .ai-badge.low { background: #38a169; }
+        .priority-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700; display: inline-block; margin-left: 6px; }
+        .priority-tag.high { background: #e53e3e; color: white; }
+        .priority-tag.medium { background: #f59e0b; color: white; }
+        .priority-tag.low { background: #38a169; color: white; }
         
         .ai-recommendation .recommendation-text {
-            font-weight: 500;
-            color: #92400e;
-            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a365d;
+            margin-bottom: 6px;
+            font-size: 14px;
         }
         
         .ai-recommendation .impact {
             font-size: 12px;
-            color: #78350f;
+            color: #4a5568;
             margin-bottom: 12px;
+            padding: 6px 10px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 6px;
         }
+        /* Top Routes */
+        .top-routes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 8px; }
+        .route-card { padding: 14px 16px; border-radius: 10px; border-left: 4px solid #e2e8f0; background: #f8fafc; transition: transform 0.2s; cursor: pointer; }
+        .route-card:hover { transform: translateY(-2px); }
+        .route-card.overload { border-left-color: #e53e3e; background: #fff5f5; }
+        .route-card.delay { border-left-color: #f59e0b; background: #fffbeb; }
+        .route-card.normal { border-left-color: #38a169; background: #f0fff4; }
+        .route-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .route-card-id { font-weight: 700; font-size: 15px; color: #1a365d; }
+        .route-status-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+        .route-status-pill.overload { background: #e53e3e; color: white; }
+        .route-status-pill.delay { background: #f59e0b; color: white; }
+        .route-status-pill.normal { background: #38a169; color: white; }
+        /* Quick Actions */
+        .quick-actions-waste { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+        .qa-waste-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .qa-waste-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .qa-waste-btn.assign { background: #1a365d; color: white; }
+        .qa-waste-btn.dispatch { background: #38a169; color: white; }
+        .qa-waste-btn.report { background: #f59e0b; color: white; }
+        /* Summary */
+        .efficiency-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 8px; }
+        .eff-item { padding: 14px; border-radius: 10px; text-align: center; }
+        .eff-item.good { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+        .eff-item.warn { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+        .eff-item.bad { background: linear-gradient(135deg, #fee2e2, #fecaca); }
+        .eff-icon { font-size: 24px; margin-bottom: 6px; }
+        .eff-label { font-size: 11px; font-weight: 600; color: #4a5568; text-transform: uppercase; }
+        .eff-value { font-size: 20px; font-weight: 800; margin: 4px 0; }
+        .eff-note { font-size: 11px; color: #718096; }
+        /* Trend toggle */
+        .trend-toggle-group { display: flex; gap: 6px; }
+        .trend-toggle-btn { padding: 4px 12px; border-radius: 20px; border: 1px solid #e2e8f0; background: white; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+        .trend-toggle-btn.active { background: #1a365d; color: white; border-color: #1a365d; }
+        /* Alert color enhancements */
+        .alert-item-clickable.sev-critical { border-left: 3px solid #e53e3e; background: rgba(229,62,62,0.05); border-radius: 8px; }
+        .alert-item-clickable.sev-warning { border-left: 3px solid #f59e0b; background: rgba(245,158,11,0.05); border-radius: 8px; }
+        .alert-item-clickable.sev-info { border-left: 3px solid #3182ce; background: rgba(49,130,206,0.05); border-radius: 8px; }
+        .alert-time-tag { font-size: 10px; font-weight: 600; color: #94a3b8; margin-top: 2px; }
+        /* Table colored status */
+        .status-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .status-pill.completed { background: #d1fae5; color: #065f46; }
+        .status-pill.in-progress { background: #dbeafe; color: #1e40af; }
+        .status-pill.delayed { background: #fee2e2; color: #991b1b; }
+        .status-pill.with-issues { background: #fef3c7; color: #92400e; }
+        .view-route-btn { padding: 3px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; font-size: 11px; cursor: pointer; color: #1a365d; font-weight: 600; transition: all 0.15s; }
+        .view-route-btn:hover { background: #1a365d; color: white; border-color: #1a365d; }
+        /* Full Map Overlay */
+        .fullmap-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .fullmap-container { width: 95vw; height: 92vh; background: white; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .fullmap-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: #1a365d; color: white; }
+        .fullmap-header h3 { font-size: 16px; font-weight: 700; }
+        .fullmap-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .fullmap-close:hover { background: rgba(255,255,255,0.35); }
+        .fullmap-body { flex: 1; position: relative; }
+        .fullmap-filter-bar { position: absolute; top: 12px; right: 12px; z-index: 10001; display: flex; gap: 6px; }
+        .fullmap-filter-btn { padding: 6px 14px; border-radius: 20px; border: 2px solid white; font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .fullmap-filter-btn.all { background: #1a365d; color: white; }
+        .fullmap-filter-btn.active-f { background: #22c55e; color: white; }
+        .fullmap-filter-btn.delayed-f { background: #f59e0b; color: white; }
+        .fullmap-filter-btn.hotspot-f { background: #ef4444; color: white; }
+        /* Route Dialog */
+        .route-dialog-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .route-dialog { width: 680px; max-width: 95vw; max-height: 90vh; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+        .route-dialog-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #1a365d; color: white; }
+        .route-dialog-header h3 { font-size: 16px; font-weight: 700; }
+        .route-dialog-body { flex: 1; overflow-y: auto; }
+        .route-dialog-map { width: 100%; height: 320px; }
+        .route-dialog-info { padding: 16px 20px; }
+        .route-stop-list { list-style: none; padding: 0; margin: 0; }
+        .route-stop-list li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        .route-stop-list li:last-child { border-bottom: none; }
+        .stop-num { width: 24px; height: 24px; border-radius: 50%; background: #1a365d; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+        .stop-num.done { background: #22c55e; }
+        .stop-num.current { background: #f59e0b; }
+        .route-dialog-footer { padding: 12px 20px; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; justify-content: flex-end; }
         
         .citizen-section {
             margin-top: 24px;
@@ -688,7 +781,6 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-        <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item">
                 <span class="nav-icon">🏠</span>
                 <span class="nav-text">Dashboard</span>
@@ -781,6 +873,11 @@
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                 <span>{{successMessage}}</span>
                 <button class="gov-btn sm" ng-click="successMessage = null">Dismiss</button>
+            </div>
+            <!-- Fixed Toast for Quick Action feedback -->
+            <div ng-show="toastMessage" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a365d;color:white;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.25);display:flex;align-items:center;gap:10px;max-width:500px;">
+                <span>{{toastMessage}}</span>
+                <button ng-click="toastMessage=null" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:2px 8px;border-radius:6px;cursor:pointer;font-size:12px;">✕</button>
             </div>
 
             <!-- Geographic Filter Bar -->
@@ -892,68 +989,56 @@
             <!-- AI-Assisted Recommendations -->
             <div class="gov-card" style="margin-top: 24px;">
                 <div class="card-header">
-                    <h3>🤖 AI-Assisted Recommendations</h3>
-                    <span class="badge info">Live Analysis</span>
+                    <h3 style="font-size:1.1rem;">🤖 AI-Assisted Recommendations</h3>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <span class="badge info">Live Analysis</span>
+                        <span style="font-size:11px;color:#64748b;">{{aiRecommendations.length}} active</span>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div class="ai-recommendation" ng-repeat="rec in aiRecommendations">
-                        <span class="ai-badge">AI INSIGHT</span>
+                    <div class="ai-recommendation" ng-class="'priority-' + rec.priority" ng-repeat="rec in aiRecommendations" style="position:relative;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                            <span class="ai-badge" ng-class="rec.priority">AI INSIGHT</span>
+                            <span class="priority-tag" ng-class="rec.priority">{{rec.priority | uppercase}} PRIORITY</span>
+                            <span style="margin-left:auto;font-size:11px;color:#94a3b8;">{{rec.route}}</span>
+                        </div>
                         <div class="recommendation-text">{{rec.text}}</div>
                         <div class="impact">💡 Impact: {{rec.impact}}</div>
-                        <button class="gov-btn primary sm" ng-click="executeRecommendation(rec)">
-                            {{rec.actionLabel}}
-                        </button>
-                        <button class="gov-btn sm" ng-click="dismissRecommendation(rec)">
-                            Dismiss
-                        </button>
+                        <div style="display:flex;gap:8px;margin-top:8px;">
+                            <button class="gov-btn primary sm" ng-click="executeRecommendation(rec)">{{rec.actionLabel}}</button>
+                            <button class="gov-btn sm" ng-click="dismissRecommendation(rec)">Dismiss</button>
+                        </div>
                     </div>
                     <div class="empty-state" ng-show="aiRecommendations.length === 0">
-                        <p>No recommendations at this time. System is operating optimally.</p>
+                        <p>✅ No recommendations. System operating optimally.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Control Room Layout: Map (dominant) + Side Panel -->
             <div class="control-room-layout">
-                <!-- Live Operations Map - DOMINANT -->
+                <!-- Live Operations Map - Leaflet -->
                 <div class="gov-card map-dominant">
                     <div class="card-header">
                         <h3>🗺️ Live Operations Map</h3>
                         <div class="map-controls">
                             <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'all'}" ng-click="setMapFilter('all')">All</button>
-                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'active'}" ng-click="setMapFilter('active')">Active</button>
-                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'delayed'}" ng-click="setMapFilter('delayed')">Delayed</button>
-                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'hotspots'}" ng-click="setMapFilter('hotspots')">Hotspots</button>
+                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'active'}" ng-click="setMapFilter('active')">🟢 Active</button>
+                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'delayed'}" ng-click="setMapFilter('delayed')">🟡 Delayed</button>
+                            <button class="gov-btn sm" ng-class="{'primary': mapFilter === 'hotspots'}" ng-click="setMapFilter('hotspots')">🔴 Hotspots</button>
+                            <button class="gov-btn sm primary" ng-click="openFullMap()">🗺️ Full Map</button>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="map-container" id="operationsMap">
-                            <!-- Zone Overlays -->
-                            <div class="map-zone-overlay map-zone-a">ZONE A</div>
-                            <div class="map-zone-overlay map-zone-b">ZONE B</div>
-                            <div class="map-zone-overlay map-zone-c">ZONE C</div>
-                            
-                            <!-- Vehicle Markers -->
-                            <div class="map-marker" 
-                                 ng-repeat="marker in mapMarkers | filter:filterMapMarkers"
-                                 ng-class="marker.type"
-                                 ng-style="{'top': marker.top + 'px', 'left': marker.left + 'px'}"
-                                 ng-click="openVehicleDetail(marker)"
-                                 title="{{marker.label}}">
-                                <span ng-if="marker.type === 'active'">🚛</span>
-                                <span ng-if="marker.type === 'delayed'">⚠️</span>
-                                <span ng-if="marker.type === 'hotspot'">🔴</span>
-                                <span ng-if="marker.type === 'inactive'">⏸️</span>
-                            </div>
-                            
-                            <!-- Map Legend -->
-                            <div class="map-legend">
-                                <div style="display: flex; gap: 16px; font-size: 12px;">
-                                    <span><span class="status-dot active"></span> Active ({{getMarkerCount('active')}})</span>
-                                    <span><span class="status-dot delayed"></span> Delayed ({{getMarkerCount('delayed')}})</span>
-                                    <span><span class="status-dot danger"></span> Hotspot ({{getMarkerCount('hotspot')}})</span>
-                                </div>
-                            </div>
+                        <div style="position:relative;width:100%;height:450px;border-radius:12px;overflow:hidden;">
+                            <div id="leafletMap" style="width:100%;height:100%;"></div>
+                        </div>
+                        <!-- Map Legend -->
+                        <div style="display:flex;gap:16px;font-size:12px;margin-top:10px;padding:8px 12px;background:#f8fafc;border-radius:8px;flex-wrap:wrap;">
+                            <span>🟢 Active ({{getMarkerCount('active')}})</span>
+                            <span>🟡 Delayed ({{getMarkerCount('delayed')}})</span>
+                            <span>🔴 Hotspot ({{getMarkerCount('hotspot')}})</span>
+                            <span>⚫ Inactive ({{getMarkerCount('inactive')}})</span>
                         </div>
                     </div>
                 </div>
@@ -967,19 +1052,19 @@
                             <span class="badge danger">{{operationalAlerts.length}} Active</span>
                         </div>
                         <div class="card-body operations-alerts">
-                            <div class="alert-item alert-item-clickable" 
+                            <div class="alert-item alert-item-clickable"
+                                 ng-class="'sev-' + alert.severity"
                                  ng-repeat="alert in operationalAlerts"
                                  ng-click="focusAlertOnMap(alert)">
-                                <span class="alert-icon" ng-class="alert.severity">
+                                <span class="alert-icon">
                                     {{alert.severity === 'critical' ? '🔴' : alert.severity === 'warning' ? '🟡' : '🔵'}}
                                 </span>
                                 <div class="alert-content">
-                                    <div class="alert-title">{{alert.title}}</div>
-                                    <div class="alert-meta">{{alert.location}} • {{alert.time}}</div>
+                                    <div class="alert-title" style="font-weight:600;">{{alert.title}}</div>
+                                    <div class="alert-meta">📍 {{alert.location}}</div>
+                                    <div class="alert-time-tag">🕐 {{alert.time}}</div>
                                 </div>
-                                <button class="gov-btn sm primary" ng-click="$event.stopPropagation(); resolveAlert(alert)">
-                                    Act
-                                </button>
+                                <button class="gov-btn sm primary" ng-click="$event.stopPropagation(); resolveAlert(alert)">Act</button>
                             </div>
                             <div class="empty-state" ng-show="operationalAlerts.length === 0">
                                 <p>✅ No active alerts</p>
@@ -987,15 +1072,41 @@
                         </div>
                     </div>
 
-                    <!-- Trend Chart -->
+                    <!-- Trend Chart with Toggle -->
                     <div class="gov-card" style="margin-top: 16px;">
                         <div class="card-header">
-                            <h3>📈 Collection Trend</h3>
+                            <div>
+                                <h3>📈 Collection Trend</h3>
+                                <p style="font-size:12px;color:#64748b;">Waste collected (MT) over time</p>
+                            </div>
+                            <div class="trend-toggle-group">
+                                <button class="trend-toggle-btn" ng-class="{active: trendPeriod==='daily'}" ng-click="setTrendPeriod('daily')">Daily</button>
+                                <button class="trend-toggle-btn" ng-class="{active: trendPeriod==='weekly'}" ng-click="setTrendPeriod('weekly')">Weekly</button>
+                                <button class="trend-toggle-btn" ng-class="{active: trendPeriod==='monthly'}" ng-click="setTrendPeriod('monthly')">Monthly</button>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <div class="trend-chart-wrapper" ng-click="openTrendDrilldown()">
-                                <canvas id="trendChart" height="150"></canvas>
+                            <canvas id="trendChart" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Routes -->
+            <div class="gov-card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3>🏆 Top Routes Status</h3>
+                    <span class="badge warning">2 Need Attention</span>
+                </div>
+                <div class="card-body">
+                    <div class="top-routes-grid">
+                        <div class="route-card overload" ng-repeat="route in topRoutes" ng-class="route.cardClass" ng-click="openRecordDetail(getRecordByRoute(route.id))">
+                            <div class="route-card-header">
+                                <span class="route-card-id">{{route.id}}</span>
+                                <span class="route-status-pill" ng-class="route.statusClass">{{route.statusLabel}}</span>
                             </div>
+                            <div style="font-size:12px;color:#4a5568;">{{route.detail}}</div>
+                            <div style="font-size:11px;margin-top:6px;color:#718096;">🕐 {{route.time}} &nbsp; 📍 {{route.ward}}</div>
                         </div>
                     </div>
                 </div>
@@ -1023,34 +1134,88 @@
                                 <th>Collected</th>
                                 <th>Compliance</th>
                                 <th>Time</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="clickable-row" 
+                            <tr class="clickable-row"
                                 ng-repeat="record in filteredRecords"
                                 ng-click="openRecordDetail(record)">
                                 <td><strong>{{record.routeId}}</strong></td>
                                 <td>{{record.ward}}</td>
-                                <td>{{record.vehicle}}</td>
+                                <td style="font-size:12px;">{{record.vehicle}}</td>
                                 <td>
-                                    <span class="badge" ng-class="record.statusClass">{{record.status}}</span>
+                                    <span class="status-pill" ng-class="record.statusPillClass">{{record.status}}</span>
                                 </td>
                                 <td>{{record.collected}} kg</td>
                                 <td>
                                     <div class="mini-progress">
-                                        <div class="mini-progress-bar" ng-style="{'width': record.compliance + '%'}" 
+                                        <div class="mini-progress-bar" ng-style="{'width': record.compliance + '%'}"
                                              ng-class="{'success': record.compliance >= 80, 'warning': record.compliance >= 50 && record.compliance < 80, 'danger': record.compliance < 50}">
                                         </div>
                                     </div>
                                     <span class="compliance-value">{{record.compliance}}%</span>
                                 </td>
                                 <td>{{record.time}}</td>
+                                <td>
+                                    <button class="view-route-btn" ng-click="$event.stopPropagation(); viewRoute(record)">View Route</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                     <div class="empty-state" ng-show="filteredRecords.length === 0">
                         <p>No records match your filter criteria.</p>
                         <button class="gov-btn primary" ng-click="setRecordFilter('all')">Show All Records</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="gov-card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3>⚡ Quick Actions</h3>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions-waste">
+                        <button class="qa-waste-btn assign" ng-click="quickActionWaste('assign')">
+                            <span>🚛</span> Assign Vehicle
+                        </button>
+                        <button class="qa-waste-btn dispatch" ng-click="quickActionWaste('dispatch')">
+                            <span>👷</span> Dispatch Team
+                        </button>
+                        <button class="qa-waste-btn report" ng-click="quickActionWaste('report')">
+                            <span>📄</span> Generate Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Efficiency Summary -->
+            <div class="gov-card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3>📊 Daily Efficiency Summary</h3>
+                    <span style="font-size:12px;color:#64748b;">Auto-updated every 15 min</span>
+                </div>
+                <div class="card-body">
+                    <div class="efficiency-summary">
+                        <div class="eff-item good">
+                            <div class="eff-icon">📈</div>
+                            <div class="eff-value" style="color:#065f46;">↑ 12%</div>
+                            <div class="eff-label">Efficiency vs Yesterday</div>
+                            <div class="eff-note">847 MT collected today</div>
+                        </div>
+                        <div class="eff-item warn">
+                            <div class="eff-icon">⚠️</div>
+                            <div class="eff-value" style="color:#92400e;">Route 5</div>
+                            <div class="eff-label">Active Issue</div>
+                            <div class="eff-note">Overloaded — needs vehicle</div>
+                        </div>
+                        <div class="eff-item bad">
+                            <div class="eff-icon">🚛</div>
+                            <div class="eff-value" style="color:#991b1b;">2</div>
+                            <div class="eff-label">Inactive Vehicles</div>
+                            <div class="eff-note">MH-MN-6789 in maintenance</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1405,6 +1570,60 @@
         </div>
     </div>
 
+    <!-- Full Map Overlay -->
+    <div class="fullmap-overlay" ng-show="fullMapOpen" ng-click="closeFullMap()">
+        <div class="fullmap-container" ng-click="$event.stopPropagation()">
+            <div class="fullmap-header">
+                <h3>🗺️ Full Operations Map — All Vehicles & Hotspots</h3>
+                <button class="fullmap-close" ng-click="closeFullMap()">✕</button>
+            </div>
+            <div class="fullmap-body">
+                <div class="fullmap-filter-bar">
+                    <button class="fullmap-filter-btn all" ng-click="setFullMapFilter('all')" ng-class="{'all': fullMapFilter==='all'}">All</button>
+                    <button class="fullmap-filter-btn active-f" ng-click="setFullMapFilter('active')">🟢 Active</button>
+                    <button class="fullmap-filter-btn delayed-f" ng-click="setFullMapFilter('delayed')">🟡 Delayed</button>
+                    <button class="fullmap-filter-btn hotspot-f" ng-click="setFullMapFilter('hotspots')">🔴 Hotspots</button>
+                </div>
+                <div id="fullMapLeaflet" style="width:100%;height:100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Route Dialog -->
+    <div class="route-dialog-overlay" ng-show="routeDialogOpen" ng-click="closeRouteDialog()">
+        <div class="route-dialog" ng-click="$event.stopPropagation()">
+            <div class="route-dialog-header">
+                <h3>🗺️ Route Map — {{viewRouteRecord.routeId}} ({{viewRouteRecord.ward}})</h3>
+                <button class="fullmap-close" ng-click="closeRouteDialog()">✕</button>
+            </div>
+            <div class="route-dialog-body">
+                <div id="routeDialogMap" class="route-dialog-map"></div>
+                <div class="route-dialog-info">
+                    <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;">
+                        <div style="font-size:13px;"><strong>Vehicle:</strong> {{viewRouteRecord.vehicle}}</div>
+                        <div style="font-size:13px;"><strong>Status:</strong> <span class="status-pill" ng-class="viewRouteRecord.statusPillClass">{{viewRouteRecord.status}}</span></div>
+                        <div style="font-size:13px;"><strong>Collected:</strong> {{viewRouteRecord.collected}} kg</div>
+                        <div style="font-size:13px;"><strong>Compliance:</strong> {{viewRouteRecord.compliance}}%</div>
+                    </div>
+                    <h4 style="font-size:13px;font-weight:700;margin-bottom:8px;color:#1a365d;">Timeline</h4>
+                    <ul class="route-stop-list">
+                        <li ng-repeat="step in viewRouteRecord.timeline">
+                            <span class="stop-num" ng-class="{'done': $index < viewRouteRecord.timeline.length - 1, 'current': $index === viewRouteRecord.timeline.length - 1}">{{$index + 1}}</span>
+                            <div style="flex:1;">
+                                <div style="font-weight:600;">{{step.title}}</div>
+                                <div style="font-size:11px;color:#64748b;">{{step.time}}</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="route-dialog-footer">
+                <button class="gov-btn" ng-click="closeRouteDialog()">Close</button>
+                <button class="gov-btn primary" ng-click="closeRouteDialog(); openRecordDetail(viewRouteRecord)">Full Details</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // AngularJS Application
         var app = angular.module('adminApp', []);
@@ -1510,23 +1729,43 @@
             $scope.aiRecommendations = [
                 {
                     id: 1,
-                    text: 'Route R-15 shows 23% higher collection time. Consider adding one more vehicle.',
-                    impact: 'Could reduce collection time by 18 minutes and cover 12 more households.',
-                    actionLabel: 'Reassign Vehicle'
+                    priority: 'high',
+                    route: 'Route 5',
+                    text: 'Route R-05 is overloaded — 23% higher collection time. Add one more vehicle immediately.',
+                    impact: 'Could reduce collection time by 18 min and cover 12 more households per cycle.',
+                    actionLabel: 'Add Vehicle'
                 },
                 {
                     id: 2,
-                    text: 'Ward 3 segregation dropped 8% this week. Send awareness team.',
+                    priority: 'medium',
+                    route: 'Ward 3',
+                    text: 'Ward 3 segregation compliance dropped 8% this week. Send awareness team.',
                     impact: 'Previous campaigns improved compliance by 15% within 2 weeks.',
                     actionLabel: 'Schedule Campaign'
                 },
                 {
                     id: 3,
-                    text: 'Vehicle MH-12-AB-1234 due for maintenance in 2 days.',
-                    impact: 'Proactive maintenance reduces breakdown risk by 40%.',
-                    actionLabel: 'Schedule Service'
+                    priority: 'low',
+                    route: 'Route 3',
+                    text: 'Vehicle MH-12-EF-9012 is repeatedly delayed. Route 3 needs replanning.',
+                    impact: 'Proactive rerouting reduces delay by 40% based on historical data.',
+                    actionLabel: 'Replan Route'
                 }
             ];
+
+            // Top Routes
+            $scope.topRoutes = [
+                { id: 'Route 5', ward: 'Ward 5', detail: 'Overloaded — vehicle at 95% capacity, 12 stops behind', statusLabel: 'Overload', statusClass: 'overload', cardClass: 'overload', time: 'Since 09:00 AM' },
+                { id: 'Route 3', ward: 'Ward 3', detail: 'Route delay — traffic congestion at Sector 4', statusLabel: 'Delay', statusClass: 'delay', cardClass: 'delay', time: 'Since 08:30 AM' },
+                { id: 'Route 1', ward: 'Ward 1', detail: 'On schedule — 92% compliance, 34 stops done', statusLabel: 'On Track', statusClass: 'normal', cardClass: 'normal', time: 'Started 06:00 AM' },
+                { id: 'Route 4', ward: 'Ward 4', detail: 'Completed — all sectors covered', statusLabel: 'Done', statusClass: 'normal', cardClass: 'normal', time: 'Done 08:15 AM' }
+            ];
+
+            $scope.getRecordByRoute = function(routeId) {
+                var map = { 'Route 5': 'R-005', 'Route 3': 'R-003', 'Route 1': 'R-001', 'Route 4': 'R-004' };
+                var rid = map[routeId];
+                return $scope.records.find(function(r){ return r.routeId === rid; }) || $scope.records[0];
+            };
             
             // Map Data
             $scope.mapFilter = 'all';
@@ -1554,26 +1793,26 @@
             // Records
             $scope.recordFilter = 'all';
             $scope.records = [
-                { routeId: 'R-001', ward: 'Ward 1', vehicle: 'MH-12-AB-1234', status: 'Completed', statusClass: 'success', collected: 456, compliance: 92, time: '08:45 AM', date: 'Today', households: 145, pointsAwarded: 580, participatingCitizens: 89, timeline: [
+                { routeId: 'R-001', ward: 'Ward 1', vehicle: 'MH-12-AB-1234', status: 'Completed', statusClass: 'success', statusPillClass: 'completed', collected: 456, compliance: 92, time: '08:45 AM', date: 'Today', households: 145, pointsAwarded: 580, participatingCitizens: 89, timeline: [
                     { title: 'Route Started', time: '06:00 AM', color: 'var(--gov-success)' },
                     { title: 'Sector A Complete', time: '07:15 AM', color: 'var(--gov-success)' },
                     { title: 'Sector B Complete', time: '08:00 AM', color: 'var(--gov-success)' },
                     { title: 'Route Completed', time: '08:45 AM', color: 'var(--gov-success)' }
                 ], issues: [] },
-                { routeId: 'R-002', ward: 'Ward 2', vehicle: 'MH-12-CD-5678', status: 'In Progress', statusClass: 'warning', collected: 234, compliance: 85, time: '09:30 AM', date: 'Today', households: 102, pointsAwarded: 320, participatingCitizens: 56, timeline: [
+                { routeId: 'R-002', ward: 'Ward 2', vehicle: 'MH-12-CD-5678', status: 'In Progress', statusClass: 'warning', statusPillClass: 'in-progress', collected: 234, compliance: 85, time: '09:30 AM', date: 'Today', households: 102, pointsAwarded: 320, participatingCitizens: 56, timeline: [
                     { title: 'Route Started', time: '06:30 AM', color: 'var(--gov-success)' },
                     { title: 'Sector A Complete', time: '08:00 AM', color: 'var(--gov-success)' },
                     { title: 'Sector B In Progress', time: '09:30 AM', color: 'var(--gov-warning)' }
                 ], issues: [] },
-                { routeId: 'R-003', ward: 'Ward 3', vehicle: 'MH-12-EF-9012', status: 'Delayed', statusClass: 'danger', collected: 123, compliance: 67, time: '09:45 AM', date: 'Today', households: 78, pointsAwarded: 180, participatingCitizens: 34, timeline: [
+                { routeId: 'R-003', ward: 'Ward 3', vehicle: 'MH-12-EF-9012', status: 'Delayed', statusClass: 'danger', statusPillClass: 'delayed', collected: 123, compliance: 67, time: '09:45 AM', date: 'Today', households: 78, pointsAwarded: 180, participatingCitizens: 34, timeline: [
                     { title: 'Route Started', time: '07:00 AM', color: 'var(--gov-success)' },
                     { title: 'Delay - Traffic', time: '08:30 AM', color: 'var(--gov-danger)' }
                 ], issues: [{ title: 'Vehicle delay due to traffic', status: 'Active' }] },
-                { routeId: 'R-004', ward: 'Ward 4', vehicle: 'MH-12-GH-3456', status: 'Completed', statusClass: 'success', collected: 389, compliance: 88, time: '08:15 AM', date: 'Today', households: 134, pointsAwarded: 445, participatingCitizens: 78, timeline: [
+                { routeId: 'R-004', ward: 'Ward 4', vehicle: 'MH-12-GH-3456', status: 'Completed', statusClass: 'success', statusPillClass: 'completed', collected: 389, compliance: 88, time: '08:15 AM', date: 'Today', households: 134, pointsAwarded: 445, participatingCitizens: 78, timeline: [
                     { title: 'Route Started', time: '05:30 AM', color: 'var(--gov-success)' },
                     { title: 'All Sectors Complete', time: '08:15 AM', color: 'var(--gov-success)' }
                 ], issues: [] },
-                { routeId: 'R-005', ward: 'Ward 5', vehicle: 'MH-12-IJ-7890', status: 'With Issues', statusClass: 'warning', collected: 278, compliance: 54, time: '10:00 AM', date: 'Today', households: 95, pointsAwarded: 210, participatingCitizens: 42, timeline: [
+                { routeId: 'R-005', ward: 'Ward 5', vehicle: 'MH-12-IJ-7890', status: 'With Issues', statusClass: 'warning', statusPillClass: 'with-issues', collected: 278, compliance: 54, time: '10:00 AM', date: 'Today', households: 95, pointsAwarded: 210, participatingCitizens: 42, timeline: [
                     { title: 'Route Started', time: '06:15 AM', color: 'var(--gov-success)' },
                     { title: 'Issue Reported', time: '09:00 AM', color: 'var(--gov-warning)' }
                 ], issues: [{ title: 'Low segregation compliance', status: 'Pending Action' }, { title: 'Bin overflow at Stop 12', status: 'Resolved' }] }
@@ -1941,36 +2180,268 @@
                 $timeout(function() { $scope.successMessage = null; }, 2000);
             };
             
+            // Trend Period
+            $scope.trendPeriod = 'weekly';
+            var trendChartInstance = null;
+            
+            $scope.setTrendPeriod = function(period) {
+                $scope.trendPeriod = period;
+                if (trendChartInstance) {
+                    var datasets = {
+                        daily:   { labels: ['6AM','7AM','8AM','9AM','10AM','11AM','12PM'], data: [45, 120, 180, 156, 142, 108, 96],   min: 0,    unit: 'MT/hr' },
+                        weekly:  { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],    data: [780, 820, 795, 860, 847, 720, 680], min: 600,  unit: 'MT/day' },
+                        monthly: { labels: ['W1','W2','W3','W4','W5'],                    data: [3200, 3580, 3100, 3800, 3950],       min: 3000, unit: 'MT/week' }
+                    };
+                    var d = datasets[period];
+                    trendChartInstance.data.labels = d.labels;
+                    trendChartInstance.data.datasets[0].data = d.data;
+                    trendChartInstance.data.datasets[0].label = 'Waste Collected (' + d.unit + ')';
+                    trendChartInstance.options.scales.y.min = d.min;
+                    trendChartInstance.update('active');
+                }
+            };
+
+            $scope.toastMessage = null;
+            $scope.quickActionWaste = function(action) {
+                var msgs = {
+                    assign:   '🚛 Assign Vehicle — select a route and vehicle from the fleet list.',
+                    dispatch: '👷 Dispatch Team — team dispatched to Route 5. Supervisor notified.',
+                    report:   '📄 Report generating... Download will start in a moment.'
+                };
+                $scope.toastMessage = msgs[action];
+                $timeout(function() { $scope.toastMessage = null; }, 4000);
+            };
+
+            $scope.viewRoute = function(record) {
+                $scope.viewRouteRecord = record;
+                $scope.routeDialogOpen = true;
+                // Build route stops per record
+                var routeCoords = {
+                    'R-001': [[28.6300,77.2100],[28.6270,77.2130],[28.6250,77.2150],[28.6220,77.2180],[28.6200,77.2200]],
+                    'R-002': [[28.6220,77.2250],[28.6200,77.2270],[28.6180,77.2300],[28.6160,77.2320],[28.6140,77.2350]],
+                    'R-003': [[28.6100,77.1920],[28.6080,77.1940],[28.6050,77.1960],[28.6020,77.1980],[28.6000,77.2000]],
+                    'R-004': [[28.6380,77.2350],[28.6360,77.2370],[28.6340,77.2390],[28.6320,77.2400],[28.6300,77.2420]],
+                    'R-005': [[28.6120,77.2450],[28.6100,77.2470],[28.6080,77.2500],[28.6060,77.2520],[28.6040,77.2540]]
+                };
+                var coords = routeCoords[record.routeId] || routeCoords['R-001'];
+                $timeout(function() {
+                    var el = document.getElementById('routeDialogMap');
+                    if (el && typeof L !== 'undefined') {
+                        // Clean up previous map
+                        if (el._leaflet_id) { el._leaflet_id = null; el.innerHTML = ''; }
+                        var rmap = L.map('routeDialogMap').setView(coords[Math.floor(coords.length/2)], 15);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; OpenStreetMap', maxZoom: 19
+                        }).addTo(rmap);
+                        // Draw route polyline
+                        L.polyline(coords, { color: '#1a365d', weight: 4, dashArray: '8,6', opacity: 0.8 }).addTo(rmap);
+                        // Stop markers
+                        var completedStops = record.timeline ? record.timeline.length : 0;
+                        coords.forEach(function(c, i) {
+                            var isDone = i < completedStops;
+                            var isCurrent = i === completedStops - 1;
+                            var color = isDone ? '#22c55e' : '#94a3b8';
+                            if (isCurrent) color = '#f59e0b';
+                            var icon = L.divIcon({
+                                className: '',
+                                html: '<div style="width:28px;height:28px;border-radius:50%;background:' + color + ';border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">' + (i+1) + '</div>',
+                                iconSize: [28,28], iconAnchor: [14,14]
+                            });
+                            var label = isDone ? 'Completed' : (isCurrent ? 'Current' : 'Upcoming');
+                            L.marker(c, { icon: icon }).addTo(rmap).bindPopup('<b>Stop ' + (i+1) + '</b><br>' + label);
+                        });
+                        // Start pin
+                        L.marker(coords[0], {
+                            icon: L.divIcon({ className: '', html: '<div style="font-size:22px;">\uD83C\uDFC1</div>', iconSize:[22,22], iconAnchor:[11,11] })
+                        }).addTo(rmap);
+                        setTimeout(function() { rmap.invalidateSize(); }, 200);
+                    }
+                }, 100);
+            };
+            $scope.routeDialogOpen = false;
+            $scope.viewRouteRecord = {};
+            $scope.closeRouteDialog = function() { $scope.routeDialogOpen = false; };
+
+            $scope.fullMapOpen = false;
+            $scope.openFullMap = function() {
+                $scope.fullMapOpen = true;
+                $timeout(function() {
+                    var el = document.getElementById('fullMapLeaflet');
+                    if (el && typeof L !== 'undefined') {
+                        if (el._leaflet_id) { el._leaflet_id = null; el.innerHTML = ''; }
+                        var fmap = L.map('fullMapLeaflet').setView([28.6139, 77.2090], 13);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; OpenStreetMap', maxZoom: 19
+                        }).addTo(fmap);
+                        var vehicles = [
+                            { lat:28.6250,lng:77.2150,type:'active',  label:'MH-12-AB-1234',driver:'Ramesh K.',route:'R-001',status:'On Route' },
+                            { lat:28.6180,lng:77.2300,type:'active',  label:'MH-12-CD-5678',driver:'Suresh M.',route:'R-002',status:'On Route' },
+                            { lat:28.6020,lng:77.1980,type:'delayed', label:'MH-12-EF-9012',driver:'Dinesh P.',route:'R-003',status:'Delayed' },
+                            { lat:28.6320,lng:77.2400,type:'active',  label:'MH-12-GH-3456',driver:'Mahesh S.',route:'R-004',status:'On Route' },
+                            { lat:28.5960,lng:77.2200,type:'hotspot', label:'Overflow \u2013 Sector 5',driver:'',route:'',status:'Bin Overflow' },
+                            { lat:28.6080,lng:77.2500,type:'active',  label:'MH-12-IJ-7890',driver:'Ganesh R.',route:'R-005',status:'On Route' },
+                            { lat:28.6150,lng:77.1850,type:'delayed', label:'MH-12-KL-2345',driver:'Ramesh T.',route:'R-006',status:'Delayed' },
+                            { lat:28.6400,lng:77.2050,type:'inactive',label:'MH-12-MN-6789',driver:'Nilesh T.',route:'N/A', status:'Maintenance' },
+                            { lat:28.6050,lng:77.2600,type:'hotspot', label:'Dumping \u2013 Ward 4',driver:'',route:'',status:'Illegal Dumping' },
+                            { lat:28.5900,lng:77.2000,type:'active',  label:'MH-12-OP-1357',driver:'Sunil V.', route:'R-007',status:'On Route' }
+                        ];
+                        var cm = {active:'#22c55e',delayed:'#f59e0b',hotspot:'#ef4444',inactive:'#94a3b8'};
+                        var em = {active:'\uD83D\uDE9B',delayed:'\u26A0\uFE0F',hotspot:'\uD83D\uDD34',inactive:'\u23F8\uFE0F'};
+                        var fGroups = { active:L.layerGroup().addTo(fmap), delayed:L.layerGroup().addTo(fmap), hotspot:L.layerGroup().addTo(fmap), inactive:L.layerGroup().addTo(fmap) };
+                        vehicles.forEach(function(v) {
+                            var c = cm[v.type];
+                            var ic = L.divIcon({ className:'', html:'<div style="width:44px;height:44px;border-radius:50%;background:'+c+';border:3px solid white;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 3px 12px rgba(0,0,0,0.35);cursor:pointer;">'+em[v.type]+'</div>', iconSize:[44,44], iconAnchor:[22,22], popupAnchor:[0,-24] });
+                            var pp = '<div style="font-family:Inter;min-width:200px"><strong>'+v.label+'</strong>';
+                            if(v.driver) pp+='<div style="font-size:11px;color:#64748b;margin-top:4px">Driver: <b>'+v.driver+'</b></div>';
+                            if(v.route) pp+='<div style="font-size:11px;color:#64748b">Route: <b>'+v.route+'</b></div>';
+                            pp+='<div style="font-size:11px;color:#64748b">'+v.status+'</div>';
+                            pp+='<div style="margin-top:6px;padding:3px 10px;background:'+c+';color:white;border-radius:20px;font-size:10px;font-weight:700;display:inline-block">'+v.type.toUpperCase()+'</div></div>';
+                            L.marker([v.lat,v.lng],{icon:ic}).addTo(fGroups[v.type]).bindPopup(pp);
+                        });
+                        $scope._fullMapGroups = fGroups;
+                        $scope._fullMap = fmap;
+                        setTimeout(function() { fmap.invalidateSize(); }, 200);
+                    }
+                }, 100);
+            };
+            $scope.closeFullMap = function() { $scope.fullMapOpen = false; };
+            $scope.fullMapFilter = 'all';
+            $scope.setFullMapFilter = function(filter) {
+                $scope.fullMapFilter = filter;
+                var g = $scope._fullMapGroups;
+                var m = $scope._fullMap;
+                if (!g || !m) return;
+                Object.keys(g).forEach(function(type) {
+                    if (filter === 'all') { if (!m.hasLayer(g[type])) m.addLayer(g[type]); }
+                    else if (filter === 'hotspots') { if (type === 'hotspot') { if (!m.hasLayer(g[type])) m.addLayer(g[type]); } else { if (m.hasLayer(g[type])) m.removeLayer(g[type]); } }
+                    else if (type === filter) { if (!m.hasLayer(g[type])) m.addLayer(g[type]); }
+                    else { if (m.hasLayer(g[type])) m.removeLayer(g[type]); }
+                });
+            };
+
             // Chart Initialization
             function initChart() {
                 var ctx = document.getElementById('trendChart');
                 if (ctx) {
-                    new Chart(ctx.getContext('2d'), {
+                    trendChartInstance = new Chart(ctx.getContext('2d'), {
                         type: 'line',
                         data: {
                             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                             datasets: [{
-                                label: 'Waste Collected (MT)',
+                                label: 'Waste Collected (MT/day)',
                                 data: [780, 820, 795, 860, 847, 720, 680],
                                 borderColor: '#1a365d',
                                 backgroundColor: 'rgba(26, 54, 93, 0.1)',
                                 fill: true,
-                                tension: 0.4
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#1a365d',
+                                pointHoverRadius: 6
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: { display: false }
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(ctx) { return ' ' + ctx.parsed.y + ' MT'; }
+                                    }
+                                }
                             },
                             scales: {
-                                y: { beginAtZero: false, min: 600 }
-                            }
+                                y: {
+                                    beginAtZero: false,
+                                    min: 600,
+                                    grid: { color: 'rgba(0,0,0,0.05)' }
+                                },
+                                x: { grid: { display: false } }
+                            },
+                            animation: { duration: 600 }
                         }
                     });
                 }
+
+                // Leaflet Map with layer groups for filter support
+                var leafletEl = document.getElementById('leafletMap');
+                if (leafletEl && typeof L !== 'undefined') {
+                    var leafletMap = L.map('leafletMap', { zoomControl: true }).setView([28.6139, 77.2090], 13);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                        maxZoom: 19,
+                        crossOrigin: true
+                    }).addTo(leafletMap);
+
+                    // Force tile render after DOM is stable
+                    setTimeout(function() { leafletMap.invalidateSize(); }, 300);
+                    setTimeout(function() { leafletMap.invalidateSize(); }, 800);
+
+                    var vehicles = [
+                        { lat: 28.6250, lng: 77.2150, type: 'active',   label: 'MH-12-AB-1234', route: 'R-001', driver: 'Ramesh K.',  status: 'On Route' },
+                        { lat: 28.6180, lng: 77.2300, type: 'active',   label: 'MH-12-CD-5678', route: 'R-002', driver: 'Suresh M.',  status: 'On Route' },
+                        { lat: 28.6020, lng: 77.1980, type: 'delayed',  label: 'MH-12-EF-9012', route: 'R-003', driver: 'Dinesh P.',  status: 'Delayed 25 min' },
+                        { lat: 28.6320, lng: 77.2400, type: 'active',   label: 'MH-12-GH-3456', route: 'R-004', driver: 'Mahesh S.',  status: 'On Route' },
+                        { lat: 28.5960, lng: 77.2200, type: 'hotspot',  label: 'Overflow \u2013 Sector 5', route: '',      driver: '',          status: 'Bin Overflow!' },
+                        { lat: 28.6080, lng: 77.2500, type: 'active',   label: 'MH-12-IJ-7890', route: 'R-005', driver: 'Ganesh R.',  status: 'On Route' },
+                        { lat: 28.6150, lng: 77.1850, type: 'delayed',  label: 'MH-12-KL-2345', route: 'R-006', driver: 'Ramesh T.',  status: 'Delayed 15 min' },
+                        { lat: 28.6400, lng: 77.2050, type: 'inactive', label: 'MH-12-MN-6789', route: 'N/A',   driver: 'Nilesh T.',  status: 'In Maintenance' },
+                        { lat: 28.6050, lng: 77.2600, type: 'hotspot',  label: 'Dumping \u2013 Ward 4', route: '',     driver: '',          status: 'Illegal Dumping' },
+                        { lat: 28.5900, lng: 77.2000, type: 'active',   label: 'MH-12-OP-1357', route: 'R-007', driver: 'Sunil V.',   status: 'On Route' }
+                    ];
+
+                    var colorMap = { active: '#22c55e', delayed: '#f59e0b', hotspot: '#ef4444', inactive: '#94a3b8' };
+                    var emojiMap  = { active: '\uD83D\uDE9B', delayed: '\u26A0\uFE0F', hotspot: '\uD83D\uDD34', inactive: '\u23F8\uFE0F' };
+
+                    // Create one layer group per type — this is what makes filter buttons work
+                    var layerGroups = {
+                        active:   L.layerGroup().addTo(leafletMap),
+                        delayed:  L.layerGroup().addTo(leafletMap),
+                        hotspot:  L.layerGroup().addTo(leafletMap),
+                        inactive: L.layerGroup().addTo(leafletMap)
+                    };
+
+                    vehicles.forEach(function(v) {
+                        var color = colorMap[v.type] || '#94a3b8';
+                        var icon = L.divIcon({
+                            className: '',
+                            html: '<div style="width:40px;height:40px;border-radius:50%;background:' + color + ';border:3px solid white;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 3px 12px rgba(0,0,0,0.35);cursor:pointer;">' + emojiMap[v.type] + '</div>',
+                            iconSize: [40, 40],
+                            iconAnchor: [20, 20],
+                            popupAnchor: [0, -22]
+                        });
+                        var popup = '<div style="font-family:Inter,sans-serif;min-width:200px;padding:4px 0;">'
+                            + '<strong style="font-size:13px;color:#1a365d;">' + v.label + '</strong>';
+                        if (v.driver) popup += '<div style="font-size:11px;color:#64748b;margin-top:5px;">&#128100; Driver: <b>' + v.driver + '</b></div>';
+                        if (v.route)  popup += '<div style="font-size:11px;color:#64748b;">&#128205; Route: <b>' + v.route + '</b></div>';
+                        popup += '<div style="font-size:11px;color:#64748b;">&#8505; ' + v.status + '</div>';
+                        popup += '<div style="margin-top:8px;padding:3px 10px;background:' + color + ';color:white;border-radius:20px;font-size:10px;font-weight:700;display:inline-block;">' + v.type.toUpperCase() + '</div></div>';
+
+                        var grp = layerGroups[v.type] || layerGroups.inactive;
+                        L.marker([v.lat, v.lng], { icon: icon }).addTo(grp).bindPopup(popup);
+                    });
+
+                    // Override setMapFilter to control layer visibility on the real map
+                    $scope.setMapFilter = function(filter) {
+                        $scope.mapFilter = filter;
+                        Object.keys(layerGroups).forEach(function(type) {
+                            var grp = layerGroups[type];
+                            if (filter === 'all') {
+                                if (!leafletMap.hasLayer(grp)) leafletMap.addLayer(grp);
+                            } else if (filter === 'hotspots') {
+                                if (type === 'hotspot') { if (!leafletMap.hasLayer(grp)) leafletMap.addLayer(grp); }
+                                else { if (leafletMap.hasLayer(grp)) leafletMap.removeLayer(grp); }
+                            } else if (type === filter) {
+                                if (!leafletMap.hasLayer(grp)) leafletMap.addLayer(grp);
+                            } else {
+                                if (leafletMap.hasLayer(grp)) leafletMap.removeLayer(grp);
+                            }
+                        });
+                    };
+                }
             }
+
             
             function initHourlyChart() {
                 var ctx = document.getElementById('hourlyChart');

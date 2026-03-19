@@ -1,0 +1,180 @@
+﻿<!-- Collection Screen -->
+<div class="collection-screen">
+
+    <!-- Nav Row -->
+    <div class="collection-nav">
+        <button class="btn-back" ng-click="goBack()">← Route</button>
+        <span class="collection-progress-pill">
+            House <strong>{{pendingDone + 1}}</strong> of <strong>{{stats.total}}</strong>
+        </span>
+    </div>
+
+    <!-- Live Status Bar -->
+    <div class="clive-bar">
+        <div class="clive-item">
+            <span class="clive-icon">⏱️</span>
+            <div>
+                <div class="clive-val" ng-class="{'clive-warn': timerSeconds > 180}">{{timeSpent}}</div>
+                <div class="clive-lbl">Time Here</div>
+            </div>
+        </div>
+        <div class="clive-divider"></div>
+        <div class="clive-item">
+            <span class="clive-pulse-wrap"><span class="clive-pulse"></span></span>
+            <div>
+                <div class="clive-val clive-live">Live</div>
+                <div class="clive-lbl">Sending Location</div>
+            </div>
+        </div>
+        <div class="clive-divider"></div>
+        <div class="clive-item">
+            <span class="clive-icon">🏠</span>
+            <div>
+                <div class="clive-val">{{stats.pending}}</div>
+                <div class="clive-lbl">Houses Left</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Route Mini-Map -->
+    <div class="cmap-card">
+        <div class="cmap-header">
+            <div class="cmap-title">🗺️ Live Route Map</div>
+            <div class="cmap-legend">
+                <span class="cmap-dot" style="background:#2563eb"></span> Current
+                <span class="cmap-dot" style="background:#10b981"></span> Done
+                <span class="cmap-dot" style="background:#f59e0b"></span> Pending
+                <span class="cmap-dot" style="background:#ef4444"></span> Issue
+                <span class="cmap-truck">�</span> You
+            </div>
+        </div>
+        <div id="collection-map" class="cmap-canvas"></div>
+    </div>
+
+    <!-- Main Collection Card -->
+    <div class="collection-main-card" ng-hide="showIssuePanel">
+
+        <!-- Hero Header -->
+        <div class="collection-hero">
+            <div class="collection-house-badge">🏠</div>
+            <div class="collection-hero-info">
+                <h2>{{house.id}}</h2>
+                <div class="collection-hero-meta">
+                    <span class="cmeta">📍 {{house.address}}</span>
+                    <span class="cmeta">📏 {{house.distance}}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Face Status Flow -->
+        <div class="face-status-row">
+            <button class="face-btn" ng-class="{fsel: faceStatus==='todo'}" ng-click="setFaceStatus('todo')">
+                <span class="face-emoji">⏳</span>
+                <span class="face-lbl">To Do</span>
+            </button>
+            <span class="face-arrow">›</span>
+            <button class="face-btn" ng-class="{fsel: faceStatus==='collecting'}" ng-click="setFaceStatus('collecting')">
+                <span class="face-emoji">�</span>
+                <span class="face-lbl">Collecting</span>
+            </button>
+            <span class="face-arrow">›</span>
+            <button class="face-btn fsel-done" ng-class="{fsel: faceStatus==='done'}" ng-click="setFaceStatus('done')">
+                <span class="face-emoji">✅</span>
+                <span class="face-lbl">Done</span>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="collection-body">
+
+            <!-- Waste Type -->
+            <div class="section-label">Waste Type Collected</div>
+            <div class="waste-type-grid">
+                <button class="waste-type-btn" ng-class="{sel: wasteType === 'dry'}"   ng-click="wasteType = 'dry'">
+                    <span class="wt-icon">♻️</span> Dry Waste
+                </button>
+                <button class="waste-type-btn" ng-class="{sel: wasteType === 'wet'}"   ng-click="wasteType = 'wet'">
+                    <span class="wt-icon">💧</span> Wet Waste
+                </button>
+                <button class="waste-type-btn" ng-class="{sel: wasteType === 'mixed'}" ng-click="wasteType = 'mixed'">
+                    <span class="wt-icon">🗑️</span> Mixed
+                </button>
+            </div>
+
+            <!-- Photo Upload (Optional) -->
+            <div class="section-label">
+                Photo Proof
+                <span class="optional-tag">Optional</span>
+                <span class="optional-hint">– Skip if you're busy, don't waste time</span>
+            </div>
+            <div class="photo-upload-area" ng-click="triggerPhoto()" ng-class="{'has-photo': photoPreview}">
+                <input type="file" id="photoInput" accept="image/*" style="display:none">
+                <div ng-if="!photoPreview" class="photo-placeholder">
+                    <span class="photo-icon">📷</span>
+                    <span class="photo-hint">Tap to add photo</span>
+                </div>
+                <img ng-if="photoPreview" ng-src="{{photoPreview}}" class="photo-preview-img" alt="Proof photo">
+                <button ng-if="photoPreview" class="photo-remove-btn" ng-click="removePhoto($event)">✕ Remove</button>
+            </div>
+            <!-- Verification status -->
+            <div ng-if="photoVerifying" style="display:flex;align-items:center;gap:0.4rem;margin-top:0.4rem;font-size:0.78rem;color:var(--g500);">
+                <span>⏳</span> Verifying photo…
+            </div>
+            <div ng-if="photoVerification" style="display:flex;align-items:center;gap:0.4rem;margin-top:0.4rem;font-size:0.78rem;font-weight:600;border-radius:8px;padding:0.3rem 0.6rem;"
+                ng-style="{'background': photoVerification.status === 'Verified' ? 'rgba(16,185,129,0.1)' : photoVerification.status === 'Acceptable' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)', 'color': photoVerification.status === 'Verified' ? 'var(--success)' : photoVerification.status === 'Acceptable' ? 'var(--warning)' : 'var(--danger)'}">
+                <span ng-if="photoVerification.status === 'Verified'">&#10003;</span>
+                <span ng-if="photoVerification.status === 'Acceptable'">&#9888;</span>
+                <span ng-if="photoVerification.status === 'Suspicious'">&#9888;</span>
+                {{photoVerification.status}} &middot; Score {{photoVerification.score}}
+            </div>
+
+            <!-- Notes -->
+            <div class="section-label">Remarks <span class="optional-tag">Optional</span></div>
+            <textarea class="collection-notes" ng-model="collectionNote" placeholder="Any remarks about this house…" rows="2"></textarea>
+
+            <!-- Actions -->
+            <div class="collection-actions">
+                <button class="btn-collected"    ng-click="markCollected()">✔ Collected</button>
+                <button class="btn-report-issue" ng-click="openIssuePanel()">⚠ Issue</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Issue Panel -->
+    <div class="issue-panel" ng-show="showIssuePanel">
+        <div class="issue-panel-header">
+            <h3>⚠️ Report an Issue</h3>
+            <button class="btn-back" ng-click="closeIssuePanel()">✕ Cancel</button>
+        </div>
+        <div class="issue-panel-body">
+            <div class="issue-options">
+                <div class="issue-option"
+                     ng-repeat="issue in issueTypes"
+                     ng-class="{selected: selectedIssue === issue.id}"
+                     ng-click="selectIssue(issue)">
+                    <div class="issue-option-icon">{{issue.icon}}</div>
+                    <span class="issue-option-text">{{issue.label}}</span>
+                </div>
+            </div>
+            <button class="btn-submit-issue" ng-click="submitIssue()" ng-disabled="!selectedIssue">
+                📤 Submit Issue Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Overlay -->
+    <div class="success-overlay" ng-if="showSuccess">
+        <div class="success-card">
+            <div class="success-icon">{{successIcon}}</div>
+            <div class="success-title">{{successTitle}}</div>
+            <div class="success-text">{{successMessage}}</div>
+            <div class="success-pts-chip" ng-if="pointsAwarded !== 0">
+                <span ng-if="pointsAwarded > 0" class="pts-chip positive">+{{pointsAwarded}} pts earned!</span>
+                <span ng-if="pointsAwarded < 0" class="pts-chip negative">{{pointsAwarded}} pts</span>
+            </div>
+            <button class="btn-continue" ng-click="continueToNext()">Next House →</button>
+        </div>
+    </div>
+
+</div>

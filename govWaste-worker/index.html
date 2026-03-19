@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="wasteWorkerApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste Collector Portal | Suvidha</title>
+    <link rel="stylesheet" href="css/waste-worker-style.css">
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    <!-- Dynamic Base Href for Flask + Live Server Compatibility -->
+    <script>
+        (function() {
+            var base = document.createElement('base');
+            var currentPath = window.location.pathname;
+            // Use /govWaste-worker/ when URL contains it (both Flask and Live Server from root)
+            if (currentPath.includes('/govWaste-worker/')) {
+                base.href = '/govWaste-worker/';
+            } else {
+                base.href = '/';
+            }
+            document.head.insertBefore(base, document.head.firstChild);
+        })();
+    </script>
+</head>
+
+<body ng-controller="MainController">
+
+    <!-- App Container -->
+    <div class="app-container">
+
+        <!-- Sidebar -->
+        <div ng-include="'app/components/sidebar.html'"></div>
+
+        <!-- Main Content Area -->
+        <main class="worker-main-content">
+
+            <!-- Topbar -->
+            <div ng-include="'app/components/topbar.html'"></div>
+
+            <!-- Routed View -->
+            <div class="worker-content" ng-view></div>
+
+        </main>
+
+    </div>
+
+    <!-- App Script -->
+    <script src="/static/js/image-verification.service.js"></script>
+    <script src="app/app.js"></script>
+
+</body>
+
+</html>
