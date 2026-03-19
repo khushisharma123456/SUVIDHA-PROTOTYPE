@@ -4,3 +4,5 @@ flask-cors
 werkzeug>=2.0.0
 nyckel
 requests
+Pillow>=9.0.0
+imagehash>=4.3.0
