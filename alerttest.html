@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkaji · civic advisories ✦ glass</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 10% 30%, #1b3b4f, #0b1f2c);
+            background-image: url('https://images.unsplash.com/photo-1569336415962-a4bd9f69cd07?q=80&w=2831&auto=format&fit=crop'); /* soft city texture */
+            background-size: cover;
+            background-position: center 30%;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* main advisory panel – glass container */
+        .advisory-panel {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(18, 30, 38, 0.3);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 2.5rem;
+            padding: 2rem 2.2rem;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* section header */
+        .section-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 2.2rem;
+        }
+        .title-with-glow h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            background: linear-gradient(130deg, #f0f9ff, #c4e0f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 2px 5px rgba(0,30,50,0.5);
+        }
+        .title-with-glow h2 i {
+            color: #fcd34d;
+            text-shadow: 0 0 12px #fbbf24;
+            font-size: 2rem;
+        }
+        .live-badge {
+            background: rgba(239, 68, 68, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(248, 113, 113, 0.4);
+            border-radius: 100px;
+            padding: 0.5rem 1.3rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #fee2e2;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+        }
+        .live-badge i {
+            margin-right: 6px;
+            color: #f87171;
+        }
+
+        /* summary chips */
+        .summary-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+        .summary-chip {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.7rem 1.5rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            color: rgba(230, 245, 255, 0.9);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transition: 0.2s;
+        }
+        .summary-chip i {
+            margin-right: 8px;
+            opacity: 0.9;
+        }
+        .summary-chip:hover {
+            background: rgba(40, 70, 90, 0.5);
+            transform: scale(1.02);
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        /* group titles */
+        .group-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin: 2rem 0 1.2rem 0;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: -0.2px;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            padding-bottom: 0.6rem;
+        }
+        .group-title i {
+            font-size: 1.8rem;
+            opacity: 0.8;
+        }
+
+        /* card grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* ----- glass card styles ----- */
+        .advisory-card {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2) inset;
+            padding: 1.5rem 1.3rem 1.3rem 1.5rem;
+            transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+            animation: cardAppear 0.4s ease-out backwards;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* left border based on category */
+        .advisory-card.electricity {
+            border-left: 6px solid #fbbf24;
+            background: linear-gradient(145deg, rgba(255,255,245,0.65), rgba(255,255,255,0.5));
+        }
+        .advisory-card.water {
+            border-left: 6px solid #38bdf8;
+            background: linear-gradient(145deg, rgba(235, 248, 255, 0.65), rgba(255,255,255,0.5));
+        }
+        .advisory-card.solar {
+            border-left: 6px solid #facc15;
+            background: linear-gradient(145deg, rgba(255, 250, 225, 0.65), rgba(255,255,255,0.5));
+        }
+        .advisory-card.waste {
+            border-left: 6px solid #4ade80;
+            background: linear-gradient(145deg, rgba(235, 255, 235, 0.65), rgba(255,255,255,0.5));
+        }
+        /* fallback default (nice blue) */
+        .advisory-card.default {
+            border-left: 6px solid #94a3b8;
+        }
+
+        /* hover effect */
+        .advisory-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 50px -12px black, 0 0 0 1px rgba(255,255,255,0.4) inset;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(18px);
+        }
+
+        /* card header: icon + title */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .card-icon {
+            font-size: 2rem;
+            width: 2.6rem;
+            text-align: center;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        }
+        .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #0b1e2a;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+            line-height: 1.2;
+        }
+
+        /* description */
+        .card-desc {
+            font-size: 1rem;
+            line-height: 1.4;
+            color: #1e2f3c;
+            font-weight: 500;
+            margin: 8px 0 12px 0;
+            opacity: 0.85;
+            flex: 1;
+        }
+
+        /* metadata row (date + status tag) */
+        .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+        .date {
+            font-size: 0.85rem;
+            color: #2b404e;
+            font-weight: 500;
+            background: rgba(255,255,255,0.3);
+            padding: 4px 12px;
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
+        }
+        .status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 60px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .status.critical {
+            background: rgba(220, 38, 38, 0.25);
+            color: #4c0b0b;
+            border-color: rgba(220, 38, 38, 0.5);
+        }
+        .status.scheduled {
+            background: rgba(250, 204, 21, 0.25);
+            color: #513e06;
+            border-color: rgba(250, 204, 21, 0.6);
+        }
+        .status.informational {
+            background: rgba(59, 130, 246, 0.2);
+            color: #113153;
+            border-color: rgba(59, 130, 246, 0.6);
+        }
+
+        /* subtle pulse for critical cards (only while not hovering) */
+        .advisory-card.critical-pulse {
+            animation: softPulse 2s infinite ease-in-out;
+        }
+        .advisory-card.critical-pulse:hover {
+            animation: none;
+        }
+
+        @keyframes softPulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3), 0 20px 35px -8px rgba(0,0,0,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.08), 0 20px 35px -8px rgba(0,0,0,0.5); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.0), 0 20px 35px -8px rgba(0,0,0,0.4); }
+        }
+
+        @keyframes cardAppear {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* optional detail tooltip (appears on hover over icon) — simple inline */
+        .extra-detail {
+            font-size: 0.85rem;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba(255,255,255,0.5);
+            color: #0b3b4a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.9;
+            transition: 0.2s;
+        }
+        .extra-detail i {
+            font-size: 0.9rem;
+            color: #1f4a64;
+        }
+
+        /* responsive */
+        @media (max-width: 600px) {
+            .advisory-panel { padding: 1.5rem; }
+            .title-with-glow h2 { font-size: 1.8rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+
+        /* decorative bg blur elements */
+        .blob {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle at 30% 30%, #61a5c2, transparent 70%);
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.25;
+            z-index: -1;
+            top: 5%;
+            left: 10%;
+        }
+        .blob2 {
+            bottom: 0;
+            right: 0;
+            width: 600px;
+            height: 600px;
+            background: #3b6d4b;
+            filter: blur(90px);
+            opacity: 0.15;
+            position: fixed;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="blob"></div>
+    <div class="blob2"></div>
+
+    <div class="advisory-panel">
+        <!-- header with dynamic count -->
+        <div class="section-header">
+            <div class="title-with-glow">
+                <h2><i class="fas fa-exclamation-triangle"></i> 3 Active Alerts · Kalkaji</h2>
+            </div>
+            <div class="live-badge">
+                <i class="fas fa-circle" style="font-size: 0.6rem; vertical-align: middle;"></i> LIVE · DELHI
+            </div>
+        </div>
+
+        <!-- summary chips (bonus) -->
+        <div class="summary-row">
+            <span class="summary-chip"><i class="fas fa-bolt" style="color: #fbbf24;"></i> ⚡ 2 blocks maintenance today</span>
+            <span class="summary-chip"><i class="fas fa-tint" style="color: #38bdf8;"></i> 💧 Water supply rescheduled in 3 areas</span>
+            <span class="summary-chip"><i class="fas fa-solar-panel" style="color: #facc15;"></i> ☀️ Solar net metering workshop</span>
+            <span class="summary-chip"><i class="fas fa-trash-alt" style="color: #4ade80;"></i> 🗑️ Waste segregation drive starts Mon</span>
+        </div>
+
+        <!-- ACTIVE ISSUES group -->
+        <div class="group-title">
+            <i class="fas fa-exclamation-circle" style="color: #f87171;"></i> 🚨 Active issues · now
+        </div>
+        <div class="cards-grid">
+            <!-- Card 1: electricity critical -->
+            <div class="advisory-card electricity critical-pulse" style="animation-delay: 0.05s;">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <h3>Grid overload · Block C</h3>
+                </div>
+                <div class="card-desc">
+                    Feeder tripping due to high demand. Crews on site. Partial outage in C-3, C-4.
+                </div>
+                <!-- extra detail (tooltip-like) appears on hover (using extra block) -->
+                <div class="extra-detail">
+                    <i class="fas fa-hard-hat"></i> Estimated fix: 10:45 PM
+                </div>
+                <div class="card-meta">
+                    <span class="date"><i class="far fa-calendar-alt"></i> 18 Mar, 21:30</span>
+                    <span class="status critical">🔴 critical</span>
+                </div>
+            </div>
+
+            <!-- Card 2: water pipe leak (active) -->
+            <div class="advisory-card water" style="animation-delay: 0.1s;">
+                <div class="card-header">
+                    <span class="card-icon">💧</span>
+                    <h3>Water main leak · Kalkaji ext.</h3>
+                </div>
+                <div class="card-desc">
+                    12" line damaged near DDA market. Low pressure in blocks E, F, G.
+                </div>
+                <div class="extra-detail">
+                    <i class="fas fa-truck"></i> Repair crew arrived
+                </div>
+                <div class="card-meta">
+                    <span class="date"><i class="far fa-clock"></i> 2 hours ago</span>
+                    <span class="status critical">🔴 critical</span>
+                </div>
+            </div>
+
+            <!-- Card 3: waste collection delay (active, waste) -->
+            <div class="advisory-card waste" style="animation-delay: 0.15s;">
+                <div class="card-header">
+                    <span class="card-icon">🗑️</span>
+                    <h3>Collection delayed · sector 7</h3>
+                </div>
+                <div class="card-desc">
+                    Vehicle breakdown. Alternate route arranged, will be collected by midnight.
+                </div>
+                <div class="extra-detail">
+                    <i class="fas fa-dump-truck"></i> Temporary bins at corner
+                </div>
+                <div class="card-meta">
+                    <span class="date">18 Mar – 19 Mar</span>
+                    <span class="status informational">🔵 informational</span>
+                </div>
+            </div>
+        </div> <!-- end active grid -->
+
+        <!-- UPCOMING / SCHEDULED group -->
+        <div class="group-title" style="margin-top: 2.5rem;">
+            <i class="fas fa-calendar-alt" style="color: #a78bfa;"></i> 📅 Upcoming · scheduled
+        </div>
+        <div class="cards-grid">
+            <!-- Card 4: Solar maintenance (scheduled) -->
+            <div class="advisory-card solar" style="animation-delay: 0.2s;">
+                <div class="card-header">
+                    <span class="card-icon">☀️</span>
+                    <h3>Solar array cleaning</h3>
+                </div>
+                <div class="card-desc">
+                    Rooftop panels in community centre & library. Power will remain on (battery).
+                </div>
+                <div class="extra-detail">
+                    <i class="fas fa-broom"></i> 2 hour window
+                </div>
+                <div class="card-meta">
+                    <span class="date">20 Mar, 10:00–12:00</span>
+                    <span class="status scheduled">🟡 scheduled</span>
+                </div>
+            </div>
+
+            <!-- Card 5: Electricity upgrade (scheduled) -->
+            <div class="advisory-card electricity" style="animation-delay: 0.25s;">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <h3>Feeder upgrade · A block</h3>
+                </div>
+                <div class="card-desc">
+                    Planned shutdown for cable replacement. Backup gen covered for essential.
+                </div>
+                <div class="extra-detail">
+                    <i class="fas fa-clock"></i> 4hrs, no residential outage
+                </div>
+                <div class="card-meta">
+                    <span class="date">21 Mar, 09:00–13:00</span>
+                    <span class="status scheduled">🟡 scheduled</span>
+                </div>
+            </div>
+
+            <!-- Card 6: Water advisory (informational, water) -->
+            <div class="advisory-card water" style="animation-delay: 0.3s;">
+                <div class="card-header">
+                    <span class="card-icon">💧</span>
+                    <h3>Flushing · hydrant test</h3>
+                </div>
+                <div class="card-desc">
+                    Temporary discoloration possible. Safe to use after running tap 2min.
+                </div>
+                <div class="extra-detail">
+                    <i class="fas fa-vial"></i> water quality unaffected
+                </div>
+                <div class="card-meta">
+                    <span class="date">22 Mar, 8:00–17:00</span>
+                    <span class="status informational">🔵 informational</span>
+                </div>
+            </div>
+
+            <!-- Card 7: Waste awareness drive (bonus, waste) -->
+            <div class="advisory-card waste" style="animation-delay: 0.35s;">
+                <div class="card-header">
+                    <span class="card-icon">🗑️</span>
+                    <h3>Zero waste workshop</h3>
+                </div>
+                <div class="card-desc">
+                    Community hall · composting & segregation demo. Open to all.
+                </div>
+                <div class="extra-detail">
+                    <i class="fas fa-seedling"></i> free compost bin
+                </div>
+                <div class="card-meta">
+                    <span class="date">23 Mar, 4pm</span>
+                    <span class="status informational">🔵 informational</span>
+                </div>
+            </div>
+        </div> <!-- end upcoming grid -->
+
+        <!-- subtle count summary (bonus) -->
+        <div style="margin-top: 2rem; text-align: right; font-size: 0.9rem; color: rgba(220,240,255,0.7); backdrop-filter: blur(6px); padding: 0.5rem 1rem; border-radius: 60px; display: inline-block; background: rgba(0,0,0,0.2);">
+            <i class="far fa-bell"></i> 3 critical · 2 scheduled · 2 info — last updated 21:44
+        </div>
+    </div>
+
+    <!-- tiny script to randomize pulse/demo counts – but all static already, just for optional dynamic text (nothing needed) -->
+    <script>
+        (function() {
+            // This script can adjust counts if needed, but static is fine.
+            // just a small detail: the summary chips show real counts.
+            console.log('glass advisories — Kalkaji');
+        })();
+    </script>
+</body>
+</html>

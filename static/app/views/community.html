@@ -1,69 +1,87 @@
 <div class="main-content">
-    <!-- Community Page Header -->
-    <div class="community-header" style="text-align:center;">
-        <div class="community-title-row" style="flex-direction:column; align-items:center;">
-            <div style="margin-bottom:1rem;">
-                <h1>Welcome, {{vm.citizenName || 'Citizen'}}, to your Community</h1>
-                <p>Utility performance and community participation for <strong ng-bind="vm.selectedWard"></strong></p>
+    <div class="dashboard-container">
+
+        <!-- HERO STRIP -->
+        <div class="cm-hero-strip">
+            <div class="cm-hero-left">
+                <div class="cm-hero-eyebrow">&#127968; Community Hub</div>
+                <div class="cm-hero-name">Welcome, {{vm.citizenName || 'Citizen'}}</div>
+                <div class="cm-hero-sub">{{vm.selectedWard || 'Kailash Colony'}} &middot; Ward 54E &middot; New Delhi</div>
             </div>
-            
-            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center; align-items:flex-end;">
-                <div class="ward-selector-enhanced">
-                    <label><i data-lucide="globe"></i> State</label>
-                    <select ng-model="vm.selectedState" ng-change="vm.onStateChange()" class="form-control enhanced">
+            <div class="cm-hero-selectors">
+                <div class="cm-selector-group">
+                    <label><i data-lucide="globe" style="width:12px;height:12px;"></i> State</label>
+                    <select ng-model="vm.selectedState" ng-change="vm.onStateChange()" class="cm-select">
                         <option ng-repeat="s in vm.stateList" value="{{s}}">{{s}}</option>
                     </select>
                 </div>
-                <div class="ward-selector-enhanced">
-                    <label><i data-lucide="building"></i> City</label>
-                    <select ng-model="vm.selectedCity" ng-change="vm.onCityChange()" class="form-control enhanced">
+                <div class="cm-selector-group">
+                    <label><i data-lucide="building" style="width:12px;height:12px;"></i> City</label>
+                    <select ng-model="vm.selectedCity" ng-change="vm.onCityChange()" class="cm-select">
                         <option ng-repeat="c in vm.cityList" value="{{c}}">{{c}}</option>
                     </select>
                 </div>
-                <div class="ward-selector-enhanced">
-                    <label><i data-lucide="map-pin"></i> Ward</label>
-                    <select ng-model="vm.selectedWard" ng-change="vm.loadWardData()" class="form-control enhanced">
+                <div class="cm-selector-group">
+                    <label><i data-lucide="map-pin" style="width:12px;height:12px;"></i> Ward</label>
+                    <select ng-model="vm.selectedWard" ng-change="vm.loadWardData()" class="cm-select">
                         <option ng-repeat="w in vm.wardList" value="{{w.value}}">{{w.label}}</option>
                     </select>
                 </div>
-                
-                <!-- Utility Selector Next to Ward Selection -->
-                <div style="display:flex; gap:0.5rem; justify-content:center; align-items:center; margin-left:1rem; padding-bottom: 0.5rem;">
-                    <button class="btn btn-sm" ng-class="{'btn-primary': vm.selectedUtility === 'electricity', 'btn-outline': vm.selectedUtility !== 'electricity'}" ng-click="vm.selectUtility('electricity')"><i data-lucide="zap" style="width: 14px;"></i> Electricity</button>
-                    <button class="btn btn-sm" ng-class="{'btn-primary': vm.selectedUtility === 'water', 'btn-outline': vm.selectedUtility !== 'water'}" ng-click="vm.selectUtility('water')"><i data-lucide="droplet" style="width: 14px;"></i> Water</button>
-                    <button class="btn btn-sm" ng-class="{'btn-primary': vm.selectedUtility === 'gas', 'btn-outline': vm.selectedUtility !== 'gas'}" ng-click="vm.selectUtility('gas')"><i data-lucide="flame" style="width: 14px;"></i> Gas</button>
-                    <button class="btn btn-sm" ng-class="{'btn-primary': vm.selectedUtility === 'waste', 'btn-outline': vm.selectedUtility !== 'waste'}" ng-click="vm.selectUtility('waste')"><i data-lucide="trash-2" style="width: 14px;"></i> Waste</button>
-                </div>
+            </div>
+            <div class="cm-hero-utility">
+                <button class="cm-util-btn cm-util-elec" ng-class="{'active': vm.selectedUtility === 'electricity'}" ng-click="vm.selectUtility('electricity')">
+                    <i data-lucide="zap" style="width:14px;height:14px;"></i> Electricity
+                </button>
+                <button class="cm-util-btn cm-util-water" ng-class="{'active': vm.selectedUtility === 'water'}" ng-click="vm.selectUtility('water')">
+                    <i data-lucide="droplet" style="width:14px;height:14px;"></i> Water
+                </button>
+                <button class="cm-util-btn cm-util-gas" ng-class="{'active': vm.selectedUtility === 'gas'}" ng-click="vm.selectUtility('gas')">
+                    <i data-lucide="flame" style="width:14px;height:14px;"></i> Gas
+                </button>
+                <button class="cm-util-btn cm-util-waste" ng-class="{'active': vm.selectedUtility === 'waste'}" ng-click="vm.selectUtility('waste')">
+                    <i data-lucide="trash-2" style="width:14px;height:14px;"></i> Waste
+                </button>
             </div>
         </div>
-    </div>
 
-    <!-- Navigation Tabs -->
-    <div class="community-tabs" style="margin-top:2rem;">
-        <button class="community-tab" ng-class="{active: vm.activeSection === 'overview'}"
-            ng-click="vm.showSection('overview')">
-            <i data-lucide="layout-grid"></i>
-            <span>Overview</span>
-        </button>
-        <button class="community-tab" ng-class="{active: vm.activeSection === 'challenges'}"
-            ng-click="vm.showSection('challenges')">
-            <i data-lucide="trophy"></i>
-            <span>Civic Challenges</span>
-        </button>
-        <button class="community-tab" ng-class="{active: vm.activeSection === 'advisories'}"
-            ng-click="vm.showSection('advisories')">
-            <i data-lucide="megaphone"></i>
-            <span>Advisories</span>
-        </button>
-        <button class="community-tab" ng-class="{active: vm.activeSection === 'insights'}"
-            ng-click="vm.showSection('insights')">
-            <i data-lucide="bar-chart-3"></i>
-            <span>Ward Insights</span>
-        </button>
-    </div>
+        <!-- TAB QUICK-ROW -->
+        <div class="cm-tab-row">
+            <div class="cm-tab-card" ng-class="{active: vm.activeSection === 'overview'}" ng-click="vm.showSection('overview')">
+                <div class="cm-tab-icon">&#128202;</div>
+                <div class="cm-tab-body">
+                    <div class="cm-tab-title">Overview</div>
+                    <div class="cm-tab-sub">Savings &amp; rankings</div>
+                </div>
+                <div class="cm-tab-arrow">&#8594;</div>
+            </div>
+            <div class="cm-tab-card" ng-class="{active: vm.activeSection === 'challenges'}" ng-click="vm.showSection('challenges')">
+                <div class="cm-tab-icon">&#127942;</div>
+                <div class="cm-tab-body">
+                    <div class="cm-tab-title">Civic Challenges</div>
+                    <div class="cm-tab-sub">Earn points &amp; compete</div>
+                </div>
+                <div class="cm-tab-arrow">&#8594;</div>
+            </div>
+            <div class="cm-tab-card" ng-class="{active: vm.activeSection === 'advisories'}" ng-click="vm.showSection('advisories')">
+                <div class="cm-tab-icon">&#128226;</div>
+                <div class="cm-tab-body">
+                    <div class="cm-tab-title">Advisories</div>
+                    <div class="cm-tab-sub">Alerts &amp; outages</div>
+                </div>
+                <div class="cm-tab-arrow">&#8594;</div>
+            </div>
+            <div class="cm-tab-card" ng-class="{active: vm.activeSection === 'insights'}" ng-click="vm.showSection('insights')">
+                <div class="cm-tab-icon">&#128269;</div>
+                <div class="cm-tab-body">
+                    <div class="cm-tab-title">Ward Insights</div>
+                    <div class="cm-tab-sub">Performance &amp; impact</div>
+                </div>
+                <div class="cm-tab-arrow">&#8594;</div>
+            </div>
+        </div>
 
-    <!-- CONTENT AREA -->
-    <main class="community-content">
+        <!-- CONTENT AREA -->
+        <div class="community-content">
 
         <!-- SECTION 1: OVERVIEW -->
         <div id="overview" class="community-section" ng-show="vm.activeSection === 'overview'">
@@ -71,83 +89,117 @@
             <!-- Competitive Graphs -->
             <div class="enhanced-card" style="margin-bottom: 2rem; background: #ffffff;">
                 <div class="card-header-with-actions">
-                    <h3><span class="icon">📊</span> <span style="text-transform: capitalize;">{{vm.selectedUtility}}</span> Savings & Usage Overview</h3>
+                    <h3><span class="icon">📊</span> <span style="text-transform: capitalize;">{{vm.selectedUtility}}</span> Savings &amp; Usage Overview</h3>
                 </div>
-                <p style="color:var(--text-muted); font-size: 0.9rem;">See how you and your ward are scoring in savings.</p>
-                <div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:space-between; margin-top:2rem;">
-                    
-                    <!-- Left Graph: Ward compared to Nearby Wards -->
-                    <div style="flex:1; min-width: 300px; padding: 1rem; border: 1px solid var(--border-color); border-radius:8px; background:#ffffff;">
-                        <h4 style="text-align:center; font-size:1.1rem; color:var(--text-color);">Your Ward vs Nearby Wards in Saving <span style="text-transform: capitalize;">{{vm.selectedUtility}}</span> (Jan - Mar 2026)</h4>
-                        <div class="vertical-bar-chart" style="display:flex; align-items:flex-end; height: 200px; gap:1rem; border-bottom: 2px solid #e5e7eb; padding-bottom:0.5rem; margin-top:2rem; justify-content: space-around;">
-                            <div class="bar-wrapper" ng-repeat="wardScore in vm.wardSavingsGraphData" style="display:flex; flex-direction:column; align-items:center; flex:1;" title="{{wardScore.tooltip}}">
-                                <div class="bar-fill" ng-style="{ height: wardScore.percent + '%', background: wardScore.isCurrent ? 'var(--primary-color)' : '#9ca3af', width: '40px', borderRadius: '4px 4px 0 0', position: 'relative', transition: 'height 0.3s ease' }">
-                                    <span style="position: absolute; top: -22px; text-align:center; width: 100%; font-size:0.85rem; font-weight:bold; color:var(--text-color);">{{wardScore.score}}</span>
-                                </div>
-                                <span style="font-size:0.85rem; margin-top: 0.75rem; text-align:center; font-weight:600; color:var(--text-color);">{{wardScore.label}}</span>
+                <p style="color:#6b7280; font-size: 0.9rem;">See how you and your ward are scoring in savings.</p>
+                <div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:space-between; margin-top:1.5rem;">
+
+                    <!-- Left Graph: Ward vs Nearby Wards -->
+                    <div style="flex:1; min-width:280px; padding:1.25rem; border:1px solid #e5e7eb; border-radius:12px; background:#f9fafb;">
+                        <h4 style="text-align:center; font-size:0.95rem; font-weight:600; color:#1f2937; margin-bottom:1.5rem;">
+                            Your Ward vs Nearby Wards · <span style="text-transform:capitalize; color:#1D70B8;">{{vm.selectedUtility}}</span> Saved (Jan–Mar 2026)
+                        </h4>
+
+                        <!-- Chart area -->
+                        <div style="display:flex; align-items:flex-end; justify-content:space-around; height:200px; background:#ffffff; border-radius:10px; border:1px solid #e5e7eb; padding:0 1rem; padding-top:2rem; position:relative;">
+                            <!-- Y-axis guide lines -->
+                            <div style="position:absolute; left:0; right:0; top:0; bottom:0; pointer-events:none; padding:0 1rem;">
+                                <div style="position:absolute; bottom:50%; left:1rem; right:1rem; border-top:1px dashed #e5e7eb;"></div>
+                                <div style="position:absolute; bottom:75%; left:1rem; right:1rem; border-top:1px dashed #e5e7eb;"></div>
+                                <div style="position:absolute; bottom:25%; left:1rem; right:1rem; border-top:1px dashed #e5e7eb;"></div>
                             </div>
+
+                            <div ng-repeat="wardScore in vm.wardSavingsGraphData"
+                                 style="display:flex; flex-direction:column; align-items:center; z-index:1; flex:1; max-width:80px;">
+                                <!-- Value label above bar -->
+                                <span style="font-size:0.78rem; font-weight:700; color:#1f2937; margin-bottom:4px; white-space:nowrap;">{{wardScore.score}}</span>
+                                <!-- Bar -->
+                                <div ng-style="{
+                                    height: (wardScore.percent * 1.5) + 'px',
+                                    background: wardScore.barColor,
+                                    width: '36px',
+                                    borderRadius: '6px 6px 0 0',
+                                    transition: 'height 0.4s ease',
+                                    boxShadow: wardScore.isCurrent ? '0 4px 12px rgba(29,112,184,0.35)' : '0 2px 6px rgba(0,0,0,0.1)'
+                                }"></div>
+                            </div>
+                        </div>
+
+                        <!-- X-axis labels -->
+                        <div style="display:flex; justify-content:space-around; margin-top:0.6rem; padding:0 1rem;">
+                            <span ng-repeat="wardScore in vm.wardSavingsGraphData"
+                                  style="flex:1; max-width:80px; text-align:center; font-size:0.8rem; font-weight:600;"
+                                  ng-style="{ color: wardScore.isCurrent ? '#1D70B8' : '#6b7280' }">
+                                {{wardScore.label}}
+                                <span ng-if="wardScore.isCurrent" style="display:block; font-size:0.7rem; color:#1D70B8;">▲ You</span>
+                            </span>
                         </div>
                     </div>
 
-                    <!-- Right Graph: User vs Average People in Ward -->
-                    <div style="flex:1; min-width: 300px; padding: 1rem; border: 1px solid var(--border-color); border-radius:8px; background:#ffffff;">
-                        <h4 style="text-align:center; font-size:1.1rem; color:var(--text-color);">Your <span style="text-transform: capitalize;">{{vm.selectedUtility}}</span> Standing vs Ward (Mar 2026)</h4>
-                        <div class="vertical-bar-chart" style="display:flex; align-items:flex-end; height: 200px; gap:3rem; justify-content:center; border-bottom: 2px solid #e5e7eb; padding-bottom:0.5rem; margin-top:2rem;">
-                            <!-- Average User -->
-                            <div class="bar-wrapper" style="display:flex; flex-direction:column; align-items:center;" title="Average usage of people in your ward">
-                                <div class="bar-fill" ng-style="{ height: vm.userStandingGraphData.avgPercent + '%', background: '#9ca3af', width: '60px', borderRadius: '4px 4px 0 0', position: 'relative', transition: 'height 0.3s ease' }">
-                                    <span style="position: absolute; top: -22px; text-align:center; width: 100%; font-size:0.85rem; font-weight:bold; color:var(--text-color);">{{vm.userStandingGraphData.avgVal}}</span>
-                                </div>
-                                <span style="font-size:0.85rem; margin-top: 0.75rem; font-weight:bold; color:var(--text-color);">Ward Avg</span>
+                    <!-- Right Graph: You vs Ward Avg -->
+                    <div style="flex:1; min-width:280px; padding:1.25rem; border:1px solid #e5e7eb; border-radius:12px; background:#f9fafb;">
+                        <h4 style="text-align:center; font-size:0.95rem; font-weight:600; color:#1f2937; margin-bottom:1.5rem;">
+                            Your <span style="text-transform:capitalize; color:#1D70B8;">{{vm.selectedUtility}}</span> Usage vs Ward Average (Mar 2026)
+                        </h4>
+
+                        <!-- Chart area -->
+                        <div style="display:flex; align-items:flex-end; justify-content:space-around; height:200px; background:#ffffff; border-radius:10px; border:1px solid #e5e7eb; padding:0 2rem; padding-top:2rem; position:relative;">
+                            <div style="position:absolute; left:0; right:0; top:0; bottom:0; pointer-events:none; padding:0 2rem;">
+                                <div style="position:absolute; bottom:50%; left:2rem; right:2rem; border-top:1px dashed #e5e7eb;"></div>
+                                <div style="position:absolute; bottom:75%; left:2rem; right:2rem; border-top:1px dashed #e5e7eb;"></div>
+                                <div style="position:absolute; bottom:25%; left:2rem; right:2rem; border-top:1px dashed #e5e7eb;"></div>
                             </div>
 
-                            <!-- You -->
-                            <div class="bar-wrapper" style="display:flex; flex-direction:column; align-items:center;" title="{{vm.userStandingGraphData.tooltip}}">
-                                <div class="bar-fill" ng-style="{ height: vm.userStandingGraphData.userPercent + '%', background: 'var(--success-color)', width: '60px', borderRadius: '4px 4px 0 0', position: 'relative', transition: 'height 0.3s ease' }">
-                                    <span style="position: absolute; top: -22px; text-align:center; width: 100%; font-size:0.85rem; font-weight:bold; color:var(--text-color);">{{vm.userStandingGraphData.userVal}}</span>
-                                </div>
-                                <span style="font-size:0.85rem; margin-top: 0.75rem; font-weight:bold; color:var(--text-color);">You</span>
+                            <!-- Ward Avg bar -->
+                            <div style="display:flex; flex-direction:column; align-items:center; z-index:1;">
+                                <span style="font-size:0.8rem; font-weight:700; color:#1f2937; margin-bottom:4px;">{{vm.userStandingGraphData.avgVal}}</span>
+                                <div ng-style="{
+                                    height: (vm.userStandingGraphData.avgPercent * 1.5) + 'px',
+                                    background: 'linear-gradient(to top, #6b7280, #9ca3af)',
+                                    width: '52px',
+                                    borderRadius: '6px 6px 0 0',
+                                    transition: 'height 0.4s ease',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.12)'
+                                }"></div>
+                            </div>
+
+                            <!-- You bar -->
+                            <div style="display:flex; flex-direction:column; align-items:center; z-index:1;">
+                                <span style="font-size:0.8rem; font-weight:700; color:#059669; margin-bottom:4px;">{{vm.userStandingGraphData.userVal}}</span>
+                                <div ng-style="{
+                                    height: (vm.userStandingGraphData.userPercent * 1.5) + 'px',
+                                    background: 'linear-gradient(to top, #059669, #34d399)',
+                                    width: '52px',
+                                    borderRadius: '6px 6px 0 0',
+                                    transition: 'height 0.4s ease',
+                                    boxShadow: '0 4px 14px rgba(5,150,105,0.35)'
+                                }"></div>
                             </div>
                         </div>
-                        <p style="text-align: center; margin-top: 1rem; color: var(--success-color); font-weight: 600;" ng-bind="vm.userStandingGraphData.summaryText"></p>
+
+                        <!-- X labels -->
+                        <div style="display:flex; justify-content:space-around; padding:0 2rem; margin-top:0.6rem;">
+                            <span style="font-size:0.82rem; font-weight:600; color:#6b7280; text-align:center;">Ward Avg</span>
+                            <span style="font-size:0.82rem; font-weight:700; color:#059669; text-align:center;">You 🎉</span>
+                        </div>
+
+                        <!-- Summary -->
+                        <div style="margin-top:1rem; background:#ecfdf5; border-radius:8px; padding:0.75rem 1rem; border-left:4px solid #059669;">
+                            <p style="color:#065f46; font-size:0.88rem; font-weight:600; margin:0;" ng-bind="vm.userStandingGraphData.summaryText"></p>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- HEATMAP / STRESS MAP -->
-            <div class="enhanced-card heatmap-container" style="margin-bottom: 2rem; background: #ffffff;">
-                <div class="card-header-with-actions">
+            <div class="enhanced-card heatmap-container" style="margin-bottom: 2rem; padding: 0; overflow: hidden; border-radius: 12px;">
+                <div class="card-header-with-actions" style="padding: 1.25rem 1.5rem; background: #ffffff; border-bottom: 1px solid #e5e7eb;">
                     <div>
-                        <h3><span class="icon">🗺️</span> Stress Map for {{vm.selectedWard}}</h3>
-                        <p>Aggregated stress indicators across the region.</p>
-                    </div>
-                    <div class="map-toggles">
-                        <button class="map-toggle-btn" ng-click="vm.openMapModal('ward')"><i data-lucide="home"></i> Ward</button>
-                        <button class="map-toggle-btn" ng-click="vm.openMapModal('zone')"><i data-lucide="building"></i> Zone</button>
-                        <button class="map-toggle-btn" ng-click="vm.openMapModal('city')"><i data-lucide="map"></i> City</button>
+                        <h3><span class="icon">🗺️</span> Interactive City Resource Stress Map</h3>
+                        <p style="color: #6b7280; margin-top: 0.25rem;">Explore resource stress metrics across <strong>{{vm.selectedWard}}</strong> - Electricity, Water, Waste & Solar Adoption</p>
                     </div>
                 </div>
-                
-                <div class="heatmap-visual" style="grid-template-columns:repeat(4,1fr); gap:0.5rem; margin-top:1rem;">
-                    <div ng-repeat="block in vm.heatmapBlocks" class="heat-zone" ng-class="block.stressClass" title="{{block.label}} ({{block.score}}%)" style="cursor: pointer;" onclick="alert('Block selected')">
-                        <span class="block-label">{{block.label}}</span>
-                        <span class="stress-pct" style="font-size:0.78rem; font-weight:600; color:inherit;">{{block.score}}%</span>
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem; padding-top:1rem; border-top: 1px solid var(--border-color);">
-                    <h4 style="margin-bottom:0.75rem;">Stress Marking Progress</h4>
-                    <div class="progress" style="height: 16px; background:#e5e7eb; border-radius: 8px; overflow:hidden; display:flex;">
-                         <div ng-style="{'width': vm.overallStress.success + '%', 'background': '#10b981'}" title="Stable ({{vm.overallStress.success}}%)"></div>
-                         <div ng-style="{'width': vm.overallStress.warning + '%', 'background': '#f59e0b'}" title="Moderate ({{vm.overallStress.warning}}%)"></div>
-                         <div ng-style="{'width': vm.overallStress.danger + '%', 'background': '#ef4444'}" title="High ({{vm.overallStress.danger}}%)"></div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-top:0.5rem;">
-                        <span>Stable</span>
-                        <span>Moderate</span>
-                        <span>High Stress</span>
-                    </div>
-                </div>
+                <iframe id="stressMapFrame" ng-src="{{vm.mapIframeSrc}}" style="width: 100%; height: 600px; border: none; display: block;"></iframe>
             </div>
 
             <!-- Averages and Ward Ranking -->
@@ -259,20 +311,34 @@
 
             <!-- List of challenges -->
             <div class="challenge-grid" style="margin-top: 1rem;">
-                <div class="enhanced-card challenge-card" ng-repeat="challenge in vm.filteredChallenges" style="background: #ffffff;">
-                    <div class="challenge-icon-badge elec">
-                        <i data-lucide="{{challenge.icon}}"></i>
-                    </div>
-                    <div class="challenge-header">
-                        <h4 style="display:flex;align-items:center;gap:0.5rem;">{{challenge.title}}</h4>
-                        <span class="points-badge">
-                            <i data-lucide="coins"></i>
-                            {{challenge.points}} Points
+                <div class="challenge-card-wrap" ng-repeat="challenge in vm.filteredChallenges">
+
+                    <!-- Photo banner -->
+                    <div class="challenge-banner" ng-style="{'background-image': 'url(' + challenge.img + ')'}">
+                        <div class="challenge-banner-overlay"></div>
+                        <span class="challenge-tag-pill">{{challenge.tag}}</span>
+                        <span class="challenge-status-pill" ng-class="'csp-' + challenge.type">
+                            {{challenge.type === 'current' ? '🟢 Active' : challenge.type === 'future' ? '🔵 Upcoming' : '⚫ Ended'}}
                         </span>
                     </div>
-                    <p class="challenge-desc" style="margin-top:1rem;">{{challenge.desc}}</p>
-                    <button class="btn btn-primary" style="margin-top: 1.5rem; width: 100%; justify-content:center;" ng-if="challenge.type === 'current'">Join Challenge</button>
-                    <button class="btn btn-outline" style="margin-top: 1.5rem; width: 100%; justify-content:center;" ng-if="challenge.type !== 'current'" disabled>{{challenge.type === 'past' ? 'Completed/Expired' : 'Coming Soon'}}</button>
+
+                    <!-- Card body -->
+                    <div class="challenge-card-body">
+                        <div class="challenge-top-row">
+                            <div class="challenge-icon-badge elec">
+                                <i data-lucide="{{challenge.icon}}"></i>
+                            </div>
+                            <span class="points-badge">
+                                <i data-lucide="coins"></i>
+                                {{challenge.points}} pts
+                            </span>
+                        </div>
+                        <h4 class="challenge-card-title">{{challenge.title}}</h4>
+                        <p class="challenge-desc">{{challenge.desc}}</p>
+                        <button class="btn btn-primary" style="margin-top: 1.25rem; width: 100%; justify-content:center;" ng-if="challenge.type === 'current'">Join Challenge →</button>
+                        <button class="btn btn-outline" style="margin-top: 1.25rem; width: 100%; justify-content:center;" ng-if="challenge.type !== 'current'" disabled>{{challenge.type === 'past' ? 'Completed / Expired' : 'Coming Soon'}}</button>
+                    </div>
+
                 </div>
                 <div ng-if="!vm.filteredChallenges.length" style="padding: 2rem; text-align:center; color: var(--text-muted); width: 100%;">
                     No {{vm.challengeFilter}} challenges found.
@@ -282,36 +348,69 @@
 
         <!-- SECTION 3: ADVISORIES -->
         <div id="advisories" class="community-section" ng-show="vm.activeSection === 'advisories'">
-            <div class="enhanced-card" style="margin-bottom: 1.5rem; background: #ffffff;">
-                <div class="card-icon-header">
-                    <div class="icon-badge warning">
-                        <i data-lucide="megaphone"></i>
-                    </div>
+
+            <!-- Panel -->
+            <div class="adv-panel">
+
+                <!-- Header -->
+                <div class="adv-section-header">
                     <div>
-                        <h3><span class="icon">📢</span> Advisories for {{vm.selectedWard}} Area</h3>
-                        <p style="color:var(--text-muted);">Only the current ward advisories are displayed below</p>
+                        <h2 class="adv-title"><i class="fas fa-exclamation-triangle"></i> Civic Advisories · {{vm.selectedWard}}</h2>
+                    </div>
+                    <div class="adv-live-badge">
+                        <i class="fas fa-circle" style="font-size:0.6rem; vertical-align:middle;"></i> LIVE · DELHI
                     </div>
                 </div>
-            </div>
 
-            <div class="advisory-list" style="margin-top: 1.5rem;">
-                <div class="enhanced-card advisory-card" ng-repeat="advisory in vm.advisories" style="display:flex; gap:1.5rem; align-items:flex-start; background: #ffffff;">
-                    <div class="utility-icon-large" style="background:#fef3c7; color:#d97706; padding:1rem; border-radius:12px;">
-                        <i data-lucide="{{advisory.icon}}" style="width:24px;height:24px;"></i>
-                    </div>
-                    <div style="flex:1;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                            <h4 style="margin:0; font-size:1.1rem;">{{advisory.title}}</h4>
-                            <span style="font-size:0.8rem; background:rgba(217,119,6,0.1); color:#d97706; padding:0.25rem 0.5rem; border-radius:4px; font-weight:bold; text-transform:uppercase;">
-                                {{advisory.priority}}
-                            </span>
+                <!-- Summary chips -->
+                <div class="adv-summary-row">
+                    <span class="adv-chip"><i class="fas fa-bolt" style="color:#fbbf24;"></i> 1 electricity outage active</span>
+                    <span class="adv-chip"><i class="fas fa-tint" style="color:#38bdf8;"></i> Water pressure low in 3 blocks</span>
+                    <span class="adv-chip"><i class="fas fa-solar-panel" style="color:#facc15;"></i> Solar cleaning scheduled</span>
+                    <span class="adv-chip"><i class="fas fa-trash-alt" style="color:#4ade80;"></i> Waste drive starts Monday</span>
+                </div>
+
+                <!-- Active group -->
+                <div class="adv-group-title">
+                    <i class="fas fa-exclamation-circle" style="color:#f87171;"></i> 🚨 Active Issues · Now
+                </div>
+                <div class="adv-cards-grid">
+                    <div class="adv-card adv-{{a.cat}}" ng-class="{'adv-pulse': a.pulse}" ng-repeat="a in vm.activeAdvisories" ng-style="{'animation-delay': ($index * 0.07) + 's'}">
+                        <div class="adv-card-header">
+                            <span class="adv-card-icon">{{a.icon}}</span>
+                            <h3>{{a.title}}</h3>
                         </div>
-                        <p style="color:var(--text-muted); margin-bottom: 0.5rem; font-size: 0.95rem;">{{advisory.desc}}</p>
-                        <span style="font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:0.25rem;">
-                            <i data-lucide="calendar" style="width:14px;height:14px;"></i>
-                            Valid: {{advisory.date}}
-                        </span>
+                        <div class="adv-card-desc">{{a.desc}}</div>
+                        <div class="adv-extra-detail"><i class="fas fa-hard-hat"></i> {{a.detail}}</div>
+                        <div class="adv-card-meta">
+                            <span class="adv-date"><i class="far fa-calendar-alt"></i> {{a.date}}</span>
+                            <span class="adv-status adv-status-{{a.status}}">{{a.statusLabel}}</span>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Upcoming group -->
+                <div class="adv-group-title" style="margin-top:2.5rem;">
+                    <i class="fas fa-calendar-alt" style="color:#a78bfa;"></i> 📅 Upcoming · Scheduled
+                </div>
+                <div class="adv-cards-grid">
+                    <div class="adv-card adv-{{a.cat}}" ng-repeat="a in vm.upcomingAdvisories" ng-style="{'animation-delay': ($index * 0.07 + 0.2) + 's'}">
+                        <div class="adv-card-header">
+                            <span class="adv-card-icon">{{a.icon}}</span>
+                            <h3>{{a.title}}</h3>
+                        </div>
+                        <div class="adv-card-desc">{{a.desc}}</div>
+                        <div class="adv-extra-detail"><i class="fas fa-info-circle"></i> {{a.detail}}</div>
+                        <div class="adv-card-meta">
+                            <span class="adv-date"><i class="far fa-calendar-alt"></i> {{a.date}}</span>
+                            <span class="adv-status adv-status-{{a.status}}">{{a.statusLabel}}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer count -->
+                <div style="margin-top:2rem; text-align:right;">
+                    <span class="adv-count-pill"><i class="far fa-bell"></i> {{vm.activeAdvisories.length}} active &middot; {{vm.upcomingAdvisories.length}} scheduled &mdash; updated today</span>
                 </div>
             </div>
         </div>
@@ -354,9 +453,10 @@
             </div>
         </div>
 
-    </main>
+        </div><!-- /community-content -->
 
-</div>
+    </div><!-- /dashboard-container -->
+</div><!-- /main-content -->
 
 <script>
     if (typeof lucide !== 'undefined') {
@@ -365,3 +465,4 @@
         }, 300);
     }
 </script>
+

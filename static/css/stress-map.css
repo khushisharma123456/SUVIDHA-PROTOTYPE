@@ -1,0 +1,100 @@
+/* ============================================
+   STRESS MAP SPECIFIC STYLES
+   ============================================ */
+
+/* Grid cell styling on map */
+.grid-cell {
+    fill-opacity: 0.8;
+    stroke: white;
+    stroke-width: 2;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.grid-cell:hover {
+    stroke-width: 3;
+    filter: brightness(1.1);
+    fill-opacity: 0.95;
+}
+
+.grid-cell.low-stress {
+    fill: #10B981;
+}
+
+.grid-cell.moderate-stress {
+    fill: #FBBF24;
+}
+
+.grid-cell.high-stress {
+    fill: #F97316;
+}
+
+.grid-cell.critical-stress {
+    fill: #EF4444;
+}
+
+/* Leaflet popup styling */
+.leaflet-popup-content {
+    margin: 0;
+    padding: 0;
+}
+
+.leaflet-popup {
+    opacity: 0;
+    animation: popupAppear 0.3s ease forwards;
+}
+
+@keyframes popupAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Layer transition animations */
+.leaflet-pane svg {
+    transition: opacity 0.4s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #map {
+        height: calc(100vh - 120px);
+    }
+}
+
+/* Button and control animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.toggle-btn {
+    animation: slideIn 0.3s ease;
+}
+
+.toggle-btn:nth-child(2) {
+    animation-delay: 0.05s;
+}
+
+.toggle-btn:nth-child(3) {
+    animation-delay: 0.1s;
+}
+
+.toggle-btn:nth-child(4) {
+    animation-delay: 0.15s;
+}
+
+.toggle-btn:nth-child(5) {
+    animation-delay: 0.2s;
+}

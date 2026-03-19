@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Resource Stress Map - Kailash Colony</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/stress-map.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .stress-map-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 0;
+            height: 100vh;
+            background: white;
+        }
+        
+        .sidebar {
+            background: linear-gradient(135deg, #1D70B8 0%, #0055A4 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sidebar h2 i {
+            font-size: 1.5rem;
+        }
+        
+        .control-section {
+            margin-bottom: 2rem;
+        }
+        
+        .control-section h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+        
+        .layer-toggle {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(4px);
+        }
+        
+        .toggle-btn.active {
+            background: white;
+            color: #1D70B8;
+            border-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .toggle-btn i {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .legend-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .legend-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .opacity-control {
+            margin-bottom: 1.5rem;
+        }
+        
+        .opacity-control label {
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .opacity-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .opacity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .opacity-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #1D70B8;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .tooltip-map {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #1D70B8;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 280px;
+        }
+        
+        .tooltip-map h4 {
+            margin: 0 0 0.75rem;
+            color: #1D70B8;
+            font-size: 1rem;
+        }
+        
+        .tooltip-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .tooltip-metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .metric-value {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .metric-bar {
+            height: 6px;
+            width: 80px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-left: auto;
+        }
+        
+        .metric-bar-fill {
+            height: 100%;
+            background: #1D70B8;
+            transition: width 0.3s ease;
+        }
+        
+        .stress-score {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 2px solid #f0f0f0;
+            font-weight: 700;
+            color: #1D70B8;
+            font-size: 1.1rem;
+        }
+        
+        /* Control buttons on map */
+        .map-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 400;
+        }
+        
+        .control-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.25s ease;
+            font-size: 1.1rem;
+            color: #1D70B8;
+        }
+        
+        .control-btn:hover {
+            background: #1D70B8;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        @media (max-width: 1024px) {
+            .stress-map-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 280px;
+                height: 100vh;
+                z-index: 1000;
+            }
+            
+            .sidebar.open {
+                display: block;
+            }
+            
+            .toggle-menu-btn {
+                position: absolute;
+                top: 1.5rem;
+                left: 1.5rem;
+                z-index: 500;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .tooltip-map {
+                min-width: auto;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <h2><i class="fas fa-layer-group"></i> Layers & Controls</h2>
+            
+            <!-- Legend -->
+            <div class="legend-box">
+                <div class="legend-title">Stress Level</div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #10B981;"></div>
+                    <span>Low (0-25%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #FBBF24;"></div>
+                    <span>Moderate (26-50%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #F97316;"></div>
+                    <span>High (51-75%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #EF4444;"></div>
+                    <span>Critical (76-100%)</span>
+                </div>
+            </div>
+            
+            <!-- Layer Toggles -->
+            <div class="control-section">
+                <h3>Data Layers</h3>
+                <div class="layer-toggle">
+                    <button class="toggle-btn active" data-layer="combined" title="Combined stress score">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Combined Stress</span>
+                    </button>
+                    <button class="toggle-btn active" data-layer="electricity" title="40% weight in combined score">
+                        <i class="fas fa-bolt"></i>
+                        <span>Electricity</span>
+                    </button>
+                    <button class="toggle-btn active" data-layer="water" title="30% weight in combined score">
+                        <i class="fas fa-droplet"></i>
+                        <span>Water</span>
+                    </button>
+                    <button class="toggle-btn active" data-layer="waste" title="20% weight in combined score">
+                        <i class="fas fa-trash"></i>
+                        <span>Waste</span>
+                    </button>
+                    <button class="toggle-btn active" data-layer="solar" title="10% weight in combined score">
+                        <i class="fas fa-sun"></i>
+                        <span>Solar Adoption</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Opacity Control -->
+            <div class="opacity-control">
+                <label for="opacitySlider">Grid Opacity</label>
+                <input type="range" id="opacitySlider" class="opacity-slider" min="0.2" max="1" step="0.1" value="0.8">
+            </div>
+            
+            <!-- Info Section -->
+            <div class="control-section">
+                <h3>About</h3>
+                <p style="font-size: 0.85rem; line-height: 1.5; opacity: 0.9;">
+                    This map visualizes resource stress across Kailash Colony. Hover over grid cells to see detailed metrics.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-map"></i> City Resource Stress Map</h1>
+                <p>Kailash Colony, Delhi • Real-time resource consumption metrics</p>
+            </div>
+            
+            <div class="map-container">
+                <div id="map"></div>
+                <div class="map-controls">
+                    <button class="control-btn" id="zoomInBtn" title="Zoom In">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="control-btn" id="zoomOutBtn" title="Zoom Out">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="control-btn" id="resetBtn" title="Reset View">
+                        <i class="fas fa-home"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../js/stress-map.js"></script>
+</body>
+</html>

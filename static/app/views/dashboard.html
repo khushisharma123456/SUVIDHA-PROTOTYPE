@@ -1,4 +1,4 @@
-<div class="main-content">
+﻿<div class="main-content">
     <div class="dashboard-container">
         <!-- Utility Modal -->
         <div class="utility-modal" ng-show="vm.showUtilityModal">
@@ -79,7 +79,7 @@
                 <div class="modal-header">
                     <h2 class="modal-title">
                         <i data-lucide="file-text"></i>
-                        Complete Rate Plan — {{vm.selectedUtility | uppercase}}
+                        Complete Rate Plan â€” {{vm.selectedUtility | uppercase}}
                     </h2>
                     <button class="modal-close" ng-click="vm.closeRatePlanModal()">
                         <i data-lucide="x"></i>
@@ -149,7 +149,7 @@
                 <div class="modal-header">
                     <div class="modal-header-left">
                         <div class="modal-header-icon"><i data-lucide="sparkles"></i></div>
-                        <h2 class="modal-title">Ask Suvidha Bandhu — {{(vm.bandhuUtility || 'utility') | uppercase}}</h2>
+                        <h2 class="modal-title">Ask Suvidha Bandhu â€” {{(vm.bandhuUtility || 'utility') | uppercase}}</h2>
                     </div>
                     <button class="modal-close" ng-click="vm.closeBandhuDialog()"><i data-lucide="x"></i></button>
                 </div>
@@ -193,7 +193,7 @@
                             <i data-lucide="sparkles"></i>
                         </div>
                         <div>
-                            <h2 class="modal-title">Utility Insights — Ask Suvidha</h2>
+                            <h2 class="modal-title">Utility Insights â€” Ask Suvidha</h2>
                             <p style="font-size:0.8rem; color:#9ca3af; margin:0.25rem 0 0;">Personalized recommendations based on your consumption</p>
                         </div>
                     </div>
@@ -223,22 +223,22 @@
                     <!-- Insights with Images Cards -->
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
                         <div style="background:#f0fdf4; border:1px solid #d1fae5; padding:1rem; border-radius:12px; text-align:center;">
-                            <div style="font-size:2.5rem; margin-bottom:0.5rem;">💡</div>
+                            <div style="font-size:2.5rem; margin-bottom:0.5rem;">ðŸ’¡</div>
                             <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">Energy Saving</h5>
                             <p style="font-size:0.8rem; color:#374151; margin:0;">Use LED bulbs and maintain your appliances regularly to reduce consumption</p>
                         </div>
                         <div style="background:#f0fdf4; border:1px solid #d1fae5; padding:1rem; border-radius:12px; text-align:center;">
-                            <div style="font-size:2.5rem; margin-bottom:0.5rem;">⚡</div>
+                            <div style="font-size:2.5rem; margin-bottom:0.5rem;">âš¡</div>
                             <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">Peak Hours</h5>
                             <p style="font-size:0.8rem; color:#374151; margin:0;">Shift heavy appliance use to off-peak hours for better rates</p>
                         </div>
                         <div style="background:#f0fdf4; border:1px solid #d1fae5; padding:1rem; border-radius:12px; text-align:center;">
-                            <div style="font-size:2.5rem; margin-bottom:0.5rem;">🌡️</div>
+                            <div style="font-size:2.5rem; margin-bottom:0.5rem;">ðŸŒ¡ï¸</div>
                             <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">Temperature</h5>
-                            <p style="font-size:0.8rem; color:#374151; margin:0;">Set AC to 24°C or above for optimal energy efficiency</p>
+                            <p style="font-size:0.8rem; color:#374151; margin:0;">Set AC to 24Â°C or above for optimal energy efficiency</p>
                         </div>
                         <div style="background:#f0fdf4; border:1px solid #d1fae5; padding:1rem; border-radius:12px; text-align:center;">
-                            <div style="font-size:2.5rem; margin-bottom:0.5rem;">🔧</div>
+                            <div style="font-size:2.5rem; margin-bottom:0.5rem;">ðŸ”§</div>
                             <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">Maintenance</h5>
                             <p style="font-size:0.8rem; color:#374151; margin:0;">Regular servicing of equipment prevents energy wastage</p>
                         </div>
@@ -283,9 +283,9 @@
                 <div class="modal-body" style="padding:1.5rem;">
                     <div class="pay-bill-summary">
                         <div class="pay-bill-amount-large">
-                            <span class="currency-sym">₹</span>{{vm.payBillData.amount}}
+                            <span class="currency-sym">â‚¹</span>{{vm.payBillData.amount}}
                         </div>
-                        <p class="pay-bill-period">{{vm.payBillData.label}} — {{vm.payBillData.period}}</p>
+                        <p class="pay-bill-period">{{vm.payBillData.label}} â€” {{vm.payBillData.period}}</p>
                         <p class="pay-bill-due">Due: {{vm.payBillData.dueDate}}</p>
                     </div>
                     <div class="form-group">
@@ -325,15 +325,15 @@
                         <div class="all-notif-item warning" ng-if="vm.userData.consumption.electricity.status === 'pending' || vm.userData.consumption.electricity.status === 'overdue'">
                             <div class="all-notif-icon"><i data-lucide="alert-triangle"></i></div>
                             <div class="all-notif-content">
-                                <p>Electricity bill ₹{{vm.userData.consumption.electricity.current_bill}} {{vm.userData.consumption.electricity.status === 'overdue' ? 'is overdue' : 'due'}} by {{vm.userData.consumption.electricity.due_date}}</p>
-                                <span>Action needed · {{vm.userData.consumption.electricity.status | uppercase}}</span>
+                                <p>Electricity bill â‚¹{{vm.userData.consumption.electricity.current_bill}} {{vm.userData.consumption.electricity.status === 'overdue' ? 'is overdue' : 'due'}} by {{vm.userData.consumption.electricity.due_date}}</p>
+                                <span>Action needed Â· {{vm.userData.consumption.electricity.status | uppercase}}</span>
                             </div>
                         </div>
                         <div class="all-notif-item warning" ng-if="vm.userData.consumption.gas.status === 'pending' || vm.userData.consumption.gas.status === 'overdue'">
                             <div class="all-notif-icon"><i data-lucide="flame"></i></div>
                             <div class="all-notif-content">
-                                <p>Gas bill ₹{{vm.userData.consumption.gas.current_bill}} due by {{vm.userData.consumption.gas.due_date}}</p>
-                                <span>Pay soon · PENDING</span>
+                                <p>Gas bill â‚¹{{vm.userData.consumption.gas.current_bill}} due by {{vm.userData.consumption.gas.due_date}}</p>
+                                <span>Pay soon Â· PENDING</span>
                             </div>
                         </div>
                         <div class="all-notif-item success" ng-if="vm.userData.reports.resolved > 0">
@@ -346,7 +346,7 @@
                         <div class="all-notif-item success" ng-if="vm.userData.consumption.water.status === 'paid'">
                             <div class="all-notif-icon"><i data-lucide="check-circle"></i></div>
                             <div class="all-notif-content">
-                                <p>Water bill ₹{{vm.userData.consumption.water.current_bill}} paid successfully</p>
+                                <p>Water bill â‚¹{{vm.userData.consumption.water.current_bill}} paid successfully</p>
                                 <span>Payment confirmed</span>
                             </div>
                         </div>
@@ -404,8 +404,8 @@
                             <span class="service-ticket-id">#SR-2026-001</span>
                             <span class="badge badge-warning">In Progress</span>
                         </div>
-                        <p class="service-ticket-title">Street light repair — Sector 12</p>
-                        <p class="service-ticket-meta">Filed: 8 Jan 2026 &nbsp;·&nbsp; ETA: 3 days</p>
+                        <p class="service-ticket-title">Street light repair â€” Sector 12</p>
+                        <p class="service-ticket-meta">Filed: 8 Jan 2026 &nbsp;Â·&nbsp; ETA: 3 days</p>
                     </div>
                 </div>
                 <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem;">
@@ -418,20 +418,21 @@
             </div>
         </div>
 
-        <!-- Welcome Header -->
-        <div class="page-header-welcome">
-            <div class="welcome-left">
-                <h1 class="welcome-title">Welcome, {{vm.userData.username || 'Citizen'}}</h1>
+        <!-- Welcome Bar -->
+        <div class="db-welcome-bar">
+            <div>
+                <h1 class="db-welcome-title">Welcome back, {{vm.userData.username || 'Citizen'}} &#128075;</h1>
+                <p class="db-welcome-sub">{{vm.userState || 'Your Ward'}} &middot; Smart City Services</p>
             </div>
-            <div class="welcome-actions">
+            <div class="db-welcome-icons">
                 <button class="header-icon-btn" ng-click="vm.openServiceStatusDialog()" title="Service Requests">
                     <i data-lucide="wrench"></i>
-                    <span class="header-icon-badge" ng-show="(vm.userData.reports.open || 0) + (vm.userData.reports.in_progress || 0) > 0">{{(vm.userData.reports.open || 0) + (vm.userData.reports.in_progress || 0)}}</span>
+                    <span class="header-icon-badge" ng-show="(vm.userData.reports.open||0)+(vm.userData.reports.in_progress||0)>0">{{(vm.userData.reports.open||0)+(vm.userData.reports.in_progress||0)}}</span>
                 </button>
                 <div class="notif-wrapper">
                     <button class="header-icon-btn" ng-click="vm.toggleNotifications()" title="Notifications">
                         <i data-lucide="bell"></i>
-                        <span class="header-icon-badge" ng-show="vm.pendingNotifCount > 0">{{vm.pendingNotifCount}}</span>
+                        <span class="header-icon-badge" ng-show="vm.pendingNotifCount>0">{{vm.pendingNotifCount}}</span>
                     </button>
                     <div class="notif-dropdown" ng-show="vm.showNotifDropdown">
                         <div class="notif-dropdown-header">
@@ -441,31 +442,19 @@
                         <div class="notif-dropdown-list">
                             <div class="notif-item notif-warning" ng-if="vm.userData.consumption.electricity.status === 'pending' || vm.userData.consumption.electricity.status === 'overdue'">
                                 <i data-lucide="alert-triangle"></i>
-                                <div>
-                                    <p>Electricity bill ₹{{vm.userData.consumption.electricity.current_bill}} due {{vm.userData.consumption.electricity.due_date}}</p>
-                                    <span>Action needed</span>
-                                </div>
+                                <div><p>Electricity bill &#8377;{{vm.userData.consumption.electricity.current_bill}} due {{vm.userData.consumption.electricity.due_date}}</p><span>Action needed</span></div>
                             </div>
                             <div class="notif-item notif-warning" ng-if="vm.userData.consumption.gas.status === 'pending' || vm.userData.consumption.gas.status === 'overdue'">
                                 <i data-lucide="flame"></i>
-                                <div>
-                                    <p>Gas bill ₹{{vm.userData.consumption.gas.current_bill}} due {{vm.userData.consumption.gas.due_date}}</p>
-                                    <span>Pay soon</span>
-                                </div>
+                                <div><p>Gas bill &#8377;{{vm.userData.consumption.gas.current_bill}} due {{vm.userData.consumption.gas.due_date}}</p><span>Pay soon</span></div>
                             </div>
                             <div class="notif-item notif-success" ng-if="vm.userData.reports.resolved > 0">
                                 <i data-lucide="check-circle"></i>
-                                <div>
-                                    <p>{{vm.userData.reports.resolved}} service request(s) resolved</p>
-                                    <span>Recently resolved</span>
-                                </div>
+                                <div><p>{{vm.userData.reports.resolved}} service request(s) resolved</p><span>Recently resolved</span></div>
                             </div>
                             <div class="notif-item notif-info">
                                 <i data-lucide="trending-up"></i>
-                                <div>
-                                    <p>Electricity usage: {{vm.userData.consumption.electricity.current}} {{vm.userData.consumption.electricity.unit}}</p>
-                                    <span>This month</span>
-                                </div>
+                                <div><p>Electricity usage: {{vm.userData.consumption.electricity.current}} {{vm.userData.consumption.electricity.unit}}</p><span>This month</span></div>
                             </div>
                         </div>
                         <div class="notif-dropdown-footer">
@@ -476,210 +465,208 @@
             </div>
         </div>
 
-        <!-- Urgent Alert Banner -->
-        <div class="urgent-alert-banner" ng-show="vm.urgentAlert">
-            <i data-lucide="alert-triangle"></i>
-            <div class="urgent-alert-track">
-                <span class="urgent-alert-text">🔴 URGENT: Electricity bill of ₹{{vm.userData.consumption.electricity.current_bill}} is due by {{vm.userData.consumption.electricity.due_date}} &nbsp;·&nbsp; Gas bill ₹{{vm.userData.consumption.gas.current_bill}} due by {{vm.userData.consumption.gas.due_date}} &nbsp;·&nbsp; Pay your bills on time to avoid late fees and service interruption 🔴</span>
+        <!-- SECTION 1: HERO BILL STRIP -->
+        <div class="db-hero-strip">
+            <div class="db-hs-left">
+                <span class="db-hs-icon">&#9888;</span>
+                <div>
+                    <div class="db-hs-total">&#8377;{{vm.getTotalUnpaidBills() || '2,470'}} Total Due</div>
+                    <div class="db-hs-breakdown">
+                        <span>&#9889; &#8377;{{(vm.userData.consumption && vm.userData.consumption.electricity.current_bill) || '1,850'}}</span>
+                        <span class="db-hs-sep">|</span>
+                        <span>&#128167; &#8377;{{(vm.userData.consumption && vm.userData.consumption.water.current_bill) || '340'}}</span>
+                        <span class="db-hs-sep">|</span>
+                        <span>&#128293; &#8377;{{(vm.userData.consumption && vm.userData.consumption.gas.current_bill) || '280'}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="db-hs-right">
+                <div class="db-hs-bills-mini" ng-show="vm.unpaidBills && vm.unpaidBills.length">
+                    <div class="db-hs-bill" ng-repeat="bill in vm.unpaidBills">
+                        <span class="db-hs-bill-label">{{bill.type | uppercase}}</span>
+                        <span class="db-hs-bill-amt">&#8377;{{bill.amount}}</span>
+                        <button class="db-hs-bill-pay-btn" ng-click="vm.payBillIndividually(bill)">Pay</button>
+                    </div>
+                </div>
+                <button class="db-hs-pay-btn" ng-click="vm.payAllBills()">Pay All &#8594;</button>
             </div>
         </div>
 
-        <!-- Unpaid Bills + Monthly Cost Breakdown Row -->
-        <div class="bills-cost-layout">
-            <!-- LEFT: Unpaid Bills -->
-            <div class="unpaid-bills-section-inline">
-                <div class="unpaid-bills-card">
-                    <div class="unpaid-bills-header">
-                        <i data-lucide="file-text" style="width:16px; height:16px;"></i>
-                        Unpaid Bills
-                    </div>
-                    <div class="unpaid-bills-list">
-                        <div class="unpaid-bill-item" ng-repeat="bill in vm.unpaidBills">
-                            <div class="bill-info">
-                                <div class="bill-utility">
-                                    <i ng-if="bill.type === 'electricity'" data-lucide="zap" style="width:14px; height:14px;"></i>
-                                    <i ng-if="bill.type === 'water'" data-lucide="droplet" style="width:14px; height:14px;"></i>
-                                    <i ng-if="bill.type === 'gas'" data-lucide="flame" style="width:14px; height:14px;"></i>
-                                    {{bill.type | uppercase}}
-                                </div>
-                                <div class="bill-period">{{bill.period}}</div>
-                            </div>
-                            <div class="bill-amount">₹{{bill.amount}}</div>
-                            <button class="btn-individual-pay" ng-click="vm.payBillIndividually(bill)" title="Pay this bill">
-                                <i data-lucide="credit-card" style="width:14px; height:14px;"></i>
-                            </button>
-                            <button class="btn-download" ng-click="vm.downloadBill(bill)" title="Download Bill">
-                                <i data-lucide="download" style="width:14px; height:14px;"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="unpaid-bills-total">
-                        <span>Total Outstanding:</span>
-                        <strong>₹{{vm.getTotalUnpaidBills()}}</strong>
-                    </div>
-                    <div class="unpaid-bills-actions">
-                        <button class="btn-primary" ng-click="vm.payAllBills()" style="width: 100%;">
-                            <i data-lucide="check-circle" style="width:14px; height:14px;"></i>
-                            Pay All Bills
-                        </button>
-                    </div>
+        <!-- SECTION 2: QUICK ACTIONS -->
+        <div class="db-quick-row">
+            <a href="#!/wallet" class="db-qa-card">
+                <div class="db-qa-icon">&#128179;</div>
+                <div class="db-qa-label">Pay Bills</div>
+            </a>
+            <a href="#!/insights" class="db-qa-card">
+                <div class="db-qa-icon">&#128202;</div>
+                <div class="db-qa-label">View Usage</div>
+            </a>
+            <a href="#!/services" class="db-qa-card">
+                <div class="db-qa-icon">&#128295;</div>
+                <div class="db-qa-label">Raise Request</div>
+            </a>
+            <button class="db-qa-card db-qa-btn" ng-click="vm.openBandhuDialog()">
+                <div class="db-qa-icon">&#129302;</div>
+                <div class="db-qa-label">Ask Assistant</div>
+            </button>
+        </div>
+
+        <!-- SECTION 3: UTILITY HEALTH DNA HELIX -->
+        <div class="db-dna-section">
+            <div class="db-dna-sec-left">
+                <div class="db-dna-sec-title">Utility Health</div>
+                <div class="db-dna-sec-score">
+                    <span class="db-dna-big-score">{{vm.healthScore || 82}}</span>
+                    <span class="db-dna-big-denom">/100</span>
+                </div>
+                <div class="db-dna-grade-chip">&#127942; Good Standing</div>
+                <div class="db-dna-util-pills">
+                    <div class="db-dna-pill db-dna-pill-elec" ng-click="vm.openModal('electricity')" style="cursor:pointer;">&#9889; Elec &nbsp;<strong>82</strong> <span style="color:#f59e0b;">Good</span></div>
+                    <div class="db-dna-pill db-dna-pill-water" ng-click="vm.openModal('water')" style="cursor:pointer;">&#128167; Water &nbsp;<strong>85</strong> <span style="color:#ef4444;">High</span></div>
+                    <div class="db-dna-pill db-dna-pill-gas" ng-click="vm.openModal('gas')" style="cursor:pointer;">&#128293; Gas &nbsp;<strong>68</strong> <span style="color:#10b981;">Normal</span></div>
+                </div>
+                <div class="db-dna-mom">
+                    <span class="db-mom db-mom-up">&#9889; +12%</span>
+                    <span class="db-mom db-mom-down">&#128167; -5%</span>
+                    <span class="db-mom db-mom-up">&#128293; +3%</span>
+                    <span class="db-mom-lbl">vs last month</span>
                 </div>
             </div>
-
-            <!-- RIGHT: Monthly Cost Breakdown with Percentages -->
-            <div class="monthly-cost-section">
-                <div class="cost-breakdown-header-small">
-                    <i data-lucide="bar-chart-2" style="width:16px; height:16px;"></i>
-                    Monthly Avg Cost
-                </div>
-                <div class="cost-breakdown-list-compact">
-                    <div class="cost-item-compact">
-                        <div class="cost-item-left">
-                            <i data-lucide="zap" class="cost-icon cost-icon-electricity" style="width:16px; height:16px;"></i>
-                            <div class="cost-details-compact">
-                                <span class="cost-label">Electricity</span>
-                                <span class="cost-amount">₹1850</span>
-                            </div>
-                        </div>
-                        <span class="cost-percentage">74%</span>
-                    </div>
-                    <div class="cost-item-compact">
-                        <div class="cost-item-left">
-                            <i data-lucide="droplet" class="cost-icon cost-icon-water" style="width:16px; height:16px;"></i>
-                            <div class="cost-details-compact">
-                                <span class="cost-label">Water</span>
-                                <span class="cost-amount">₹340</span>
-                            </div>
-                        </div>
-                        <span class="cost-percentage">14%</span>
-                    </div>
-                    <div class="cost-item-compact">
-                        <div class="cost-item-left">
-                            <i data-lucide="flame" class="cost-icon cost-icon-gas" style="width:16px; height:16px;"></i>
-                            <div class="cost-details-compact">
-                                <span class="cost-label">Gas</span>
-                                <span class="cost-amount">₹280</span>
-                            </div>
-                        </div>
-                        <span class="cost-percentage">12%</span>
+            <div class="db-dna-sec-canvas">
+                <div class="dna-container" id="dna-container" style="position:relative; width:100%; height:100%;">
+                    <canvas id="dna-canvas" style="display:block; width:100%; height:100%;"></canvas>
+                    <div class="dna-tooltip" id="dna-tooltip" style="position:fixed; z-index:2000; display:none; pointer-events:none;">
+                        <div class="tooltip-header"><i class="tooltip-icon"></i><span class="tooltip-title"></span></div>
+                        <div class="tooltip-content"></div>
                     </div>
                 </div>
-                <div class="cost-total-compact">
-                    <span class="total-label">Total Monthly</span>
-                    <span class="total-amount">₹2470</span>
+                <div class="db-dna-legend" style="margin-top:0.6rem;">
+                    <div class="dna-legend-item db-legend-elec" data-utility="electricity">&#9889; Electricity</div>
+                    <div class="dna-legend-item db-legend-water" data-utility="water">&#128167; Water</div>
+                    <div class="dna-legend-item db-legend-gas" data-utility="gas">&#128293; Gas</div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 2-COLUMN DASHBOARD LAYOUT ===== -->
-        <!-- FULL WIDTH DNA + UTILITIES SECTION -->
-        <div class="dna-full-section">
-            <!-- Health Score Header -->
-            <div class="dna-header-top">
-                <div class="health-score-header-inline">
-                    <span class="health-label">Utility Health</span>
-                    <div class="health-score-inline">
-                        <span class="health-number">{{vm.healthScore || 82}}</span>
-                        <span class="health-divider">/</span>
-                        <span class="health-max">100</span>
+        <!-- SECTION 4: CONSUMPTION CHART (full width) -->
+        <div class="db-panels-row db-panels-row-single">
+
+            <!-- LEFT: Health Score + Utility Status -->
+            <div class="db-panel db-health-panel">
+                <div class="db-panel-title">
+                    Utility Health Score
+                    <span class="db-panel-badge">Updated today</span>
+                </div>
+                <div class="db-gauge-center">
+                    <div class="db-gauge-wrap">
+                        <svg viewBox="0 0 120 120" class="db-gauge-svg">
+                            <circle cx="60" cy="60" r="50" class="db-gauge-bg"></circle>
+                            <circle cx="60" cy="60" r="50" class="db-gauge-fill"
+                                ng-attr-style="stroke-dasharray:314; stroke-dashoffset:{{314 - (314 * ((vm.healthScore||82) / 100))}}"></circle>
+                        </svg>
+                        <div class="db-gauge-inner">
+                            <div class="db-gauge-score">{{vm.healthScore || 82}}</div>
+                            <div class="db-gauge-denom">/100</div>
+                            <div class="db-gauge-grade">Good</div>
+                        </div>
                     </div>
+                </div>
+                <div class="db-util-strip">
+                    <div class="db-util-chip db-chip-elec" ng-click="vm.openModal('electricity')" style="cursor:pointer;">
+                        <span class="db-chip-emoji">&#9889;</span>
+                        <div class="db-chip-body">
+                            <div class="db-chip-name">Electricity</div>
+                            <div class="db-chip-status" style="color:#f59e0b;">Good</div>
+                        </div>
+                        <div class="db-chip-score">82</div>
+                    </div>
+                    <div class="db-util-chip db-chip-water" ng-click="vm.openModal('water')" style="cursor:pointer;">
+                        <span class="db-chip-emoji">&#128167;</span>
+                        <div class="db-chip-body">
+                            <div class="db-chip-name">Water</div>
+                            <div class="db-chip-status" style="color:#ef4444;">High</div>
+                        </div>
+                        <div class="db-chip-score">85</div>
+                    </div>
+                    <div class="db-util-chip db-chip-gas" ng-click="vm.openModal('gas')" style="cursor:pointer;">
+                        <span class="db-chip-emoji">&#128293;</span>
+                        <div class="db-chip-body">
+                            <div class="db-chip-name">Gas</div>
+                            <div class="db-chip-status" style="color:#10b981;">Normal</div>
+                        </div>
+                        <div class="db-chip-score">68</div>
+                    </div>
+                </div>
+                <div class="db-mom-strip">
+                    <span class="db-mom db-mom-up">&#9889; +12%</span>
+                    <span class="db-mom db-mom-down">&#128167; -5%</span>
+                    <span class="db-mom db-mom-up">&#128293; +3%</span>
+                    <span class="db-mom-lbl">vs last month</span>
                 </div>
             </div>
 
-            <!-- DNA + Comparison Grid -->
-            <div class="dna-with-comparison-grid">
-                <!-- DNA Helix (Left/Main) -->
-                <div class="dna-helix-full" ng-click="vm.openModal(vm.selectedUtility || 'electricity')" style="cursor: pointer;">
-                    <div class="dna-container" id="dna-container">
-                        <canvas id="dna-canvas"></canvas>
-
-                        <!-- Tooltip for strand info -->
-                        <div class="dna-tooltip" id="dna-tooltip">
-                            <div class="tooltip-header">
-                                <i class="tooltip-icon"></i>
-                                <span class="tooltip-title"></span>
-                            </div>
-                            <div class="tooltip-content"></div>
-                        </div>
+            <!-- RIGHT: Consumption Chart (chart panel) -->
+            <div class="db-panel db-chart-panel">
+                <div class="db-chart-top">
+                    <div class="db-utility-tabs">
+                        <button class="db-utab" ng-class="{active: vm.selectedUtility==='electricity'}" ng-click="vm.switchUtility('electricity')">&#9889; Electricity</button>
+                        <button class="db-utab" ng-class="{active: vm.selectedUtility==='water'}" ng-click="vm.switchUtility('water')">&#128167; Water</button>
+                        <button class="db-utab" ng-class="{active: vm.selectedUtility==='gas'}" ng-click="vm.switchUtility('gas')">&#128293; Gas</button>
+                    </div>
+                    <select class="db-period-sel" ng-model="vm.selectedPeriod" ng-change="vm.onPeriodChange()">
+                        <option value="3months">3 Months</option>
+                        <option value="6months">6 Months</option>
+                        <option value="1year">12 Months</option>
+                    </select>
+                </div>
+                <div class="db-chart-canvas">
+                    <canvas id="utilityConsumptionChart"></canvas>
+                </div>
+                <div class="db-chart-stats">
+                    <div class="db-cs">
+                        <div class="db-cs-val">{{vm.utilityStats.peakMonth}}</div>
+                        <div class="db-cs-lbl">Peak</div>
+                    </div>
+                    <div class="db-cs">
+                        <div class="db-cs-val">{{vm.utilityStats.lowestMonth}}</div>
+                        <div class="db-cs-lbl">Lowest</div>
+                    </div>
+                    <div class="db-cs" ng-class="vm.utilityStats.trendClass">
+                        <div class="db-cs-val">{{vm.utilityStats.trendText}}</div>
+                        <div class="db-cs-lbl">Change</div>
+                    </div>
+                    <div class="db-cs">
+                        <div class="db-cs-val">{{vm.utilityStats.average}} {{vm.utilityStats.unit}}</div>
+                        <div class="db-cs-lbl">Monthly Avg</div>
                     </div>
                 </div>
-
-                <!-- Comparison Widget on Right -->
-                <div class="dna-comparison-right">
-                    <div class="comparison-card">
-                        <div class="comparison-card-header">
-                            <i data-lucide="arrow-up-down" style="width:16px; height:16px;"></i>
-                            This Month vs Last
-                        </div>
-                        <div class="comparison-items">
-                            <div class="comparison-item">
-                                <div class="comparison-item-name">
-                                    <i data-lucide="zap" style="width:16px; height:16px;"></i>
-                                    Electricity
-                                </div>
-                                <div class="comparison-item-change comparison-increase">
-                                    <i data-lucide="arrow-up" style="width:14px; height:14px;"></i>
-                                    +12%
-                                </div>
-                            </div>
-                            <div class="comparison-item">
-                                <div class="comparison-item-name">
-                                    <i data-lucide="droplet" style="width:16px; height:16px;"></i>
-                                    Water
-                                </div>
-                                <div class="comparison-item-change comparison-decrease">
-                                    <i data-lucide="arrow-down" style="width:14px; height:14px;"></i>
-                                    -5%
-                                </div>
-                            </div>
-                            <div class="comparison-item">
-                                <div class="comparison-item-name">
-                                    <i data-lucide="flame" style="width:16px; height:16px;"></i>
-                                    Gas
-                                </div>
-                                <div class="comparison-item-change comparison-increase">
-                                    <i data-lucide="arrow-up" style="width:14px; height:14px;"></i>
-                                    +3%
-                                </div>
-                            </div>
-                        </div>
+                <div class="db-slab-bar" ng-repeat="slab in vm.ratePlanData[vm.selectedUtility].slabs" ng-if="slab.highlight">
+                    <div class="db-slab-left">
+                        <span class="db-slab-tag">Your Slab</span>
+                        <span class="db-slab-range">{{slab.range}}</span>
+                        <span class="db-slab-rate">{{slab.rate}}</span>
                     </div>
+                    <button class="db-slab-more" ng-click="vm.viewRatePlanDetails()">Full Plan &#8594;</button>
                 </div>
-            </div>
-
-            <!-- Utilities Row Below DNA -->
-            <div class="utilities-row-below">
-                <div class="utility-status-card" ng-click="vm.openModal('electricity')" style="cursor: pointer;">
-                    <div class="utility-service-icon">⚡</div>
-                    <div class="utility-service-name">Electricity</div>
-                    <div class="utility-service-status efficient">Efficient</div>
-                    <div class="utility-service-number">82</div>
-                </div>
-                <div class="utility-status-card" ng-click="vm.openModal('gas')" style="cursor: pointer;">
-                    <div class="utility-service-icon">🔥</div>
-                    <div class="utility-service-name">Gas</div>
-                    <div class="utility-service-status normal">Normal</div>
-                    <div class="utility-service-number">68</div>
-                </div>
-                <div class="utility-status-card" ng-click="vm.openModal('water')" style="cursor: pointer;">
-                    <div class="utility-service-icon">💧</div>
-                    <div class="utility-service-name">Water</div>
-                    <div class="utility-service-status high">High</div>
-                    <div class="utility-service-number">85</div>
+                <div class="db-chart-footer">
+                    <button class="db-ask-suvidha" ng-click="vm.openSuvidhaInsights()">
+                        <i data-lucide="sparkles" style="width:13px;height:13px;"></i> Ask Suvidha
+                    </button>
+                    <span class="db-datasrc">{{vm.utilityStats.dataSource}}</span>
                 </div>
             </div>
         </div>
 
-        <!-- ===== GOVERNMENT SCHEMES CAROUSEL ===== -->
+        <!-- SECTION 5: GOVERNMENT SCHEMES -->
         <section class="government-schemes-section">
             <div class="schemes-header">
                 <h2 class="schemes-title">
-                    <span class="schemes-icon">🏛️</span>
-                    Latest Government Schemes & Subsidies
+                    <span class="schemes-icon">&#127963;</span>
+                    Latest Government Schemes &amp; Subsidies
                 </h2>
                 <p class="schemes-subtitle">For {{vm.userState || 'Your State'}} - Tap to explore benefits</p>
             </div>
-
             <div class="schemes-carousel-container">
                 <div class="schemes-carousel-track">
                     <div class="scheme-card" ng-repeat="scheme in vm.governmentSchemes" ng-click="vm.openSchemeLink(scheme)">
@@ -689,340 +676,92 @@
                             <p class="scheme-description">{{scheme.description}}</p>
                             <span class="scheme-benefit">Subsidy: {{scheme.subsidy}}</span>
                         </div>
-                        <div class="scheme-arrow">
-                            <i data-lucide="arrow-right"></i>
-                        </div>
+                        <div class="scheme-arrow"><i data-lucide="arrow-right"></i></div>
                     </div>
                 </div>
             </div>
-
             <div class="carousel-dots">
-                <span class="dot" ng-repeat="scheme in vm.governmentSchemes" 
+                <span class="dot" ng-repeat="scheme in vm.governmentSchemes"
                     ng-class="{'active': $index === vm.currentSchemeIndex}"
                     ng-click="vm.setCurrentScheme($index)"></span>
             </div>
         </section>
 
-        <div class="dashboard-main-layout">
-            <!-- LEFT COLUMN (70%) -->
-            <div class="dashboard-left-column">
+        <!-- SECTION 6 + 7: IMPACT + SERVICES (combined bottom row) -->
+        <div class="db-bottom-row">
 
-                <!-- ===== UTILITY CONSUMPTION & RATE PLAN SECTION ===== -->
-                <section class="dashboard-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="icon">⚡</span>
-                    Utility Consumption & Rate Plan
-                </h2>
-                <button class="btn-suvidha-insights" ng-click="vm.openSuvidhaInsights()">
-                    <i data-lucide="sparkles"></i>
-                    Ask Suvidha
-                </button>
-            </div>
-
-            <!-- Utility Selector + Period Filter Row -->
-            <div class="utility-dashboard-controls" style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-bottom:1.25rem; align-items:center;">
-                <div class="tabs-container enhanced" style="flex:1; min-width:280px; margin:0;">
-                    <div class="tabs">
-                        <button class="tab-btn utility-tab" ng-class="{active: vm.selectedUtility === 'electricity'}"
-                            ng-click="vm.switchUtility('electricity')">
-                            <i data-lucide="zap"></i>
-                            <span class="tab-label">Electricity</span>
-                        </button>
-                        <button class="tab-btn utility-tab" ng-class="{active: vm.selectedUtility === 'gas'}"
-                            ng-click="vm.switchUtility('gas')">
-                            <i data-lucide="flame"></i>
-                            <span class="tab-label">Gas</span>
-                        </button>
-                        <button class="tab-btn utility-tab" ng-class="{active: vm.selectedUtility === 'water'}"
-                            ng-click="vm.switchUtility('water')">
-                            <i data-lucide="droplet"></i>
-                            <span class="tab-label">Water</span>
-                        </button>
-                    </div>
+            <!-- Environmental Impact -->
+            <div class="db-impact-box">
+                <div class="db-box-title">&#127807; Your Environmental Impact</div>
+                <div class="db-impact-hero">
+                    <div class="db-impact-big">{{vm.electricitySaved || 1250}}</div>
+                    <div class="db-impact-unit">kWh Saved</div>
                 </div>
-                <div class="period-filter-group" style="display:flex; align-items:center; gap:0.5rem;">
-                    <label style="font-size:0.82rem; font-weight:500; color:#6b7280; white-space:nowrap;">
-                        <i data-lucide="calendar-range" style="width:14px; height:14px; display:inline; vertical-align:middle;"></i>
-                        Period:
-                    </label>
-                    <select class="form-control enhanced" ng-model="vm.selectedPeriod" ng-change="vm.onPeriodChange()" style="min-width:140px;">
-                        <option value="3months">Last 3 Months</option>
-                        <option value="6months">Last 6 Months</option>
-                        <option value="1year">Last 12 Months</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Utility Stats Cards (change with selected utility) -->
-            <div class="stats-grid" style="margin-bottom:1.25rem;">
-                <div class="stat-card primary">
-                    <div class="stat-icon-box blue">📊</div>
-                    <div class="stat-content">
-                        <span class="stat-value">{{vm.utilityStats.consumption}} {{vm.utilityStats.unit}}</span>
-                        <span class="stat-label">Total Consumption</span>
+                <div class="db-impact-eq">= Equivalent to planting 10 trees &#127795;</div>
+                <div class="db-impact-grid">
+                    <div class="db-istat">
+                        <div class="db-istat-icon">&#128167;</div>
+                        <div class="db-istat-val">{{vm.waterSaved || 3680}}</div>
+                        <div class="db-istat-lbl">kL Water</div>
                     </div>
-                </div>
-                <div class="stat-card warning">
-                    <div class="stat-icon-box orange">⚠️</div>
-                    <div class="stat-content">
-                        <span class="stat-value">{{vm.utilityStats.pendingBills}}</span>
-                        <span class="stat-label">Pending Bills</span>
+                    <div class="db-istat">
+                        <div class="db-istat-icon">&#128293;</div>
+                        <div class="db-istat-val">{{vm.gasSaved || 285}}</div>
+                        <div class="db-istat-lbl">SCM Gas</div>
                     </div>
-                    <div class="stat-trend down" ng-if="vm.utilityStats.pendingBills > 0">
-                        <span>Pay soon</span>
+                    <div class="db-istat">
+                        <div class="db-istat-icon">&#11088;</div>
+                        <div class="db-istat-val">{{vm.totalPoints || 2450}}</div>
+                        <div class="db-istat-lbl">Pts Earned</div>
+                    </div>
+                    <div class="db-istat">
+                        <div class="db-istat-icon">&#127981;</div>
+                        <div class="db-istat-val">{{vm.carbonReduction || 520}}</div>
+                        <div class="db-istat-lbl">kg CO2</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Chart + Rate Plan two-column grid -->
-            <div class="content-grid two-column enhanced">
-                <!-- Consumption Chart -->
-                <div class="card chart-card enhanced">
-                    <div class="card-header">
-                        <div class="header-left">
-                            <i data-lucide="bar-chart-2" class="header-icon"></i>
-                            <div>
-                                <h3><span class="icon">📊</span> Monthly Consumption</h3>
-                                <p class="card-subtitle">{{vm.utilityStats.chartSubtitle}}</p>
-                            </div>
+            <!-- Services -->
+            <div class="db-services-box">
+                <div class="db-box-title">&#128295; Utility Services</div>
+                <div class="db-svc-list">
+                    <div class="db-svc-item db-svc-elec">
+                        <div class="db-svc-icon">&#9889;</div>
+                        <div class="db-svc-info">
+                            <div class="db-svc-name">Electricity Board</div>
+                            <div class="db-svc-prov">State Electricity Board &middot; Domestic</div>
                         </div>
-                        <div class="header-right">
-                            <span class="badge success">AVG: {{vm.utilityStats.average}} {{vm.utilityStats.unit}}</span>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="utilityConsumptionChart"></canvas>
-                    </div>
-                    <div class="chart-insights">
-                        <div class="insight-item">
-                            <span class="insight-label">Peak:</span>
-                            <span class="insight-value">{{vm.utilityStats.peakMonth}}</span>
-                        </div>
-                        <div class="insight-item">
-                            <span class="insight-label">Lowest:</span>
-                            <span class="insight-value">{{vm.utilityStats.lowestMonth}}</span>
-                        </div>
-                        <div class="insight-item">
-                            <span class="insight-label">Change:</span>
-                            <span class="insight-value" ng-class="vm.utilityStats.trendClass">{{vm.utilityStats.trendText}}</span>
+                        <div class="db-svc-right">
+                            <span class="db-svc-badge">Active</span>
+                            <a href="#!/records" class="db-svc-btn">View &#8594;</a>
                         </div>
                     </div>
-                    <div class="card-footer">
-                        <i data-lucide="info"></i>
-                        <p class="source-note">{{vm.utilityStats.dataSource}}</p>
+                    <div class="db-svc-item db-svc-water">
+                        <div class="db-svc-icon">&#128167;</div>
+                        <div class="db-svc-info">
+                            <div class="db-svc-name">Water Board</div>
+                            <div class="db-svc-prov">Municipal Water Works &middot; Metered</div>
+                        </div>
+                        <div class="db-svc-right">
+                            <span class="db-svc-badge">Active</span>
+                            <a href="#!/records" class="db-svc-btn">View &#8594;</a>
+                        </div>
+                    </div>
+                    <div class="db-svc-item db-svc-gas">
+                        <div class="db-svc-icon">&#128293;</div>
+                        <div class="db-svc-info">
+                            <div class="db-svc-name">Gas Services</div>
+                            <div class="db-svc-prov">City Gas Distribution &middot; PNG Domestic</div>
+                        </div>
+                        <div class="db-svc-right">
+                            <span class="db-svc-badge">Active</span>
+                            <a href="#!/records" class="db-svc-btn">View &#8594;</a>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Current Rate Plan -->
-                <div class="card info-card enhanced">
-                    <div class="card-header">
-                        <i data-lucide="layers" class="header-icon"></i>
-                        <h3><span class="icon">💳</span> Current Rate Plan</h3>
-                    </div>
-                    <div class="provider-info">
-                        <div class="provider-logo">
-                            <i data-lucide="building"></i>
-                        </div>
-                        <div class="provider-details">
-                            <h4>{{vm.ratePlanData[vm.selectedUtility].provider}}</h4>
-                            <p>Last updated: {{vm.ratePlanData[vm.selectedUtility].lastUpdated}}</p>
-                        </div>
-                    </div>
-                    <div class="tariff-slabs rate-plan-slabs">
-                        <div class="slab-item" ng-repeat="slab in vm.ratePlanData[vm.selectedUtility].slabs"
-                            ng-class="{'active': slab.highlight}">
-                            <div class="slab-header">
-                                <span class="slab-title">{{slab.range}}</span>
-                                <span class="slab-badge current" ng-if="slab.highlight">Your Current</span>
-                                <span class="slab-badge subsidy" ng-if="!slab.highlight && slab.type === 'Subsidized'">Subsidized</span>
-                            </div>
-                            <div class="slab-rate">{{slab.rate}}</div>
-                        </div>
-                    </div>
-                    <div class="info-alert enhanced">
-                        <i data-lucide="info"></i>
-                        <p>{{vm.utilityStats.ratePlanTip}}</p>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-secondary full-width" ng-click="vm.viewRatePlanDetails()">
-                            <i data-lucide="file-text"></i>
-                            View Complete Rate Plan
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-            </div>
         </div>
 
-        <!-- Sustainability & Resources Section -->
-        <section class="dashboard-section sustainability-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="icon">🌱</span>
-                    Your Environmental Contribution
-                </h2>
-                <p class="section-subtitle">Track your resource savings and community impact</p>
-            </div>
-
-            <div class="sustainability-grid">
-                <!-- Total Points Card -->
-                <div class="contribution-card points-card">
-                    <div class="contribution-icon">⭐</div>
-                    <div class="contribution-value">{{vm.totalPoints || 2450}}</div>
-                    <div class="contribution-label">Total Points Earned</div>
-                    <div class="contribution-meta">Since you joined</div>
-                </div>
-
-                <!-- Electricity Saved -->
-                <div class="contribution-card electricity-card">
-                    <div class="contribution-icon">⚡</div>
-                    <div class="contribution-value">{{vm.electricitySaved || 1250}}</div>
-                    <div class="contribution-label">kWh Saved</div>
-                    <div class="contribution-resource">= {{vm.coalSaved || 425}} kg Coal Saved</div>
-                </div>
-
-                <!-- Water Saved -->
-                <div class="contribution-card water-card">
-                    <div class="contribution-icon">💧</div>
-                    <div class="contribution-value">{{vm.waterSaved || 3680}}</div>
-                    <div class="contribution-label">kL Water Saved</div>
-                    <div class="contribution-resource">= {{vm.waterProjection || 3.2}} years of water</div>
-                </div>
-
-                <!-- Gas Saved -->
-                <div class="contribution-card gas-card">
-                    <div class="contribution-icon">🔥</div>
-                    <div class="contribution-value">{{vm.gasSaved || 285}}</div>
-                    <div class="contribution-label">SCM Gas Saved</div>
-                    <div class="contribution-resource">= {{vm.carbonReduction || 520}} kg CO₂ Reduced</div>
-                </div>
-            </div>
-        </section>
-
-
-
-            <div class="vendor-grid">
-                <!-- Electricity Vendor -->
-                <div class="vendor-card vendor-electricity">
-                    <div class="vendor-header">
-                        <div class="vendor-icon">
-                            <i data-lucide="zap"></i>
-                        </div>
-                        <div class="vendor-title-group">
-                            <h3>Electricity Board</h3>
-                            <span class="vendor-badge">Active</span>
-                        </div>
-                    </div>
-                    <div class="vendor-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Service Provider:</span>
-                            <span class="detail-value">State Electricity Board</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Customer ID:</span>
-                            <span class="detail-value">{{vm.userData.username || 'Not assigned'}}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Connection Type:</span>
-                            <span class="detail-value">Domestic</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Contact:</span>
-                            <span class="detail-value">1800-XXX-XXXX</span>
-                        </div>
-                    </div>
-                    <div class="vendor-actions">
-                        <a href="#!/records" class="btn-outline-small">
-                            <i data-lucide="external-link"></i>
-                            View Records
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Water Vendor -->
-                <div class="vendor-card vendor-water">
-                    <div class="vendor-header">
-                        <div class="vendor-icon">
-                            <i data-lucide="droplet"></i>
-                        </div>
-                        <div class="vendor-title-group">
-                            <h3>Water Board</h3>
-                            <span class="vendor-badge">Active</span>
-                        </div>
-                    </div>
-                    <div class="vendor-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Service Provider:</span>
-                            <span class="detail-value">Municipal Water Works</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Customer ID:</span>
-                            <span class="detail-value">{{vm.userData.username || 'Not assigned'}}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Connection Type:</span>
-                            <span class="detail-value">Metered</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Contact:</span>
-                            <span class="detail-value">1800-XXX-YYYY</span>
-                        </div>
-                    </div>
-                    <div class="vendor-actions">
-                        <a href="#!/records" class="btn-outline-small">
-                            <i data-lucide="external-link"></i>
-                            View Records
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Gas Vendor -->
-                <div class="vendor-card vendor-gas">
-                    <div class="vendor-header">
-                        <div class="vendor-icon">
-                            <i data-lucide="flame"></i>
-                        </div>
-                        <div class="vendor-title-group">
-                            <h3>Gas Services</h3>
-                            <span class="vendor-badge">Active</span>
-                        </div>
-                    </div>
-                    <div class="vendor-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Service Provider:</span>
-                            <span class="detail-value">City Gas Distribution</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Customer ID:</span>
-                            <span class="detail-value">{{vm.userData.username || 'Not assigned'}}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Connection Type:</span>
-                            <span class="detail-value">PNG Domestic</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Contact:</span>
-                            <span class="detail-value">1800-XXX-ZZZZ</span>
-                        </div>
-                    </div>
-                    <div class="vendor-actions">
-                        <a href="#!/records" class="btn-outline-small">
-                            <i data-lucide="external-link"></i>
-                            View Records
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </div>
-
-    <script>
-        // Initialize Lucide icons
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-    </script>
-</div> <!-- /.main-content -->

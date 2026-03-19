@@ -1,49 +1,78 @@
 <div class="main-content">
+    <div class="dashboard-container">
 
-    <!-- Profile Hero Header -->
-    <div class="profile-hero">
-        <div class="profile-avatar-container">
-            <img ng-if="vm.user.profilePicture" src="{{vm.user.profilePicture}}" alt="{{vm.user.fullName}}" class="profile-avatar-image">
-            <div ng-if="!vm.user.profilePicture" class="profile-avatar-initials">
-                {{vm.user.fullName.charAt(0).toUpperCase()}}
+        <!-- HERO STRIP -->
+        <div class="pf-hero-strip">
+            <div class="pf-hero-avatar-col">
+                <div class="pf-avatar-wrap">
+                    <img ng-if="vm.user.profilePicture" src="{{vm.user.profilePicture}}" alt="{{vm.user.fullName}}" class="pf-avatar-img">
+                    <div ng-if="!vm.user.profilePicture" class="pf-avatar-initials">
+                        {{vm.user.fullName.charAt(0).toUpperCase()}}
+                    </div>
+                    <label for="profilePhotoUpload" class="pf-avatar-cam" title="Upload profile picture">
+                        <i data-lucide="camera"></i>
+                    </label>
+                    <input type="file" id="profilePhotoUpload" accept="image/*" ng-change="vm.uploadProfilePicture()" style="display:none;">
+                </div>
             </div>
-            <label for="profilePhotoUpload" class="profile-avatar-upload-btn" title="Upload profile picture">
-                <i data-lucide="camera"></i>
-            </label>
-            <input type="file" id="profilePhotoUpload" accept="image/*" ng-change="vm.uploadProfilePicture()" class="profile-photo-input" style="display: none;">
+            <div class="pf-hero-left">
+                <div class="pf-hero-eyebrow">&#128100; My Profile</div>
+                <div class="pf-hero-name">{{vm.user.fullName || 'Citizen'}}</div>
+                <div class="pf-hero-sub">{{vm.user.email || 'No email on file'}} &nbsp;&#8226;&nbsp; &#128205; Ward {{vm.user.ward || 'N/A'}}</div>
+            </div>
+            <div class="pf-hero-stats">
+                <div class="pf-hero-stat">
+                    <div class="pf-hero-stat-val">{{vm.connections.length || 3}}</div>
+                    <div class="pf-hero-stat-lbl">Connections</div>
+                </div>
+                <div class="pf-hero-stat-div"></div>
+                <div class="pf-hero-stat">
+                    <div class="pf-hero-stat-val pf-stat-green">Active</div>
+                    <div class="pf-hero-stat-lbl">Account Status</div>
+                </div>
+                <div class="pf-hero-stat-div"></div>
+                <div class="pf-hero-stat">
+                    <div class="pf-hero-stat-val">{{vm.user.ward || '—'}}</div>
+                    <div class="pf-hero-stat-lbl">Ward</div>
+                </div>
+            </div>
         </div>
-        <div class="profile-hero-info">
-            <h2>{{vm.user.fullName || 'Citizen'}}</h2>
-            <p>{{vm.user.email || 'No email on file'}}</p>
-            <span class="profile-hero-badge" ng-if="vm.user.ward">
-                📍 Ward {{vm.user.ward}}
-            </span>
-        </div>
-    </div>
 
-    <!-- Settings Tabs Navigation -->
-    <div class="settings-nav-tabs">
-        <button class="settings-tab-btn" ng-class="{active: vm.settingsTab === 'profile'}"
-            ng-click="vm.settingsTab = 'profile'">
-            <span class="icon">👤</span>
-            <span>Profile</span>
-        </button>
-        <button class="settings-tab-btn" ng-class="{active: vm.settingsTab === 'preferences'}"
-            ng-click="vm.settingsTab = 'preferences'">
-            <span class="icon">🎛️</span>
-            <span>Preferences</span>
-        </button>
-        <button class="settings-tab-btn" ng-class="{active: vm.settingsTab === 'notifications'}"
-            ng-click="vm.settingsTab = 'notifications'">
-            <span class="icon">🔔</span>
-            <span>Notifications</span>
-        </button>
-        <button class="settings-tab-btn" ng-class="{active: vm.settingsTab === 'privacy'}"
-            ng-click="vm.settingsTab = 'privacy'">
-            <span class="icon">🔒</span>
-            <span>Privacy</span>
-        </button>
-    </div>
+        <!-- SETTINGS TAB CARDS -->
+        <div class="pf-tab-row">
+            <div class="pf-tab-card" ng-class="{active: vm.settingsTab === 'profile'}" ng-click="vm.settingsTab = 'profile'">
+                <div class="pf-tab-icon">&#128100;</div>
+                <div class="pf-tab-body">
+                    <div class="pf-tab-title">Profile</div>
+                    <div class="pf-tab-sub">Personal info &amp; connections</div>
+                </div>
+                <div class="pf-tab-arrow">&#8594;</div>
+            </div>
+            <div class="pf-tab-card" ng-class="{active: vm.settingsTab === 'preferences'}" ng-click="vm.settingsTab = 'preferences'">
+                <div class="pf-tab-icon">&#127917;</div>
+                <div class="pf-tab-body">
+                    <div class="pf-tab-title">Preferences</div>
+                    <div class="pf-tab-sub">Language &amp; accessibility</div>
+                </div>
+                <div class="pf-tab-arrow">&#8594;</div>
+            </div>
+            <div class="pf-tab-card" ng-class="{active: vm.settingsTab === 'notifications'}" ng-click="vm.settingsTab = 'notifications'">
+                <div class="pf-tab-icon">&#128276;</div>
+                <div class="pf-tab-body">
+                    <div class="pf-tab-title">Notifications</div>
+                    <div class="pf-tab-sub">SMS &amp; email alerts</div>
+                </div>
+                <div class="pf-tab-arrow">&#8594;</div>
+            </div>
+            <div class="pf-tab-card" ng-class="{active: vm.settingsTab === 'privacy'}" ng-click="vm.settingsTab = 'privacy'">
+                <div class="pf-tab-icon">&#128274;</div>
+                <div class="pf-tab-body">
+                    <div class="pf-tab-title">Privacy</div>
+                    <div class="pf-tab-sub">Data &amp; security</div>
+                </div>
+                <div class="pf-tab-arrow">&#8594;</div>
+            </div>
+        </div>
 
     <!-- Settings Content Area -->
     <div class="settings-content-area">
@@ -300,6 +329,8 @@
 
         </div>
 
-    </div>
+    </div><!-- /settings-content-area -->
+
+    </div><!-- /dashboard-container -->
 
 </div> <!-- /.main-content -->

@@ -1,0 +1,153 @@
+/* ===== Voice Navigation - Floating Mic Button ===== */
+
+/* Mic Button Container */
+.voice-nav-container {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+/* Transcript Popup */
+.voice-nav-popup {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    max-width: 260px;
+    word-wrap: break-word;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+    line-height: 1.4;
+}
+
+.voice-nav-popup.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.voice-nav-popup .popup-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 4px;
+}
+
+.voice-nav-popup .popup-text {
+    color: #fff;
+}
+
+.voice-nav-popup.error .popup-text {
+    color: #ff6b6b;
+}
+
+.voice-nav-popup.success .popup-text {
+    color: #51cf66;
+}
+
+/* Mic Button */
+.voice-nav-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1D70B8, #0055A4);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(29, 112, 184, 0.4), 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    position: relative;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.voice-nav-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 24px rgba(29, 112, 184, 0.5), 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.voice-nav-btn:active {
+    transform: scale(0.96);
+}
+
+.voice-nav-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: opacity 0.2s ease;
+}
+
+/* Listening (active) state */
+.voice-nav-btn.listening {
+    background: linear-gradient(135deg, #F47738, #e05a1b);
+    box-shadow: 0 0 0 0 rgba(244, 119, 56, 0.6);
+    animation: voicePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes voicePulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(244, 119, 56, 0.5), 0 4px 16px rgba(244, 119, 56, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 0 14px rgba(244, 119, 56, 0), 0 4px 20px rgba(244, 119, 56, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(244, 119, 56, 0), 0 4px 16px rgba(244, 119, 56, 0.3);
+    }
+}
+
+/* Processing state */
+.voice-nav-btn.processing {
+    background: linear-gradient(135deg, #6c63ff, #4834d4);
+    pointer-events: none;
+}
+
+.voice-nav-btn.processing svg {
+    animation: voiceSpin 1s linear infinite;
+}
+
+@keyframes voiceSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .voice-nav-container {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .voice-nav-btn {
+        width: 50px;
+        height: 50px;
+    }
+
+    .voice-nav-btn svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .voice-nav-popup {
+        max-width: 220px;
+        font-size: 0.8rem;
+    }
+}

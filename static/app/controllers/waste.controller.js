@@ -194,21 +194,58 @@
         // Waste validation now happens automatically from backend when driver confirms collection
         // No manual validation button for citizens
 
-        // Analyze Waste Photo with AI
+        // Analyze Waste Photo with AI (Nyckel ML Model)
         vm.analyzeWastePhoto = function () {
             if (!vm.aiPhoto) return;
 
             vm.aiAnalyzing = true;
 
-            // Simulate AI analysis delay
-            $timeout(function () {
-                // Mock AI analysis - randomly select waste type
+            // Read file and create object URL for Nyckel API
+            var fileInput = document.getElementById('aiPhoto');
+            var file = fileInput.files[0];
+            
+            if (!file) {
+                vm.aiAnalyzing = false;
+                return;
+            }
+
+            // Create object URL for the uploaded image
+            var imageUrl = URL.createObjectURL(file);
+            
+            // Send to backend for Nyckel classification
+            ApiService.classifyWaste({
+                image_url: imageUrl
+            })
+            .then(function (response) {
+                if (response.data && response.data.success) {
+                    // Get the classification from Nyckel
+                    vm.aiResult = response.data.classification;
+                    vm.aiResult.confidence = response.data.confidence;
+                } else {
+                    // Fallback to mock analysis if API fails
+                    var wasteTypes = Object.keys(vm.wasteAnalysisDatabase);
+                    var randomWaste = wasteTypes[Math.floor(Math.random() * wasteTypes.length)];
+                    vm.aiResult = vm.wasteAnalysisDatabase[randomWaste];
+                }
+                vm.aiAnalyzing = false;
+                
+                // Clean up the object URL
+                setTimeout(function() {
+                    URL.revokeObjectURL(imageUrl);
+                }, 100);
+            })
+            .catch(function (error) {
+                console.error('Error classifying waste:', error);
+                vm.aiAnalyzing = false;
+                
+                // Fallback to mock analysis if API fails
                 var wasteTypes = Object.keys(vm.wasteAnalysisDatabase);
                 var randomWaste = wasteTypes[Math.floor(Math.random() * wasteTypes.length)];
-
                 vm.aiResult = vm.wasteAnalysisDatabase[randomWaste];
-                vm.aiAnalyzing = false;
-            }, 2000);
+                
+                // Clean up the object URL
+                URL.revokeObjectURL(imageUrl);
+            });
         };
 
         // Live Service Data

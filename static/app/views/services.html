@@ -1,110 +1,101 @@
 <div class="main-content">
     <div class="dashboard-container">
-        <!-- Welcome Header -->
-        <div class="page-header-welcome">
-            <div class="welcome-left">
-                <h1 class="welcome-title">Welcome, {{vm.userData.username || 'Citizen'}} 👋</h1>
-                <p class="welcome-subtitle">Services & Grievances - Single window for complaints and service requests</p>
+        <!-- HERO STRIP -->
+        <div class="sv-hero-strip">
+            <div class="sv-hero-left">
+                <div class="sv-hero-eyebrow">&#128203; Services &amp; Grievances</div>
+                <div class="sv-hero-name">Welcome, {{vm.userData.username || 'Citizen'}}</div>
+                <div class="sv-hero-sub">Single window for complaints &amp; service requests</div>
             </div>
-        </div>
-
-        <!-- Stats Grid - Improved spacing -->
-        <div class="stats-grid" style="gap: 1.5rem; margin-bottom: 2rem;">
-            <div class="stat-card primary">
-                <div class="stat-icon-box blue">
-                    <i data-lucide="ticket"></i>
+            <div class="sv-hero-stats">
+                <div class="sv-hero-stat">
+                    <div class="sv-hero-stat-val">{{vm.stats.activeRequests || 2}}</div>
+                    <div class="sv-hero-stat-lbl">Active Requests</div>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-label">Active Requests</div>
-                    <div class="stat-value">{{vm.stats.activeRequests}}</div>
-                    <span class="stat-trend neutral">Open tickets</span>
+                <div class="sv-hero-stat-div"></div>
+                <div class="sv-hero-stat">
+                    <div class="sv-hero-stat-val">{{vm.stats.avgResolution || '3.2'}}</div>
+                    <div class="sv-hero-stat-lbl">Avg Resolution (days)</div>
                 </div>
-            </div>
-            <div class="stat-card warning">
-                <div class="stat-icon-box orange">
-                    <i data-lucide="clock"></i>
+                <div class="sv-hero-stat-div"></div>
+                <div class="sv-hero-stat">
+                    <div class="sv-hero-stat-val sv-stat-green">{{vm.stats.resolvedCount || 8}}</div>
+                    <div class="sv-hero-stat-lbl">Resolved (12mo)</div>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-label">Avg Resolution</div>
-                    <div class="stat-value">{{vm.stats.avgResolution}}</div>
-                    <span class="stat-trend neutral">Days</span>
+                <div class="sv-hero-stat-div"></div>
+                <div class="sv-hero-stat">
+                    <div class="sv-hero-stat-val">{{vm.stats.pendingCount || 1}}</div>
+                    <div class="sv-hero-stat-lbl">Pending</div>
                 </div>
-            </div>
-            <div class="stat-card success">
-                <div class="stat-icon-box green">
-                    <i data-lucide="check-circle"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-label">Resolved (12mo)</div>
-                    <div class="stat-value">{{vm.stats.resolvedCount}}</div>
-                    <span class="stat-trend up">
-                        <i data-lucide="trending-up"></i> Completed
-                    </span>
+                <div class="sv-hero-stat-div"></div>
+                <div class="sv-hero-stat">
+                    <div class="sv-hero-stat-val sv-stat-yellow">{{vm.stats.inProgressCount || 1}}</div>
+                    <div class="sv-hero-stat-lbl">In Progress</div>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Report Buttons -->
-        <div class="card enhanced quick-actions-card">
-            <div class="card-header">
-                <div class="header-left">
-                    <div class="header-icon">
-                        <i data-lucide="zap"></i>
-                    </div>
-                    <div>
-                        <h3><span class="icon">⚡</span> Quick Report</h3>
-                        <p class="card-subtitle">Fast track for common issues</p>
-                    </div>
+        <!-- QUICK REPORT ROW -->
+        <div class="sv-quick-row">
+            <div class="sv-quick-card sv-qc-power" ng-click="vm.quickReport('power_outage')">
+                <div class="sv-qc-icon">&#9889;</div>
+                <div class="sv-qc-body">
+                    <div class="sv-qc-title">Power Outage</div>
+                    <div class="sv-qc-sub">Report electricity failure</div>
                 </div>
+                <div class="sv-qc-arrow">&#8594;</div>
             </div>
-            <div class="card-body">
-                <div class="quick-actions-grid">
-                    <button class="quick-action-card warning" ng-click="vm.quickReport('power_outage')">
-                        <div class="action-icon">
-                            <i data-lucide="zap-off"></i>
-                        </div>
-                        <span>Power Outage</span>
-                    </button>
-                    <button class="quick-action-card info" ng-click="vm.quickReport('street_light')">
-                        <div class="action-icon">
-                            <i data-lucide="lightbulb"></i>
-                        </div>
-                        <span>Street Light</span>
-                    </button>
-                    <button class="quick-action-card info" ng-click="vm.quickReport('water_supply')">
-                        <div class="action-icon">
-                            <i data-lucide="droplet"></i>
-                        </div>
-                        <span>Water Supply</span>
-                    </button>
-                    <button class="quick-action-card alert" ng-click="vm.quickReport('gas_leakage')">
-                        <div class="action-icon">
-                            <i data-lucide="flame"></i>
-                        </div>
-                        <span>Gas Leakage</span>
-                    </button>
+            <div class="sv-quick-card sv-qc-light" ng-click="vm.quickReport('street_light')">
+                <div class="sv-qc-icon">&#128161;</div>
+                <div class="sv-qc-body">
+                    <div class="sv-qc-title">Street Light</div>
+                    <div class="sv-qc-sub">Faulty or missing light</div>
                 </div>
+                <div class="sv-qc-arrow">&#8594;</div>
+            </div>
+            <div class="sv-quick-card sv-qc-water" ng-click="vm.quickReport('water_supply')">
+                <div class="sv-qc-icon">&#128167;</div>
+                <div class="sv-qc-body">
+                    <div class="sv-qc-title">Water Supply</div>
+                    <div class="sv-qc-sub">Irregular or no supply</div>
+                </div>
+                <div class="sv-qc-arrow">&#8594;</div>
+            </div>
+            <div class="sv-quick-card sv-qc-gas" ng-click="vm.quickReport('gas_leakage')">
+                <div class="sv-qc-icon">&#128293;</div>
+                <div class="sv-qc-body">
+                    <div class="sv-qc-title">Gas Leakage</div>
+                    <div class="sv-qc-sub">Smell or suspected leak</div>
+                </div>
+                <div class="sv-qc-arrow">&#8594;</div>
             </div>
         </div>
 
-        <!-- Service Mode Toggle -->
-        <div class="tabs-container enhanced">
-            <div class="tabs">
-                <button class="service-tab" ng-class="{active: vm.serviceMode === 'complaint'}"
-                    ng-click="vm.toggleServiceMode('complaint')">
-                    <i data-lucide="alert-circle"></i>
-                    <span>Raise a Complaint</span>
-                </button>
-                <button class="service-tab" ng-class="{active: vm.serviceMode === 'service'}"
-                    ng-click="vm.toggleServiceMode('service')">
-                    <i data-lucide="clipboard-check"></i>
-                    <span>Apply for Service</span>
-                </button>
-                <button class="service-tab" ng-class="{active: vm.serviceMode === 'track'}"
-                    ng-click="vm.toggleServiceMode('track')">
-                    <i data-lucide="search"></i>
-                    <span>Track Requests</span>
-                </button>
+        <!-- SERVICE MODE TAB CARDS -->
+        <div class="sv-tab-row">
+            <div class="sv-tab-card" ng-class="{active: vm.serviceMode === 'complaint'}" ng-click="vm.toggleServiceMode('complaint')">
+                <div class="sv-tab-icon">&#128221;</div>
+                <div class="sv-tab-body">
+                    <div class="sv-tab-title">Raise a Complaint</div>
+                    <div class="sv-tab-sub">Lodge a grievance</div>
+                </div>
+                <div class="sv-tab-arrow">&#8594;</div>
+            </div>
+            <div class="sv-tab-card" ng-class="{active: vm.serviceMode === 'service'}" ng-click="vm.toggleServiceMode('service')">
+                <div class="sv-tab-icon">&#128203;</div>
+                <div class="sv-tab-body">
+                    <div class="sv-tab-title">Apply for Service</div>
+                    <div class="sv-tab-sub">New connection or change</div>
+                </div>
+                <div class="sv-tab-arrow">&#8594;</div>
+            </div>
+            <div class="sv-tab-card" ng-class="{active: vm.serviceMode === 'track'}" ng-click="vm.toggleServiceMode('track')">
+                <div class="sv-tab-icon">&#128269;</div>
+                <div class="sv-tab-body">
+                    <div class="sv-tab-title">Track Requests</div>
+                    <div class="sv-tab-sub">View status &amp; updates</div>
+                </div>
+                <div class="sv-tab-arrow">&#8594;</div>
             </div>
         </div>
 

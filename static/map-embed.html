@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Stress Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            min-height: 100vh;
+            padding: 0;
+        }
+        .dashboard {
+            width: 100%;
+            max-width: 100%;
+            background: #ffffff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .top-bar {
+            background: #ffffff;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .title h1 {
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+        }
+        .title span {
+            color: #1D70B8;
+            font-weight: 400;
+            font-size: 0.9rem;
+            margin-left: 8px;
+        }
+        .global-controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .opacity-slider {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+        .opacity-slider input {
+            width: 100px;
+            cursor: pointer;
+            accent-color: #1D70B8;
+        }
+        .main-panel {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+        .layer-sidebar {
+            width: 200px;
+            background: #f9fafb;
+            padding: 16px 12px;
+            color: #374151;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        .layer-sidebar h3 {
+            font-weight: 600;
+            color: #1D70B8;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+        .layer-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .layer-btn {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .layer-btn i {
+            width: 20px;
+            font-size: 1rem;
+            color: #6b7280;
+        }
+        .layer-btn.active {
+            background: #1D70B8;
+            border-color: #1D70B8;
+            color: white;
+            box-shadow: 0 2px 8px rgba(29, 112, 184, 0.3);
+        }
+        .layer-btn.active i {
+            color: white;
+        }
+        .layer-btn:hover:not(.active) {
+            background: #f0f9ff;
+            border-color: #1D70B8;
+        }
+        .stress-info {
+            background: #f0f9ff;
+            border-radius: 12px;
+            padding: 14px 12px;
+            border: 1px solid #dbeafe;
+        }
+        .stress-info h4 {
+            color: #1D70B8;
+            font-size: 0.85rem;
+        }
+        .stress-info .formula {
+            background: #ffffff;
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 6px 0;
+            color: #1f2937;
+            font-size: 0.8rem;
+            border: 1px solid #e5e7eb;
+        }
+        .stress-info p {
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #6b7280;
+        }
+        #map {
+            flex: 1;
+            background: #f0f9ff;
+            z-index: 1;
+        }
+        .legend.leaflet-control {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(6px);
+            color: #1f2937;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+            color: #374151;
+        }
+        .color-box {
+            width: 24px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        .leaflet-tooltip {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            color: #1f2937;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 10px 14px;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+        .leaflet-tooltip-left::before {
+            border-left-color: #e5e7eb;
+        }
+        .leaflet-tooltip-right::before {
+            border-right-color: #e5e7eb;
+        }
+        .leaflet-tooltip-top::before {
+            border-top-color: #e5e7eb;
+        }
+        .leaflet-tooltip-bottom::before {
+            border-bottom-color: #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <div class="top-bar">
+        <div class="title">
+            <h1 id="mapTitle">🗺️ Loading... <span>DELHI</span></h1>
+        </div>
+        <div class="global-controls">
+            <div class="opacity-slider">
+                <i class="fas fa-layer-group" style="color:#1D70B8;"></i>
+                <span>Opacity</span>
+                <input type="range" id="opacityRange" min="0.3" max="1.0" step="0.05" value="0.85">
+            </div>
+        </div>
+    </div>
+    <div class="main-panel">
+        <div class="layer-sidebar">
+            <div>
+                <h3><i class="fas fa-chart-pie" style="margin-right: 6px;"></i> Data Layer</h3>
+                <div class="layer-buttons">
+                    <button id="btnElectricity" class="layer-btn active"><i class="fas fa-bolt"></i> Electricity</button>
+                    <button id="btnWater" class="layer-btn"><i class="fas fa-water"></i> Water</button>
+                    <button id="btnSolar" class="layer-btn"><i class="fas fa-sun"></i> Solar</button>
+                    <button id="btnWaste" class="layer-btn"><i class="fas fa-trash-alt"></i> Waste</button>
+                    <button id="btnStress" class="layer-btn"><i class="fas fa-heartbeat"></i> Combined</button>
+                </div>
+            </div>
+            <div class="stress-info">
+                <h4>⚖️ Stress Score</h4>
+                <div class="formula">0.4·⚡ + 0.3·💧 + 0.2·🗑️ + 0.1·☀️</div>
+                <p>Cells colored by selected metric.<br>Hover any grid for details.</p>
+                <p id="mapCoords" style="margin-top: 6px; opacity:0.8;">📍 Loading...</p>
+            </div>
+        </div>
+        <div id="map"></div>
+    </div>
+</div>
+
+<script>
+    // All ward data - keyed by ward name
+    const wardDatabase = {
+        'Kalkaji': {
+            name: 'Kalkaji',
+            center: [28.5350, 77.2590],
+            zoom: 15,
+            zones: 25,
+            gridData: [
+                { lat: 28.5370, lng: 77.2570, elec: 72, water: 65, solar: 18, waste: 58 },
+                { lat: 28.5375, lng: 77.2580, elec: 85, water: 48, solar: 10, waste: 70 },
+                { lat: 28.5360, lng: 77.2600, elec: 55, water: 78, solar: 22, waste: 45 },
+                { lat: 28.5345, lng: 77.2555, elec: 30, water: 82, solar: 35, waste: 28 },
+                { lat: 28.5390, lng: 77.2595, elec: 68, water: 52, solar: 15, waste: 62 },
+                { lat: 28.5340, lng: 77.2610, elec: 42, water: 35, solar: 40, waste: 38 },
+                { lat: 28.5395, lng: 77.2565, elec: 78, water: 60, solar: 8, waste: 75 },
+                { lat: 28.5355, lng: 77.2630, elec: 25, water: 45, solar: 58, waste: 22 },
+                { lat: 28.5330, lng: 77.2585, elec: 90, water: 88, solar: 5, waste: 85 },
+                { lat: 28.5405, lng: 77.2615, elec: 62, water: 38, solar: 28, waste: 50 },
+                { lat: 28.5335, lng: 77.2540, elec: 38, water: 72, solar: 32, waste: 35 },
+                { lat: 28.5380, lng: 77.2545, elec: 75, water: 55, solar: 20, waste: 65 },
+                { lat: 28.5365, lng: 77.2640, elec: 15, water: 28, solar: 82, waste: 18 },
+                { lat: 28.5415, lng: 77.2580, elec: 50, water: 62, solar: 25, waste: 48 },
+                { lat: 28.5350, lng: 77.2620, elec: 65, water: 75, solar: 12, waste: 72 },
+                { lat: 28.5385, lng: 77.2558, elec: 82, water: 40, solar: 14, waste: 55 },
+                { lat: 28.5320, lng: 77.2590, elec: 35, water: 80, solar: 28, waste: 32 },
+                { lat: 28.5425, lng: 77.2600, elec: 58, water: 25, solar: 42, waste: 30 },
+                { lat: 28.5358, lng: 77.2572, elec: 88, water: 58, solar: 10, waste: 68 },
+                { lat: 28.5400, lng: 77.2635, elec: 45, water: 68, solar: 30, waste: 42 },
+                { lat: 28.5343, lng: 77.2562, elec: 22, water: 85, solar: 38, waste: 25 },
+                { lat: 28.5410, lng: 77.2548, elec: 70, water: 30, solar: 50, waste: 52 },
+                { lat: 28.5372, lng: 77.2618, elec: 40, water: 50, solar: 35, waste: 60 },
+                { lat: 28.5348, lng: 77.2638, elec: 28, water: 42, solar: 68, waste: 20 },
+                { lat: 28.5382, lng: 77.2588, elec: 72, water: 48, solar: 22, waste: 55 }
+            ]
+        },
+        'Nehru Place': {
+            name: 'Nehru Place',
+            center: [28.5491, 77.2530],
+            zoom: 15,
+            zones: 25,
+            gridData: [
+                { lat: 28.5510, lng: 77.2510, elec: 92, water: 35, solar: 8, waste: 78 },
+                { lat: 28.5515, lng: 77.2520, elec: 88, water: 42, solar: 6, waste: 82 },
+                { lat: 28.5500, lng: 77.2540, elec: 75, water: 55, solar: 12, waste: 65 },
+                { lat: 28.5485, lng: 77.2505, elec: 60, water: 70, solar: 20, waste: 50 },
+                { lat: 28.5525, lng: 77.2535, elec: 95, water: 30, solar: 5, waste: 88 },
+                { lat: 28.5480, lng: 77.2545, elec: 45, water: 48, solar: 35, waste: 40 },
+                { lat: 28.5530, lng: 77.2515, elec: 85, water: 38, solar: 10, waste: 72 },
+                { lat: 28.5495, lng: 77.2560, elec: 55, water: 62, solar: 28, waste: 48 },
+                { lat: 28.5470, lng: 77.2525, elec: 98, water: 85, solar: 3, waste: 95 },
+                { lat: 28.5540, lng: 77.2550, elec: 70, water: 28, solar: 18, waste: 58 },
+                { lat: 28.5475, lng: 77.2495, elec: 52, water: 75, solar: 30, waste: 45 },
+                { lat: 28.5520, lng: 77.2500, elec: 82, water: 45, solar: 14, waste: 68 },
+                { lat: 28.5505, lng: 77.2570, elec: 35, water: 22, solar: 72, waste: 25 },
+                { lat: 28.5545, lng: 77.2520, elec: 78, water: 58, solar: 15, waste: 62 },
+                { lat: 28.5490, lng: 77.2555, elec: 65, water: 68, solar: 10, waste: 75 },
+                { lat: 28.5522, lng: 77.2508, elec: 90, water: 32, solar: 8, waste: 70 },
+                { lat: 28.5465, lng: 77.2530, elec: 40, water: 82, solar: 25, waste: 35 },
+                { lat: 28.5555, lng: 77.2540, elec: 68, water: 20, solar: 40, waste: 32 },
+                { lat: 28.5498, lng: 77.2512, elec: 93, water: 50, solar: 7, waste: 80 },
+                { lat: 28.5535, lng: 77.2565, elec: 58, water: 65, solar: 22, waste: 52 },
+                { lat: 28.5478, lng: 77.2502, elec: 32, water: 88, solar: 35, waste: 28 },
+                { lat: 28.5548, lng: 77.2498, elec: 80, water: 25, solar: 45, waste: 55 },
+                { lat: 28.5508, lng: 77.2548, elec: 48, water: 52, solar: 32, waste: 62 },
+                { lat: 28.5488, lng: 77.2568, elec: 38, water: 40, solar: 60, waste: 30 },
+                { lat: 28.5518, lng: 77.2528, elec: 85, water: 42, solar: 12, waste: 65 }
+            ]
+        },
+        'Greater Kailash II': {
+            name: 'Greater Kailash II',
+            center: [28.5535, 77.2400],
+            zoom: 15,
+            zones: 25,
+            gridData: [
+                { lat: 28.5535, lng: 77.2385, elec: 82, water: 44, solar: 12, waste: 67 },
+                { lat: 28.5540, lng: 77.2390, elec: 91, water: 38, solar: 8, waste: 73 },
+                { lat: 28.5520, lng: 77.2410, elec: 44, water: 72, solar: 24, waste: 51 },
+                { lat: 28.5510, lng: 77.2360, elec: 23, water: 86, solar: 31, waste: 22 },
+                { lat: 28.5555, lng: 77.2405, elec: 67, water: 55, solar: 17, waste: 48 },
+                { lat: 28.5505, lng: 77.2420, elec: 31, water: 27, solar: 42, waste: 39 },
+                { lat: 28.5560, lng: 77.2375, elec: 77, water: 63, solar: 6, waste: 81 },
+                { lat: 28.5528, lng: 77.2440, elec: 18, water: 41, solar: 63, waste: 28 },
+                { lat: 28.5495, lng: 77.2395, elec: 95, water: 82, solar: 4, waste: 92 },
+                { lat: 28.5570, lng: 77.2425, elec: 58, water: 29, solar: 21, waste: 45 },
+                { lat: 28.5500, lng: 77.2345, elec: 37, water: 68, solar: 35, waste: 33 },
+                { lat: 28.5545, lng: 77.2350, elec: 73, water: 47, solar: 18, waste: 62 },
+                { lat: 28.5530, lng: 77.2450, elec: 12, water: 22, solar: 89, waste: 17 },
+                { lat: 28.5580, lng: 77.2390, elec: 47, water: 58, solar: 27, waste: 54 },
+                { lat: 28.5515, lng: 77.2430, elec: 63, water: 71, solar: 11, waste: 77 },
+                { lat: 28.5550, lng: 77.2368, elec: 81, water: 34, solar: 15, waste: 59 },
+                { lat: 28.5485, lng: 77.2400, elec: 28, water: 79, solar: 22, waste: 36 },
+                { lat: 28.5590, lng: 77.2410, elec: 54, water: 19, solar: 45, waste: 24 },
+                { lat: 28.5522, lng: 77.2380, elec: 88, water: 52, solar: 9, waste: 71 },
+                { lat: 28.5565, lng: 77.2445, elec: 41, water: 64, solar: 29, waste: 43 },
+                { lat: 28.5508, lng: 77.2370, elec: 19, water: 91, solar: 38, waste: 21 },
+                { lat: 28.5575, lng: 77.2355, elec: 74, water: 26, solar: 55, waste: 47 },
+                { lat: 28.5538, lng: 77.2428, elec: 38, water: 48, solar: 33, waste: 68 },
+                { lat: 28.5510, lng: 77.2448, elec: 25, water: 36, solar: 72, waste: 29 },
+                { lat: 28.5547, lng: 77.2398, elec: 68, water: 43, solar: 20, waste: 56 }
+            ]
+        }
+    };
+
+    // Read ward from URL parameter, default to Kalkaji
+    const urlParams = new URLSearchParams(window.location.search);
+    const wardName = urlParams.get('ward') || 'Kalkaji';
+    const activeWard = wardDatabase[wardName] || wardDatabase['Kalkaji'];
+
+    const gridData = activeWard.gridData;
+
+    // Set dynamic title and info
+    document.getElementById('mapTitle').innerHTML = '🗺️ ' + activeWard.name + ' · Resource Stress <span>DELHI</span>';
+    document.getElementById('mapCoords').textContent = '📍 ' + activeWard.center[0].toFixed(2) + '°N, ' + activeWard.center[1].toFixed(2) + '°E · ' + activeWard.zones + ' zones';
+
+    let map, currentLayer = 'electricity';
+    const gridLayers = [];
+
+    function getColor(value) {
+        if (value <= 25) return '#10B981';
+        if (value <= 50) return '#FBBF24';
+        if (value <= 75) return '#F97316';
+        return '#EF4444';
+    }
+
+    function computeStress(d) {
+        return 0.4 * d.elec + 0.3 * d.water + 0.2 * d.waste + 0.1 * d.solar;
+    }
+
+    function makeTooltip(d) {
+        let stressVal = computeStress(d).toFixed(1);
+        return `
+            <b>${activeWard.name} Grid</b><br>
+            ⚡ Electricity: ${d.elec}%<br>
+            💧 Water: ${d.water}%<br>
+            ☀️ Solar: ${d.solar}%<br>
+            🗑️ Waste: ${d.waste}%<br>
+            <span style="color:#1D70B8; font-weight:600;">⚖️ Stress: ${stressVal}%</span>
+        `;
+    }
+
+    function buildGridCells() {
+        gridLayers.length = 0;
+        const cellW = 0.0022;
+        const cellH = 0.0018;
+
+        gridData.forEach(d => {
+            const sw = [d.lat - cellH/2, d.lng - cellW/2];
+            const ne = [d.lat + cellH/2, d.lng + cellW/2];
+            const bounds = [sw, ne];
+
+            let initValue;
+            if (currentLayer === 'electricity') initValue = d.elec;
+            else if (currentLayer === 'water') initValue = d.water;
+            else if (currentLayer === 'solar') initValue = d.solar;
+            else if (currentLayer === 'waste') initValue = d.waste;
+            else initValue = computeStress(d);
+
+            const color = getColor(initValue);
+
+            const rect = L.rectangle(bounds, {
+                color: '#d1d5db',
+                weight: 0.8,
+                fillColor: color,
+                fillOpacity: 0.85,
+                smoothFactor: 0.5
+            }).addTo(map);
+
+            rect.bindTooltip(makeTooltip(d), {
+                permanent: false,
+                direction: 'top',
+                offset: [0, -6],
+                className: 'tooltip-style'
+            });
+
+            gridLayers.push({ rect, data: d });
+        });
+    }
+
+    function updateMapColors() {
+        const opacity = parseFloat(document.getElementById('opacityRange').value);
+        gridLayers.forEach(item => {
+            const d = item.data;
+            let value;
+            if (currentLayer === 'electricity') value = d.elec;
+            else if (currentLayer === 'water') value = d.water;
+            else if (currentLayer === 'solar') value = d.solar;
+            else if (currentLayer === 'waste') value = d.waste;
+            else value = computeStress(d);
+
+            const newColor = getColor(value);
+            item.rect.setStyle({ fillColor: newColor, fillOpacity: opacity });
+            item.rect.unbindTooltip().bindTooltip(makeTooltip(d), {
+                permanent: false, direction: 'top', offset: [0, -6], className: 'tooltip-style'
+            });
+        });
+    }
+
+    function setActiveLayer(layerId) {
+        currentLayer = layerId;
+        updateMapColors();
+        document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
+        if (layerId === 'electricity') document.getElementById('btnElectricity').classList.add('active');
+        if (layerId === 'water') document.getElementById('btnWater').classList.add('active');
+        if (layerId === 'solar') document.getElementById('btnSolar').classList.add('active');
+        if (layerId === 'waste') document.getElementById('btnWaste').classList.add('active');
+        if (layerId === 'stress') document.getElementById('btnStress').classList.add('active');
+    }
+
+    window.addEventListener('load', function() {
+        map = L.map('map', {
+            center: activeWard.center,
+            zoom: activeWard.zoom,
+            zoomControl: true,
+            fadeAnimation: true,
+            zoomAnimation: true
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19
+        }).addTo(map);
+
+        buildGridCells();
+
+        const legend = L.control({ position: 'bottomright' });
+        legend.onAdd = function() {
+            const div = L.DomUtil.create('div', 'legend');
+            div.innerHTML = `
+                <div style="font-weight:600; margin-bottom:8px;">📊 Stress Levels</div>
+                <div class="legend-item"><span class="color-box" style="background:#10B981;"></span> Low 0–25%</div>
+                <div class="legend-item"><span class="color-box" style="background:#FBBF24;"></span> Moderate 26–50%</div>
+                <div class="legend-item"><span class="color-box" style="background:#F97316;"></span> High 51–75%</div>
+                <div class="legend-item"><span class="color-box" style="background:#EF4444;"></span> Critical 76–100%</div>
+            `;
+            return div;
+        };
+        legend.addTo(map);
+
+        document.getElementById('opacityRange').addEventListener('input', function(e) {
+            gridLayers.forEach(item => item.rect.setStyle({ fillOpacity: e.target.value }));
+        });
+
+        document.getElementById('btnElectricity').addEventListener('click', () => setActiveLayer('electricity'));
+        document.getElementById('btnWater').addEventListener('click', () => setActiveLayer('water'));
+        document.getElementById('btnSolar').addEventListener('click', () => setActiveLayer('solar'));
+        document.getElementById('btnWaste').addEventListener('click', () => setActiveLayer('waste'));
+        document.getElementById('btnStress').addEventListener('click', () => setActiveLayer('stress'));
+
+        setActiveLayer('electricity');
+    });
+</script>
+</body>
+</html>

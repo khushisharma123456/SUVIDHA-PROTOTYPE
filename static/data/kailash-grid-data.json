@@ -1,0 +1,105 @@
+{
+  "city": "Delhi",
+  "country": "India",
+  "cityCenter": {
+    "lat": 28.6139,
+    "lng": 77.2090,
+    "zoom": 10
+  },
+  "colonies": [
+    {
+      "id": 1,
+      "name": "Kailash Colony",
+      "lat": 28.5244,
+      "lng": 77.2011,
+      "zoom": 15,
+      "stress": 58,
+      "gridData": [
+        {"id": 1, "lat": 28.5270, "lng": 77.1980, "electricity": 45, "water": 52, "solar": 15, "waste": 38, "zone": "A1"},
+        {"id": 2, "lat": 28.5270, "lng": 77.2010, "electricity": 62, "water": 68, "solar": 22, "waste": 55, "zone": "A2"},
+        {"id": 3, "lat": 28.5270, "lng": 77.2040, "electricity": 38, "water": 45, "solar": 28, "waste": 32, "zone": "A3"},
+        {"id": 4, "lat": 28.5240, "lng": 77.1980, "electricity": 72, "water": 78, "solar": 12, "waste": 65, "zone": "B1"},
+        {"id": 5, "lat": 28.5240, "lng": 77.2010, "electricity": 55, "water": 61, "solar": 35, "waste": 48, "zone": "B2"},
+        {"id": 6, "lat": 28.5240, "lng": 77.2040, "electricity": 48, "water": 54, "solar": 42, "waste": 40, "zone": "B3"},
+        {"id": 7, "lat": 28.5210, "lng": 77.1980, "electricity": 65, "water": 72, "solar": 18, "waste": 58, "zone": "C1"},
+        {"id": 8, "lat": 28.5210, "lng": 77.2010, "electricity": 52, "water": 58, "solar": 38, "waste": 45, "zone": "C2"},
+        {"id": 9, "lat": 28.5210, "lng": 77.2040, "electricity": 42, "water": 48, "solar": 48, "waste": 35, "zone": "C3"},
+        {"id": 10, "lat": 28.5180, "lng": 77.1980, "electricity": 58, "water": 65, "solar": 25, "waste": 52, "zone": "D1"},
+        {"id": 11, "lat": 28.5180, "lng": 77.2010, "electricity": 68, "water": 75, "solar": 20, "waste": 62, "zone": "D2"},
+        {"id": 12, "lat": 28.5180, "lng": 77.2040, "electricity": 45, "water": 52, "solar": 45, "waste": 38, "zone": "D3"},
+        {"id": 13, "lat": 28.5270, "lng": 77.1950, "electricity": 35, "water": 40, "solar": 32, "waste": 28, "zone": "A0"},
+        {"id": 14, "lat": 28.5240, "lng": 77.1950, "electricity": 78, "water": 82, "solar": 10, "waste": 72, "zone": "B0"},
+        {"id": 15, "lat": 28.5210, "lng": 77.1950, "electricity": 62, "water": 68, "solar": 22, "waste": 55, "zone": "C0"},
+        {"id": 16, "lat": 28.5180, "lng": 77.1950, "electricity": 55, "water": 61, "solar": 30, "waste": 48, "zone": "D0"},
+        {"id": 17, "lat": 28.5270, "lng": 77.2070, "electricity": 48, "water": 55, "solar": 38, "waste": 42, "zone": "A4"},
+        {"id": 18, "lat": 28.5240, "lng": 77.2070, "electricity": 65, "water": 72, "solar": 18, "waste": 58, "zone": "B4"},
+        {"id": 19, "lat": 28.5210, "lng": 77.2070, "electricity": 52, "water": 59, "solar": 40, "waste": 46, "zone": "C4"},
+        {"id": 20, "lat": 28.5180, "lng": 77.2070, "electricity": 70, "water": 77, "solar": 15, "waste": 64, "zone": "D4"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Dwarka",
+      "lat": 28.5921,
+      "lng": 77.0460,
+      "zoom": 15,
+      "stress": 72,
+      "gridData": [
+        {"id": 1, "lat": 28.5950, "lng": 77.0430, "electricity": 75, "water": 80, "solar": 10, "waste": 68, "zone": "A1"},
+        {"id": 2, "lat": 28.5950, "lng": 77.0460, "electricity": 70, "water": 76, "solar": 15, "waste": 65, "zone": "A2"},
+        {"id": 3, "lat": 28.5950, "lng": 77.0490, "electricity": 68, "water": 72, "solar": 20, "waste": 60, "zone": "A3"},
+        {"id": 4, "lat": 28.5920, "lng": 77.0430, "electricity": 80, "water": 85, "solar": 8, "waste": 72, "zone": "B1"},
+        {"id": 5, "lat": 28.5920, "lng": 77.0460, "electricity": 72, "water": 78, "solar": 18, "waste": 65, "zone": "B2"},
+        {"id": 6, "lat": 28.5920, "lng": 77.0490, "electricity": 65, "water": 70, "solar": 25, "waste": 58, "zone": "B3"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Noida City Centre",
+      "lat": 28.5746,
+      "lng": 77.3640,
+      "zoom": 15,
+      "stress": 65,
+      "gridData": [
+        {"id": 1, "lat": 28.5770, "lng": 77.3610, "electricity": 62, "water": 68, "solar": 18, "waste": 55, "zone": "A1"},
+        {"id": 2, "lat": 28.5770, "lng": 77.3640, "electricity": 68, "water": 75, "solar": 15, "waste": 60, "zone": "A2"},
+        {"id": 3, "lat": 28.5770, "lng": 77.3670, "electricity": 60, "water": 65, "solar": 22, "waste": 52, "zone": "A3"},
+        {"id": 4, "lat": 28.5720, "lng": 77.3610, "electricity": 70, "water": 76, "solar": 12, "waste": 62, "zone": "B1"},
+        {"id": 5, "lat": 28.5720, "lng": 77.3640, "electricity": 65, "water": 72, "solar": 20, "waste": 58, "zone": "B2"},
+        {"id": 6, "lat": 28.5720, "lng": 77.3670, "electricity": 58, "water": 64, "solar": 28, "waste": 50, "zone": "B3"}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Laxmi Nagar",
+      "lat": 28.5965,
+      "lng": 77.2940,
+      "zoom": 15,
+      "stress": 48,
+      "gridData": [
+        {"id": 1, "lat": 28.5990, "lng": 77.2910, "electricity": 42, "water": 48, "solar": 32, "waste": 38, "zone": "A1"},
+        {"id": 2, "lat": 28.5990, "lng": 77.2940, "electricity": 50, "water": 56, "solar": 28, "waste": 45, "zone": "A2"},
+        {"id": 3, "lat": 28.5990, "lng": 77.2970, "electricity": 48, "water": 54, "solar": 35, "waste": 42, "zone": "A3"},
+        {"id": 4, "lat": 28.5940, "lng": 77.2910, "electricity": 52, "water": 58, "solar": 30, "waste": 48, "zone": "B1"},
+        {"id": 5, "lat": 28.5940, "lng": 77.2940, "electricity": 45, "water": 51, "solar": 38, "waste": 40, "zone": "B2"},
+        {"id": 6, "lat": 28.5940, "lng": 77.2970, "electricity": 48, "water": 54, "solar": 34, "waste": 43, "zone": "B3"}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Indirapuram",
+      "lat": 28.6297,
+      "lng": 77.4154,
+      "zoom": 15,
+      "stress": 55,
+      "gridData": [
+        {"id": 1, "lat": 28.6320, "lng": 77.4120, "electricity": 52, "water": 58, "solar": 25, "waste": 48, "zone": "A1"},
+        {"id": 2, "lat": 28.6320, "lng": 77.4154, "electricity": 58, "water": 64, "solar": 20, "waste": 52, "zone": "A2"},
+        {"id": 3, "lat": 28.6320, "lng": 77.4188, "electricity": 50, "water": 56, "solar": 30, "waste": 45, "zone": "A3"},
+        {"id": 4, "lat": 28.6270, "lng": 77.4120, "electricity": 62, "water": 68, "solar": 18, "waste": 55, "zone": "B1"},
+        {"id": 5, "lat": 28.6270, "lng": 77.4154, "electricity": 55, "water": 61, "solar": 28, "waste": 50, "zone": "B2"},
+        {"id": 6, "lat": 28.6270, "lng": 77.4188, "electricity": 48, "water": 54, "solar": 35, "waste": 42, "zone": "B3"}
+      ]
+    }
+  ]
+}

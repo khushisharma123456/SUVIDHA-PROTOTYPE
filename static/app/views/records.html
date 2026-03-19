@@ -1,58 +1,91 @@
 <div class="main-content">
-    <!-- Welcome Section -->
-    <div style="margin-bottom: 2rem;">
-        <h2 style="margin: 0 0 1.5rem 0; font-size: 1.25rem; font-weight: 600; color: #111827;">Welcome Citizen to your Records and Billing</h2>
-        
-        <div style="display: flex; gap: 0.75rem; width: 100%; flex-wrap: nowrap;">
-            <button class="btn btn-secondary" ng-click="vm.downloadCSV()" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1rem; color: #000; font-weight: 600; min-height: 44px;">
-                <i data-lucide="download"></i>
-                Download CSV
-            </button>
-            <button class="btn btn-secondary" ng-click="vm.exportPDF()" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1rem; color: #000; font-weight: 600; min-height: 44px;">
-                <i data-lucide="file-text"></i>
-                Export PDF
-            </button>
-            <button class="btn btn-primary" ng-click="vm.openPayBillDialog()" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1rem; color: #fff; font-weight: 600; min-height: 44px;">
-                <i data-lucide="credit-card"></i>
-                Pay Bill
-            </button>
-        </div>
-    </div>
+    <div class="dashboard-container">
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-        <div class="stat-card primary">
-            <div class="stat-icon-box blue">🧾</div>
-            <div class="stat-content">
-                <span class="stat-value" ng-bind="vm.stats.totalBills"></span>
-                <span class="stat-label">Total Bills</span>
+        <!-- HERO STRIP -->
+        <div class="rc-hero-strip">
+            <div class="rc-hero-left">
+                <div class="rc-hero-eyebrow">&#129531; Records &amp; Billing</div>
+                <div class="rc-hero-name">Welcome, {{vm.userData.username || 'Citizen'}}</div>
+                <div class="rc-hero-sub">Your complete billing history &amp; payment records</div>
+            </div>
+            <div class="rc-hero-stats">
+                <div class="rc-hero-stat">
+                    <div class="rc-hero-stat-val">{{vm.stats.totalBills}}</div>
+                    <div class="rc-hero-stat-lbl">Total Bills</div>
+                </div>
+                <div class="rc-hero-stat-div"></div>
+                <div class="rc-hero-stat">
+                    <div class="rc-hero-stat-val">{{vm.stats.totalAmount}}</div>
+                    <div class="rc-hero-stat-lbl">Total Paid</div>
+                </div>
+                <div class="rc-hero-stat-div"></div>
+                <div class="rc-hero-stat">
+                    <div class="rc-hero-stat-val">{{vm.stats.avgMonthly}}</div>
+                    <div class="rc-hero-stat-lbl">Avg Monthly</div>
+                </div>
+                <div class="rc-hero-stat-div"></div>
+                <div class="rc-hero-stat">
+                    <div class="rc-hero-stat-val rc-stat-amber">{{vm.stats.pending}}</div>
+                    <div class="rc-hero-stat-lbl">Pending Bills</div>
+                </div>
             </div>
         </div>
-        <div class="stat-card success">
-            <div class="stat-icon-box green">💰</div>
-            <div class="stat-content">
-                <span class="stat-value" ng-bind="vm.stats.totalAmount"></span>
-                <span class="stat-label">Total Paid</span>
+
+        <!-- QUICK ACTIONS ROW -->
+        <div class="rc-quick-row">
+            <div class="rc-quick-card" ng-click="vm.downloadCSV()">
+                <div class="rc-qc-icon rc-qc-csv">&#128229;</div>
+                <div class="rc-qc-body">
+                    <div class="rc-qc-title">Download CSV</div>
+                    <div class="rc-qc-sub">Export full records</div>
+                </div>
+                <div class="rc-qc-arrow">&#8594;</div>
+            </div>
+            <div class="rc-quick-card" ng-click="vm.exportPDF()">
+                <div class="rc-qc-icon rc-qc-pdf">&#128196;</div>
+                <div class="rc-qc-body">
+                    <div class="rc-qc-title">Export PDF</div>
+                    <div class="rc-qc-sub">Printable statement</div>
+                </div>
+                <div class="rc-qc-arrow">&#8594;</div>
+            </div>
+            <div class="rc-quick-card rc-qc-pay-card" ng-click="vm.openPayBillDialog()">
+                <div class="rc-qc-icon rc-qc-payment">&#128179;</div>
+                <div class="rc-qc-body">
+                    <div class="rc-qc-title">Pay Bill</div>
+                    <div class="rc-qc-sub">Settle pending dues</div>
+                </div>
+                <div class="rc-qc-arrow">&#8594;</div>
+            </div>
+            <div class="rc-quick-card" ng-click="vm.clearAllFilters()">
+                <div class="rc-qc-icon rc-qc-reset">&#128260;</div>
+                <div class="rc-qc-body">
+                    <div class="rc-qc-title">Reset Filters</div>
+                    <div class="rc-qc-sub">Show all records</div>
+                </div>
+                <div class="rc-qc-arrow">&#8594;</div>
             </div>
         </div>
-        <div class="stat-card info">
-            <div class="stat-icon-box blue">📅</div>
-            <div class="stat-content">
-                <span class="stat-value" ng-bind="vm.stats.avgMonthly"></span>
-                <span class="stat-label">Avg Monthly</span>
+
+        <!-- VIEW MODE TAB CARDS -->
+        <div class="rc-tab-row">
+            <div class="rc-tab-card" ng-class="{active: vm.viewMode === 'table'}" ng-click="vm.setViewMode('table')">
+                <div class="rc-tab-icon">&#128202;</div>
+                <div class="rc-tab-body">
+                    <div class="rc-tab-title">Table View</div>
+                    <div class="rc-tab-sub">Sortable rows &amp; columns</div>
+                </div>
+                <div class="rc-tab-arrow">&#8594;</div>
+            </div>
+            <div class="rc-tab-card" ng-class="{active: vm.viewMode === 'cards'}" ng-click="vm.setViewMode('cards')">
+                <div class="rc-tab-icon">&#128193;</div>
+                <div class="rc-tab-body">
+                    <div class="rc-tab-title">Card View</div>
+                    <div class="rc-tab-sub">Visual card layout</div>
+                </div>
+                <div class="rc-tab-arrow">&#8594;</div>
             </div>
         </div>
-        <div class="stat-card warning">
-            <div class="stat-icon-box orange">⏳</div>
-            <div class="stat-content">
-                <span class="stat-value" ng-bind="vm.stats.pending"></span>
-                <span class="stat-label">Pending Bills</span>
-            </div>
-            <div class="stat-trend down" ng-if="vm.stats.pending > 0">
-                <span>Needs attention</span>
-            </div>
-        </div>
-    </div>
 
     <!-- Filter and Search Controls -->
     <div class="records-controls-card enhanced-card">
@@ -134,21 +167,9 @@
     <div class="enhanced-card records-table-card">
         <div class="table-header">
             <h3>
-                <span class="icon">📋</span>
+                <span class="icon">&#128203;</span>
                 Billing Records
             </h3>
-            <div class="view-toggle">
-                <button class="view-btn" ng-class="{active: vm.viewMode === 'table'}"
-                    ng-click="vm.setViewMode('table')">
-                    <i data-lucide="table"></i>
-                    Table
-                </button>
-                <button class="view-btn" ng-class="{active: vm.viewMode === 'cards'}"
-                    ng-click="vm.setViewMode('cards')">
-                    <i data-lucide="layout-grid"></i>
-                    Cards
-                </button>
-            </div>
         </div>
 
         <!-- Table View -->
@@ -314,6 +335,8 @@
 
         <p class="source-note">All data is sourced from official meter readings and validated billing records</p>
     </div>
+
+    </div><!-- /dashboard-container -->
 
     <!-- Pay Bill Dialog (Records) -->
     <div class="modal-overlay" ng-show="vm.showPayBillDialog" ng-click="vm.closePayBillDialog()" style="z-index:9000;"></div>

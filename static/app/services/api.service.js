@@ -87,5 +87,18 @@
                     };
                 });
             };
+
+            self.classifyWaste = function(data) {
+                return self.post('/waste/classify', data).catch(function(error) {
+                    // Return mock classification if API fails
+                    console.error('Waste classification API error:', error);
+                    return {
+                        data: {
+                            success: false,
+                            message: 'Waste classification failed'
+                        }
+                    };
+                });
+            };
         }]);
 })();

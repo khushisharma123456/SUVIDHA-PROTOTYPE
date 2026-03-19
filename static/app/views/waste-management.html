@@ -1,12 +1,5 @@
-<div class="main-content">
+﻿<div class="main-content">
     <div class="dashboard-container">
-        <!-- Welcome Header -->
-        <div class="page-header-welcome">
-            <div class="welcome-left">
-                <h1 class="welcome-title">Welcome, {{vm.userData.username || 'Citizen'}} 👋</h1>
-                <p class="welcome-subtitle">Waste Management - Track collection, report issues & stay clean</p>
-            </div>
-        </div>
 
         <!-- Loading State -->
         <div class="loading-spinner" ng-show="vm.loading">
@@ -16,271 +9,165 @@
 
         <!-- Main Content -->
         <div ng-hide="vm.loading">
-            <!-- Today's Waste Status Section -->
-            <section class="dashboard-section">
-                <div class="section-header">
-                    <h2 class="section-title"><span class="icon">📆</span> Today's Waste Status</h2>
-                    <span class="status-badge success">✓ On Schedule</span>
+
+            <!-- SECTION 1: HERO STRIP -->
+            <div class="wm-hero-strip">
+                <div class="wm-hero-left">
+                    <div class="wm-hero-eyebrow">&#9851; Waste Management</div>
+                    <div class="wm-hero-name">Welcome, {{vm.userData.username || 'Citizen'}}</div>
+                    <div class="wm-hero-sub">Kailash Colony &middot; Ward 54E &middot; New Delhi</div>
                 </div>
-
-                <div class="stats-grid">
-                    <!-- Last Pickup Card -->
-                    <div class="stat-card success">
-                        <div class="stat-icon-box green">✅</div>
-                        <div class="stat-content">
-                            <span class="stat-value">{{vm.wasteStatus.lastPickup}}</span>
-                            <span class="stat-label">Last Pickup</span>
-                        </div>
-                        <div class="stat-trend up">
-                            <span>Completed</span>
-                        </div>
+                <div class="wm-hero-stats">
+                    <div class="wm-hero-stat">
+                        <div class="wm-hero-stat-val">{{vm.wasteStatus.lastPickup || 'Today'}}</div>
+                        <div class="wm-hero-stat-lbl">Last Pickup</div>
                     </div>
-
-                    <!-- Waste Type Card -->
-                    <div class="stat-card info">
-                        <div class="stat-icon-box blue">♻️</div>
-                        <div class="stat-content">
-                            <span class="stat-value">{{vm.wasteStatus.wasteType}}</span>
-                            <span class="stat-label">Waste Type</span>
-                        </div>
-                        <div class="stat-trend up">
-                            <span>Segregated</span>
-                        </div>
+                    <div class="wm-hero-stat-div"></div>
+                    <div class="wm-hero-stat">
+                        <div class="wm-hero-stat-val wm-stat-green">&#10003; On Schedule</div>
+                        <div class="wm-hero-stat-lbl">Collection Status</div>
                     </div>
-
-                    <!-- Points Earned Card -->
-                    <div class="stat-card warning">
-                        <div class="stat-icon-box orange">⭐</div>
-                        <div class="stat-content">
-                            <span class="stat-value">+{{vm.wasteStatus.pointsEarned}}</span>
-                            <span class="stat-label">Points Earned</span>
-                        </div>
-                        <div class="stat-trend up">
-                            <span>Earned Today</span>
-                        </div>
+                    <div class="wm-hero-stat-div"></div>
+                    <div class="wm-hero-stat">
+                        <div class="wm-hero-stat-val">{{vm.wasteStatus.nextScheduledPickup || 'Tomorrow'}}</div>
+                        <div class="wm-hero-stat-lbl">Next Pickup</div>
                     </div>
-
-                    <!-- Next Pickup Card -->
-                    <div class="stat-card primary">
-                        <div class="stat-icon-box blue">📅</div>
-                        <div class="stat-content">
-                            <span class="stat-value">{{vm.wasteStatus.nextScheduledPickup}}</span>
-                            <span class="stat-label">Next Pickup</span>
-                        </div>
-                        <div class="stat-trend neutral">
-                            <span>Tomorrow</span>
-                        </div>
+                    <div class="wm-hero-stat-div"></div>
+                    <div class="wm-hero-stat">
+                        <div class="wm-hero-stat-val wm-stat-gold">+{{vm.wasteStatus.pointsEarned || 50}} pts</div>
+                        <div class="wm-hero-stat-lbl">Earned Today</div>
                     </div>
                 </div>
-            </section>
-
-            <!-- Live Tracking Wide Card -->
-            <section class="dashboard-section">
-                <div class="card enhanced" style="overflow: hidden; border: 1px solid #e5e7eb; box-shadow: 0 8px 30px rgba(0,0,0,0.06);">
-                    <div class="card-header" style="background: white; border-bottom: 1px solid #e5e7eb;">
-                        <h3 style="margin: 0; font-size: 1.15rem;"><span class="icon">📍</span> Live Waste Collection Tracking</h3>
-                    </div>
-                    <div class="card-body" style="padding: 0; display: flex; flex-direction: column;">
-                        <div style="display: flex; flex-wrap: wrap;">
-                            <!-- Map Area -->
-                            <div style="flex: 1 1 500px; min-height: 320px; background: #f3f4f6; position: relative;">
-                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14013.921313364239!2d77.2415128!3d28.5355161!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce151aaaaaaab%3A0x6a5aa2ab6841113!2sKalkaji%2C%20New%20Delhi!5e0!3m2!1sen!2sin!4v1700000000000" width="100%" height="100%" style="border:0; position: absolute; top:0; left:0;" allowfullscreen="" loading="lazy"></iframe>
-                            </div>
-                            <!-- Info Area -->
-                            <div style="flex: 1 1 300px; padding: 1.5rem; background: white; display: flex; flex-direction: column;">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
-                                    <div>
-                                        <h4 style="margin: 0 0 0.25rem 0; font-size: 1.25rem; color: #111827;">Truck {{vm.liveServiceData.truckId}}</h4>
-                                        <span style="color: #6b7280; font-size: 0.85rem;">Municipal Waste Collection Service</span>
-                                    </div>
-                                    <span class="status-badge pulse" style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;">{{vm.liveServiceData.truckStatus}}</span>
-                                </div>
-                                
-                                <div style="display: flex; flex-direction: column; gap: 1rem; flex-grow: 1;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
-                                        <span style="color: #4b5563; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="map" style="width: 16px; height: 16px;"></i> Distance</span>
-                                        <strong style="color: #111827;">{{vm.liveServiceData.distance}}</strong>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
-                                        <span style="color: #4b5563; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="clock" style="width: 16px; height: 16px;"></i> Projected Time (ETA)</span>
-                                        <strong style="color: #111827;">{{vm.liveServiceData.eta}}</strong>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
-                                        <span style="color: #4b5563; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="user" style="width: 16px; height: 16px;"></i> Driver</span>
-                                        <strong style="color: #111827;">{{vm.liveServiceData.driverName}}</strong>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span style="color: #4b5563; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="battery-charging" style="width: 16px; height: 16px;"></i> Capacity</span>
-                                        <strong style="color: #111827;">{{vm.liveServiceData.capacity}}</strong>
-                                    </div>
-                                </div>
-                                
-                                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
-                                    <button class="btn-primary" disabled style="width: 100%; justify-content: center; padding: 0.75rem; opacity: 0.6; cursor: not-allowed;">
-                                        <i data-lucide="check-circle"></i> Validate Waste Collection
-                                    </button>
-                                    <p style="font-size: 0.8rem; color: #6b7280; margin: 0; text-align: center; font-style: italic;">
-                                        ✓ Validation will happen automatically once the driver confirms collection
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="wm-hero-right">
+                    <button class="wm-hero-btn" ng-click="vm.showReportForm = !vm.showReportForm">&#128680; Report Issue</button>
                 </div>
-            </section>
+            </div>
 
-            <!-- Weekly Impact Report -->
-            <section class="dashboard-section">
-                <div class="waste-impact-card">
-                    <div class="waste-impact-icon">🌍</div>
-                    <div class="waste-impact-content">
-                        <h3 class="waste-impact-title">Your Weekly Waste Impact</h3>
-                        <p class="waste-impact-description">
-                            Your waste was successfully transported to the <strong>Okhla Waste-to-Energy Plant</strong>. 
-                            Because your waste was <strong>very well segregated</strong>, it was utilized highly efficiently 
-                            and helped reduce landfill burden.
-                        </p>
-                        <div class="impact-metrics">
-                            <div class="impact-metric">
-                                <span class="metric-icon">⚡</span>
-                                <span class="metric-value">45 kWh</span>
-                                <span class="metric-label">Energy Generated</span>
+            <!-- SECTION 2: QUICK ACTIONS -->
+            <div class="wm-quick-row">
+                <div class="wm-quick-card wm-qc-report" ng-click="vm.showReportForm = !vm.showReportForm">
+                    <div class="wm-qc-icon">&#128680;</div>
+                    <div class="wm-qc-body">
+                        <div class="wm-qc-title">Report Issue</div>
+                        <div class="wm-qc-sub">Missed pickup or overflow?</div>
+                    </div>
+                    <div class="wm-qc-arrow">&#8594;</div>
+                </div>
+                <div class="wm-quick-card wm-qc-ai" ng-click="vm.showAiWasteHelper = !vm.showAiWasteHelper">
+                    <div class="wm-qc-icon">&#129302;</div>
+                    <div class="wm-qc-body">
+                        <div class="wm-qc-title">Swachh Bandhu</div>
+                        <div class="wm-qc-sub">Identify waste with AI</div>
+                    </div>
+                    <div class="wm-qc-arrow">&#8594;</div>
+                </div>
+                <div class="wm-quick-card wm-qc-guide" ng-click="vm.showWasteGuide = true">
+                    <div class="wm-qc-icon">&#128161;</div>
+                    <div class="wm-qc-body">
+                        <div class="wm-qc-title">Waste Guide</div>
+                        <div class="wm-qc-sub">Learn proper segregation</div>
+                    </div>
+                    <div class="wm-qc-arrow">&#8594;</div>
+                </div>
+                <div class="wm-quick-card wm-qc-pts">
+                    <div class="wm-qc-icon">&#11088;</div>
+                    <div class="wm-qc-body">
+                        <div class="wm-qc-title">Green Points</div>
+                        <div class="wm-qc-sub">1,240 pts accumulated</div>
+                    </div>
+                    <div class="wm-qc-arrow">&#8594;</div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: LIVE TRACKING + WEEKLY IMPACT -->
+            <div class="wm-panels-row">
+
+                <!-- Left: Live Tracking Card -->
+                <div class="wm-card wm-tracking-card">
+                    <div class="wm-card-title">
+                        &#128205; Live Collection Tracking
+                        <span class="wm-card-badge wm-badge-live">&#9679; Live</span>
+                    </div>
+                    <div class="wm-tracking-body">
+                        <div class="wm-map-area">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14013.921313364239!2d77.2415128!3d28.5355161!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce151aaaaaaab%3A0x6a5aa2ab6841113!2sKalkaji%2C%20New%20Delhi!5e0!3m2!1sen!2sin!4v1700000000000" width="100%" height="100%" style="border:0; display:block;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                        <div class="wm-truck-info">
+                            <div class="wm-truck-header">
+                                <div>
+                                    <div class="wm-truck-id">Truck {{vm.liveServiceData.truckId || 'WCV-042'}}</div>
+                                    <div class="wm-truck-sub">Municipal Waste Collection</div>
+                                </div>
+                                <span class="wm-status-pill wm-pill-blue">{{vm.liveServiceData.truckStatus || 'En Route'}}</span>
                             </div>
-                            <div class="impact-metric">
-                                <span class="metric-icon">🌱</span>
-                                <span class="metric-value">12 kg</span>
-                                <span class="metric-label">Compost Created</span>
+                            <div class="wm-truck-rows">
+                                <div class="wm-truck-row">
+                                    <span><i data-lucide="map" style="width:14px;height:14px;"></i> Distance</span>
+                                    <strong>{{vm.liveServiceData.distance || '1.2 km'}}</strong>
+                                </div>
+                                <div class="wm-truck-row">
+                                    <span><i data-lucide="clock" style="width:14px;height:14px;"></i> ETA</span>
+                                    <strong>{{vm.liveServiceData.eta || '18 mins'}}</strong>
+                                </div>
+                                <div class="wm-truck-row">
+                                    <span><i data-lucide="user" style="width:14px;height:14px;"></i> Driver</span>
+                                    <strong>{{vm.liveServiceData.driverName || 'Ravi Kumar'}}</strong>
+                                </div>
+                                <div class="wm-truck-row">
+                                    <span><i data-lucide="battery-charging" style="width:14px;height:14px;"></i> Capacity</span>
+                                    <strong>{{vm.liveServiceData.capacity || '68%'}}</strong>
+                                </div>
                             </div>
-                            <div class="impact-metric">
-                                <span class="metric-icon">⭐</span>
-                                <span class="metric-value">+5 Points</span>
-                                <span class="metric-label">Bonus Awarded</span>
-                            </div>
+                            <button class="wm-validate-btn" disabled>
+                                <i data-lucide="check-circle" style="width:15px;height:15px;"></i>
+                                Validate Collection
+                            </button>
+                            <p class="wm-validate-note">Auto-validated when driver confirms</p>
                         </div>
                     </div>
                 </div>
-            </section>
 
-            <!-- Quick Actions Section -->
-            <section class="dashboard-section">
-                <div class="policy-banner-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-                    <!-- Report Issue Card -->
-                    <div class="policy-card policy-report" ng-click="vm.showReportForm = !vm.showReportForm">
-                        <div class="policy-card-body">
-                            <div class="policy-icon alert">
-                                <i data-lucide="alert-circle"></i>
-                            </div>
-                            <div class="policy-content">
-                                <h3><span class="icon">🚨</span> Report an Issue</h3>
-                                <p>Missed pickup or overflow bin?</p>
-                            </div>
-                            <div class="policy-btn-primary">Report Now →</div>
+                <!-- Right: Weekly Impact Panel -->
+                <div class="wm-card wm-impact-panel">
+                    <div class="wm-card-title">
+                        &#127758; Your Weekly Impact
+                        <span class="wm-card-badge wm-badge-green">This Week</span>
+                    </div>
+                    <div class="wm-impact-desc">
+                        Your waste was transported to <strong>Okhla Waste-to-Energy Plant</strong>.
+                        Your <strong>excellent segregation</strong> maximized efficiency and reduced landfill burden.
+                    </div>
+                    <div class="wm-impact-metrics">
+                        <div class="wm-impact-metric">
+                            <div class="wm-metric-circle wm-mc-yellow">&#9889;</div>
+                            <div class="wm-metric-val">45 kWh</div>
+                            <div class="wm-metric-lbl">Energy Generated</div>
+                        </div>
+                        <div class="wm-impact-metric">
+                            <div class="wm-metric-circle wm-mc-green">&#127793;</div>
+                            <div class="wm-metric-val">12 kg</div>
+                            <div class="wm-metric-lbl">Compost Created</div>
+                        </div>
+                        <div class="wm-impact-metric">
+                            <div class="wm-metric-circle wm-mc-gold">&#11088;</div>
+                            <div class="wm-metric-val">+5 pts</div>
+                            <div class="wm-metric-lbl">Bonus Awarded</div>
                         </div>
                     </div>
-
-                    <!-- Ask AI About Waste Card -->
-                    <div class="policy-card policy-ai" ng-click="vm.showAiWasteHelper = !vm.showAiWasteHelper">
-                        <div class="policy-card-body">
-                            <div class="policy-icon ai">
-                                <i data-lucide="brain"></i>
-                            </div>
-                            <div class="policy-content">
-                                <h3><span class="icon">🤖</span> Swachh Bandhu</h3>
-                                <p>Identify waste type with photo</p>
-                            </div>
-                            <div class="policy-btn-primary">Ask AI →</div>
+                    <div class="wm-score-row">
+                        <div class="wm-score-label">Segregation Score</div>
+                        <div class="wm-score-bar-wrap">
+                            <div class="wm-score-bar"><div class="wm-score-fill" style="width:92%;"></div></div>
+                            <span class="wm-score-pct">92%</span>
                         </div>
                     </div>
-
-                    <!-- Waste Guide Card -->
-                    <div class="policy-card policy-guide" ng-click="vm.showWasteGuide = true">
-                        <div class="policy-card-body">
-                            <div class="policy-icon guide">
-                                <i data-lucide="lightbulb"></i>
-                            </div>
-                            <div class="policy-content">
-                                <h3><span class="icon">💡</span> Waste Guide</h3>
-                                <p>Learn proper segregation</p>
-                            </div>
-                            <div class="policy-btn-primary">Learn →</div>
-                        </div>
+                    <div class="wm-status-chips">
+                        <div class="wm-status-chip wm-chip-green">&#9851; Organic &middot; Collected</div>
+                        <div class="wm-status-chip wm-chip-blue">&#128230; Dry &middot; Collected</div>
+                        <div class="wm-status-chip wm-chip-red">&#9888; Hazardous &middot; Scheduled</div>
                     </div>
                 </div>
-            </section>
 
-            <!-- Waste Guide Modal -->
-            <div class="modal-overlay" ng-show="vm.showWasteGuide" ng-click="vm.showWasteGuide = false"></div>
-            <div class="waste-guide-modal" ng-show="vm.showWasteGuide">
-                <div class="waste-guide-content" style="max-width:780px;">
-                    <div class="waste-guide-header">
-                        <h2>📖 Waste Segregation Guide</h2>
-                        <button ng-click="vm.showWasteGuide = false">
-                            <i data-lucide="x"></i>
-                        </button>
-                    </div>
-                    <div class="waste-guide-body">
-                        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem;">
-                            <!-- Organic Card -->
-                            <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius:16px; padding:1.5rem; border:1px solid rgba(22,163,74,0.12); text-align:center;">
-                                <div style="width:56px; height:56px; border-radius:50%; background:rgba(22,163,74,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 0.75rem; font-size:1.75rem;">🌱</div>
-                                <h3 style="font-size:1.05rem; font-weight:700; margin:0 0 0.25rem; color:#15803d;">Organic Waste</h3>
-                                <span style="display:inline-block; font-size:0.65rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:20px; background:rgba(22,163,74,0.15); color:#16a34a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.75rem;">Green Bin</span>
-                                <div style="display:flex; flex-wrap:wrap; gap:0.35rem; justify-content:center;">
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Food scraps</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Plant leaves</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Flowers</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Paper napkins</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Tea/coffee</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Fruit peels</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Egg shells</span>
-                                </div>
-                                <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid rgba(22,163,74,0.12); font-size:0.75rem; color:#15803d;">
-                                    <strong>💡 Tip:</strong> Drain liquids before disposal
-                                </div>
-                            </div>
-                            <!-- Dry Waste Card -->
-                            <div style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius:16px; padding:1.5rem; border:1px solid rgba(37,99,235,0.12); text-align:center;">
-                                <div style="width:56px; height:56px; border-radius:50%; background:rgba(37,99,235,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 0.75rem; font-size:1.75rem;">📦</div>
-                                <h3 style="font-size:1.05rem; font-weight:700; margin:0 0 0.25rem; color:#1d4ed8;">Dry Waste</h3>
-                                <span style="display:inline-block; font-size:0.65rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:20px; background:rgba(37,99,235,0.15); color:#2563eb; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.75rem;">Blue Bin</span>
-                                <div style="display:flex; flex-wrap:wrap; gap:0.35rem; justify-content:center;">
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Plastic bottles</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Cardboard</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Metal cans</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Newspapers</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Glass jars</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Foil</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Packaging</span>
-                                </div>
-                                <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid rgba(37,99,235,0.12); font-size:0.75rem; color:#1d4ed8;">
-                                    <strong>💡 Tip:</strong> Rinse containers before recycling
-                                </div>
-                            </div>
-                            <!-- Hazardous Card -->
-                            <div style="background:linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius:16px; padding:1.5rem; border:1px solid rgba(220,38,38,0.12); text-align:center;">
-                                <div style="width:56px; height:56px; border-radius:50%; background:rgba(220,38,38,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 0.75rem; font-size:1.75rem;">⚠️</div>
-                                <h3 style="font-size:1.05rem; font-weight:700; margin:0 0 0.25rem; color:#dc2626;">Hazardous Waste</h3>
-                                <span style="display:inline-block; font-size:0.65rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:20px; background:rgba(220,38,38,0.15); color:#dc2626; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.75rem;">Red Bin</span>
-                                <div style="display:flex; flex-wrap:wrap; gap:0.35rem; justify-content:center;">
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Batteries</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Electronics</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Medicines</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Chemicals</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Paint cans</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Light bulbs</span>
-                                    <span style="font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:8px; background:rgba(255,255,255,0.7); color:#374151; font-weight:500;">Syringes</span>
-                                </div>
-                                <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid rgba(220,38,38,0.12); font-size:0.75rem; color:#dc2626;">
-                                    <strong>💡 Tip:</strong> Never mix with regular waste
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="waste-guide-footer">
-                        <i data-lucide="star"></i>
-                        <p>Proper segregation earns you green points and helps keep our community clean!</p>
-                    </div>
-                </div>
             </div>
 
             <!-- AI Waste Helper Modal -->
@@ -362,17 +249,17 @@
                             <h3 class="ai-section-title" style="justify-content:center;">Waste Categories</h3>
                             <div class="categories-grid">
                                 <div class="category-card organic">
-                                    <div class="cat-icon">🌱</div>
+                                    <div class="cat-icon">ðŸŒ±</div>
                                     <h4>Organic</h4>
                                     <p>Food scraps, leaves, paper</p>
                                 </div>
                                 <div class="category-card dry">
-                                    <div class="cat-icon">📦</div>
+                                    <div class="cat-icon">ðŸ“¦</div>
                                     <h4>Dry Waste</h4>
                                     <p>Plastic, paper, metal, glass</p>
                                 </div>
                                 <div class="category-card hazardous">
-                                    <div class="cat-icon">⚠️</div>
+                                    <div class="cat-icon">âš ï¸</div>
                                     <h4>Hazardous</h4>
                                     <p>Electronics, batteries, medicine</p>
                                 </div>
@@ -472,67 +359,72 @@
                 </div>
             </div>
 
-
-
-            <!-- Waste Guidelines Section -->
-            <section class="dashboard-section">
-                <div class="section-header">
-                    <h2 class="section-title"><span class="icon">📖</span> Waste Segregation Guidelines</h2>
+            <!-- SECTION 4: SEGREGATION GUIDELINES -->
+            <div class="wm-card wm-guidelines-card">
+                <div class="wm-card-title">&#128214; Waste Segregation Guidelines <span class="wm-card-badge">3 Categories</span></div>
+                <div class="wm-guide-grid">
+                    <div class="wm-guide-bin wm-bin-organic">
+                        <div class="wm-bin-header">
+                            <div class="wm-bin-icon">&#127793;</div>
+                            <div>
+                                <div class="wm-bin-name">Organic Waste</div>
+                                <span class="wm-bin-badge wm-bb-green">Green Bin</span>
+                            </div>
+                        </div>
+                        <div class="wm-bin-items">
+                            <span>Food scraps</span><span>Plant leaves</span><span>Flowers</span>
+                            <span>Paper napkins</span><span>Tea/coffee</span><span>Fruit peels</span><span>Egg shells</span>
+                        </div>
+                        <div class="wm-bin-tip">&#128161; Drain liquids before disposal</div>
+                    </div>
+                    <div class="wm-guide-bin wm-bin-dry">
+                        <div class="wm-bin-header">
+                            <div class="wm-bin-icon">&#128230;</div>
+                            <div>
+                                <div class="wm-bin-name">Dry Waste</div>
+                                <span class="wm-bin-badge wm-bb-blue">Blue Bin</span>
+                            </div>
+                        </div>
+                        <div class="wm-bin-items">
+                            <span>Plastic bottles</span><span>Cardboard</span><span>Metal cans</span>
+                            <span>Newspapers</span><span>Glass jars</span><span>Foil</span><span>Packaging</span>
+                        </div>
+                        <div class="wm-bin-tip">&#128161; Rinse containers before recycling</div>
+                    </div>
+                    <div class="wm-guide-bin wm-bin-hazardous">
+                        <div class="wm-bin-header">
+                            <div class="wm-bin-icon">&#9888;</div>
+                            <div>
+                                <div class="wm-bin-name">Hazardous Waste</div>
+                                <span class="wm-bin-badge wm-bb-red">Red Bin</span>
+                            </div>
+                        </div>
+                        <div class="wm-bin-items">
+                            <span>Batteries</span><span>Electronics</span><span>Medicines</span>
+                            <span>Chemicals</span><span>Paint cans</span><span>Light bulbs</span><span>Syringes</span>
+                        </div>
+                        <div class="wm-bin-tip">&#128161; Never mix with regular waste</div>
+                    </div>
+                    <div class="wm-guide-bin wm-bin-tips">
+                        <div class="wm-bin-header">
+                            <div class="wm-bin-icon">&#9989;</div>
+                            <div>
+                                <div class="wm-bin-name">Best Practices</div>
+                                <span class="wm-bin-badge wm-bb-gray">Tips</span>
+                            </div>
+                        </div>
+                        <div class="wm-bin-items">
+                            <span>Don't mix wet &amp; dry</span><span>Keep hazardous separate</span>
+                            <span>Use proper bins</span><span>Label waste clearly</span>
+                        </div>
+                        <div class="wm-bin-tip">&#128161; Earn points for proper segregation!</div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="policy-banner-grid">
-                    <div class="guideline-card organic">
-                        <div class="guideline-icon">🌱</div>
-                        <h3>Organic Waste</h3>
-                        <ul>
-                            <li>Food scraps</li>
-                            <li>Plant leaves</li>
-                            <li>Paper napkins</li>
-                            <li>Tea/coffee grounds</li>
-                        </ul>
-                    </div>
-
-                    <div class="guideline-card dry">
-                        <div class="guideline-icon">📦</div>
-                        <h3>Dry Waste</h3>
-                        <ul>
-                            <li>Plastic bottles</li>
-                            <li>Cardboard boxes</li>
-                            <li>Newspapers</li>
-                            <li>Metal cans</li>
-                        </ul>
-                    </div>
-
-                    <div class="guideline-card hazardous">
-                        <div class="guideline-icon">⚠️</div>
-                        <h3>Hazardous Waste</h3>
-                        <ul>
-                            <li>Medicine bottles</li>
-                            <li>Glass bottles</li>
-                            <li>Electronics</li>
-                            <li>Batteries</li>
-                        </ul>
-                    </div>
-
-                    <div class="guideline-card tips">
-                        <div class="guideline-icon">✅</div>
-                        <h3>Best Practices</h3>
-                        <ul>
-                            <li>Don't mix wet & dry</li>
-                            <li>Keep hazardous separate</li>
-                            <li>Use proper bins</li>
-                            <li>Label waste clearly</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- FAQ Section -->
-            <section class="dashboard-section">
-                <div class="section-header">
-                    <h2 class="section-title"><span class="icon">❓</span> Frequently Asked Questions</h2>
-                </div>
-
+            <!-- SECTION 5: FAQ -->
+            <div class="wm-card wm-faq-card">
+                <div class="wm-card-title">&#10067; Frequently Asked Questions</div>
                 <div class="faq-container">
                     <div class="faq-item" ng-repeat="item in vm.faqItems">
                         <button class="faq-question" ng-click="item.open = !item.open">
@@ -544,7 +436,8 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+
         </div>
     </div>
-</div> <!-- /.main-content -->
+</div>

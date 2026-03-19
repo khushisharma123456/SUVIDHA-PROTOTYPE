@@ -4,6 +4,8 @@ import os
 import secrets
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import nyckel
+import requests
 from models import (db, User, Vendor, Community, CommunityStats, Bill, ServiceReport,
                     GovOfficial, Grievance, MeterReading, RWAProject, AuditLog, 
                     FieldOperation, WardStats, ParticipationScheme, Redemption,
@@ -2485,6 +2487,280 @@ def api_get_agent_tasks_today(agent_id):
         })
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ============================================
+# WASTE CLASSIFICATION WITH NYCKEL ML
+# ============================================
+@app.route('/api/waste/classify', methods=['POST'])
+def classify_waste():
+    """Classify waste type using Nyckel ML model"""
+    try:
+        # Nyckel credentials
+        credentials = nyckel.Credentials(
+            client_id="bcviakb30hiiq558qa84tju5ov3kyof2",
+            client_secret="bjpq7sppbz6knefhvrfaly9siquegr5c1f66ff0ykjtuc9hagmo685hdax8hya9j"
+        )
+        
+        # Get image URL from request
+        data = request.get_json()
+        image_url = data.get('image_url')
+        
+        if not image_url:
+            return jsonify({'success': False, 'message': 'Image URL is required'}), 400
+        
+        # Call Nyckel API to classify waste
+        result = nyckel.invoke("waste-bin-type", image_url, credentials)
+        
+        # Map Nyckel classification to bin types
+        waste_mapping = {
+            'organic': {
+                'wasteType': 'Organic Waste',
+                'category': 'organic',
+                'icon': 'leaf',
+                'tips': [
+                    'Place in green bin for composting',
+                    'Drain liquids from food waste',
+                    'Wrap in newspaper if wet',
+                    'Do not include cooked food with meat'
+                ],
+                'points': 15,
+                'bin_color': 'Green'
+            },
+            'plastic': {
+                'wasteType': 'Plastic Waste',
+                'category': 'dry',
+                'icon': 'box',
+                'tips': [
+                    'Rinse plastic bottles before disposal',
+                    'Place in blue bin for recycling',
+                    'Remove caps and labels',
+                    'Crush bottles to save space'
+                ],
+                'points': 20,
+                'bin_color': 'Blue'
+            },
+            'glass': {
+                'wasteType': 'Glass Waste',
+                'category': 'hazardous',
+                'icon': 'alert-circle',
+                'tips': [
+                    'Wrap glass carefully in newspaper',
+                    'Place in separate container',
+                    'Keep away from organic waste',
+                    'Inform collection staff about glass'
+                ],
+                'points': 25,
+                'bin_color': 'Red'
+            },
+            'paper': {
+                'wasteType': 'Paper Waste',
+                'category': 'dry',
+                'icon': 'file-text',
+                'tips': [
+                    'Bundle paper together with twine',
+                    'Place in blue recycling bin',
+                    'Remove plastic coatings/laminates',
+                    'Compress to save space'
+                ],
+                'points': 15,
+                'bin_color': 'Blue'
+            },
+            'metal': {
+                'wasteType': 'Metal Waste',
+                'category': 'dry',
+                'icon': 'box',
+                'tips': [
+                    'Remove any food residue from metal containers',
+                    'Place metal cans in blue bin',
+                    'Rinse containers thoroughly',
+                    'Separate aluminum from steel if possible'
+                ],
+                'points': 20,
+                'bin_color': 'Blue'
+            },
+            'electronics': {
+                'wasteType': 'Electronic Waste',
+                'category': 'hazardous',
+                'icon': 'alert-circle',
+                'tips': [
+                    'Do NOT mix with regular waste',
+                    'Take to e-waste collection center',
+                    'Keep in safe location until collection',
+                    'Ensure safe handling for toxins'
+                ],
+                'points': 50,
+                'bin_color': 'Red'
+            },
+            'food': {
+                'wasteType': 'Food Waste',
+                'category': 'organic',
+                'icon': 'leaf',
+                'tips': [
+                    'Place in green bin',
+                    'Drain all liquids',
+                    'Avoid meat and fish in composting',
+                    'Wrap in biodegradable material'
+                ],
+                'points': 15,
+                'bin_color': 'Green'
+            },
+            'textiles': {
+                'wasteType': 'Textile Waste',
+                'category': 'dry',
+                'icon': 'box',
+                'tips': [
+                    'Bundle textiles together',
+                    'Check if items can be donated',
+                    'Place in recyclable bin',
+                    'Separate worn items for composting'
+                ],
+                'points': 15,
+                'bin_color': 'Blue'
+            }
+        }
+        
+        # Parse Nyckel result
+        if result and isinstance(result, dict):
+            # Get classification label
+            classification = result.get('label', 'unknown').lower()
+            confidence = result.get('confidence', 0)
+            
+            # Find matching waste type
+            matched_waste = None
+            for key in waste_mapping:
+                if key in classification:
+                    matched_waste = waste_mapping[key]
+                    break
+            
+            # If no exact match, use closest match
+            if not matched_waste:
+                if 'organic' in classification or 'food' in classification:
+                    matched_waste = waste_mapping['organic']
+                elif 'plastic' in classification:
+                    matched_waste = waste_mapping['plastic']
+                elif 'glass' in classification:
+                    matched_waste = waste_mapping['glass']
+                else:
+                    matched_waste = waste_mapping['paper']
+            
+            return jsonify({
+                'success': True,
+                'classification': matched_waste,
+                'confidence': confidence,
+                'nyckel_label': classification
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to classify image'
+            }), 400
+            
+    except Exception as e:
+        print(f"Waste classification error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ========== Voice Navigation - Dialogflow ES Proxy ==========
+
+# Configure these with your Dialogflow ES credentials
+DIALOGFLOW_PROJECT_ID = os.environ.get('DIALOGFLOW_PROJECT_ID', 'your-dialogflow-project-id')
+DIALOGFLOW_API_KEY = os.environ.get('DIALOGFLOW_API_KEY', '')  # API key for Dialogflow ES v2
+
+@app.route('/api/voice/detect-intent', methods=['POST'])
+def voice_detect_intent():
+    """Proxy endpoint for Dialogflow ES detectIntent API.
+    Keeps credentials server-side and avoids CORS issues."""
+    try:
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({'error': 'Missing text field'}), 400
+
+        text = data['text'][:256]  # Limit input length
+        session_id = data.get('sessionId', 'default')[:64]
+        language_code = data.get('languageCode', 'en')[:5]
+
+        # If no API key configured, use local keyword fallback
+        if not DIALOGFLOW_API_KEY or DIALOGFLOW_PROJECT_ID == 'your-dialogflow-project-id':
+            result = _local_intent_match(text)
+            return jsonify(result), 200
+
+        # Dialogflow ES v2 REST API
+        df_url = (
+            f'https://dialogflow.googleapis.com/v2/projects/{DIALOGFLOW_PROJECT_ID}'
+            f'/agent/sessions/{session_id}:detectIntent'
+        )
+
+        payload = {
+            'queryInput': {
+                'text': {
+                    'text': text,
+                    'languageCode': language_code
+                }
+            }
+        }
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {DIALOGFLOW_API_KEY}'
+        }
+
+        resp = requests.post(df_url, json=payload, headers=headers, timeout=5)
+
+        if resp.status_code == 200:
+            df_data = resp.json()
+            query_result = df_data.get('queryResult', {})
+            intent_info = query_result.get('intent', {})
+            return jsonify({
+                'intent': intent_info.get('displayName', ''),
+                'fulfillmentText': query_result.get('fulfillmentText', ''),
+                'confidence': query_result.get('intentDetectionConfidence', 0)
+            }), 200
+        else:
+            # Dialogflow call failed, use local fallback
+            result = _local_intent_match(text)
+            return jsonify(result), 200
+
+    except requests.exceptions.Timeout:
+        result = _local_intent_match(data.get('text', ''))
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"Voice detect-intent error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+def _local_intent_match(text):
+    """Local keyword-based intent matching as fallback when Dialogflow is unavailable."""
+    lower = text.lower()
+
+    keyword_map = [
+        (['dashboard', 'home', 'main page'],        'open_dashboard',       'Opening dashboard'),
+        (['service', 'services'],                     'open_services',        'Opening services'),
+        (['waste', 'garbage', 'trash', 'dustbin'],   'open_wastemanagement', 'Opening waste management'),
+        (['wallet', 'payment', 'pay', 'bill', 'money'], 'open_wallet',      'Taking you to wallet'),
+        (['record', 'records', 'history'],            'open_record',          'Opening records'),
+        (['insight', 'insights', 'analytics', 'stats'], 'open_insight',      'Opening insights'),
+        (['utility', 'utilities', 'electricity', 'water', 'gas'], 'open_utilities', 'Opening utilities'),
+        (['community', 'forum', 'neighbor'],          'open_community',       'Opening community'),
+        (['profile', 'account', 'setting', 'settings'], 'open_profile',      'Opening profile'),
+    ]
+
+    for keywords, intent, fulfillment in keyword_map:
+        for kw in keywords:
+            if kw in lower:
+                return {
+                    'intent': intent,
+                    'fulfillmentText': fulfillment,
+                    'confidence': 0.85
+                }
+
+    return {
+        'intent': '',
+        'fulfillmentText': "Sorry, I didn't understand that command.",
+        'confidence': 0
+    }
 
 
 if __name__ == '__main__':

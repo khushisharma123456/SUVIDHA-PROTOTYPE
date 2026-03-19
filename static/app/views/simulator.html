@@ -1,53 +1,60 @@
 <div class="main-content">
     <div class="dashboard-container">
-        <!-- Simulator Page Header -->
-        <div class="page-header-welcome">
-            <div class="welcome-left">
-                <h1 class="welcome-title">Bill Simulator 🧮</h1>
-                <p class="welcome-subtitle">Estimate utility bills and explore various savings scenarios</p>
+        <!-- HERO STRIP -->
+        <div class="sm-hero-strip">
+            <div class="sm-hero-left">
+                <div class="sm-hero-eyebrow">&#129518; Bill Simulator</div>
+                <div class="sm-hero-name">Welcome, {{vm.userData.username || 'Citizen'}}</div>
+                <div class="sm-hero-sub">Estimate utility bills &amp; explore savings scenarios</div>
+            </div>
+            <div class="sm-hero-stats">
+                <div class="sm-hero-stat">
+                    <div class="sm-hero-stat-val">{{vm.totalSimulations || 0}}</div>
+                    <div class="sm-hero-stat-lbl">Simulations Run</div>
+                </div>
+                <div class="sm-hero-stat-div"></div>
+                <div class="sm-hero-stat">
+                    <div class="sm-hero-stat-val sm-stat-green">30%</div>
+                    <div class="sm-hero-stat-lbl">Potential Savings</div>
+                </div>
+                <div class="sm-hero-stat-div"></div>
+                <div class="sm-hero-stat">
+                    <div class="sm-hero-stat-val">{{vm.utilityType | uppercase}}</div>
+                    <div class="sm-hero-stat-lbl">Active Utility</div>
+                </div>
+                <div class="sm-hero-stat-div"></div>
+                <div class="sm-hero-stat">
+                    <div class="sm-hero-stat-val">&#8377;{{vm.totalBill | number:0}}</div>
+                    <div class="sm-hero-stat-lbl">Last Estimate</div>
+                </div>
             </div>
         </div>
 
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card primary">
-                <div class="stat-icon-box blue">
-                    <i data-lucide="calculator"></i>
+        <!-- UTILITY TAB CARDS -->
+        <div class="sm-tab-row">
+            <div class="sm-tab-card" ng-class="{active: vm.utilityType === 'electricity'}" ng-click="vm.selectUtility('electricity')">
+                <div class="sm-tab-icon">&#9889;</div>
+                <div class="sm-tab-body">
+                    <div class="sm-tab-title">Electricity</div>
+                    <div class="sm-tab-sub">kWh consumption</div>
                 </div>
-                <div class="stat-content">
-                    <span class="stat-value">{{vm.totalSimulations}}</span>
-                    <span class="stat-label">Simulations Run</span>
-                </div>
+                <div class="sm-tab-arrow">&#8594;</div>
             </div>
-            <div class="stat-card success">
-                <div class="stat-icon-box green">
-                    <i data-lucide="piggy-bank"></i>
+            <div class="sm-tab-card" ng-class="{active: vm.utilityType === 'water'}" ng-click="vm.selectUtility('water')">
+                <div class="sm-tab-icon">&#128167;</div>
+                <div class="sm-tab-body">
+                    <div class="sm-tab-title">Water</div>
+                    <div class="sm-tab-sub">KL consumption</div>
                 </div>
-                <div class="stat-content">
-                    <span class="stat-value">Up to 30%</span>
-                    <span class="stat-label">Potential Savings</span>
-                </div>
-                <div class="stat-trend up">
-                    <span>Explore scenarios</span>
-                </div>
+                <div class="sm-tab-arrow">&#8594;</div>
             </div>
-        </div>
-
-        <!-- Utility Selector Tabs -->
-        <div class="tabs-container enhanced" style="margin-bottom: 2rem;">
-            <div class="tabs">
-                <button class="service-tab" ng-class="{active: vm.utilityType === 'electricity'}" ng-click="vm.selectUtility('electricity')">
-                    <i data-lucide="zap"></i>
-                    <span>Electricity</span>
-                </button>
-                <button class="service-tab" ng-class="{active: vm.utilityType === 'water'}" ng-click="vm.selectUtility('water')">
-                    <i data-lucide="droplet"></i>
-                    <span>Water</span>
-                </button>
-                <button class="service-tab" ng-class="{active: vm.utilityType === 'gas'}" ng-click="vm.selectUtility('gas')">
-                    <i data-lucide="flame"></i>
-                    <span>Gas</span>
-                </button>
+            <div class="sm-tab-card" ng-class="{active: vm.utilityType === 'gas'}" ng-click="vm.selectUtility('gas')">
+                <div class="sm-tab-icon">&#128293;</div>
+                <div class="sm-tab-body">
+                    <div class="sm-tab-title">Gas</div>
+                    <div class="sm-tab-sub">SCM consumption</div>
+                </div>
+                <div class="sm-tab-arrow">&#8594;</div>
             </div>
         </div>
 

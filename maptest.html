@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kailash Colony · Resource Stress Map</title>
+    <!-- Leaflet CSS + JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Font Awesome for icons (optional, but nice) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #1e2b3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .dashboard {
+            width: 1400px;
+            max-width: 100%;
+            background: #0f1a27;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        /* header */
+        .top-bar {
+            background: #11212e;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #2a3b4c;
+        }
+        .title h1 {
+            color: #eef5ff;
+            font-weight: 400;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+        .title span {
+            color: #7fc9ff;
+            font-weight: 300;
+            font-size: 1rem;
+            margin-left: 12px;
+        }
+        .global-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .opacity-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #cbd5e0;
+            font-size: 0.9rem;
+        }
+        .opacity-slider input {
+            width: 120px;
+            cursor: pointer;
+            accent-color: #4f9eff;
+        }
+        /* main content: left layers + map */
+        .main-panel {
+            display: flex;
+            height: 650px;
+            min-height: 500px;
+        }
+        .layer-sidebar {
+            width: 220px;
+            background: #0b1621;
+            padding: 24px 16px;
+            color: #e2e8f0;
+            border-right: 1px solid #253543;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        .layer-sidebar h3 {
+            font-weight: 400;
+            color: #9ab8d9;
+            margin-bottom: 16px;
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+            border-bottom: 1px dashed #2e4053;
+            padding-bottom: 8px;
+        }
+        .layer-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .layer-btn {
+            background: #1c2a38;
+            border: none;
+            color: #c9d9e9;
+            padding: 12px 16px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid transparent;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .layer-btn i {
+            width: 24px;
+            font-size: 1.2rem;
+            color: #7aa9d9;
+        }
+        .layer-btn.active {
+            background: #1f3b4f;
+            border-color: #4f9eff;
+            color: white;
+            box-shadow: 0 0 10px #1e4c76;
+        }
+        .layer-btn:hover {
+            background: #263b4b;
+        }
+        .stress-info {
+            background: #101e2b;
+            border-radius: 18px;
+            padding: 18px 14px;
+            margin-top: 10px;
+        }
+        .stress-info p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #b6cbe0;
+        }
+        .stress-info .formula {
+            background: #1d2c3b;
+            padding: 8px;
+            border-radius: 12px;
+            font-family: monospace;
+            margin: 8px 0;
+            color: #d6eaff;
+        }
+        #map {
+            flex: 1;
+            background: #1b2b36;
+            z-index: 1;
+        }
+        /* legend custom */
+        .legend.leaflet-control {
+            background: rgba(10, 20, 30, 0.85);
+            backdrop-filter: blur(6px);
+            color: white;
+            border-radius: 24px;
+            padding: 14px 18px;
+            font-size: 14px;
+            border: 1px solid #3f5567;
+            box-shadow: 0 6px 12px black;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 6px 0;
+        }
+        .color-box {
+            width: 28px;
+            height: 20px;
+            border-radius: 6px;
+        }
+        .tooltip-style {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .leaflet-tooltip {
+            background: #0e1e2b;
+            border: 1px solid #4c6a82;
+            color: #f0f6fc;
+            box-shadow: 0 4px 10px black;
+            border-radius: 16px;
+            padding: 10px 14px;
+            line-height: 1.6;
+        }
+        .leaflet-tooltip-left::before {
+            border-left-color: #4c6a82;
+        }
+        .leaflet-tooltip-right::before {
+            border-right-color: #4c6a82;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <!-- top bar -->
+    <div class="top-bar">
+        <div class="title">
+            <h1>⚡ Kailash Colony · resource stress <span>DELHI</span></h1>
+        </div>
+        <div class="global-controls">
+            <div class="opacity-slider">
+                <i class="fas fa-layer-group" style="color:#90b8dc;"></i>
+                <span>Opacity</span>
+                <input type="range" id="opacityRange" min="0.3" max="1.0" step="0.05" value="0.85">
+            </div>
+        </div>
+    </div>
+
+    <!-- main area: left layers + map -->
+    <div class="main-panel">
+        <div class="layer-sidebar">
+            <div>
+                <h3><i class="fas fa-chart-pie" style="margin-right: 8px;"></i> DATA LAYER</h3>
+                <div class="layer-buttons">
+                    <button id="btnElectricity" class="layer-btn active"><i class="fas fa-bolt"></i> Electricity</button>
+                    <button id="btnWater" class="layer-btn"><i class="fas fa-water"></i> Water</button>
+                    <button id="btnSolar" class="layer-btn"><i class="fas fa-sun"></i> Solar adoption</button>
+                    <button id="btnWaste" class="layer-btn"><i class="fas fa-trash-alt"></i> Waste</button>
+                    <button id="btnStress" class="layer-btn"><i class="fas fa-heartbeat"></i> Combined stress</button>
+                </div>
+            </div>
+            <div class="stress-info">
+                <h4 style="margin-bottom: 6px;">⚖️ stress score</h4>
+                <div class="formula">0.4·⚡ + 0.3·💧 + 0.2·🗑️ + 0.1·☀️</div>
+                <p>Cells colored by selected metric.<br>Hover any grid for details.</p>
+                <p style="margin-top: 8px; opacity:0.9;"><i class="fa-regular fa-compass"></i> 28.55°N, 77.24°E · 20 zones</p>
+            </div>
+        </div>
+        <div id="map"></div>
+    </div>
+</div>
+
+<!-- embedded data.json as a javascript variable (static) -->
+<script>
+    // ---------- DATA: 25 grid points around Kailash Colony ----------
+    const gridData = [
+        // lat, lng, electricity%, water%, solar%, waste%
+        { lat: 28.5535, lng: 77.2385, elec: 82, water: 44, solar: 12, waste: 67 }, // core
+        { lat: 28.5540, lng: 77.2390, elec: 91, water: 38, solar: 8, waste: 73 },
+        { lat: 28.5520, lng: 77.2410, elec: 44, water: 72, solar: 24, waste: 51 },
+        { lat: 28.5510, lng: 77.2360, elec: 23, water: 86, solar: 31, waste: 22 },
+        { lat: 28.5555, lng: 77.2405, elec: 67, water: 55, solar: 17, waste: 48 },
+        { lat: 28.5505, lng: 77.2420, elec: 31, water: 27, solar: 42, waste: 39 },
+        { lat: 28.5560, lng: 77.2375, elec: 77, water: 63, solar: 6, waste: 81 },
+        { lat: 28.5528, lng: 77.2440, elec: 18, water: 41, solar: 63, waste: 28 },
+        { lat: 28.5495, lng: 77.2395, elec: 95, water: 82, solar: 4, waste: 92 },
+        { lat: 28.5570, lng: 77.2425, elec: 58, water: 29, solar: 21, waste: 45 },
+        { lat: 28.5500, lng: 77.2345, elec: 37, water: 68, solar: 35, waste: 33 },
+        { lat: 28.5545, lng: 77.2350, elec: 73, water: 47, solar: 18, waste: 62 },
+        { lat: 28.5530, lng: 77.2450, elec: 12, water: 22, solar: 89, waste: 17 },
+        { lat: 28.5580, lng: 77.2390, elec: 47, water: 58, solar: 27, waste: 54 },
+        { lat: 28.5515, lng: 77.2430, elec: 63, water: 71, solar: 11, waste: 77 },
+        { lat: 28.5550, lng: 77.2368, elec: 81, water: 34, solar: 15, waste: 59 },
+        { lat: 28.5485, lng: 77.2400, elec: 28, water: 79, solar: 22, waste: 36 },
+        { lat: 28.5590, lng: 77.2410, elec: 54, water: 19, solar: 45, waste: 24 },
+        { lat: 28.5522, lng: 77.2380, elec: 88, water: 52, solar: 9, waste: 71 },
+        { lat: 28.5565, lng: 77.2445, elec: 41, water: 64, solar: 29, waste: 43 },
+        { lat: 28.5508, lng: 77.2370, elec: 19, water: 91, solar: 38, waste: 21 },
+        { lat: 28.5575, lng: 77.2355, elec: 74, water: 26, solar: 55, waste: 47 },
+        { lat: 28.5538, lng: 77.2428, elec: 38, water: 48, solar: 33, waste: 68 },
+        { lat: 28.5510, lng: 77.2448, elec: 25, water: 36, solar: 72, waste: 29 },
+        { lat: 28.5547, lng: 77.2398, elec: 68, water: 43, solar: 20, waste: 56 }
+    ];
+
+    // ---------- initialization ----------
+    let map, currentLayer = 'electricity';   // 'electricity', 'water', 'solar', 'waste', 'stress'
+    const gridLayers = []; // store all rectangle references for updates
+
+    // color function based on percent value (0-100)
+    function getColor(value) {
+        if (value <= 25) return '#2b8c4a'; // green (low stress)
+        if (value <= 50) return '#f7d13b'; // yellow / moderate
+        if (value <= 75) return '#f1903d'; // orange / high
+        return '#d63434'; // red critical
+    }
+
+    // compute combined stress from a data point
+    function computeStress(d) {
+        return 0.4 * d.elec + 0.3 * d.water + 0.2 * d.waste + 0.1 * d.solar;
+    }
+
+    // tooltip content generator
+    function makeTooltip(d) {
+        let stressVal = computeStress(d).toFixed(1);
+        return `
+            <b>Kailash grid</b><br>
+            ⚡ Electricity: ${d.elec}%<br>
+            💧 Water: ${d.water}%<br>
+            ☀️ Solar adoption: ${d.solar}%<br>
+            🗑️ Waste: ${d.waste}%<br>
+            <span style="color:#aad0ff;">⚖️ stress: ${stressVal}%</span>
+        `;
+    }
+
+    // create grid cells (rectangles) from data
+    function buildGridCells() {
+        gridLayers.length = 0; // clear
+
+        // cell size ~ 0.002° (~200m) — adjust for visual appeal
+        const cellW = 0.0022; 
+        const cellH = 0.0018; 
+
+        gridData.forEach(d => {
+            // rectangle bounds: southWest, northEast
+            const sw = [d.lat - cellH/2, d.lng - cellW/2];
+            const ne = [d.lat + cellH/2, d.lng + cellW/2];
+            const bounds = [sw, ne];
+
+            // compute initial color based on default layer (electricity)
+            let initValue;
+            if (currentLayer === 'electricity') initValue = d.elec;
+            else if (currentLayer === 'water') initValue = d.water;
+            else if (currentLayer === 'solar') initValue = d.solar;
+            else if (currentLayer === 'waste') initValue = d.waste;
+            else initValue = computeStress(d); // stress
+
+            const color = getColor(initValue);
+
+            // create rectangle
+            const rect = L.rectangle(bounds, {
+                color: '#2f3e4e',
+                weight: 0.8,
+                fillColor: color,
+                fillOpacity: 0.85,
+                smoothFactor: 0.5
+            }).addTo(map);
+
+            // bind tooltip (hover)
+            rect.bindTooltip(makeTooltip(d), {
+                permanent: false,
+                direction: 'top',
+                offset: [0, -6],
+                className: 'tooltip-style'
+            });
+
+            // store rect + original data for later updates
+            gridLayers.push({
+                rect: rect,
+                data: d
+            });
+        });
+    }
+
+    // update colors of all grids based on selected layer + opacity
+    function updateMapColors() {
+        const opacity = parseFloat(document.getElementById('opacityRange').value);
+        gridLayers.forEach(item => {
+            const d = item.data;
+            let value;
+            if (currentLayer === 'electricity') value = d.elec;
+            else if (currentLayer === 'water') value = d.water;
+            else if (currentLayer === 'solar') value = d.solar;
+            else if (currentLayer === 'waste') value = d.waste;
+            else value = computeStress(d); // 'stress'
+
+            const newColor = getColor(value);
+            item.rect.setStyle({ fillColor: newColor, fillOpacity: opacity });
+            
+            // also update tooltip (though data unchanged, we can rebuild string if needed)
+            // update tooltip content (optional)
+            item.rect.unbindTooltip().bindTooltip(makeTooltip(d), {
+                permanent: false, direction: 'top', offset: [0, -6], className: 'tooltip-style'
+            });
+        });
+    }
+
+    // layer toggle handlers + active UI
+    function setActiveLayer(layerId) {
+        currentLayer = layerId;
+        updateMapColors();
+
+        // update active button styling
+        document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
+        if (layerId === 'electricity') document.getElementById('btnElectricity').classList.add('active');
+        if (layerId === 'water') document.getElementById('btnWater').classList.add('active');
+        if (layerId === 'solar') document.getElementById('btnSolar').classList.add('active');
+        if (layerId === 'waste') document.getElementById('btnWaste').classList.add('active');
+        if (layerId === 'stress') document.getElementById('btnStress').classList.add('active');
+    }
+
+    // ---------- initialize map and UI ----------
+    window.addEventListener('load', function() {
+        map = L.map('map', {
+            center: [28.5535, 77.2400],
+            zoom: 15,
+            zoomControl: true,
+            fadeAnimation: true,
+            zoomAnimation: true
+        });
+
+        // base map (dark streets for contrast)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // build grid cells
+        buildGridCells();
+
+        // add custom legend (on map)
+        const legend = L.control({ position: 'bottomright' });
+        legend.onAdd = function() {
+            const div = L.DomUtil.create('div', 'legend');
+            div.innerHTML = `
+                <div style="font-weight:600; margin-bottom:8px;">📊 STRESS LEVELS</div>
+                <div class="legend-item"><span class="color-box" style="background:#2b8c4a;"></span> Low 0–25%</div>
+                <div class="legend-item"><span class="color-box" style="background:#f7d13b;"></span> Moderate 26–50%</div>
+                <div class="legend-item"><span class="color-box" style="background:#f1903d;"></span> High 51–75%</div>
+                <div class="legend-item"><span class="color-box" style="background:#d63434;"></span> Critical 76–100%</div>
+                <hr style="border-color:#3d576d; margin:10px 0 5px;">
+                <div><i class="fa-regular fa-hand-pointer"></i> hover cell → details</div>
+            `;
+            return div;
+        };
+        legend.addTo(map);
+
+        // opacity slider event
+        document.getElementById('opacityRange').addEventListener('input', function(e) {
+            const val = e.target.value;
+            gridLayers.forEach(item => item.rect.setStyle({ fillOpacity: val }));
+        });
+
+        // button listeners (with animation emulated via class change)
+        document.getElementById('btnElectricity').addEventListener('click', () => setActiveLayer('electricity'));
+        document.getElementById('btnWater').addEventListener('click', () => setActiveLayer('water'));
+        document.getElementById('btnSolar').addEventListener('click', () => setActiveLayer('solar'));
+        document.getElementById('btnWaste').addEventListener('click', () => setActiveLayer('waste'));
+        document.getElementById('btnStress').addEventListener('click', () => setActiveLayer('stress'));
+
+        // optional: smooth zoom - already smooth with leaflet
+
+        // set default active (electricity)
+        setActiveLayer('electricity');
+
+        // minor: to show area nicely, add a marker for context (optional)
+        L.circleMarker([28.5535, 77.2400], { radius: 2, color: '#c0d8f0', weight: 1 }).addTo(map);
+    });
+</script>
+<!-- no external JSON needed, but dummy data is embedded as gridData -->
+</body>
+</html>
