@@ -17,12 +17,12 @@
             </div>
             <div class="pf-hero-left">
                 <div class="pf-hero-eyebrow">&#128100; My Profile</div>
-                <div class="pf-hero-name">{{vm.user.fullName || 'Citizen'}}</div>
-                <div class="pf-hero-sub">{{vm.user.email || 'No email on file'}} &nbsp;&#8226;&nbsp; &#128205; Ward {{vm.user.ward || 'N/A'}}</div>
+                <div class="pf-hero-name">{{ vm.user.fullName ? vm.user.fullName : 'Citizen' }}</div>
+                <div class="pf-hero-sub">{{ vm.user.email ? vm.user.email : 'Not provided' }} &nbsp;&#8226;&nbsp; &#128205; Ward {{vm.user.ward || 'N/A'}}</div>
             </div>
             <div class="pf-hero-stats">
                 <div class="pf-hero-stat">
-                    <div class="pf-hero-stat-val">{{vm.connections.length || 3}}</div>
+                    <div class="pf-hero-stat-val">{{vm.connections.length ? vm.connections.length : '3'}}</div>
                     <div class="pf-hero-stat-lbl">Connections</div>
                 </div>
                 <div class="pf-hero-stat-div"></div>
@@ -32,7 +32,7 @@
                 </div>
                 <div class="pf-hero-stat-div"></div>
                 <div class="pf-hero-stat">
-                    <div class="pf-hero-stat-val">{{vm.user.ward || '—'}}</div>
+                    <div class="pf-hero-stat-val">{{vm.user.ward ? vm.user.ward : '—'}}</div>
                     <div class="pf-hero-stat-lbl">Ward</div>
                 </div>
             </div>
@@ -94,49 +94,49 @@
                 <div class="form-display-row">
                     <div class="form-display-label">Full Name</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.fullName}">
-                        {{vm.user.fullName || 'Not provided'}}
+                        {{ vm.user.fullName ? vm.user.fullName : 'Not provided' }}
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Phone Number</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.phone}">
-                        {{vm.user.phone || 'Not provided'}}
+                        {{ vm.user.phone ? vm.user.phone : 'Not provided' }}
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Email Address</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.email}">
-                        {{vm.user.email || 'Not provided'}}
+                        {{ vm.user.email ? vm.user.email : 'Not provided' }}
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Date of Birth</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.dateOfBirth}">
-                        {{vm.user.dateOfBirth || 'Not provided'}}
+                        {{vm.user.dateOfBirth ? vm.user.dateOfBirth : 'Not provided'}}
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Ward / Area</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.ward}">
-                        {{vm.user.ward || 'Not assigned'}}
+                        {{ vm.user.ward ? vm.user.ward : 'Not provided' }}
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">City</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.city}">
-                        {{vm.user.city || 'Not assigned'}}
+                        {{ vm.user.city ? vm.user.city : 'Not provided' }}
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">State</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.state}">
-                        {{vm.user.state || 'Not assigned'}}
+                        {{ vm.user.state ? vm.user.state : 'Not provided' }}
                     </div>
                 </div>
                 <div class="form-display-row full-width">
                     <div class="form-display-label">Address / Locality</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.address}">
-                        {{vm.user.address || 'No address on file'}}
+                        {{ vm.user.address ? vm.user.address : 'Not provided' }}
                     </div>
                 </div>
                 <div class="form-display-row">
