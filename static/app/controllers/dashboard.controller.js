@@ -775,6 +775,83 @@
             };
         }
 
+        // ===== MARKDOWN HELPER =====
+        function mdToHtml(text) {
+            if (!text) return '';
+            // Escape HTML first
+            var s = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            // Bold: **text**
+            s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            // Italic: *text*
+            s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            // Line breaks
+            s = s.replace(/\n/g, '<br>');
+            return s;
+        }
+
+        // ===== GLOBAL ASK SUVIDHA CHAT =====
+        vm.showGlobalChat = false;
+        vm.globalChatInput = '';
+        vm.globalChatHistory = [];
+        vm.globalChatLoading = false;
+
+        vm.openGlobalChat = function() {
+            vm.showGlobalChat = true;
+            $timeout(function() { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
+        };
+
+        vm.closeGlobalChat = function() {
+            vm.showGlobalChat = false;
+            vm.globalChatLoading = false;
+        };
+
+        vm.sendGlobalChat = function() {
+            if (!vm.globalChatInput || vm.globalChatLoading) return;
+            var question = vm.globalChatInput;
+            vm.globalChatHistory.push({ role: 'user', text: question });
+            vm.globalChatInput = '';
+            vm.globalChatLoading = true;
+
+            var totalCost = vm.getTotalCost();
+            var context = [
+                'User: ' + (vm.userData.username || 'Citizen'),
+                'State: ' + (vm.userState || 'N/A'),
+                'Total monthly utility cost: ₹' + totalCost,
+                'Electricity: ' + ((vm.userData.consumption && vm.userData.consumption.electricity.current) || 0) + ' ' + ((vm.userData.consumption && vm.userData.consumption.electricity.unit) || 'kWh') + ', Bill: ₹' + ((vm.userData.consumption && vm.userData.consumption.electricity.current_bill) || 0),
+                'Water: ' + ((vm.userData.consumption && vm.userData.consumption.water.current) || 0) + ' ' + ((vm.userData.consumption && vm.userData.consumption.water.unit) || 'kL') + ', Bill: ₹' + ((vm.userData.consumption && vm.userData.consumption.water.current_bill) || 0),
+                'Gas: ' + ((vm.userData.consumption && vm.userData.consumption.gas.current) || 0) + ' ' + ((vm.userData.consumption && vm.userData.consumption.gas.unit) || 'SCM') + ', Bill: ₹' + ((vm.userData.consumption && vm.userData.consumption.gas.current_bill) || 0),
+                'Question: ' + question
+            ].join('\n');
+
+            fetch('/api/ask-suvidha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: context,
+                    system: 'You are Suvidha, a friendly Indian civic services AI assistant. Help citizens with utility bills, government schemes, consumption tips, and civic services. Be concise and helpful. Use 3-5 short bullet points when giving advice.'
+                })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                $scope.$apply(function() {
+                    vm.globalChatLoading = false;
+                    var text = (data && data.success && data.response) ? mdToHtml(data.response) : ((data && data.error) || 'Sorry, I could not process that. Please try again.');
+                    vm.globalChatHistory.push({ role: 'ai', text: text });
+                    $timeout(function() {
+                        var el = document.querySelector('.global-chat-messages');
+                        if (el) el.scrollTop = el.scrollHeight;
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    }, 50);
+                });
+            })
+            .catch(function() {
+                $scope.$apply(function() {
+                    vm.globalChatLoading = false;
+                    vm.globalChatHistory.push({ role: 'ai', text: 'Unable to connect right now. Please try again later.' });
+                });
+            });
+        };
+
         // ===== ASK SUVIDHA BANDHU (AI) =====
         vm.showBandhuDialog = false;
         vm.bandhuUtility = 'electricity';
@@ -823,50 +900,32 @@
                 'Respond in concise plain English (4-6 short bullet points), mention both highest and lowest month/season, and give action steps for this month.'
             ].join('\n');
 
-            var geminiApiKey = localStorage.getItem('geminiApiKey') || (window.GEMINI_API_KEY || '');
-            if (!geminiApiKey) {
-                vm.suvidhaLoading = false;
-                vm.suvidhaResponse = 'Gemini API key is not configured. Please set localStorage key "geminiApiKey" and try again.';
-                return;
-            }
-
-            fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + geminiApiKey, {
+            fetch('/api/ask-suvidha', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    contents: [
-                        {
-                            role: 'user',
-                            parts: [{ text: composedContext }]
-                        }
-                    ],
-                    generationConfig: {
-                        temperature: 0.6,
-                        topK: 32,
-                        topP: 0.95,
-                        maxOutputTokens: 450
-                    }
+                    message: composedContext,
+                    system: 'You are Suvidha Bandhu, an Indian civic utility advisor. Analyze citizen utility trends and provide practical monthly cost reduction tips. Respond in concise plain English (4-6 short bullet points), mention both highest and lowest month/season, and give action steps for this month.'
                 })
             })
             .then(function(res) { return res.json(); })
             .then(function(data) {
                 $scope.$apply(function() {
                     vm.suvidhaLoading = false;
-                    var candidates = data && data.candidates;
-                    var text = '';
-                    if (candidates && candidates[0] && candidates[0].content && candidates[0].content.parts) {
-                        text = candidates[0].content.parts.map(function(part) { return part.text || ''; }).join('\n');
+                    if (data && data.success && data.response) {
+                        vm.suvidhaResponse = mdToHtml(data.response);
+                    } else {
+                        vm.suvidhaResponse = (data && data.error) || 'I could not process your query right now. Please try again.';
                     }
-                    vm.suvidhaResponse = text || 'I could not process your query right now. Please try again.';
                     vm.suvidhaInput = '';
                 });
             })
             .catch(function() {
                 $scope.$apply(function() {
                     vm.suvidhaLoading = false;
-                    vm.suvidhaResponse = 'Unable to connect to Gemini right now. Please check the API key and internet connection.';
+                    vm.suvidhaResponse = 'Unable to connect to Suvidha AI right now. Please try again later.';
                 });
             });
         };
@@ -1582,13 +1641,39 @@
             var utilityTitle = utility.charAt(0).toUpperCase() + utility.slice(1);
             var period = vm.insightPeriod || '6months';
 
-            // Placeholder response - in production, call Gemini API
-            $timeout(function() {
-                vm.insightLoading = false;
-                // Show success message
-                alert('Thank you for your question! Suvidha will analyze your consumption patterns and provide detailed insights soon.');
-                vm.insightQuestion = '';
-            }, 1500);
+            var insightContext = [
+                'Utility: ' + utilityTitle,
+                'Period: ' + period,
+                'User question: ' + question,
+                'Provide a helpful, concise answer about this utility.'
+            ].join('\n');
+
+            fetch('/api/ask-suvidha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: insightContext,
+                    system: 'You are Suvidha, an Indian civic utility advisor. Give concise, helpful insights about utility consumption. Respond in 4-6 short bullet points with actionable advice.'
+                })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                $scope.$apply(function() {
+                    vm.insightLoading = false;
+                    if (data && data.success && data.response) {
+                        vm.insightAIResponse = mdToHtml(data.response);
+                    } else {
+                        vm.insightAIResponse = (data && data.error) || 'Could not process your query. Please try again.';
+                    }
+                    vm.insightQuestion = '';
+                });
+            })
+            .catch(function() {
+                $scope.$apply(function() {
+                    vm.insightLoading = false;
+                    vm.insightAIResponse = 'Unable to connect to Suvidha AI right now. Please try again later.';
+                });
+            });
         };
 
         init();

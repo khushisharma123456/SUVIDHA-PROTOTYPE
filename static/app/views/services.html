@@ -116,12 +116,19 @@
                                     </div>
                                     <div style="flex: 1;">
                                         <h4 style="margin: 0 0 0.25rem 0; color: #115e59; font-size: 0.95rem; font-weight: 600;">AI Complaint Helper</h4>
-                                        <p style="margin: 0 0 0.75rem 0; color: #0f766e; font-size: 0.8rem;">Describe your problem and let AI automatically select the utility, category, and priority details.</p>
+                                        <p style="margin: 0 0 0.75rem 0; color: #0f766e; font-size: 0.8rem;">Describe your problem in plain language — the system will auto-fill all fields.</p>
                                         <div style="display: flex; gap: 0.5rem;">
-                                            <input type="text" ng-model="vm.aiPrompt" placeholder='e.g., "Street light not working near my house"' class="form-control enhanced" style="background: white; border-color: #5eead4; margin-bottom: 0;">
+                                            <input type="text" ng-model="vm.aiPrompt" placeholder='e.g., "Gas leak smell near my kitchen since morning"' class="form-control enhanced" style="background: white; border-color: #5eead4; margin-bottom: 0;">
                                             <button type="button" class="btn-primary" ng-click="vm.useAiHelper()" style="background: #0d9488; border: none; padding: 0 1rem; border-radius: 8px; flex-shrink: 0;">
                                                 <i data-lucide="wand-2" style="width: 16px; height: 16px;"></i>
                                             </button>
+                                        </div>
+                                        <div style="margin-top: 0.5rem; display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                            <span ng-click="vm.aiPrompt='Gas leak smell near my house since morning'; vm.useAiHelper()" style="cursor: pointer; background: #ccfbf1; color: #115e59; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; border: 1px solid #99f6e4;">🔥 Gas leak</span>
+                                            <span ng-click="vm.aiPrompt='No water supply in our building for 2 days'; vm.useAiHelper()" style="cursor: pointer; background: #ccfbf1; color: #115e59; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; border: 1px solid #99f6e4;">💧 No water</span>
+                                            <span ng-click="vm.aiPrompt='Street light not working on main road near park'; vm.useAiHelper()" style="cursor: pointer; background: #ccfbf1; color: #115e59; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; border: 1px solid #99f6e4;">💡 Street light</span>
+                                            <span ng-click="vm.aiPrompt='Power outage in entire block since last night'; vm.useAiHelper()" style="cursor: pointer; background: #ccfbf1; color: #115e59; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; border: 1px solid #99f6e4;">⚡ Power cut</span>
+                                            <span ng-click="vm.aiPrompt='Dirty brown water coming from taps'; vm.useAiHelper()" style="cursor: pointer; background: #ccfbf1; color: #115e59; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; border: 1px solid #99f6e4;">🚰 Dirty water</span>
                                         </div>
                                     </div>
                                 </div>

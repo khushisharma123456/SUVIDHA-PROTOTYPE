@@ -281,42 +281,189 @@
         }
 
         function useAiHelper() {
-            if (!vm.aiPrompt) return;
-            
-            var text = vm.aiPrompt.toLowerCase();
-            vm.priority = 'medium'; 
-            
-            if (text.includes('street light') || text.includes('power') || text.includes('electricity')) {
-                vm.selectedUtility = 'electricity';
-                vm.updateCategories();
-                
-                if (text.includes('street light')) vm.category = 'Street Light';
-                else if (text.includes('outage') || text.includes('no power')) vm.category = 'Power Outage';
-                else if (text.includes('bill')) vm.category = 'Billing Issue';
-                
-                if (text.includes('spark') || text.includes('fire')) vm.priority = 'high';
-            } 
-            else if (text.includes('water') || text.includes('pipe') || text.includes('leak')) {
-                vm.selectedUtility = 'water';
-                vm.updateCategories();
-                vm.category = text.includes('leak') ? 'Leakage' : 'Supply Issue';
-                
-                if (text.includes('flood') || text.includes('burst')) vm.priority = 'high';
+            if (!vm.aiPrompt || !vm.aiPrompt.trim()) {
+                $rootScope.showDialog('Empty Input', 'Please describe your complaint first. For example: "Gas leak near my house since morning"', 'warning');
+                return;
             }
-            else if (text.includes('gas') || text.includes('smell')) {
-                vm.selectedUtility = 'gas';
-                vm.updateCategories();
-                vm.category = 'Gas Leakage';
-                vm.priority = 'high';
+
+            var text = vm.aiPrompt.toLowerCase().trim();
+            var detected = { utility: null, category: null, priority: 'medium', scope: null, location: null, sla: null };
+
+            // ── Utility & Category Detection ──
+            // Electricity keywords
+            if (text.match(/street\s*light|lamp\s*post|pole\s*light/)) {
+                detected.utility = 'electricity';
+                detected.category = 'Street Light';
+                detected.priority = 'medium';
+            } else if (text.match(/power\s*outage|power\s*cut|no\s*power|blackout|no\s*electricity|light\s*gone|bijli\s*nahi/)) {
+                detected.utility = 'electricity';
+                detected.category = 'Power Outage';
+                detected.priority = 'high';
+            } else if (text.match(/meter\s*(fault|issue|problem|broken|not\s*work|wrong\s*reading)/) && text.match(/electric|power|bijli|light/)) {
+                detected.utility = 'electricity';
+                detected.category = 'Meter Issue';
+                detected.priority = 'medium';
+            } else if (text.match(/electricity.*bill|power.*bill|bill.*electricity|overcharge.*electric|electric.*overcharge/)) {
+                detected.utility = 'electricity';
+                detected.category = 'Billing Issue';
+                detected.priority = 'low';
+            } else if (text.match(/theft|tamper|illegal\s*connect|hook|bypass.*meter/)) {
+                detected.utility = 'electricity';
+                detected.category = 'Theft/Tampering';
+                detected.priority = 'high';
+            } else if (text.match(/spark|fire|wire.*hang|wire.*down|electric.*shock|short\s*circuit/)) {
+                detected.utility = 'electricity';
+                detected.category = 'Power Outage';
+                detected.priority = 'high';
             }
-            
-            if (text.includes('house') || text.includes('my home')) vm.impactScope = 'Individual House';
-            else if (text.includes('street') || text.includes('road')) vm.impactScope = 'Entire Street';
-            
+            // Gas keywords
+            else if (text.match(/gas\s*leak|gas\s*leakage|smell.*gas|gas.*smell|gas\s*odou?r|rotten.*egg/)) {
+                detected.utility = 'gas';
+                detected.category = 'Gas Leakage';
+                detected.priority = 'high';
+            } else if (text.match(/no\s*gas|gas\s*supply|low\s*pressure.*gas|gas.*low\s*pressure|gas.*not\s*com/)) {
+                detected.utility = 'gas';
+                detected.category = 'Supply Issue';
+                detected.priority = 'medium';
+            } else if (text.match(/gas.*bill|bill.*gas|png.*bill/)) {
+                detected.utility = 'gas';
+                detected.category = 'Billing Issue';
+                detected.priority = 'low';
+            } else if (text.match(/gas.*meter|meter.*gas|png.*meter/)) {
+                detected.utility = 'gas';
+                detected.category = 'Meter Issue';
+                detected.priority = 'medium';
+            } else if (text.match(/gas.*safe|gas.*inspect|gas.*danger|pipeline.*check/)) {
+                detected.utility = 'gas';
+                detected.category = 'Safety Concern';
+                detected.priority = 'high';
+            }
+            // Water keywords
+            else if (text.match(/water.*leak|leak.*water|pipe.*leak|pipe.*burst|broken\s*pipe|pipe.*broken|water.*flood/)) {
+                detected.utility = 'water';
+                detected.category = 'Leakage';
+                detected.priority = 'high';
+            } else if (text.match(/no\s*water|water\s*supply|low\s*pressure.*water|water.*low\s*pressure|water.*not\s*com|paani\s*nahi/)) {
+                detected.utility = 'water';
+                detected.category = 'Supply Issue';
+                detected.priority = 'medium';
+            } else if (text.match(/dirty\s*water|water.*dirty|water.*colour|water.*color|brown\s*water|yellow\s*water|contamina|water.*quality|water.*smell/)) {
+                detected.utility = 'water';
+                detected.category = 'Water Quality';
+                detected.priority = 'high';
+            } else if (text.match(/water.*bill|bill.*water|jal.*bill/)) {
+                detected.utility = 'water';
+                detected.category = 'Billing Issue';
+                detected.priority = 'low';
+            } else if (text.match(/water.*meter|meter.*water/)) {
+                detected.utility = 'water';
+                detected.category = 'Meter Issue';
+                detected.priority = 'medium';
+            }
+            // Broad single-word fallbacks
+            else if (text.match(/\b(electricity|electric|power|bijli|light)\b/)) {
+                detected.utility = 'electricity';
+                detected.category = 'Power Outage';
+                detected.priority = 'medium';
+            } else if (text.match(/\b(gas|png|igl)\b/)) {
+                detected.utility = 'gas';
+                detected.category = 'Gas Leakage';
+                detected.priority = 'high';
+            } else if (text.match(/\b(water|paani|pipe|jal)\b/)) {
+                detected.utility = 'water';
+                detected.category = 'Supply Issue';
+                detected.priority = 'medium';
+            }
+
+            // ── Priority overrides from urgency keywords ──
+            if (text.match(/urgent|emergency|danger|immediate|asap|critical|life\s*threat|hazard/)) {
+                detected.priority = 'high';
+            }
+            if (text.match(/minor|routine|small|not\s*urgent|whenever/)) {
+                detected.priority = 'low';
+            }
+
+            // ── Impact Scope Detection ──
+            if (text.match(/my\s*house|my\s*home|my\s*flat|my\s*apartment|individual/)) {
+                detected.scope = 'Individual House';
+            } else if (text.match(/building|society|apartment\s*complex|tower|floor/)) {
+                detected.scope = 'Entire Building';
+            } else if (text.match(/street|road|lane|block|sector|area|colony|mohalla|neighbourhood|neighborhood|entire/)) {
+                detected.scope = 'Entire Street';
+            } else {
+                detected.scope = 'Individual House';
+            }
+
+            // ── Location Detection ──
+            var locationPatterns = [
+                /(?:near|at|in|around|behind|opposite|next\s*to)\s+([^.]{3,40})(?:\s*since|\s*from|\.|$)/i,
+                /(?:sector|block|lane|road|colony|nagar|vihar|enclave|park)\s*[\-\s]?\w*/i
+            ];
+            detected.location = null;
+            for (var lp = 0; lp < locationPatterns.length; lp++) {
+                var locMatch = vm.aiPrompt.match(locationPatterns[lp]);
+                if (locMatch) {
+                    detected.location = locMatch[0].replace(/since.*|from.*/i, '').trim();
+                    break;
+                }
+            }
+            if (!detected.location) {
+                detected.location = 'Kailash Colony, New Delhi';
+            }
+
+            // ── If nothing detected ──
+            if (!detected.utility) {
+                $rootScope.showDialog(
+                    'Could Not Identify',
+                    'I could not detect the utility type from your description. Try including keywords like "electricity", "water", "gas", "power outage", "gas leak", "pipe burst", etc.\n\nExamples:\n• "Gas leak smell near my kitchen since morning"\n• "No water supply in our building for 2 days"\n• "Street light not working on main road"',
+                    'warning'
+                );
+                return;
+            }
+
+            // ── Apply to form ──
+            vm.selectedUtility = detected.utility;
+            vm.updateCategories();
+            vm.category = detected.category;
+            vm.priority = detected.priority;
+            vm.impactScope = detected.scope;
+            vm.location = detected.location;
             vm.description = vm.aiPrompt;
-            vm.location = 'Kalkaji, New Delhi'; // Mocked
-            
-            $rootScope.showDialog('AI Assistant', 'I have identified the utility, category, and priority based on your description. Please review and submit.', 'success');
+
+            // Mock incident date — set to a few hours ago
+            var now = new Date();
+            now.setHours(now.getHours() - 2);
+            vm.incidentDate = now;
+
+            // Mock consumer ID based on utility
+            var mockIds = { 'electricity': 'BRPL-KLJ-204857', 'water': 'DJB-K-38291', 'gas': 'IGL-BP-104729' };
+            vm.identifier = mockIds[detected.utility] || '';
+
+            // SLA info
+            var slaMap = { 'electricity': '24–48 hours', 'water': '3–5 working days', 'gas': 'Emergency: 2–4 hours' };
+            detected.sla = slaMap[detected.utility];
+
+            // ── Build a visual breakdown summary ──
+            var utilityLabel = { 'electricity': '⚡ Electricity (BRPL)', 'water': '💧 Water (DJB)', 'gas': '🔥 Gas (IGL)' };
+            var priorityLabel = { 'low': '🟢 Low (Routine)', 'medium': '🟡 Medium', 'high': '🔴 High (Emergency)' };
+
+            var summary = 
+                '✅ All fields auto-filled from your description:\n\n' +
+                '🏢 Utility: ' + utilityLabel[detected.utility] + '\n' +
+                '📋 Category: ' + detected.category + '\n' +
+                '🚨 Priority: ' + priorityLabel[detected.priority] + '\n' +
+                '📍 Location: ' + detected.location + '\n' +
+                '🏠 Scope: ' + detected.scope + '\n' +
+                '🆔 Consumer ID: ' + vm.identifier + ' (demo)\n' +
+                '⏱️ SLA: ' + detected.sla + '\n\n' +
+                'Please review the form below and click Submit.';
+
+            $rootScope.showDialog('AI Complaint Helper — Analysis Complete', summary, 'success');
+
+            // Refresh icons after form updates
+            $timeout(function() {
+                if (window.lucide) lucide.createIcons();
+            }, 200);
         }
 
         function openMapPicker() {

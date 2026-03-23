@@ -1960,15 +1960,18 @@
         /* ══════════════════════════════════════════
            WALLET SECTION (REDESIGNED)
         ══════════════════════════════════════════ */
+        .wallet-section-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
         .wallet-row {
             display: grid;
             grid-template-columns: 1fr 2fr;
             gap: 0;
             background: white;
-            border-radius: var(--radius-xl);
             overflow: hidden;
-            border: 1px solid var(--gov-gray-200);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
 
         .wallet-balance-panel {
@@ -2348,7 +2351,11 @@
             </div>
 
             <!-- ══ WALLET ══ -->
-            <div class="wallet-row">
+            <div class="section-card wallet-section-wrapper">
+              <div class="sc-header">
+                <div class="sc-title">💰 Wallet</div>
+              </div>
+              <div class="wallet-row">
                 <div class="wallet-balance-panel">
                     <div class="wallet-coin">🪙</div>
                     <div>
@@ -2384,6 +2391,7 @@
                         </button>
                     </div>
                 </div>
+              </div>
             </div>
 
         </div><!-- /worker-content -->

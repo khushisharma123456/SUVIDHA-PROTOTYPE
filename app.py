@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request, jsonify, send_from_directory, redirect
+from flask import Flask, render_template, session, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import secrets
@@ -13,9 +13,6 @@ from models import (db, User, Vendor, Community, CommunityStats, Bill, ServiceRe
                     FieldOperation, WardStats, ParticipationScheme, Redemption,
                     FieldAgent, TaskAssignment, AgentLocationHistory, AgentPerformance,
                     Household, MeterSubmission, ImageHash)
-
-# Import translation service (commented for now - can be enabled later)
-# from translations_service import TranslationService
 
 # Import admin blueprint
 from admin_routes import admin_bp, init_admin_models
@@ -119,7 +116,7 @@ with app.app_context():
 # ============================================
 @app.route('/')
 def landing():
-    return render_template('landing.html')
+    return render_template('index.html')
 
 @app.route('/app')
 def citizen_app():
@@ -2747,7 +2744,7 @@ def _local_intent_match(text):
 
     keyword_map = [
         (['dashboard', 'home', 'main page'],        'open_dashboard',       'Opening dashboard'),
-        (['service', 'services'],                     'open_services',        'Opening services'),
+        (['service', 'services', 'complaint', 'register a complaint', 'register complaint', 'grievance'], 'open_services', 'Opening services'),
         (['waste', 'garbage', 'trash', 'dustbin'],   'open_wastemanagement', 'Opening waste management'),
         (['wallet', 'payment', 'pay', 'bill', 'money'], 'open_wallet',      'Taking you to wallet'),
         (['record', 'records', 'history'],            'open_record',          'Opening records'),
@@ -2841,93 +2838,62 @@ def api_verify_image():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
-# ============================================
-# MULTILINGUAL / TRANSLATION ENDPOINTS
-# ============================================
+# ===== ASK SUVIDHA (Cohere AI Proxy) =====
+COHERE_API_KEY = os.environ.get('COHERE_API_KEY', 'Wnbb8UEKegZDy1SgH0plrAle330uIi8igLi6tR3F')
 
-@app.route('/api/language/set/<language>', methods=['POST', 'GET'])
-def api_set_language(language):
-    """Set user's preferred language"""
+@app.route('/api/ask-suvidha', methods=['POST'])
+def ask_suvidha():
+    """Proxy endpoint for Cohere AI chat to avoid CORS issues."""
+    data = request.get_json()
+    if not data or not data.get('message'):
+        return jsonify({'success': False, 'error': 'Message is required'}), 400
+
+    user_message = data['message']
+    system_prompt = data.get('system', 'You are Suvidha Bandhu, an Indian civic utility advisor.')
+
+    # Limit message length to prevent abuse
+    if len(user_message) > 2000:
+        return jsonify({'success': False, 'error': 'Message too long'}), 400
+
     try:
-        if TranslationService.set_language(language):
-            # Update user's database preference if logged in
-            user_id = session.get('user_id')
-            if user_id:
-                user = User.query.get(user_id)
-                if user:
-                    user.preferred_language = language
-                    db.session.commit()
-            
-            return jsonify({
-                'success': True,
-                'message': f'Language changed to {language}',
-                'language': language,
-                'available_languages': TranslationService.get_available_languages()
-            }), 200
-        else:
-            return jsonify({
-                'success': False,
-                'message': f'Language {language} not supported',
-                'available_languages': TranslationService.get_available_languages()
-            }), 400
+        response = requests.post(
+            'https://api.cohere.com/v2/chat',
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {COHERE_API_KEY}'
+            },
+            json={
+                'model': 'command-a-03-2025',
+                'messages': [
+                    {'role': 'system', 'content': system_prompt},
+                    {'role': 'user', 'content': user_message}
+                ],
+                'temperature': 0.6,
+                'max_tokens': 450
+            },
+            timeout=30
+        )
+
+        result = response.json()
+
+        if response.status_code != 200:
+            error_msg = result.get('message', 'Cohere API error')
+            return jsonify({'success': False, 'error': error_msg}), 502
+
+        text = ''
+        if result.get('message') and result['message'].get('content'):
+            parts = result['message']['content']
+            if isinstance(parts, list) and len(parts) > 0:
+                text = parts[0].get('text', '')
+            elif isinstance(parts, str):
+                text = parts
+
+        return jsonify({'success': True, 'response': text})
+
+    except requests.exceptions.Timeout:
+        return jsonify({'success': False, 'error': 'Request timed out'}), 504
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-
-@app.route('/api/language/current', methods=['GET'])
-def api_get_current_language():
-    """Get current language preference"""
-    try:
-        current_lang = TranslationService.get_language()
-        return jsonify({
-            'success': True,
-            'language': current_lang,
-            'available_languages': TranslationService.get_available_languages()
-        }), 200
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-
-@app.route('/api/language/translate', methods=['POST'])
-def api_translate():
-    """Translate text or keys"""
-    try:
-        data = request.get_json()
-        key = data.get('key')
-        language = data.get('language') or TranslationService.get_language()
-        
-        if not key:
-            return jsonify({'success': False, 'message': 'Key is required'}), 400
-        
-        translation = TranslationService.translate(key, language)
-        
-        return jsonify({
-            'success': True,
-            'key': key,
-            'translation': translation,
-            'language': language
-        }), 200
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-
-@app.route('/api/language/available', methods=['GET'])
-def api_get_available_languages():
-    """Get all available languages"""
-    try:
-        return jsonify({
-            'success': True,
-            'languages': TranslationService.get_available_languages(),
-            'language_names': {
-                'en': 'English',
-                'hi': 'हिन्दी (Hindi)',
-                'ta': 'தமிழ் (Tamil)',
-                'te': 'తెలుగు (Telugu)',
-                'bn': 'বাংলা (Bengali)'
-            }
-        }), 200
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Failed to connect to AI service'}), 502
 
 
 if __name__ == '__main__':

@@ -149,7 +149,7 @@
                 <div class="modal-header">
                     <div class="modal-header-left">
                         <div class="modal-header-icon"><i data-lucide="sparkles"></i></div>
-                        <h2 class="modal-title">Ask Suvidha Bandhu â€” {{(vm.bandhuUtility || 'utility') | uppercase}}</h2>
+                        <h2 class="modal-title">Ask Suvidha Bandhu &mdash; {{(vm.bandhuUtility || 'utility') | uppercase}}</h2>
                     </div>
                     <button class="modal-close" ng-click="vm.closeBandhuDialog()"><i data-lucide="x"></i></button>
                 </div>
@@ -158,7 +158,7 @@
                         <p class="bandhu-hint">Ask about high-bill months, seasonal usage, and ways to reduce your next bill.</p>
                         <div class="ask-suvidha-response" ng-show="vm.suvidhaResponse">
                             <i data-lucide="bot"></i>
-                            <p>{{vm.suvidhaResponse}}</p>
+                            <p ng-bind-html="vm.suvidhaResponse"></p>
                         </div>
                         <div class="ask-suvidha-response" ng-show="vm.suvidhaLoading" style="border-left-color:var(--accent-saffron);">
                             <i data-lucide="loader" style="animation:spin 1s linear infinite;"></i>
@@ -176,7 +176,7 @@
                 <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem;">
                     <button class="btn-primary" style="flex:1;" ng-click="vm.askSuvidhaBandhu()" ng-disabled="vm.suvidhaLoading || !vm.suvidhaInput">
                         <i data-lucide="send" style="width:16px;height:16px;"></i>
-                        {{vm.suvidhaLoading ? 'Analyzing...' : 'Ask Gemini'}}
+                        {{vm.suvidhaLoading ? 'Analyzing...' : 'Ask Suvidha'}}
                     </button>
                     <button class="btn-secondary" ng-click="vm.closeBandhuDialog()">Close</button>
                 </div>
@@ -193,7 +193,7 @@
                             <i data-lucide="sparkles"></i>
                         </div>
                         <div>
-                            <h2 class="modal-title">Utility Insights â€” Ask Suvidha</h2>
+                            <h2 class="modal-title">Utility Insights &mdash; Ask Suvidha</h2>
                             <p style="font-size:0.8rem; color:#9ca3af; margin:0.25rem 0 0;">Personalized recommendations based on your consumption</p>
                         </div>
                     </div>
@@ -252,6 +252,13 @@
                             placeholder="Ask about high bills, seasonal usage, or ways to reduce consumption..."
                             style="width:100%; min-height:80px; padding:0.75rem; border:1px solid #d1d5db; border-radius:8px; font-family:inherit; font-size:0.85rem;"
                         ></textarea>
+                    </div>
+                    <!-- AI Response -->
+                    <div ng-show="vm.insightAIResponse" style="margin-top:1rem; padding:1rem; background:#f0fdf4; border-left:3px solid #22c55e; border-radius:8px;">
+                        <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+                            <i data-lucide="bot" style="width:18px;height:18px; color:#22c55e; flex-shrink:0; margin-top:2px;"></i>
+                            <p style="margin:0; font-size:0.85rem; color:#374151;" ng-bind-html="vm.insightAIResponse"></p>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem; justify-content:flex-end;">
@@ -762,6 +769,60 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- Floating Ask Suvidha Chat Button -->
+        <button class="ask-suvidha-fab" ng-click="vm.openGlobalChat()" title="Ask Suvidha">
+            <i data-lucide="sparkles" style="width:22px;height:22px;"></i>
+            <span>Ask Suvidha</span>
+        </button>
+
+        <!-- Global Suvidha Chat Dialog -->
+        <div class="modal-overlay" ng-show="vm.showGlobalChat" ng-click="vm.closeGlobalChat()" style="z-index:9100;"></div>
+        <div class="utility-modal" ng-show="vm.showGlobalChat" ng-class="{'active': vm.showGlobalChat}" style="z-index:9101;">
+            <div class="modal-content ai-bandhu-modal" style="max-width:560px;">
+                <div class="modal-header">
+                    <div class="modal-header-left">
+                        <div class="modal-header-icon" style="background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%); color:#fff;">
+                            <i data-lucide="sparkles"></i>
+                        </div>
+                        <h2 class="modal-title">Ask Suvidha</h2>
+                    </div>
+                    <button class="modal-close" ng-click="vm.closeGlobalChat()"><i data-lucide="x"></i></button>
+                </div>
+                <div class="modal-body" style="padding:1.2rem 1.5rem;">
+                    <p style="font-size:0.85rem; color:#6b7280; margin:0 0 1rem;">Ask anything about your bills, consumption, government schemes, or civic services.</p>
+                    <!-- Chat History -->
+                    <div class="global-chat-messages" style="max-height:300px; overflow-y:auto; margin-bottom:1rem;">
+                        <div ng-repeat="msg in vm.globalChatHistory" style="margin-bottom:0.75rem;">
+                            <div ng-if="msg.role === 'user'" style="text-align:right;">
+                                <span style="display:inline-block; background:#e0f2fe; color:#1e40af; padding:0.5rem 0.75rem; border-radius:12px 12px 0 12px; font-size:0.85rem; max-width:80%;">{{msg.text}}</span>
+                            </div>
+                            <div ng-if="msg.role === 'ai'" style="text-align:left;">
+                                <div style="display:inline-flex; align-items:flex-start; gap:0.5rem; max-width:90%;">
+                                    <i data-lucide="bot" style="width:16px;height:16px; color:#f59e0b; flex-shrink:0; margin-top:4px;"></i>
+                                    <span style="display:inline-block; background:#fffbeb; color:#374151; padding:0.5rem 0.75rem; border-radius:12px 12px 12px 0; font-size:0.85rem;" ng-bind-html="msg.text"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="vm.globalChatLoading" style="text-align:left;">
+                            <div style="display:inline-flex; align-items:center; gap:0.5rem; background:#fffbeb; padding:0.5rem 0.75rem; border-radius:12px; font-size:0.85rem; color:#9ca3af;">
+                                <i data-lucide="loader" style="width:14px;height:14px; animation:spin 1s linear infinite;"></i>
+                                Thinking...
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:0.5rem;">
+                        <textarea class="suvidha-input suvidha-textarea" ng-model="vm.globalChatInput"
+                            placeholder="e.g. How can I reduce my electricity bill?"
+                            rows="2" style="flex:1;"></textarea>
+                        <button class="btn-primary" ng-click="vm.sendGlobalChat()" ng-disabled="vm.globalChatLoading || !vm.globalChatInput"
+                            style="padding:0.5rem 1rem; align-self:flex-end;">
+                            <i data-lucide="send" style="width:16px;height:16px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>

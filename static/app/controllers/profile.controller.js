@@ -34,7 +34,9 @@
             billSms: true,
             usageEmail: true,
             highContrast: false,
-            largeText: false
+            largeText: false,
+            theme: 'current',
+            professionalTheme: false
         };
 
         // Load saved preferences from localStorage
@@ -67,7 +69,31 @@
             }
         };
 
+        vm.onThemeToggle = function() {
+            if (vm.preferences.professionalTheme) {
+                document.body.classList.add('professional-theme');
+                vm.preferences.theme = 'professional';
+            } else {
+                document.body.classList.remove('professional-theme');
+                vm.preferences.theme = 'current';
+            }
+            localStorage.setItem('suvidhaPreferences', JSON.stringify(vm.preferences));
+        };
+
+        // Apply saved theme on controller init
+        if (vm.preferences.professionalTheme) {
+            document.body.classList.add('professional-theme');
+        }
+
         vm.savePreferences = function() {
+            // Apply theme
+            if (vm.preferences.professionalTheme) {
+                document.body.classList.add('professional-theme');
+                vm.preferences.theme = 'professional';
+            } else {
+                document.body.classList.remove('professional-theme');
+                vm.preferences.theme = 'current';
+            }
             localStorage.setItem('suvidhaPreferences', JSON.stringify(vm.preferences));
             $rootScope.showDialog(
                 'Preferences Saved',
@@ -77,7 +103,8 @@
         };
 
         vm.resetPreferences = function() {
-            vm.preferences = { language: 'en', billSms: true, usageEmail: true, highContrast: false, largeText: false, paymentSms: true, advisoryEmail: false };
+            vm.preferences = { language: 'en', billSms: true, usageEmail: true, highContrast: false, largeText: false, paymentSms: true, advisoryEmail: false, theme: 'current', professionalTheme: false };
+            document.body.classList.remove('professional-theme');
             localStorage.removeItem('suvidhaPreferences');
             $rootScope.showDialog('Preferences Reset', 'All preferences have been reset to defaults.', 'info');
         };

@@ -189,6 +189,25 @@
                 </div>
             </div>
 
+            <!-- Theme Toggle - inside Accessibility card style -->
+            <div class="settings-card" style="margin-top: 1.5rem;">
+                <div class="settings-card-header">
+                    <span class="icon">🎨</span> Theme
+                </div>
+                <div class="settings-card-body">
+                    <div class="setting-item">
+                        <div class="setting-item-text">
+                            <div class="setting-label">Professional Mode</div>
+                            <div class="setting-desc">Clean minimal layout — light gray background, no emojis, no backdrop image</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ng-model="vm.preferences.professionalTheme" ng-change="vm.onThemeToggle()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <div class="settings-actions" style="margin-top: 2rem; margin-bottom: 3rem;">
                 <button class="gov-btn primary" ng-click="vm.savePreferences()" style="margin-right: 1rem;">Save Preferences</button>
                 <button class="gov-btn outline" ng-click="vm.resetPreferences()">Reset to Default</button>
