@@ -809,31 +809,8 @@ def api_dashboard():
     
     # For demo purposes, use a default user if not logged in
     if not user_id:
-        # Try to get first user from database for demo
-        demo_user = User.query.first()
-        if demo_user:
-            user_id = demo_user.id
-        else:
-            # Return empty data structure
-            return jsonify({
-                'username': 'Guest User',
-                'user': {
-                    'full_name': 'Guest User',
-                    'email': 'guest@example.com',
-                    'phone': 'N/A',
-                    'state': 'N/A',
-                    'city': 'N/A',
-                    'ward': 'N/A',
-                    'locality': 'N/A'
-                },
-                'consumption': {
-                    'electricity': {'current': 0, 'unit': 'kWh', 'current_bill': 0, 'due_date': 'N/A', 'status': 'none'},
-                    'gas': {'current': 0, 'unit': 'SCM', 'current_bill': 0, 'status': 'none'},
-                    'water': {'current': 0, 'unit': 'kL', 'current_bill': 0, 'status': 'none'}
-                },
-                'reports': {'total': 0, 'open': 0, 'resolved': 0, 'in_progress': 0},
-                'community': {'points': 0, 'challenges': 0, 'reports_submitted': 0, 'badges': []}
-            })
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     
     try:
         # Get user details
