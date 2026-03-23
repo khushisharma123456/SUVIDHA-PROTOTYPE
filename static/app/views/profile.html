@@ -1,11 +1,11 @@
-<div class="main-content">
+<div class="main-content" ng-controller="ProfileController as vm">
     <div class="dashboard-container">
 
         <!-- HERO STRIP -->
         <div class="pf-hero-strip">
             <div class="pf-hero-avatar-col">
                 <div class="pf-avatar-wrap">
-                    <img ng-if="vm.user.profilePicture" src="{{vm.user.profilePicture}}" alt="{{vm.user.fullName}}" class="pf-avatar-img">
+                    <img ng-if="vm.user.profilePicture" src="{{vm.user.profilePicture}}" alt="[[vm.user.fullName]]" class="pf-avatar-img">
                     <div ng-if="!vm.user.profilePicture" class="pf-avatar-initials">
                         {{vm.user.fullName.charAt(0).toUpperCase()}}
                     </div>
@@ -94,61 +94,61 @@
                 <div class="form-display-row">
                     <div class="form-display-label">Full Name</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.fullName}">
-                        {{ vm.user.fullName ? vm.user.fullName : 'Not provided' }}
+                        {{vm.userData.username || 'Citizen'}}
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Phone Number</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.phone}">
-                        {{ vm.user.phone ? vm.user.phone : 'Not provided' }}
+                        [[ vm.user.phone ? vm.user.phone : 'Not provided' ]]
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Email Address</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.email}">
-                        {{ vm.user.email ? vm.user.email : 'Not provided' }}
+                        [[ vm.user.email ? vm.user.email : 'Not provided' ]]
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Date of Birth</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.dateOfBirth}">
-                        {{vm.user.dateOfBirth ? vm.user.dateOfBirth : 'Not provided'}}
+                        [[vm.user.dateOfBirth ? vm.user.dateOfBirth : 'Not provided']]
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Ward / Area</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.ward}">
-                        {{ vm.user.ward ? vm.user.ward : 'Not provided' }}
+                        [[ vm.user.ward ? vm.user.ward : 'Not provided' ]]
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">City</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.city}">
-                        {{ vm.user.city ? vm.user.city : 'Not provided' }}
+                        [[ vm.user.city ? vm.user.city : 'Not provided' ]]
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">State</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.state}">
-                        {{ vm.user.state ? vm.user.state : 'Not provided' }}
+                        [[ vm.user.state ? vm.user.state : 'Not provided' ]]
                     </div>
                 </div>
                 <div class="form-display-row full-width">
                     <div class="form-display-label">Address / Locality</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.address}">
-                        {{ vm.user.address ? vm.user.address : 'Not provided' }}
+                        [[ vm.user.address ? vm.user.address : 'Not provided' ]]
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Account Type</div>
                     <div class="form-display-value">
-                        {{vm.user.userType === 'senior_citizen' ? 'Senior Citizen' : 'General Citizen'}}
+                        [[vm.user.userType === 'senior_citizen' ? 'Senior Citizen' : 'General Citizen']]
                     </div>
                 </div>
                 <div class="form-display-row">
                     <div class="form-display-label">Member Since</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.accountCreated}">
-                        {{vm.user.accountCreated ? (vm.user.accountCreated | date:'mediumDate') : 'N/A'}}
+                        [[vm.user.accountCreated ? (vm.user.accountCreated | date:'mediumDate') : 'N/A']]
                     </div>
                 </div>
             </div>

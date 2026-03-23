@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="landingApp">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -14,9 +14,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- AngularJS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-
+    
     <style>
         /* CSS Variables */
         :root {
@@ -545,7 +543,7 @@
 </head>
 
 <body>
-    <div class="landing-page" ng-controller="LandingController" ng-cloak>
+    <div class="landing-page">
         <!-- Main Content -->
         <div class="landing-content">
             <!-- Logo & Title Section -->
@@ -568,10 +566,10 @@
 
             <!-- Auth Buttons -->
             <div class="landing-auth-buttons">
-                <button class="auth-btn login-btn" ng-click="goToLogin()">
+                <button class="auth-btn login-btn" onclick="window.location.href='/login'">
                     Log In
                 </button>
-                <button class="auth-btn signup-btn" ng-click="goToSignup()">
+                <button class="auth-btn signup-btn" onclick="window.location.href='/signup'">
                     Sign Up
                 </button>
             </div>

@@ -3,6 +3,7 @@
     'use strict';
 
     angular.module('suvidhaApp', ['ngRoute', 'ngSanitize'])
+    
         .config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
             $routeProvider
                 .when('/', {
