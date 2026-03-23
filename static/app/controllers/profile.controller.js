@@ -25,10 +25,16 @@
                 address: storedUser.locality || '',
                 ward: storedUser.ward || '',
                 city: storedUser.city || '',
-                state: storedUser.state || ''
+                state: storedUser.state || '',
+                dateOfBirth: storedUser.date_of_birth || '',
+                preferredLanguage: storedUser.preferred_language || 'en',
+                userType: storedUser.user_type || 'general',
+                accountCreated: storedUser.account_created || '',
+                alertsEnabled: storedUser.alerts_enabled !== false,
+                isVerified: storedUser.is_verified || false
             };
         } else {
-            vm.user = { fullName: '', email: '', phone: '', address: '', ward: '', city: '', state: '' };
+            vm.user = { fullName: '', email: '', phone: '', address: '', ward: '', city: '', state: '', dateOfBirth: '', preferredLanguage: 'en', userType: 'general', accountCreated: '', alertsEnabled: true, isVerified: false };
         }
 
         // Preferences
@@ -63,7 +69,9 @@
                 locality: vm.user.address,
                 state: vm.user.state,
                 city: vm.user.city,
-                ward: vm.user.ward
+                ward: vm.user.ward,
+                date_of_birth: vm.user.dateOfBirth || null,
+                alerts_enabled: vm.user.alertsEnabled
             };
             
             ApiService.updateProfileData(profileData)
@@ -164,24 +172,23 @@
                             address: p.locality || p.address || 'No address on file',
                             ward: p.ward || 'N/A',
                             city: p.city || 'Not assigned',
-                            state: p.state || 'Not assigned'
+                            state: p.state || 'Not assigned',
+                            dateOfBirth: p.date_of_birth || '',
+                            preferredLanguage: p.preferred_language || 'en',
+                            userType: p.user_type || 'general',
+                            accountCreated: p.account_created || '',
+                            alertsEnabled: p.alerts_enabled !== false,
+                            isVerified: p.is_verified || false,
+                            profilePicture: vm.user.profilePicture || null
                         };
+                        // Sync to localStorage so other pages stay in sync
+                        localStorage.setItem('suvidhaUser', JSON.stringify(p));
                         console.log('✅ Profile loaded from database:', vm.user);
                     }
                     vm.loading = false;
                 })
                 .catch(function(error) {
-                    console.warn('Could not load from API, using demo data:', error.status);
-                    // Use demo/mock data for development/demo purposes
-                    vm.user = {
-                        fullName: 'Demo Citizen',
-                        email: 'demo@suvidha.gov.in',
-                        phone: '+91-9876543210',
-                        address: 'Sector 12, Delhi',
-                        ward: '1',
-                        city: 'New Delhi',
-                        state: 'Delhi'
-                    };
+                    console.warn('Could not load from API, using localStorage data:', error.status);
                     vm.loading = false;
                 });
         }

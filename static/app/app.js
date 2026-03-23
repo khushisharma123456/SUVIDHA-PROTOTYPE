@@ -51,7 +51,7 @@
                     requireAuth: true
                 })
                 .when('/profile', {
-                    templateUrl: '/static/app/views/profile.html?v=4',
+                    templateUrl: '/static/app/views/profile.html?v=5',
                     controller: 'ProfileController',
                     controllerAs: 'vm',
                     requireAuth: true

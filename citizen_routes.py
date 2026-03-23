@@ -174,62 +174,8 @@ def citizen_logout():
     session.clear()
     return jsonify({'success': True, 'message': 'Logged out successfully'}), 200
 
-@citizen_bp.route('/api/citizen/profile', methods=['GET'])
-def get_citizen_profile():
-    """Get citizen profile details"""
-    try:
-        user_id = session.get('user_id')
-        if not user_id:
-            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
-        
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({'success': False, 'message': 'User not found'}), 404
-        
-        return jsonify({
-            'success': True,
-            'user': user.to_dict()
-        }), 200
-        
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-@citizen_bp.route('/api/citizen/profile', methods=['PUT'])
-def update_citizen_profile():
-    """Update citizen profile"""
-    try:
-        user_id = session.get('user_id')
-        if not user_id:
-            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
-        
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({'success': False, 'message': 'User not found'}), 404
-        
-        data = request.get_json()
-        
-        if 'fullName' in data:
-            user.full_name = data['fullName']
-        if 'phone' in data:
-            user.phone = data['phone']
-        if 'preferredLanguage' in data:
-            user.preferred_language = data['preferredLanguage']
-        if 'alertsEnabled' in data:
-            user.alerts_enabled = data['alertsEnabled']
-        if 'locality' in data:
-            user.locality = data['locality']
-        
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': 'Profile updated successfully',
-            'user': user.to_dict()
-        }), 200
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)}), 500
+# NOTE: Primary profile GET/PUT endpoints are defined further below in the
+# "PROFILE MANAGEMENT ENDPOINTS" section (get_user_profile / update_user_profile).
 
 # ============================================
 # BILLS MANAGEMENT ENDPOINTS
