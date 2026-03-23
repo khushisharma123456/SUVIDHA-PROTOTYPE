@@ -2839,7 +2839,6 @@ def api_verify_image():
         )
         db.session.add(new_hash)
         db.session.commit()
-
         result['success'] = True
         return jsonify(result), 200
 
@@ -2849,7 +2848,7 @@ def api_verify_image():
 
 
 # ===== ASK SUVIDHA (Cohere AI Proxy) =====
-COHERE_API_KEY = os.environ.get('COHERE_API_KEY', 'Wnbb8UEKegZDy1SgH0plrAle330uIi8igLi6tR3F')
+COHERE_API_KEY = os.environ.get('COHERE_API_KEY', '')
 
 @app.route('/api/ask-suvidha', methods=['POST'])
 def ask_suvidha():
@@ -2860,6 +2859,9 @@ def ask_suvidha():
 
     user_message = data['message']
     system_prompt = data.get('system', 'You are Suvidha Bandhu, an Indian civic utility advisor.')
+
+    if not COHERE_API_KEY:
+        return jsonify({'success': False, 'error': 'AI service is not configured. Please set COHERE_API_KEY.'}), 503
 
     # Limit message length to prevent abuse
     if len(user_message) > 2000:

@@ -15,16 +15,21 @@
         vm.editMode = false;
         vm.saving = false;
 
-        // Initialize with default empty user object
-        vm.user = {
-            fullName: 'Citizen',
-            email: 'No email on file',
-            phone: 'Not provided',
-            address: 'No address on file',
-            ward: 'N/A',
-            city: 'Not assigned',
-            state: 'Not assigned'
-        };
+        // Load from localStorage immediately
+        var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
+        if (storedUser) {
+            vm.user = {
+                fullName: storedUser.full_name || storedUser.name || '',
+                email: storedUser.email || '',
+                phone: storedUser.phone || '',
+                address: storedUser.locality || '',
+                ward: storedUser.ward || '',
+                city: storedUser.city || '',
+                state: storedUser.state || ''
+            };
+        } else {
+            vm.user = { fullName: '', email: '', phone: '', address: '', ward: '', city: '', state: '' };
+        }
 
         // Preferences
         vm.preferences = {
@@ -32,9 +37,7 @@
             billSms: true,
             usageEmail: true,
             highContrast: false,
-            largeText: false,
-            theme: 'current',
-            professionalTheme: false
+            largeText: false
         };
 
         // Load saved preferences from localStorage
@@ -45,8 +48,12 @@
             }
         } catch (e) { /* ignore */ }
 
-        // Connections data array
-        vm.connections = [];
+        // Connections data
+        vm.connections = [
+            { utility: 'Electricity', label: 'Consumer No', number: storedUser ? (storedUser.electricity_id || 'ELEC-2025-001') : 'N/A', status: 'Active', statusClass: 'badge-success' },
+            { utility: 'Water', label: 'Connection ID', number: storedUser ? (storedUser.water_id || 'WTR-2025-001') : 'N/A', status: 'Active', statusClass: 'badge-success' },
+            { utility: 'Gas', label: 'Connection ID', number: storedUser ? (storedUser.gas_id || 'GAS-2025-001') : 'N/A', status: 'Active', statusClass: 'badge-success' }
+        ];
 
         vm.updateProfile = function() {
             vm.saving = true;
