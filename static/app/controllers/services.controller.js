@@ -3,9 +3,9 @@
     'use strict';
 
     angular.module('suvidhaApp')
-        .controller('ServicesController', ['$scope', '$timeout', 'ApiService', ServicesController]);
+        .controller('ServicesController', ['$scope', '$timeout', 'ApiService', 'TranslationService', ServicesController]);
 
-    function ServicesController($scope, $timeout, ApiService) {
+    function ServicesController($scope, $timeout, ApiService, TranslationService) {
         var vm = this;
         var $rootScope = $scope.$root;
         vm.loading = false;
@@ -13,6 +13,49 @@
         vm.requests = [];
         vm.serviceMode = 'complaint';
         vm.serviceFilter = 'elec';
+
+        // ===== LANGUAGE SELECTOR =====
+        vm.currentLanguage = TranslationService.getCurrentLanguage() || 'en';
+        vm.showLanguageMenu = false;
+        vm.availableLanguages = [
+            { code: 'en', name: 'English', flag: '🇬🇧' },
+            { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+            { code: 'bn', name: 'বাংলা', flag: '🇮🇳' },
+            { code: 'pa', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+            { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+            { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+            { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
+            { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' },
+            { code: 'ml', name: 'മലയാളം', flag: '🇮🇳' },
+            { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+            { code: 'or', name: 'ଓଡ଼ିଆ', flag: '🇮🇳' }
+        ];
+
+        vm.getCurrentLanguageLabel = function() {
+            var lang = vm.availableLanguages.find(function(l) { return l.code === vm.currentLanguage; });
+            return lang ? lang.name : 'English';
+        };
+
+        vm.switchLanguage = function(langCode) {
+            vm.currentLanguage = langCode;
+            TranslationService.setLanguage(langCode);
+            vm.showLanguageMenu = false;
+        };
+
+        vm.toggleLanguageMenu = function() {
+            vm.showLanguageMenu = !vm.showLanguageMenu;
+        };
+
+        $scope.$on('languageChanged', function(event, newLang) {
+            vm.currentLanguage = newLang;
+        });
+
+        // Close language menu on outside click
+        angular.element(document).on('click', function() {
+            if (vm.showLanguageMenu) {
+                $scope.$apply(function() { vm.showLanguageMenu = false; });
+            }
+        });
 
         // User Data
         vm.userData = {
@@ -483,6 +526,8 @@
                 category: vm.category,
                 incidentDate: vm.incidentDate,
                 impactScope: vm.impactScope,
+                location: vm.location,
+                priority: vm.priority,
                 description: vm.description
             };
 
@@ -507,6 +552,13 @@
             vm.incidentDate = '';
             vm.impactScope = 'Individual House';
             vm.description = '';
+            vm.location = '';
+            vm.priority = '';
+            vm.aiPrompt = '';
+            // Reset form validation
+            if (document.getElementById('complaintForm')) {
+                document.getElementById('complaintForm').reset();
+            }
         }
 
         function filterServices(type) {

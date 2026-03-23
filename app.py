@@ -2847,6 +2847,39 @@ def api_verify_image():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
+# ===== SERVER-SIDE TRANSLATIONS API =====
+import json as _json
+
+_translations_cache = None
+
+def _load_translations():
+    global _translations_cache
+    if _translations_cache is None:
+        try:
+            with open(os.path.join(app.static_folder, 'translations.json'), 'r', encoding='utf-8') as f:
+                _translations_cache = _json.load(f)
+        except Exception:
+            _translations_cache = {}
+    return _translations_cache
+
+@app.route('/api/translations', methods=['GET'])
+def api_get_translations():
+    """Serve translations from server. Optional ?lang=hi to get single language."""
+    translations = _load_translations()
+    lang = request.args.get('lang', '').strip().lower()
+    if lang and lang in translations:
+        return jsonify({'success': True, 'language': lang, 'translations': translations[lang]})
+    return jsonify({'success': True, 'languages': list(translations.keys()), 'translations': translations})
+
+@app.route('/api/translations/reload', methods=['POST'])
+def api_reload_translations():
+    """Force reload translations from file (admin use)."""
+    global _translations_cache
+    _translations_cache = None
+    _load_translations()
+    return jsonify({'success': True, 'languages': list(_translations_cache.keys())})
+
+
 # ===== ASK SUVIDHA (Cohere AI Proxy) =====
 COHERE_API_KEY = os.environ.get('COHERE_API_KEY', '')
 

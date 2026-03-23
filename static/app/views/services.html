@@ -3,34 +3,78 @@
         <!-- HERO STRIP -->
         <div class="sv-hero-strip">
             <div class="sv-hero-left">
-                <div class="sv-hero-eyebrow">&#128203; Services &amp; Grievances</div>
-                <div class="sv-hero-name">Welcome, {{vm.userData.username || 'Citizen'}}</div>
-                <div class="sv-hero-sub">Single window for complaints &amp; service requests</div>
+                <div class="sv-hero-eyebrow">&#128203; {{'svc_hero_title' | translate}}</div>
+                <div class="sv-hero-name">{{'svc_hero_welcome' | translate}}, {{vm.userData.username || 'Citizen'}}</div>
+                <div class="sv-hero-sub">{{'svc_hero_sub' | translate}}</div>
             </div>
+
+            <!-- Language Picker -->
+            <div style="position: relative; margin-left: auto; margin-right: 1.5rem; align-self: center;" ng-click="$event.stopPropagation()">
+                <button ng-click="vm.toggleLanguageMenu()" style="
+                    display: flex; align-items: center; gap: 8px;
+                    padding: 0.5rem 1rem; border-radius: 10px;
+                    border: 1px solid rgba(255,255,255,0.3);
+                    background: rgba(255,255,255,0.15);
+                    color: white; cursor: pointer;
+                    font-size: 0.85rem; font-weight: 600;
+                    backdrop-filter: blur(4px);
+                    transition: all 0.2s;
+                " title="Change Language">
+                    <i data-lucide="globe" style="width: 16px; height: 16px;"></i>
+                    <span>{{vm.getCurrentLanguageLabel()}}</span>
+                    <span style="font-size: 0.6rem; transition: transform 0.2s;" ng-style="{'transform': vm.showLanguageMenu ? 'rotate(180deg)' : 'rotate(0deg)'}">&#9660;</span>
+                </button>
+                <div ng-show="vm.showLanguageMenu" style="
+                    position: absolute; top: 100%; right: 0;
+                    background: white; border: 1px solid #e5e7eb;
+                    border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+                    min-width: 190px; z-index: 1000; margin-top: 8px;
+                    max-height: 360px; overflow-y: auto;
+                ">
+                    <div style="padding: 6px 0;">
+                        <div ng-repeat="lang in vm.availableLanguages"
+                            ng-click="vm.switchLanguage(lang.code)"
+                            style="
+                                padding: 9px 16px; cursor: pointer;
+                                display: flex; align-items: center; gap: 10px;
+                                font-size: 0.88rem; transition: all 0.15s;
+                                border-left: 3px solid transparent;
+                            "
+                            ng-style="vm.currentLanguage === lang.code ? {'background': '#f0fdf4', 'border-left-color': '#10b981', 'font-weight': '700'} : {}"
+                            ng-mouseenter="$event.target.style.backgroundColor = vm.currentLanguage === lang.code ? '#f0fdf4' : '#f9fafb'"
+                            ng-mouseleave="$event.target.style.backgroundColor = vm.currentLanguage === lang.code ? '#f0fdf4' : 'transparent'">
+                            <span style="font-size: 1.1rem;">{{lang.flag}}</span>
+                            <span style="flex: 1; color: #111827;">{{lang.name}}</span>
+                            <i data-lucide="check" ng-if="vm.currentLanguage === lang.code" style="width: 15px; height: 15px; color: #10b981;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="sv-hero-stats">
                 <div class="sv-hero-stat">
                     <div class="sv-hero-stat-val">{{vm.stats.activeRequests || 2}}</div>
-                    <div class="sv-hero-stat-lbl">Active Requests</div>
+                    <div class="sv-hero-stat-lbl">{{'svc_active_requests' | translate}}</div>
                 </div>
                 <div class="sv-hero-stat-div"></div>
                 <div class="sv-hero-stat">
                     <div class="sv-hero-stat-val">{{vm.stats.avgResolution || '3.2'}}</div>
-                    <div class="sv-hero-stat-lbl">Avg Resolution (days)</div>
+                    <div class="sv-hero-stat-lbl">{{'svc_avg_resolution' | translate}}</div>
                 </div>
                 <div class="sv-hero-stat-div"></div>
                 <div class="sv-hero-stat">
                     <div class="sv-hero-stat-val sv-stat-green">{{vm.stats.resolvedCount || 8}}</div>
-                    <div class="sv-hero-stat-lbl">Resolved (12mo)</div>
+                    <div class="sv-hero-stat-lbl">{{'svc_resolved_12mo' | translate}}</div>
                 </div>
                 <div class="sv-hero-stat-div"></div>
                 <div class="sv-hero-stat">
                     <div class="sv-hero-stat-val">{{vm.stats.pendingCount || 1}}</div>
-                    <div class="sv-hero-stat-lbl">Pending</div>
+                    <div class="sv-hero-stat-lbl">{{'svc_pending' | translate}}</div>
                 </div>
                 <div class="sv-hero-stat-div"></div>
                 <div class="sv-hero-stat">
                     <div class="sv-hero-stat-val sv-stat-yellow">{{vm.stats.inProgressCount || 1}}</div>
-                    <div class="sv-hero-stat-lbl">In Progress</div>
+                    <div class="sv-hero-stat-lbl">{{'svc_in_progress' | translate}}</div>
                 </div>
             </div>
         </div>
@@ -40,32 +84,32 @@
             <div class="sv-quick-card sv-qc-power" ng-click="vm.quickReport('power_outage')">
                 <div class="sv-qc-icon">&#9889;</div>
                 <div class="sv-qc-body">
-                    <div class="sv-qc-title">Power Outage</div>
-                    <div class="sv-qc-sub">Report electricity failure</div>
+                    <div class="sv-qc-title">{{'svc_power_outage' | translate}}</div>
+                    <div class="sv-qc-sub">{{'svc_report_electricity' | translate}}</div>
                 </div>
                 <div class="sv-qc-arrow">&#8594;</div>
             </div>
             <div class="sv-quick-card sv-qc-light" ng-click="vm.quickReport('street_light')">
                 <div class="sv-qc-icon">&#128161;</div>
                 <div class="sv-qc-body">
-                    <div class="sv-qc-title">Street Light</div>
-                    <div class="sv-qc-sub">Faulty or missing light</div>
+                    <div class="sv-qc-title">{{'svc_street_light' | translate}}</div>
+                    <div class="sv-qc-sub">{{'svc_faulty_light' | translate}}</div>
                 </div>
                 <div class="sv-qc-arrow">&#8594;</div>
             </div>
             <div class="sv-quick-card sv-qc-water" ng-click="vm.quickReport('water_supply')">
                 <div class="sv-qc-icon">&#128167;</div>
                 <div class="sv-qc-body">
-                    <div class="sv-qc-title">Water Supply</div>
-                    <div class="sv-qc-sub">Irregular or no supply</div>
+                    <div class="sv-qc-title">{{'svc_water_supply' | translate}}</div>
+                    <div class="sv-qc-sub">{{'svc_irregular_supply' | translate}}</div>
                 </div>
                 <div class="sv-qc-arrow">&#8594;</div>
             </div>
             <div class="sv-quick-card sv-qc-gas" ng-click="vm.quickReport('gas_leakage')">
                 <div class="sv-qc-icon">&#128293;</div>
                 <div class="sv-qc-body">
-                    <div class="sv-qc-title">Gas Leakage</div>
-                    <div class="sv-qc-sub">Smell or suspected leak</div>
+                    <div class="sv-qc-title">{{'svc_gas_leakage' | translate}}</div>
+                    <div class="sv-qc-sub">{{'svc_smell_leak' | translate}}</div>
                 </div>
                 <div class="sv-qc-arrow">&#8594;</div>
             </div>
@@ -76,24 +120,24 @@
             <div class="sv-tab-card" ng-class="{active: vm.serviceMode === 'complaint'}" ng-click="vm.toggleServiceMode('complaint')">
                 <div class="sv-tab-icon">&#128221;</div>
                 <div class="sv-tab-body">
-                    <div class="sv-tab-title">Raise a Complaint</div>
-                    <div class="sv-tab-sub">Lodge a grievance</div>
+                    <div class="sv-tab-title">{{'svc_raise_complaint' | translate}}</div>
+                    <div class="sv-tab-sub">{{'svc_lodge_grievance' | translate}}</div>
                 </div>
                 <div class="sv-tab-arrow">&#8594;</div>
             </div>
             <div class="sv-tab-card" ng-class="{active: vm.serviceMode === 'service'}" ng-click="vm.toggleServiceMode('service')">
                 <div class="sv-tab-icon">&#128203;</div>
                 <div class="sv-tab-body">
-                    <div class="sv-tab-title">Apply for Service</div>
-                    <div class="sv-tab-sub">New connection or change</div>
+                    <div class="sv-tab-title">{{'svc_apply_service' | translate}}</div>
+                    <div class="sv-tab-sub">{{'svc_new_connection' | translate}}</div>
                 </div>
                 <div class="sv-tab-arrow">&#8594;</div>
             </div>
             <div class="sv-tab-card" ng-class="{active: vm.serviceMode === 'track'}" ng-click="vm.toggleServiceMode('track')">
                 <div class="sv-tab-icon">&#128269;</div>
                 <div class="sv-tab-body">
-                    <div class="sv-tab-title">Track Requests</div>
-                    <div class="sv-tab-sub">View status &amp; updates</div>
+                    <div class="sv-tab-title">{{'svc_track_requests' | translate}}</div>
+                    <div class="sv-tab-sub">{{'svc_view_status' | translate}}</div>
                 </div>
                 <div class="sv-tab-arrow">&#8594;</div>
             </div>
@@ -104,10 +148,10 @@
             <div class="content-grid enhanced two-column" style="align-items: stretch;">
                 <div class="card enhanced form-card" style="display: flex; flex-direction: column; height: 100%;">
                     <div class="card-header">
-                        <h3><span class="icon">📝</span> Lodge a Grievance</h3>
+                        <h3><span class="icon">📝</span> {{'svc_lodge_grievance_title' | translate}}</h3>
                     </div>
                     <div class="card-body" style="flex-grow: 1;">
-                        <form id="complaintForm" ng-submit="vm.submitComplaint()">
+                        <form id="complaintForm" ng-submit="vm.submitComplaint()" novalidate>
                             <!-- AI Helper box -->
                             <div class="ai-helper-box" style="background: linear-gradient(135deg, #f0fdfa, #ccfbf1); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #99f6e4;">
                                 <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
@@ -115,8 +159,8 @@
                                         <i data-lucide="sparkles"></i>
                                     </div>
                                     <div style="flex: 1;">
-                                        <h4 style="margin: 0 0 0.25rem 0; color: #115e59; font-size: 0.95rem; font-weight: 600;">AI Complaint Helper</h4>
-                                        <p style="margin: 0 0 0.75rem 0; color: #0f766e; font-size: 0.8rem;">Describe your problem in plain language — the system will auto-fill all fields.</p>
+                                        <h4 style="margin: 0 0 0.25rem 0; color: #115e59; font-size: 0.95rem; font-weight: 600;">{{'svc_ai_helper_title' | translate}}</h4>
+                                        <p style="margin: 0 0 0.75rem 0; color: #0f766e; font-size: 0.8rem;">{{'svc_ai_helper_desc' | translate}}</p>
                                         <div style="display: flex; gap: 0.5rem;">
                                             <input type="text" ng-model="vm.aiPrompt" placeholder='e.g., "Gas leak smell near my kitchen since morning"' class="form-control enhanced" style="background: white; border-color: #5eead4; margin-bottom: 0;">
                                             <button type="button" class="btn-primary" ng-click="vm.useAiHelper()" style="background: #0d9488; border: none; padding: 0 1rem; border-radius: 8px; flex-shrink: 0;">
@@ -141,10 +185,10 @@
                                 </label>
                                 <select class="form-control enhanced" ng-model="vm.selectedUtility"
                                     ng-change="vm.updateCategories()">
-                                    <option value="">-- Select Utility --</option>
-                                    <option value="electricity">Electricity (BRPL / BYPL / TPDDL)</option>
-                                    <option value="water">Water (Delhi Jal Board)</option>
-                                    <option value="gas">Gas (IGL / PNG)</option>
+                                    <option value="">{{'svc_select_utility_placeholder' | translate}}</option>
+                                    <option value="electricity">{{'svc_electricity_option' | translate}}</option>
+                                    <option value="water">{{'svc_water_option' | translate}}</option>
+                                    <option value="gas">{{'svc_gas_option' | translate}}</option>
                                 </select>
                             </div>
 
@@ -164,7 +208,7 @@
                                 </label>
                                 <select class="form-control enhanced" ng-model="vm.category"
                                     ng-disabled="!vm.selectedUtility">
-                                    <option ng-if="!vm.selectedUtility">Select Utility First</option>
+                                    <option ng-if="!vm.selectedUtility">{{'svc_select_utility_first' | translate}}</option>
                                     <option ng-repeat="cat in vm.categories" value="{{cat}}">{{cat}}</option>
                                 </select>
                             </div>
@@ -177,7 +221,7 @@
                                             Location / Address
                                         </label>
                                         <div style="display: flex; gap: 0.5rem;">
-                                            <input type="text" class="form-control enhanced" ng-model="vm.location" placeholder="Enter complete address">
+                                            <input type="text" class="form-control enhanced" ng-model="vm.location" placeholder="{{'svc_enter_address' | translate}}">
                                             <button type="button" class="btn-secondary" style="flex-shrink: 0; padding: 0 0.75rem;" title="Pin Location on Map" ng-click="vm.openMapPicker()">
                                                 <i data-lucide="map"></i>
                                             </button>
@@ -189,10 +233,10 @@
                                             Priority Level
                                         </label>
                                         <select class="form-control enhanced" ng-model="vm.priority">
-                                            <option value="">-- Select Priority --</option>
-                                            <option value="low">Low (Routine)</option>
-                                            <option value="medium">Medium (Moderate Issue)</option>
-                                            <option value="high">High (Emergency/Danger)</option>
+                                            <option value="">{{'svc_select_priority' | translate}}</option>
+                                            <option value="low">{{'svc_priority_low' | translate}}</option>
+                                            <option value="medium">{{'svc_priority_medium' | translate}}</option>
+                                            <option value="high">{{'svc_priority_high' | translate}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -208,12 +252,12 @@
                                     <div class="form-group enhanced">
                                         <label class="form-label">
                                             <i data-lucide="map-pin"></i>
-                                            Impact Scope
+                                            {{'svc_impact_scope' | translate}}
                                         </label>
                                         <select class="form-control enhanced" ng-model="vm.impactScope">
-                                            <option>Individual House</option>
-                                            <option>Entire Building</option>
-                                            <option>Entire Street</option>
+                                            <option>{{'svc_individual_house' | translate}}</option>
+                                            <option>{{'svc_entire_building' | translate}}</option>
+                                            <option>{{'svc_entire_street' | translate}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -221,23 +265,23 @@
                                 <div class="form-group enhanced">
                                     <label class="form-label">
                                         <i data-lucide="message-square"></i>
-                                        Description
+                                        {{'svc_description' | translate}}
                                     </label>
                                     <textarea class="form-control enhanced" rows="4" ng-model="vm.description"
-                                        placeholder="Describe your complaint in detail..."></textarea>
+                                        placeholder="{{'svc_description_placeholder' | translate}}"></textarea>
                                 </div>
 
                                 <div class="form-group enhanced">
                                     <label class="form-label">
                                         <i data-lucide="image"></i>
-                                        Upload Photo (Optional)
+                                        {{'svc_upload_photo' | translate}}
                                     </label>
                                     <div class="file-upload-area">
                                         <input type="file" id="photoUpload" class="file-input" accept="image/*">
                                         <label for="photoUpload" class="file-upload-label">
                                             <i data-lucide="upload"></i>
-                                            <span>Click to upload or drag and drop</span>
-                                            <small>PNG, JPG up to 5MB</small>
+                                            <span>{{'svc_click_upload' | translate}}</span>
+                                            <small>{{'svc_file_limit' | translate}}</small>
                                         </label>
                                     </div>
                                 </div>
@@ -247,38 +291,38 @@
                                         <i data-lucide="clock"></i>
                                     </div>
                                     <div class="sla-content">
-                                        <strong>Expected Resolution Time</strong>
+                                        <strong>{{'svc_expected_resolution' | translate}}</strong>
                                         <p>{{vm.slaTime}}</p>
-                                        <small>Subject to field conditions</small>
+                                        <small>{{'svc_subject_field' | translate}}</small>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-actions">
-                                <button type="submit" class="btn-primary full-width" ng-disabled="!vm.category">
+                                <button type="button" class="btn-primary full-width" ng-click="vm.submitComplaint()" ng-disabled="!vm.category">
                                     <i data-lucide="send"></i>
-                                    <span>Submit Complaint</span>
+                                    <span>{{'svc_submit_complaint' | translate}}</span>
                                 </button>
                             </div>
                         </form>
                     </div>
                     <div class="card-footer">
                         <i data-lucide="shield"></i>
-                        <span>Data shared only with concerned utility vendor. For emergencies, call helpline.</span>
+                        <span>{{'svc_data_shared' | translate}}</span>
                     </div>
                 </div>
 
                 <!-- Outage Information Card -->
                 <div class="card enhanced outage-card" style="display: flex; flex-direction: column; height: 100%;">
                     <div class="card-header">
-                        <h3><span class="icon">⚠️</span> Outage & Maintenance Info</h3>
+                        <h3><span class="icon">⚠️</span> {{'svc_outage_info' | translate}}</h3>
                     </div>
                     <div class="card-body" style="flex-grow: 1;">
                         <div class="outage-items">
                             <div class="outage-item planned">
                                 <div class="outage-badge planned">
                                     <i data-lucide="calendar"></i>
-                                    <span>Planned</span>
+                                    <span>{{'svc_planned' | translate}}</span>
                                 </div>
                                 <h4>Maintenance - Kalkaji Area</h4>
                                 <p class="outage-time">
@@ -290,17 +334,17 @@
                             <div class="outage-item resolved">
                                 <div class="outage-badge resolved">
                                     <i data-lucide="check-circle"></i>
-                                    <span>No Outages</span>
+                                    <span>{{'svc_no_outages' | translate}}</span>
                                 </div>
-                                <h4>All Clear</h4>
-                                <p class="outage-desc">No unplanned outages reported in your sector currently.</p>
+                                <h4>{{'svc_all_clear' | translate}}</h4>
+                                <p class="outage-desc">{{'svc_no_unplanned' | translate}}</p>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <a href="#" ng-click="vm.viewAllOutages()" class="link-text">
                             <i data-lucide="external-link"></i>
-                            <span>View All Outages</span>
+                            <span>{{'svc_view_all_outages' | translate}}</span>
                         </a>
                     </div>
                 </div>
@@ -312,24 +356,24 @@
         <div ng-show="vm.serviceMode === 'service'" class="service-section">
             <div class="card enhanced">
                 <div class="card-header">
-                    <h3><span class="icon">📋</span> Apply for New Service</h3>
+                    <h3><span class="icon">📋</span> {{'svc_apply_new_service' | translate}}</h3>
                 </div>
                 <div class="card-body">
                     <div class="service-filter-tabs">
                         <button class="filter-tab" ng-class="{active: vm.serviceFilter === 'elec'}"
                             ng-click="vm.filterServices('elec')">
                             <i data-lucide="zap"></i>
-                            <span>Electricity</span>
+                            <span>{{'svc_electricity' | translate}}</span>
                         </button>
                         <button class="filter-tab" ng-class="{active: vm.serviceFilter === 'water'}"
                             ng-click="vm.filterServices('water')">
                             <i data-lucide="droplet"></i>
-                            <span>Water</span>
+                            <span>{{'svc_water' | translate}}</span>
                         </button>
                         <button class="filter-tab" ng-class="{active: vm.serviceFilter === 'gas'}"
                             ng-click="vm.filterServices('gas')">
                             <i data-lucide="flame"></i>
-                            <span>Gas</span>
+                            <span>{{'svc_gas' | translate}}</span>
                         </button>
                     </div>
 
@@ -365,19 +409,19 @@
                                 </span>
                                 <span class="meta-item">
                                     <i data-lucide="file-text"></i>
-                                    {{service.documentsRequired}} docs required
-                                </span>
+                                {{service.documentsRequired}} {{'svc_docs_required' | translate}}
+                            </span>
                             </div>
                             <button class="btn-primary full-width" ng-click="vm.applyForService(service)">
                                 <i data-lucide="arrow-right"></i>
-                                <span>Apply Now</span>
+                                <span>{{'svc_apply_now' | translate}}</span>
                             </button>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer">
                     <i data-lucide="info"></i>
-                    <span>Service requests are forwarded directly to the respective utility authority portal.</span>
+                    <span>{{'svc_service_forwarded' | translate}}</span>
                 </div>
             </div>
         </div>
@@ -387,8 +431,8 @@
             <!-- Track Your Requests - Full Width -->
             <div class="card enhanced" style="margin-bottom: 1.5rem;">
                 <div class="card-header">
-                    <h3><span class="icon">📋</span> Track Your Requests</h3>
-                    <p class="card-subtitle" style="margin-top: 0.25rem; font-size: 0.85rem; color: var(--text-secondary);">View detailed status and updates for all your service requests</p>
+                    <h3><span class="icon">📋</span> {{'svc_track_your_requests' | translate}}</h3>
+                    <p class="card-subtitle" style="margin-top: 0.25rem; font-size: 0.85rem; color: var(--text-secondary);">{{'svc_track_subtitle' | translate}}</p>
                 </div>
                 <div class="card-body" style="padding: 0;">
                     <!-- Request Card 1 -->
@@ -404,7 +448,7 @@
                                 <p style="margin: 0; font-size: 0.85rem; color: #6b7280;">Power Outage • Electricity</p>
                             </div>
                             <div style="text-align: right;">
-                                <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280;">Days ago</div>
+                                <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280;">{{'svc_days_ago' | translate}}</div>
                                 <div style="font-size: 1.25rem; font-weight: 700; color: #111827;">2</div>
                             </div>
                         </div>
@@ -418,7 +462,7 @@
                                         <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 3px solid #fff; box-shadow: 0 0 0 2px #10b981;"></div>
                                     </div>
                                     <div>
-                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">Complaint Filed</h5>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">{{'svc_complaint_filed' | translate}}</h5>
                                         <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">2 Feb, 10:30 AM</p>
                                     </div>
                                 </div>
@@ -429,7 +473,7 @@
                                         <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 3px solid #fff; box-shadow: 0 0 0 2px #10b981;"></div>
                                     </div>
                                     <div>
-                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">Acknowledged by Vendor</h5>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">{{'svc_acknowledged' | translate}}</h5>
                                         <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">2 Feb, 11:00 AM</p>
                                     </div>
                                 </div>
@@ -440,7 +484,7 @@
                                         <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 3px solid #fff; box-shadow: 0 0 0 2px #10b981;"></div>
                                     </div>
                                     <div>
-                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">Field Team Assigned</h5>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">{{'svc_team_assigned' | translate}}</h5>
                                         <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">2 Feb, 2:00 PM</p>
                                     </div>
                                 </div>
@@ -451,9 +495,9 @@
                                         <div style="width: 14px; height: 14px; border-radius: 50%; background: #f59e0b; border: 3px solid #fff; box-shadow: 0 0 0 2px #f59e0b;"></div>
                                     </div>
                                     <div>
-                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">In Resolution</h5>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">{{'svc_in_resolution' | translate}}</h5>
                                         <div style="margin-top: 0.5rem; padding: 0.75rem; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 6px;">
-                                            <p style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #166534;">Vendor Update</p>
+                                            <p style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #166534;">{{'svc_vendor_update' | translate}}</p>
                                             <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: #166534;">Technician en route to location</p>
                                         </div>
                                     </div>
@@ -469,7 +513,7 @@
                             </button>
                             <button ng-click="vm.escalateTicket({id: '#REQ-2024-001'})" style="flex: 1; padding: 0.6rem; border: 1px solid var(--gray-300); background: white; border-radius: 8px; color: #ef4444; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;">
                                 <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
-                                Escalate
+                                {{'svc_escalate' | translate}}
                             </button>
                         </div>
                     </div>
@@ -487,7 +531,7 @@
                                 <p style="margin: 0; font-size: 0.85rem; color: #6b7280;">Water Supply • Water</p>
                             </div>
                             <div style="text-align: right;">
-                                <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280;">Days ago</div>
+                                <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280;">{{'svc_days_ago' | translate}}</div>
                                 <div style="font-size: 1.25rem; font-weight: 700; color: #111827;">5</div>
                             </div>
                         </div>
@@ -501,7 +545,7 @@
                                         <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 3px solid #fff; box-shadow: 0 0 0 2px #10b981;"></div>
                                     </div>
                                     <div>
-                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">Complaint Filed</h5>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #111827;">{{'svc_complaint_filed' | translate}}</h5>
                                         <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">5 Feb, 9:00 AM</p>
                                     </div>
                                 </div>
@@ -512,8 +556,8 @@
                                         <div style="width: 14px; height: 14px; border-radius: 50%; background: #d1d5db; border: 3px solid #fff; box-shadow: 0 0 0 2px #d1d5db;"></div>
                                     </div>
                                     <div>
-                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #6b7280;">Awaiting Vendor Response</h5>
-                                        <p style="margin: 0; font-size: 0.8rem; color: #9ca3af;">Typically responds within 24 hours</p>
+                                        <h5 style="margin: 0 0 0.2rem 0; font-size: 0.9rem; font-weight: 600; color: #6b7280;">{{'svc_awaiting_vendor' | translate}}</h5>
+                                        <p style="margin: 0; font-size: 0.8rem; color: #9ca3af;">{{'svc_typically_responds' | translate}}</p>
                                     </div>
                                 </div>
                             </div>
@@ -527,7 +571,7 @@
                             </button>
                             <button ng-click="vm.escalateTicket({id: '#REQ-2024-002'})" style="flex: 1; padding: 0.6rem; border: 1px solid var(--gray-300); background: white; border-radius: 8px; color: #ef4444; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;">
                                 <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
-                                Escalate
+                                {{'svc_escalate' | translate}}
                             </button>
                         </div>
                     </div>
@@ -539,7 +583,7 @@
                 <!-- Your Statistics - Compact -->
                 <div class="card enhanced">
                     <div class="card-header" style="padding: 1rem;">
-                        <h3 style="margin: 0; font-size: 1rem;"><span class="icon">📊</span> Your Statistics</h3>
+                        <h3 style="margin: 0; font-size: 1rem;"><span class="icon">📊</span> {{'svc_your_statistics' | translate}}</h3>
                     </div>
                     <div class="card-body" style="padding: 1rem;">
                         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
@@ -548,7 +592,7 @@
                                     <i data-lucide="file-text" style="width: 14px; height: 14px; color: #3b82f6;"></i>
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Total Complaints</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{'svc_total_complaints' | translate}}</div>
                                     <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">{{vm.complaintsCount}}</div>
                                 </div>
                             </div>
@@ -557,7 +601,7 @@
                                     <i data-lucide="check-circle" style="width: 14px; height: 14px; color: #10b981;"></i>
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Resolved</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{'svc_resolved' | translate}}</div>
                                     <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">{{vm.resolvedCount}}</div>
                                 </div>
                             </div>
@@ -566,7 +610,7 @@
                                     <i data-lucide="clock" style="width: 14px; height: 14px; color: #f59e0b;"></i>
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Avg Resolution</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{'svc_avg_resolution_stat' | translate}}</div>
                                     <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">{{vm.avgResolutionTime}}</div>
                                 </div>
                             </div>
@@ -577,21 +621,21 @@
                 <!-- Need Help - Compact -->
                 <div class="card enhanced">
                     <div class="card-header" style="padding: 1rem;">
-                        <h3 style="margin: 0; font-size: 1rem;"><span class="icon">❓</span> Need Help?</h3>
+                        <h3 style="margin: 0; font-size: 1rem;"><span class="icon">❓</span> {{'svc_need_help' | translate}}</h3>
                     </div>
                     <div class="card-body" style="padding: 1rem;">
                         <div style="display: flex; flex-direction: column; gap: 0.6rem;">
                             <a href="#" ng-click="vm.viewFAQ()" style="padding: 0.6rem; background: var(--gray-50); border-radius: 8px; text-decoration: none; color: var(--primary-blue); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
                                 <i data-lucide="book-open" style="width: 14px; height: 14px;"></i>
-                                <span>FAQ</span>
+                                <span>{{'svc_faq' | translate}}</span>
                             </a>
                             <a href="#" ng-click="vm.viewGrievanceCell()" style="padding: 0.6rem; background: var(--gray-50); border-radius: 8px; text-decoration: none; color: var(--primary-blue); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
                                 <i data-lucide="phone" style="width: 14px; height: 14px;"></i>
-                                <span>Grievance Cell</span>
+                                <span>{{'svc_grievance_cell' | translate}}</span>
                             </a>
                             <a href="#" ng-click="vm.downloadGuide()" style="padding: 0.6rem; background: var(--gray-50); border-radius: 8px; text-decoration: none; color: var(--primary-blue); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
                                 <i data-lucide="download" style="width: 14px; height: 14px;"></i>
-                                <span>User Guide</span>
+                                <span>{{'svc_user_guide' | translate}}</span>
                             </a>
                         </div>
                     </div>
@@ -600,7 +644,7 @@
                 <!-- Emergency Contacts - Compact -->
                 <div class="card enhanced">
                     <div class="card-header" style="padding: 1rem;">
-                        <h3 style="margin: 0; font-size: 1rem;"><span class="icon">🚨</span> Emergency</h3>
+                        <h3 style="margin: 0; font-size: 1rem;"><span class="icon">🚨</span> {{'svc_emergency' | translate}}</h3>
                     </div>
                     <div class="card-body" style="padding: 1rem;">
                         <div style="display: flex; flex-direction: column; gap: 0.6rem;">
@@ -609,7 +653,7 @@
                                     <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 0.7rem; color: #6b7280;">Power</div>
+                                    <div style="font-size: 0.7rem; color: #6b7280;">{{'svc_power' | translate}}</div>
                                     <strong style="font-size: 0.95rem; color: #111827; display: block;">1912</strong>
                                 </div>
                             </div>
@@ -618,7 +662,7 @@
                                     <i data-lucide="flame" style="width: 14px; height: 14px;"></i>
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 0.7rem; color: #6b7280;">Gas</div>
+                                    <div style="font-size: 0.7rem; color: #6b7280;">{{'svc_gas' | translate}}</div>
                                     <strong style="font-size: 0.95rem; color: #111827; display: block;">1906</strong>
                                 </div>
                             </div>
@@ -627,7 +671,7 @@
                                     <i data-lucide="droplet" style="width: 14px; height: 14px;"></i>
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 0.7rem; color: #6b7280;">Water</div>
+                                    <div style="font-size: 0.7rem; color: #6b7280;">{{'svc_water' | translate}}</div>
                                     <strong style="font-size: 0.95rem; color: #111827; display: block;">1916</strong>
                                 </div>
                             </div>
@@ -699,7 +743,7 @@
                     <button class="btn-primary" style="flex:1;" ng-click="vm.closeTicketModal()">Close</button>
                     <button class="btn-text-danger"
                         ng-click="vm.escalateTicket(vm.selectedTicket); vm.closeTicketModal();">
-                        <i data-lucide="alert-triangle"></i> Escalate
+                        <i data-lucide="alert-triangle"></i> {{'svc_escalate' | translate}}
                     </button>
                 </div>
             </div>
@@ -712,7 +756,7 @@
                 <div class="modal-header">
                     <h2 class="modal-title">
                         <i data-lucide="clipboard-check"></i>
-                        Apply for Service
+                        {{'svc_apply_service' | translate}}
                     </h2>
                     <button class="modal-close" ng-click="vm.closeApplyModal()">
                         <i data-lucide="x"></i>

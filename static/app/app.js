@@ -75,7 +75,10 @@
             // Use HTML5 mode (optional - removes # from URLs)
             // $locationProvider.html5Mode(true);
         }])
-        .run(['$rootScope', '$location', '$sce', 'AuthService', function($rootScope, $location, $sce, AuthService) {
+        .run(['$rootScope', '$location', '$sce', 'AuthService', 'TranslationService', function($rootScope, $location, $sce, AuthService, TranslationService) {
+            // Initialize translation service — load translations.json
+            TranslationService.init();
+
             // Set current language (for backward compatibility)
             $rootScope.currentLang = 'en';
 

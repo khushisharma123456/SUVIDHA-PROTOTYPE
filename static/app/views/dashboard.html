@@ -18,43 +18,43 @@
                 <div class="modal-body">
                     <div class="details-grid">
                         <div class="detail-item">
-                            <span class="detail-label">Last Month</span>
+                            <span class="detail-label">{{'db_last_month' | translate}}</span>
                             <span class="detail-value">{{vm.modalData.lastMonth}}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Usage</span>
+                            <span class="detail-label">{{'db_usage_label' | translate}}</span>
                             <span class="detail-value">{{vm.modalData.units}}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Status</span>
+                            <span class="detail-label">{{'db_status' | translate}}</span>
                             <span class="detail-value status-badge-inline"
                                 ng-class="'status-' + vm.modalData.type">{{vm.modalData.status}}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Due Date</span>
+                            <span class="detail-label">{{'db_due_date' | translate}}</span>
                             <span class="detail-value">{{vm.modalData.dueDate}}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Trend</span>
+                            <span class="detail-label">{{'db_trend' | translate}}</span>
                             <span class="detail-value trend-value">
                                 <i data-lucide="trending-up" style="width:14px;height:14px;"></i>
                                 {{vm.modalData.trend}}
                             </span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Least Usage Month</span>
+                            <span class="detail-label">{{'db_least_usage_month' | translate}}</span>
                             <span class="detail-value">{{vm.modalData.leastUsageMonth || 'N/A'}}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Highest Usage Month</span>
+                            <span class="detail-label">{{'db_highest_usage_month' | translate}}</span>
                             <span class="detail-value">{{vm.modalData.highestUsageMonth || 'N/A'}}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Least Usage Season</span>
+                            <span class="detail-label">{{'db_least_usage_season' | translate}}</span>
                             <span class="detail-value">{{vm.modalData.leastUsageSeason || 'N/A'}}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">Highest Usage Season</span>
+                            <span class="detail-label">{{'db_highest_usage_season' | translate}}</span>
                             <span class="detail-value">{{vm.modalData.highestUsageSeason || 'N/A'}}</span>
                         </div>
                     </div>
@@ -62,11 +62,11 @@
                 <div class="modal-footer">
                     <button class="btn-secondary" ng-click="vm.openBandhuDialog()">
                         <i data-lucide="sparkles" style="width:16px;height:16px;"></i>
-                        Ask Suvidha Bandhu
+                        {{'db_ask_suvidha_bandhu' | translate}}
                     </button>
                     <button class="btn-primary" ng-click="vm.closeModal()">
                         <i data-lucide="check" style="width:16px;height:16px;"></i>
-                        Got It
+                        {{'db_got_it' | translate}}
                     </button>
                 </div>
             </div>
@@ -96,7 +96,7 @@
                         </div>
                     </div>
 
-                    <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:0.75rem; color:#374151;">Usage Slabs
+                    <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:0.75rem; color:#374151;">{{'db_usage_slabs' | translate}}
                     </h4>
                     <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1.25rem;">
                         <div ng-repeat="slab in vm.ratePlanData[vm.selectedUtility].slabs"
@@ -105,8 +105,7 @@
                             <div>
                                 <span style="font-weight:600; font-size:0.88rem;">{{slab.range}}</span>
                                 <span ng-if="slab.highlight"
-                                    style="display:inline-block; margin-left:0.5rem; font-size:0.7rem; padding:2px 8px; background:#f59e0b; color:white; border-radius:20px; font-weight:500;">Your
-                                    Slab</span>
+                                    style="display:inline-block; margin-left:0.5rem; font-size:0.7rem; padding:2px 8px; background:#f59e0b; color:white; border-radius:20px; font-weight:500;">{{'db_your_slab' | translate}}</span>
                                 <p style="font-size:0.75rem; color:#6b7280; margin:0.15rem 0 0;">{{slab.type}}</p>
                             </div>
                             <strong style="font-size:1rem; color:#111827;">{{slab.rate}}</strong>
@@ -116,13 +115,13 @@
                     <div
                         style="display:flex; flex-direction:column; gap:0.5rem; padding:1rem; background:#f0fdf4; border-radius:10px; border:1px solid #dcfce7;">
                         <div style="display:flex; justify-content:space-between;">
-                            <span style="font-size:0.85rem; color:#374151;">Fixed Monthly Charge</span>
+                            <span style="font-size:0.85rem; color:#374151;">{{'db_fixed_monthly' | translate}}</span>
                             <strong
                                 style="font-size:0.85rem;">{{vm.ratePlanData[vm.selectedUtility].fixedCharge}}</strong>
                         </div>
                         <div ng-if="vm.ratePlanData[vm.selectedUtility].surcharge"
                             style="display:flex; justify-content:space-between;">
-                            <span style="font-size:0.85rem; color:#374151;">Surcharge</span>
+                            <span style="font-size:0.85rem; color:#374151;">{{'db_surcharge' | translate}}</span>
                             <strong
                                 style="font-size:0.85rem;">{{vm.ratePlanData[vm.selectedUtility].surcharge}}</strong>
                         </div>
@@ -136,7 +135,7 @@
                 <div class="modal-footer rate-plan-footer"
                     style="padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb; display:flex; justify-content:center;">
                     <button class="btn-primary rate-plan-gotit-btn" ng-click="vm.closeRatePlanModal()">
-                        <i data-lucide="check"></i> Got it
+                        <i data-lucide="check"></i> {{'db_got_it' | translate}}
                     </button>
                 </div>
             </div>
@@ -149,7 +148,7 @@
                 <div class="modal-header">
                     <div class="modal-header-left">
                         <div class="modal-header-icon"><i data-lucide="sparkles"></i></div>
-                        <h2 class="modal-title">Ask Suvidha Bandhu &mdash; {{(vm.bandhuUtility || 'utility') | uppercase}}</h2>
+                        <h2 class="modal-title">{{'db_ask_suvidha_bandhu' | translate}} &mdash; {{(vm.bandhuUtility || 'utility') | uppercase}}</h2>
                     </div>
                     <button class="modal-close" ng-click="vm.closeBandhuDialog()"><i data-lucide="x"></i></button>
                 </div>
@@ -176,9 +175,9 @@
                 <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem;">
                     <button class="btn-primary" style="flex:1;" ng-click="vm.askSuvidhaBandhu()" ng-disabled="vm.suvidhaLoading || !vm.suvidhaInput">
                         <i data-lucide="send" style="width:16px;height:16px;"></i>
-                        {{vm.suvidhaLoading ? 'Analyzing...' : 'Ask Suvidha'}}
+                        {{vm.suvidhaLoading ? ('db_processing' | translate) : ('db_ask_suvidha' | translate)}}
                     </button>
-                    <button class="btn-secondary" ng-click="vm.closeBandhuDialog()">Close</button>
+                    <button class="btn-secondary" ng-click="vm.closeBandhuDialog()">{{'db_close' | translate}}</button>
                 </div>
             </div>
         </div>
@@ -193,8 +192,8 @@
                             <i data-lucide="sparkles"></i>
                         </div>
                         <div>
-                            <h2 class="modal-title">Utility Insights &mdash; Ask Suvidha</h2>
-                            <p style="font-size:0.8rem; color:#9ca3af; margin:0.25rem 0 0;">Personalized recommendations based on your consumption</p>
+                            <h2 class="modal-title">{{'db_utility_insights' | translate}} &mdash; {{'db_ask_suvidha' | translate}}</h2>
+                            <p style="font-size:0.8rem; color:#9ca3af; margin:0.25rem 0 0;">{{'db_ask_anything' | translate}}</p>
                         </div>
                     </div>
                     <button class="modal-close" ng-click="vm.closeSuvidhaInsights()"><i data-lucide="x"></i></button>
@@ -203,7 +202,7 @@
                     <!-- Utility & Period Selectors -->
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
                         <div>
-                            <label style="display:block; font-size:0.85rem; font-weight:600; color:#374151; margin-bottom:0.5rem;">Select Utility</label>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; color:#374151; margin-bottom:0.5rem;">{{'db_select_utility' | translate}}</label>
                             <select class="form-control enhanced" ng-model="vm.insightUtility" ng-change="vm.onInsightUtilityChange()" style="width:100%;">
                                 <option value="electricity">Electricity</option>
                                 <option value="gas">Gas</option>
@@ -211,7 +210,7 @@
                             </select>
                         </div>
                         <div>
-                            <label style="display:block; font-size:0.85rem; font-weight:600; color:#374151; margin-bottom:0.5rem;">Select Period</label>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; color:#374151; margin-bottom:0.5rem;">{{'db_select_period' | translate}}</label>
                             <select class="form-control enhanced" ng-model="vm.insightPeriod" ng-change="vm.onInsightPeriodChange()" style="width:100%;">
                                 <option value="3months">Last 3 Months</option>
                                 <option value="6months">Last 6 Months</option>
@@ -224,29 +223,29 @@
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
                         <div style="background:#f0fdf4; border:1px solid #d1fae5; padding:1rem; border-radius:12px; text-align:center;">
                             <div style="font-size:2.5rem; margin-bottom:0.5rem;">ðŸ’¡</div>
-                            <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">Energy Saving</h5>
+                            <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">{{'db_energy_saving' | translate}}</h5>
                             <p style="font-size:0.8rem; color:#374151; margin:0;">Use LED bulbs and maintain your appliances regularly to reduce consumption</p>
                         </div>
                         <div style="background:#f0fdf4; border:1px solid #d1fae5; padding:1rem; border-radius:12px; text-align:center;">
                             <div style="font-size:2.5rem; margin-bottom:0.5rem;">âš¡</div>
-                            <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">Peak Hours</h5>
+                            <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">{{'db_peak_hours' | translate}}</h5>
                             <p style="font-size:0.8rem; color:#374151; margin:0;">Shift heavy appliance use to off-peak hours for better rates</p>
                         </div>
                         <div style="background:#f0fdf4; border:1px solid #d1fae5; padding:1rem; border-radius:12px; text-align:center;">
                             <div style="font-size:2.5rem; margin-bottom:0.5rem;">ðŸŒ¡ï¸</div>
-                            <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">Temperature</h5>
+                            <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">{{'db_temperature' | translate}}</h5>
                             <p style="font-size:0.8rem; color:#374151; margin:0;">Set AC to 24Â°C or above for optimal energy efficiency</p>
                         </div>
                         <div style="background:#f0fdf4; border:1px solid #d1fae5; padding:1rem; border-radius:12px; text-align:center;">
                             <div style="font-size:2.5rem; margin-bottom:0.5rem;">ðŸ”§</div>
-                            <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">Maintenance</h5>
+                            <h5 style="font-size:0.9rem; font-weight:600; color:#047857; margin:0 0 0.5rem;">{{'db_maintenance' | translate}}</h5>
                             <p style="font-size:0.8rem; color:#374151; margin:0;">Regular servicing of equipment prevents energy wastage</p>
                         </div>
                     </div>
 
                     <!-- Question Text Box -->
                     <div style="margin-bottom:1rem;">
-                        <label style="display:block; font-size:0.85rem; font-weight:600; color:#374151; margin-bottom:0.5rem;">Have a Question?</label>
+                        <label style="display:block; font-size:0.85rem; font-weight:600; color:#374151; margin-bottom:0.5rem;">{{'db_have_question' | translate}}</label>
                         <textarea class="form-control enhanced" 
                             ng-model="vm.insightQuestion" 
                             placeholder="Ask about high bills, seasonal usage, or ways to reduce consumption..."
@@ -263,11 +262,11 @@
                 </div>
                 <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem; justify-content:flex-end;">
                     <button class="btn-secondary" ng-click="vm.closeSuvidhaInsights()" style="padding:0.625rem 1.5rem;">
-                        OK
+                        {{'db_ok' | translate}}
                     </button>
                     <button class="btn-primary-pastel-green" ng-click="vm.submitInsightQuestion()" ng-disabled="vm.insightLoading || !vm.insightQuestion" style="padding:0.625rem 1.5rem;">
                         <i data-lucide="send" style="width:16px;height:16px;"></i>
-                        {{vm.insightLoading ? 'Sending...' : 'Submit Question'}}
+                        {{vm.insightLoading ? ('db_sending' | translate) : ('db_submit_question' | translate)}}
                     </button>
                 </div>
             </div>
@@ -283,7 +282,7 @@
                         <div class="modal-header-icon">
                             <i data-lucide="credit-card"></i>
                         </div>
-                        <h2 class="modal-title">Pay Bill</h2>
+                        <h2 class="modal-title">{{'db_pay_bill' | translate}}</h2>
                     </div>
                     <button class="modal-close" ng-click="vm.closePayBillDialog()"><i data-lucide="x"></i></button>
                 </div>
@@ -296,7 +295,7 @@
                         <p class="pay-bill-due">Due: {{vm.payBillData.dueDate}}</p>
                     </div>
                     <div class="form-group">
-                        <label>Payment Method</label>
+                        <label>{{'db_payment_method' | translate}}</label>
                         <select class="form-control" ng-model="vm.payMethod">
                             <option value="upi">UPI / BHIM</option>
                             <option value="netbanking">Net Banking</option>
@@ -307,9 +306,9 @@
                 <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem;">
                     <button class="btn-primary" style="flex:1;" ng-click="vm.confirmPayBill()" ng-disabled="vm.payBillProcessing">
                         <i data-lucide="check-circle" style="width:16px;height:16px;"></i>
-                        {{vm.payBillProcessing ? 'Processing...' : 'Confirm Payment'}}
+                        {{vm.payBillProcessing ? ('db_processing' | translate) : ('db_confirm_payment' | translate)}}
                     </button>
-                    <button class="btn-secondary" ng-click="vm.closePayBillDialog()">Cancel</button>
+                    <button class="btn-secondary" ng-click="vm.closePayBillDialog()">{{'db_cancel' | translate}}</button>
                 </div>
             </div>
         </div>
@@ -323,7 +322,7 @@
                         <div class="modal-header-icon">
                             <i data-lucide="bell"></i>
                         </div>
-                        <h2 class="modal-title">All Notifications</h2>
+                        <h2 class="modal-title">{{'db_all_notifications' | translate}}</h2>
                     </div>
                     <button class="modal-close" ng-click="vm.closeAllNotifDialog()"><i data-lucide="x"></i></button>
                 </div>
@@ -333,42 +332,42 @@
                             <div class="all-notif-icon"><i data-lucide="alert-triangle"></i></div>
                             <div class="all-notif-content">
                                 <p>Electricity bill â‚¹{{vm.userData.consumption.electricity.current_bill}} {{vm.userData.consumption.electricity.status === 'overdue' ? 'is overdue' : 'due'}} by {{vm.userData.consumption.electricity.due_date}}</p>
-                                <span>Action needed Â· {{vm.userData.consumption.electricity.status | uppercase}}</span>
+                                <span>{{'db_action_needed' | translate}} · {{vm.userData.consumption.electricity.status | uppercase}}</span>
                             </div>
                         </div>
                         <div class="all-notif-item warning" ng-if="vm.userData.consumption.gas.status === 'pending' || vm.userData.consumption.gas.status === 'overdue'">
                             <div class="all-notif-icon"><i data-lucide="flame"></i></div>
                             <div class="all-notif-content">
                                 <p>Gas bill â‚¹{{vm.userData.consumption.gas.current_bill}} due by {{vm.userData.consumption.gas.due_date}}</p>
-                                <span>Pay soon Â· PENDING</span>
+                                <span>{{'db_pay_soon' | translate}} · PENDING</span>
                             </div>
                         </div>
                         <div class="all-notif-item success" ng-if="vm.userData.reports.resolved > 0">
                             <div class="all-notif-icon"><i data-lucide="check-circle"></i></div>
                             <div class="all-notif-content">
                                 <p>{{vm.userData.reports.resolved}} service request(s) have been resolved</p>
-                                <span>Recently resolved</span>
+                                <span>{{'db_recently_resolved' | translate}}</span>
                             </div>
                         </div>
                         <div class="all-notif-item success" ng-if="vm.userData.consumption.water.status === 'paid'">
                             <div class="all-notif-icon"><i data-lucide="check-circle"></i></div>
                             <div class="all-notif-content">
-                                <p>Water bill â‚¹{{vm.userData.consumption.water.current_bill}} paid successfully</p>
-                                <span>Payment confirmed</span>
+                                <p>Water bill ₹{{vm.userData.consumption.water.current_bill}} paid successfully</p>
+                                <span>{{'db_payment_confirmed' | translate}}</span>
                             </div>
                         </div>
                         <div class="all-notif-item info">
                             <div class="all-notif-icon"><i data-lucide="trending-up"></i></div>
                             <div class="all-notif-content">
                                 <p>Your electricity usage is {{vm.userData.consumption.electricity.current}} {{vm.userData.consumption.electricity.unit}} this month</p>
-                                <span>Usage update</span>
+                                <span>{{'db_usage_update' | translate}}</span>
                             </div>
                         </div>
                         <div class="all-notif-item info">
                             <div class="all-notif-icon"><i data-lucide="info"></i></div>
                             <div class="all-notif-content">
                                 <p>Your community score is {{vm.userData.community.points}} points</p>
-                                <span>Community update</span>
+                                <span>{{'db_community_update' | translate}}</span>
                             </div>
                         </div>
                     </div>
@@ -376,7 +375,7 @@
                 <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem;">
                     <button class="btn-primary" style="flex:1;" ng-click="vm.closeAllNotifDialog()">
                         <i data-lucide="check" style="width:16px;height:16px;"></i>
-                        Done
+                        {{'db_done' | translate}}
                     </button>
                 </div>
             </div>
@@ -391,25 +390,25 @@
                         <div class="modal-header-icon">
                             <i data-lucide="wrench"></i>
                         </div>
-                        <h2 class="modal-title">Service Requests</h2>
+                        <h2 class="modal-title">{{'db_service_requests' | translate}}</h2>
                     </div>
                     <button class="modal-close" ng-click="vm.closeServiceDialog()"><i data-lucide="x"></i></button>
                 </div>
                 <div class="modal-body" style="padding:1.5rem;">
                     <div class="service-kpi-grid">
                         <div class="service-kpi-card open">
-                            <span class="service-kpi-label">Open + In Progress</span>
+                            <span class="service-kpi-label">{{'db_open_in_progress' | translate}}</span>
                             <span class="service-kpi-value">{{(vm.userData.reports.open || 0) + (vm.userData.reports.in_progress || 0)}}</span>
                         </div>
                         <div class="service-kpi-card resolved">
-                            <span class="service-kpi-label">Resolved</span>
+                            <span class="service-kpi-label">{{'db_resolved' | translate}}</span>
                             <span class="service-kpi-value">{{vm.userData.reports.resolved || 0}}</span>
                         </div>
                     </div>
                     <div class="service-ticket-card">
                         <div class="service-ticket-top">
                             <span class="service-ticket-id">#SR-2026-001</span>
-                            <span class="badge badge-warning">In Progress</span>
+                            <span class="badge badge-warning">{{'db_in_progress' | translate}}</span>
                         </div>
                         <p class="service-ticket-title">Street light repair â€” Sector 12</p>
                         <p class="service-ticket-meta">Filed: 8 Jan 2026 &nbsp;Â·&nbsp; ETA: 3 days</p>
@@ -418,9 +417,9 @@
                 <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem;">
                     <a href="#!/services" class="btn-primary" style="flex:1; text-align:center;">
                         <i data-lucide="external-link" style="width:16px;height:16px;"></i>
-                        View All Requests
+                        {{'db_view_all_requests' | translate}}
                     </a>
-                    <button class="btn-secondary" ng-click="vm.closeServiceDialog()">Close</button>
+                    <button class="btn-secondary" ng-click="vm.closeServiceDialog()">{{'db_close' | translate}}</button>
                 </div>
             </div>
         </div>
@@ -428,8 +427,8 @@
         <!-- Welcome Bar -->
         <div class="db-welcome-bar">
             <div>
-                <h1 class="db-welcome-title">{{'dashboard.welcome_citizen' | translate}}, {{vm.userData.username || 'Citizen'}} &#128075;</h1>
-                <p class="db-welcome-sub">{{vm.userState || 'Your Ward'}} &middot; {{'header.smart_city_services' | translate}}</p>
+                <h1 class="db-welcome-title">{{'db_welcome_citizen' | translate}}, {{vm.userData.username || 'Citizen'}} &#128075;</h1>
+                <p class="db-welcome-sub">{{vm.userState || 'Your Ward'}} &middot; {{'db_smart_city_services' | translate}}</p>
             </div>
             <div class="db-welcome-icons">
                 <!-- Language Selector -->
@@ -492,29 +491,29 @@
                     </button>
                     <div class="notif-dropdown" ng-show="vm.showNotifDropdown">
                         <div class="notif-dropdown-header">
-                            <span>Notifications</span>
+                            <span>{{'db_notifications' | translate}}</span>
                             <button class="notif-close-btn" ng-click="vm.closeNotifications()"><i data-lucide="x"></i></button>
                         </div>
                         <div class="notif-dropdown-list">
                             <div class="notif-item notif-warning" ng-if="vm.userData.consumption.electricity.status === 'pending' || vm.userData.consumption.electricity.status === 'overdue'">
                                 <i data-lucide="alert-triangle"></i>
-                                <div><p>Electricity bill &#8377;{{vm.userData.consumption.electricity.current_bill}} due {{vm.userData.consumption.electricity.due_date}}</p><span>Action needed</span></div>
+                                <div><p>Electricity bill &#8377;{{vm.userData.consumption.electricity.current_bill}} due {{vm.userData.consumption.electricity.due_date}}</p><span>{{'db_action_needed' | translate}}</span></div>
                             </div>
                             <div class="notif-item notif-warning" ng-if="vm.userData.consumption.gas.status === 'pending' || vm.userData.consumption.gas.status === 'overdue'">
                                 <i data-lucide="flame"></i>
-                                <div><p>Gas bill &#8377;{{vm.userData.consumption.gas.current_bill}} due {{vm.userData.consumption.gas.due_date}}</p><span>Pay soon</span></div>
+                                <div><p>Gas bill &#8377;{{vm.userData.consumption.gas.current_bill}} due {{vm.userData.consumption.gas.due_date}}</p><span>{{'db_pay_soon' | translate}}</span></div>
                             </div>
                             <div class="notif-item notif-success" ng-if="vm.userData.reports.resolved > 0">
                                 <i data-lucide="check-circle"></i>
-                                <div><p>{{vm.userData.reports.resolved}} service request(s) resolved</p><span>Recently resolved</span></div>
+                                <div><p>{{vm.userData.reports.resolved}} service request(s) resolved</p><span>{{'db_recently_resolved' | translate}}</span></div>
                             </div>
                             <div class="notif-item notif-info">
                                 <i data-lucide="trending-up"></i>
-                                <div><p>Electricity usage: {{vm.userData.consumption.electricity.current}} {{vm.userData.consumption.electricity.unit}}</p><span>This month</span></div>
+                                <div><p>Electricity usage: {{vm.userData.consumption.electricity.current}} {{vm.userData.consumption.electricity.unit}}</p><span>{{'db_this_month' | translate}}</span></div>
                             </div>
                         </div>
                         <div class="notif-dropdown-footer">
-                            <button class="btn-view-all-notif" ng-click="vm.openAllNotifDialog()">View All Notifications</button>
+                            <button class="btn-view-all-notif" ng-click="vm.openAllNotifDialog()">{{'db_view_all_notif' | translate}}</button>
                         </div>
                     </div>
                 </div>
@@ -526,7 +525,7 @@
             <div class="db-hs-left">
                 <span class="db-hs-icon">&#9888;</span>
                 <div>
-                    <div class="db-hs-total">&#8377;{{vm.getTotalUnpaidBills() || '2,470'}} Total Due</div>
+                    <div class="db-hs-total">&#8377;{{vm.getTotalUnpaidBills() || '2,470'}} {{'db_total_due' | translate}}</div>
                     <div class="db-hs-breakdown">
                         <span>&#9889; &#8377;{{(vm.userData.consumption && vm.userData.consumption.electricity.current_bill) || '1,850'}}</span>
                         <span class="db-hs-sep">|</span>
@@ -541,10 +540,10 @@
                     <div class="db-hs-bill" ng-repeat="bill in vm.unpaidBills">
                         <span class="db-hs-bill-label">{{bill.type | uppercase}}</span>
                         <span class="db-hs-bill-amt">&#8377;{{bill.amount}}</span>
-                        <button class="db-hs-bill-pay-btn" ng-click="vm.payBillIndividually(bill)">Pay</button>
+                        <button class="db-hs-bill-pay-btn" ng-click="vm.payBillIndividually(bill)">{{'db_pay' | translate}}</button>
                     </div>
                 </div>
-                <button class="db-hs-pay-btn" ng-click="vm.payAllBills()">Pay All &#8594;</button>
+                <button class="db-hs-pay-btn" ng-click="vm.payAllBills()">{{'db_pay_all' | translate}} &#8594;</button>
             </div>
         </div>
 
@@ -552,41 +551,40 @@
         <div class="db-quick-row">
             <a href="#!/wallet" class="db-qa-card">
                 <div class="db-qa-icon">&#128179;</div>
-                <div class="db-qa-label">{{'header.pay_bills' | translate}}</div>
+                <div class="db-qa-label">{{'db_pay_bills' | translate}}</div>
             </a>
             <a href="#!/insights" class="db-qa-card">
                 <div class="db-qa-icon">&#128202;</div>
-                <div class="db-qa-label">{{'header.view_usage' | translate}}</div>
+                <div class="db-qa-label">{{'db_view_usage' | translate}}</div>
             </a>
             <a href="#!/services" class="db-qa-card">
                 <div class="db-qa-icon">&#128295;</div>
-                <div class="db-qa-label">{{'header.raise_request' | translate}}</div>
+                <div class="db-qa-label">{{'db_raise_request' | translate}}</div>
             </a>
             <button class="db-qa-card db-qa-btn" ng-click="vm.openBandhuDialog()">
                 <div class="db-qa-icon">&#129302;</div>
-                <div class="db-qa-label">{{'header.ask_assistant' | translate}}</div>
+                <div class="db-qa-label">{{'db_ask_assistant' | translate}}</div>
             </button>
         </div>
 
         <!-- SECTION 3: UTILITY HEALTH DNA HELIX -->
         <div class="db-dna-section">
             <div class="db-dna-sec-left">
-                <div class="db-dna-sec-title">{{'dashboard.utility_health' | translate}}</div>
+                <div class="db-dna-sec-title">&#127959; {{'db_suvidha_score' | translate}}</div>
                 <div class="db-dna-sec-score">
                     <span class="db-dna-big-score">{{vm.healthScore || 82}}</span>
                     <span class="db-dna-big-denom">/100</span>
                 </div>
-                <div class="db-dna-grade-chip">&#127942; {{'dashboard.good_standing' | translate}}</div>
+                <div class="db-dna-grade-chip">&#127942; {{'db_good_standing' | translate}}</div>
                 <div class="db-dna-util-pills">
-                    <div class="db-dna-pill db-dna-pill-elec" ng-click="vm.openModal('electricity')" style="cursor:pointer;">⚡ {{'utilities.electricity' | translate}} &nbsp;<strong>82</strong> <span style="color:#f59e0b;">{{'dashboard.good' | translate}}</span></div>
-                    <div class="db-dna-pill db-dna-pill-water" ng-click="vm.openModal('water')" style="cursor:pointer;">💧 {{'utilities.water' | translate}} &nbsp;<strong>85</strong> <span style="color:#ef4444;">{{'dashboard.high' | translate}}</span></div>
-                    <div class="db-dna-pill db-dna-pill-gas" ng-click="vm.openModal('gas')" style="cursor:pointer;">🔥 {{'utilities.gas' | translate}} &nbsp;<strong>68</strong> <span style="color:#10b981;">{{'dashboard.normal' | translate}}</span></div>
+                    <div class="db-dna-pill" style="background:#fef9c3; border:1px solid #fde047; color:#713f12;">&#9889; {{'db_payment_health' | translate}} &nbsp;<strong>92</strong> <span style="color:#16a34a;">&#x2713;</span></div>
+                    <div class="db-dna-pill" style="background:#dcfce7; border:1px solid #bbf7d0; color:#14532d;">&#127807; {{'db_eco_rating' | translate}} &nbsp;<strong>78</strong> <span style="color:#f59e0b;">&#x25B2;</span></div>
+                    <div class="db-dna-pill" style="background:#ede9fe; border:1px solid #c4b5fd; color:#4c1d95;">&#127942; {{'db_civic_score' | translate}} &nbsp;<strong>85</strong> <span style="color:#10b981;">&#x2665;</span></div>
                 </div>
                 <div class="db-dna-mom">
-                    <span class="db-mom db-mom-up">⚡ +12%</span>
-                    <span class="db-mom db-mom-down">💧 -5%</span>
-                    <span class="db-mom db-mom-up">&#128293; +3%</span>
-                    <span class="db-mom-lbl">vs last month</span>
+                    <span class="db-mom db-mom-down">&#128179; &#8377;{{vm.getTotalUnpaidBills() || '2,470'}} {{'db_due' | translate}}</span>
+                    <span class="db-mom db-mom-up">&#127807; -8% {{'db_usage' | translate}}</span>
+                    <span class="db-mom-lbl">{{'db_this_month' | translate}}</span>
                 </div>
             </div>
             <div class="db-dna-sec-canvas">
@@ -598,9 +596,9 @@
                     </div>
                 </div>
                 <div class="db-dna-legend" style="margin-top:0.6rem;">
-                    <div class="dna-legend-item db-legend-elec" data-utility="electricity">&#9889; Electricity</div>
-                    <div class="dna-legend-item db-legend-water" data-utility="water">&#128167; Water</div>
-                    <div class="dna-legend-item db-legend-gas" data-utility="gas">&#128293; Gas</div>
+                    <div class="dna-legend-item db-legend-elec" data-utility="electricity">&#9889; {{'db_electricity' | translate}}</div>
+                    <div class="dna-legend-item db-legend-water" data-utility="water">&#128167; {{'db_water' | translate}}</div>
+                    <div class="dna-legend-item db-legend-gas" data-utility="gas">&#128293; {{'db_gas' | translate}}</div>
                 </div>
             </div>
         </div>
@@ -608,11 +606,11 @@
         <!-- SECTION 4: CONSUMPTION CHART (full width) -->
         <div class="db-panels-row db-panels-row-single">
 
-            <!-- LEFT: Health Score + Utility Status -->
+            <!-- LEFT: Suvidha Score + Utility Status -->
             <div class="db-panel db-health-panel">
                 <div class="db-panel-title">
-                    Utility Health Score
-                    <span class="db-panel-badge">Updated today</span>
+                    &#127959; {{'db_suvidha_score' | translate}}
+                    <span class="db-panel-badge">{{'db_updated_today' | translate}}</span>
                 </div>
                 <div class="db-gauge-center">
                     <div class="db-gauge-wrap">
@@ -632,24 +630,24 @@
                     <div class="db-util-chip db-chip-elec" ng-click="vm.openModal('electricity')" style="cursor:pointer;">
                         <span class="db-chip-emoji">&#9889;</span>
                         <div class="db-chip-body">
-                            <div class="db-chip-name">Electricity</div>
-                            <div class="db-chip-status" style="color:#f59e0b;">Good</div>
+                            <div class="db-chip-name">{{'db_electricity' | translate}}</div>
+                            <div class="db-chip-status" style="color:#f59e0b;">{{'db_good' | translate}}</div>
                         </div>
                         <div class="db-chip-score">82</div>
                     </div>
                     <div class="db-util-chip db-chip-water" ng-click="vm.openModal('water')" style="cursor:pointer;">
                         <span class="db-chip-emoji">&#128167;</span>
                         <div class="db-chip-body">
-                            <div class="db-chip-name">Water</div>
-                            <div class="db-chip-status" style="color:#ef4444;">High</div>
+                            <div class="db-chip-name">{{'db_water' | translate}}</div>
+                            <div class="db-chip-status" style="color:#ef4444;">{{'db_high' | translate}}</div>
                         </div>
                         <div class="db-chip-score">85</div>
                     </div>
                     <div class="db-util-chip db-chip-gas" ng-click="vm.openModal('gas')" style="cursor:pointer;">
                         <span class="db-chip-emoji">&#128293;</span>
                         <div class="db-chip-body">
-                            <div class="db-chip-name">Gas</div>
-                            <div class="db-chip-status" style="color:#10b981;">Normal</div>
+                            <div class="db-chip-name">{{'db_gas' | translate}}</div>
+                            <div class="db-chip-status" style="color:#10b981;">{{'db_normal' | translate}}</div>
                         </div>
                         <div class="db-chip-score">68</div>
                     </div>
@@ -658,7 +656,7 @@
                     <span class="db-mom db-mom-up">&#9889; +12%</span>
                     <span class="db-mom db-mom-down">&#128167; -5%</span>
                     <span class="db-mom db-mom-up">&#128293; +3%</span>
-                    <span class="db-mom-lbl">vs last month</span>
+                    <span class="db-mom-lbl">{{'db_vs_last_month' | translate}}</span>
                 </div>
             </div>
 
@@ -666,14 +664,14 @@
             <div class="db-panel db-chart-panel">
                 <div class="db-chart-top">
                     <div class="db-utility-tabs">
-                        <button class="db-utab" ng-class="{active: vm.selectedUtility==='electricity'}" ng-click="vm.switchUtility('electricity')">&#9889; Electricity</button>
-                        <button class="db-utab" ng-class="{active: vm.selectedUtility==='water'}" ng-click="vm.switchUtility('water')">&#128167; Water</button>
-                        <button class="db-utab" ng-class="{active: vm.selectedUtility==='gas'}" ng-click="vm.switchUtility('gas')">&#128293; Gas</button>
+                        <button class="db-utab" ng-class="{active: vm.selectedUtility==='electricity'}" ng-click="vm.switchUtility('electricity')">&#9889; {{'db_electricity' | translate}}</button>
+                        <button class="db-utab" ng-class="{active: vm.selectedUtility==='water'}" ng-click="vm.switchUtility('water')">&#128167; {{'db_water' | translate}}</button>
+                        <button class="db-utab" ng-class="{active: vm.selectedUtility==='gas'}" ng-click="vm.switchUtility('gas')">&#128293; {{'db_gas' | translate}}</button>
                     </div>
                     <select class="db-period-sel" ng-model="vm.selectedPeriod" ng-change="vm.onPeriodChange()">
-                        <option value="3months">3 Months</option>
-                        <option value="6months">6 Months</option>
-                        <option value="1year">12 Months</option>
+                        <option value="3months">{{'db_3_months' | translate}}</option>
+                        <option value="6months">{{'db_6_months' | translate}}</option>
+                        <option value="1year">{{'db_12_months' | translate}}</option>
                     </select>
                 </div>
                 <div class="db-chart-canvas">
@@ -682,32 +680,32 @@
                 <div class="db-chart-stats">
                     <div class="db-cs">
                         <div class="db-cs-val">{{vm.utilityStats.peakMonth}}</div>
-                        <div class="db-cs-lbl">Peak</div>
+                        <div class="db-cs-lbl">{{'db_peak' | translate}}</div>
                     </div>
                     <div class="db-cs">
                         <div class="db-cs-val">{{vm.utilityStats.lowestMonth}}</div>
-                        <div class="db-cs-lbl">Lowest</div>
+                        <div class="db-cs-lbl">{{'db_lowest' | translate}}</div>
                     </div>
                     <div class="db-cs" ng-class="vm.utilityStats.trendClass">
                         <div class="db-cs-val">{{vm.utilityStats.trendText}}</div>
-                        <div class="db-cs-lbl">Change</div>
+                        <div class="db-cs-lbl">{{'db_change' | translate}}</div>
                     </div>
                     <div class="db-cs">
                         <div class="db-cs-val">{{vm.utilityStats.average}} {{vm.utilityStats.unit}}</div>
-                        <div class="db-cs-lbl">Monthly Avg</div>
+                        <div class="db-cs-lbl">{{'db_monthly_avg' | translate}}</div>
                     </div>
                 </div>
                 <div class="db-slab-bar" ng-repeat="slab in vm.ratePlanData[vm.selectedUtility].slabs" ng-if="slab.highlight">
                     <div class="db-slab-left">
-                        <span class="db-slab-tag">Your Slab</span>
+                        <span class="db-slab-tag">{{'db_your_slab' | translate}}</span>
                         <span class="db-slab-range">{{slab.range}}</span>
                         <span class="db-slab-rate">{{slab.rate}}</span>
                     </div>
-                    <button class="db-slab-more" ng-click="vm.viewRatePlanDetails()">Full Plan &#8594;</button>
+                    <button class="db-slab-more" ng-click="vm.viewRatePlanDetails()">{{'db_full_plan' | translate}} &#8594;</button>
                 </div>
                 <div class="db-chart-footer">
                     <button class="db-ask-suvidha" ng-click="vm.openSuvidhaInsights()">
-                        <i data-lucide="sparkles" style="width:13px;height:13px;"></i> Ask Suvidha
+                        <i data-lucide="sparkles" style="width:13px;height:13px;"></i> {{'db_ask_suvidha' | translate}}
                     </button>
                     <span class="db-datasrc">{{vm.utilityStats.dataSource}}</span>
                 </div>
@@ -721,7 +719,7 @@
                     <span class="schemes-icon">&#127963;</span>
                     Latest Government Schemes &amp; Subsidies
                 </h2>
-                <p class="schemes-subtitle">For {{vm.userState || 'Your State'}} - Tap to explore benefits</p>
+                <p class="schemes-subtitle">For {{vm.userState || 'Your State'}} - {{'db_tap_explore' | translate}}</p>
             </div>
             <div class="schemes-carousel-container">
                 <div class="schemes-carousel-track">
@@ -730,7 +728,7 @@
                         <div class="scheme-content">
                             <h3 class="scheme-name">{{scheme.name}}</h3>
                             <p class="scheme-description">{{scheme.description}}</p>
-                            <span class="scheme-benefit">Subsidy: {{scheme.subsidy}}</span>
+                            <span class="scheme-benefit">{{'db_subsidy' | translate}}: {{scheme.subsidy}}</span>
                         </div>
                         <div class="scheme-arrow"><i data-lucide="arrow-right"></i></div>
                     </div>
@@ -748,71 +746,71 @@
 
             <!-- Environmental Impact -->
             <div class="db-impact-box">
-                <div class="db-box-title">&#127807; Your Environmental Impact</div>
+                <div class="db-box-title">&#127807; {{'db_env_impact' | translate}}</div>
                 <div class="db-impact-hero">
                     <div class="db-impact-big">{{vm.electricitySaved || 1250}}</div>
-                    <div class="db-impact-unit">kWh Saved</div>
+                    <div class="db-impact-unit">{{'db_kwh_saved' | translate}}</div>
                 </div>
-                <div class="db-impact-eq">= Equivalent to planting 10 trees &#127795;</div>
+                <div class="db-impact-eq">= {{'db_equiv_trees' | translate}} &#127795;</div>
                 <div class="db-impact-grid">
                     <div class="db-istat">
                         <div class="db-istat-icon">&#128167;</div>
                         <div class="db-istat-val">{{vm.waterSaved || 3680}}</div>
-                        <div class="db-istat-lbl">kL Water</div>
+                        <div class="db-istat-lbl">{{'db_kl_water' | translate}}</div>
                     </div>
                     <div class="db-istat">
                         <div class="db-istat-icon">&#128293;</div>
                         <div class="db-istat-val">{{vm.gasSaved || 285}}</div>
-                        <div class="db-istat-lbl">SCM Gas</div>
+                        <div class="db-istat-lbl">{{'db_scm_gas' | translate}}</div>
                     </div>
                     <div class="db-istat">
                         <div class="db-istat-icon">&#11088;</div>
                         <div class="db-istat-val">{{vm.totalPoints || 2450}}</div>
-                        <div class="db-istat-lbl">Pts Earned</div>
+                        <div class="db-istat-lbl">{{'db_pts_earned' | translate}}</div>
                     </div>
                     <div class="db-istat">
                         <div class="db-istat-icon">&#127981;</div>
                         <div class="db-istat-val">{{vm.carbonReduction || 520}}</div>
-                        <div class="db-istat-lbl">kg CO2</div>
+                        <div class="db-istat-lbl">{{'db_kg_co2' | translate}}</div>
                     </div>
                 </div>
             </div>
 
             <!-- Services -->
             <div class="db-services-box">
-                <div class="db-box-title">&#128295; Utility Services</div>
+                <div class="db-box-title">&#128295; {{'db_utility_services' | translate}}</div>
                 <div class="db-svc-list">
                     <div class="db-svc-item db-svc-elec">
                         <div class="db-svc-icon">&#9889;</div>
                         <div class="db-svc-info">
-                            <div class="db-svc-name">Electricity Board</div>
-                            <div class="db-svc-prov">State Electricity Board &middot; Domestic</div>
+                            <div class="db-svc-name">{{'db_electricity_board' | translate}}</div>
+                            <div class="db-svc-prov">{{'db_elec_provider' | translate}} &middot; {{'db_domestic' | translate}}</div>
                         </div>
                         <div class="db-svc-right">
-                            <span class="db-svc-badge">Active</span>
-                            <a href="#!/records" class="db-svc-btn">View &#8594;</a>
+                            <span class="db-svc-badge">{{'db_active' | translate}}</span>
+                            <a href="#!/records" class="db-svc-btn">{{'db_view' | translate}} &#8594;</a>
                         </div>
                     </div>
                     <div class="db-svc-item db-svc-water">
                         <div class="db-svc-icon">&#128167;</div>
                         <div class="db-svc-info">
-                            <div class="db-svc-name">Water Board</div>
-                            <div class="db-svc-prov">Municipal Water Works &middot; Metered</div>
+                            <div class="db-svc-name">{{'db_water_board' | translate}}</div>
+                            <div class="db-svc-prov">{{'db_water_provider' | translate}} &middot; {{'db_metered' | translate}}</div>
                         </div>
                         <div class="db-svc-right">
-                            <span class="db-svc-badge">Active</span>
-                            <a href="#!/records" class="db-svc-btn">View &#8594;</a>
+                            <span class="db-svc-badge">{{'db_active' | translate}}</span>
+                            <a href="#!/records" class="db-svc-btn">{{'db_view' | translate}} &#8594;</a>
                         </div>
                     </div>
                     <div class="db-svc-item db-svc-gas">
                         <div class="db-svc-icon">&#128293;</div>
                         <div class="db-svc-info">
-                            <div class="db-svc-name">Gas Services</div>
-                            <div class="db-svc-prov">City Gas Distribution &middot; PNG Domestic</div>
+                            <div class="db-svc-name">{{'db_gas_services' | translate}}</div>
+                            <div class="db-svc-prov">{{'db_gas_provider' | translate}} &middot; {{'db_png_domestic' | translate}}</div>
                         </div>
                         <div class="db-svc-right">
-                            <span class="db-svc-badge">Active</span>
-                            <a href="#!/records" class="db-svc-btn">View &#8594;</a>
+                            <span class="db-svc-badge">{{'db_active' | translate}}</span>
+                            <a href="#!/records" class="db-svc-btn">{{'db_view' | translate}} &#8594;</a>
                         </div>
                     </div>
                 </div>
@@ -823,7 +821,7 @@
         <!-- Floating Ask Suvidha Chat Button -->
         <button class="ask-suvidha-fab" ng-click="vm.openGlobalChat()" title="Ask Suvidha">
             <i data-lucide="sparkles" style="width:22px;height:22px;"></i>
-            <span>Ask Suvidha</span>
+            <span>{{'db_ask_suvidha' | translate}}</span>
         </button>
 
         <!-- Global Suvidha Chat Dialog -->
@@ -835,12 +833,12 @@
                         <div class="modal-header-icon" style="background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%); color:#fff;">
                             <i data-lucide="sparkles"></i>
                         </div>
-                        <h2 class="modal-title">Ask Suvidha</h2>
+                        <h2 class="modal-title">{{'db_ask_suvidha' | translate}}</h2>
                     </div>
                     <button class="modal-close" ng-click="vm.closeGlobalChat()"><i data-lucide="x"></i></button>
                 </div>
                 <div class="modal-body" style="padding:1.2rem 1.5rem;">
-                    <p style="font-size:0.85rem; color:#6b7280; margin:0 0 1rem;">Ask anything about your bills, consumption, government schemes, or civic services.</p>
+                    <p style="font-size:0.85rem; color:#6b7280; margin:0 0 1rem;">{{'db_ask_anything' | translate}}</p>
                     <!-- Chat History -->
                     <div class="global-chat-messages" style="max-height:300px; overflow-y:auto; margin-bottom:1rem;">
                         <div ng-repeat="msg in vm.globalChatHistory" style="margin-bottom:0.75rem;">
@@ -857,7 +855,7 @@
                         <div ng-show="vm.globalChatLoading" style="text-align:left;">
                             <div style="display:inline-flex; align-items:center; gap:0.5rem; background:#fffbeb; padding:0.5rem 0.75rem; border-radius:12px; font-size:0.85rem; color:#9ca3af;">
                                 <i data-lucide="loader" style="width:14px;height:14px; animation:spin 1s linear infinite;"></i>
-                                Thinking...
+                                {{'db_thinking' | translate}}
                             </div>
                         </div>
                     </div>

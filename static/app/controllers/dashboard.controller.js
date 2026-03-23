@@ -18,8 +18,15 @@
         vm.availableLanguages = [
             { code: 'en', name: 'English', flag: '🇬🇧' },
             { code: 'hi', name: 'हिन्दी (Hindi)', flag: '🇮🇳' },
+            { code: 'bn', name: 'বাংলা (Bengali)', flag: '🇮🇳' },
+            { code: 'pa', name: 'ਪੰਜਾਬੀ (Punjabi)', flag: '🇮🇳' },
             { code: 'ta', name: 'தமிழ் (Tamil)', flag: '🇮🇳' },
-            { code: 'mr', name: 'मराठी (Marathi)', flag: '🇮🇳' }
+            { code: 'te', name: 'తెలుగు (Telugu)', flag: '🇮🇳' },
+            { code: 'kn', name: 'ಕನ್ನಡ (Kannada)', flag: '🇮🇳' },
+            { code: 'gu', name: 'ગુજરાતી (Gujarati)', flag: '🇮🇳' },
+            { code: 'ml', name: 'മലയാളം (Malayalam)', flag: '🇮🇳' },
+            { code: 'mr', name: 'मराठी (Marathi)', flag: '🇮🇳' },
+            { code: 'or', name: 'ଓଡ଼ିଆ (Odia)', flag: '🇮🇳' }
         ];
 
         vm.getCurrentLanguageLabel = function() {
