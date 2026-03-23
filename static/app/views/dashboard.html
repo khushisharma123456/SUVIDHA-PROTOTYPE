@@ -421,10 +421,59 @@
         <!-- Welcome Bar -->
         <div class="db-welcome-bar">
             <div>
-                <h1 class="db-welcome-title">Welcome back, {{vm.userData.username || 'Citizen'}} &#128075;</h1>
-                <p class="db-welcome-sub">{{vm.userState || 'Your Ward'}} &middot; Smart City Services</p>
+                <h1 class="db-welcome-title">{{'dashboard.welcome_citizen' | translate}}, {{vm.userData.username || 'Citizen'}} &#128075;</h1>
+                <p class="db-welcome-sub">{{vm.userState || 'Your Ward'}} &middot; {{'header.smart_city_services' | translate}}</p>
             </div>
             <div class="db-welcome-icons">
+                <!-- Language Selector -->
+                <div class="language-selector-wrapper" style="position: relative;">
+                    <button class="header-icon-btn language-selector-btn" ng-click="vm.toggleLanguageMenu()" title="Change Language" style="display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="globe"></i>
+                        <span style="font-size: 12px; font-weight: 600; max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{vm.getCurrentLanguageLabel()}}</span>
+                    </button>
+                    <!-- Language Dropdown Menu -->
+                    <div class="language-dropdown" ng-show="vm.showLanguageMenu" ng-click="$event.stopPropagation()" style="
+                        position: absolute;
+                        top: 100%;
+                        right: 0;
+                        background: white;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                        min-width: 180px;
+                        z-index: 1000;
+                        margin-top: 8px;
+                    ">
+                        <div style="padding: 8px 0;">
+                            <div ng-repeat="lang in vm.availableLanguages" 
+                                ng-click="vm.switchLanguage(lang.code)"
+                                style="
+                                    padding: 10px 16px;
+                                    cursor: pointer;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 10px;
+                                    border-left: 3px solid transparent;
+                                    font-size: 14px;
+                                    transition: all 0.2s;
+                                "
+                                ng-class="vm.currentLanguage === lang.code ? 'language-active' : 'language-item'"
+                                ng-mouseenter="$event.target.style.backgroundColor = '#f3f4f6'"
+                                ng-mouseleave="$event.target.style.backgroundColor = 'transparent'">
+                                <span style="font-size: 18px;">{{lang.flag}}</span>
+                                <span style="flex: 1;">{{lang.name}}</span>
+                                <i data-lucide="check" ng-if="vm.currentLanguage === lang.code" style="width: 16px; height: 16px; color: #10b981;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <style>
+                    .language-active {
+                        background-color: #f0f9ff !important;
+                        border-left-color: #0ea5e9 !important;
+                    }
+                </style>
+                
                 <button class="header-icon-btn" ng-click="vm.openServiceStatusDialog()" title="Service Requests">
                     <i data-lucide="wrench"></i>
                     <span class="header-icon-badge" ng-show="(vm.userData.reports.open||0)+(vm.userData.reports.in_progress||0)>0">{{(vm.userData.reports.open||0)+(vm.userData.reports.in_progress||0)}}</span>
@@ -496,39 +545,39 @@
         <div class="db-quick-row">
             <a href="#!/wallet" class="db-qa-card">
                 <div class="db-qa-icon">&#128179;</div>
-                <div class="db-qa-label">Pay Bills</div>
+                <div class="db-qa-label">{{'header.pay_bills' | translate}}</div>
             </a>
             <a href="#!/insights" class="db-qa-card">
                 <div class="db-qa-icon">&#128202;</div>
-                <div class="db-qa-label">View Usage</div>
+                <div class="db-qa-label">{{'header.view_usage' | translate}}</div>
             </a>
             <a href="#!/services" class="db-qa-card">
                 <div class="db-qa-icon">&#128295;</div>
-                <div class="db-qa-label">Raise Request</div>
+                <div class="db-qa-label">{{'header.raise_request' | translate}}</div>
             </a>
             <button class="db-qa-card db-qa-btn" ng-click="vm.openBandhuDialog()">
                 <div class="db-qa-icon">&#129302;</div>
-                <div class="db-qa-label">Ask Assistant</div>
+                <div class="db-qa-label">{{'header.ask_assistant' | translate}}</div>
             </button>
         </div>
 
         <!-- SECTION 3: UTILITY HEALTH DNA HELIX -->
         <div class="db-dna-section">
             <div class="db-dna-sec-left">
-                <div class="db-dna-sec-title">Utility Health</div>
+                <div class="db-dna-sec-title">{{'dashboard.utility_health' | translate}}</div>
                 <div class="db-dna-sec-score">
                     <span class="db-dna-big-score">{{vm.healthScore || 82}}</span>
                     <span class="db-dna-big-denom">/100</span>
                 </div>
-                <div class="db-dna-grade-chip">&#127942; Good Standing</div>
+                <div class="db-dna-grade-chip">&#127942; {{'dashboard.good_standing' | translate}}</div>
                 <div class="db-dna-util-pills">
-                    <div class="db-dna-pill db-dna-pill-elec" ng-click="vm.openModal('electricity')" style="cursor:pointer;">&#9889; Elec &nbsp;<strong>82</strong> <span style="color:#f59e0b;">Good</span></div>
-                    <div class="db-dna-pill db-dna-pill-water" ng-click="vm.openModal('water')" style="cursor:pointer;">&#128167; Water &nbsp;<strong>85</strong> <span style="color:#ef4444;">High</span></div>
-                    <div class="db-dna-pill db-dna-pill-gas" ng-click="vm.openModal('gas')" style="cursor:pointer;">&#128293; Gas &nbsp;<strong>68</strong> <span style="color:#10b981;">Normal</span></div>
+                    <div class="db-dna-pill db-dna-pill-elec" ng-click="vm.openModal('electricity')" style="cursor:pointer;">⚡ {{'utilities.electricity' | translate}} &nbsp;<strong>82</strong> <span style="color:#f59e0b;">{{'dashboard.good' | translate}}</span></div>
+                    <div class="db-dna-pill db-dna-pill-water" ng-click="vm.openModal('water')" style="cursor:pointer;">💧 {{'utilities.water' | translate}} &nbsp;<strong>85</strong> <span style="color:#ef4444;">{{'dashboard.high' | translate}}</span></div>
+                    <div class="db-dna-pill db-dna-pill-gas" ng-click="vm.openModal('gas')" style="cursor:pointer;">🔥 {{'utilities.gas' | translate}} &nbsp;<strong>68</strong> <span style="color:#10b981;">{{'dashboard.normal' | translate}}</span></div>
                 </div>
                 <div class="db-dna-mom">
-                    <span class="db-mom db-mom-up">&#9889; +12%</span>
-                    <span class="db-mom db-mom-down">&#128167; -5%</span>
+                    <span class="db-mom db-mom-up">⚡ +12%</span>
+                    <span class="db-mom db-mom-down">💧 -5%</span>
                     <span class="db-mom db-mom-up">&#128293; +3%</span>
                     <span class="db-mom-lbl">vs last month</span>
                 </div>

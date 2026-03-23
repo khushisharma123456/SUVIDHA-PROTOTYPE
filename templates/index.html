@@ -126,16 +126,25 @@
             gap: 0.75rem;
         }
         .mobile-header img { height: 28px; }
-        .mobile-header span { color: #111827; font-weight: 600; font-size: 1.1rem; }
+        .mobile-header span { color: #111827; font-weight: 600; font-size: 1.1rem; flex: 1; }
+        .mobile-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
         .mobile-menu-btn {
             background: none; border: none; color: #374151;
-            font-size: 1.5rem; cursor: pointer; margin-left: auto;
+            font-size: 1.5rem; cursor: pointer;
         }
         @media (max-width: 768px) {
             .mobile-header { display: flex; }
             .sidebar { transform: translateX(-100%); }
             .sidebar.mobile-open { transform: translateX(0); }
             .main-wrapper { margin-left: 0 !important; padding-top: 56px; }
+            .language-selector-widget { display: none; }
+        }
+        @media (max-width: 480px) {
+            .mobile-header span { display: none; }
         }
     </style>
 </head>
@@ -144,6 +153,9 @@
     <div class="mobile-header">
         <img src="/static/images/suvidha%20Logo.jpg" alt="Suvidha">
         <span>Suvidha</span>
+        <div class="mobile-header-actions">
+            <ng-include src="'/static/app/components/language-selector.html'" ng-controller="DashboardController as dm"></ng-include>
+        </div>
         <button class="mobile-menu-btn" ng-click="toggleMobileSidebar()">&#9776;</button>
     </div>
 
@@ -249,6 +261,7 @@
         }
     </script>
     <script src="/static/app/app.js"></script>
+    <script src="/static/app/directives/click-outside.directive.js"></script>
     <script src="/static/app/services/auth.service.js"></script>
     <script src="/static/app/services/api.service.js"></script>
     <script src="/static/app/services/translation.service.js"></script>

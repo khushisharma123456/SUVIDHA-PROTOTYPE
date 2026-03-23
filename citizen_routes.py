@@ -814,3 +814,235 @@ def get_consumption_data():
         
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+# ============================================
+# USER PREFERENCES & SETTINGS
+# ============================================
+
+@citizen_bp.route('/api/user/preference', methods=['POST'])
+def update_user_preference():
+    """Update user preferences (language, theme, notifications, etc.)"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
+        
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        
+        data = request.get_json()
+        preference_key = data.get('key')
+        preference_value = data.get('value')
+        
+        if not preference_key:
+            return jsonify({'success': False, 'message': 'Preference key is required'}), 400
+        
+        # Handle different preference types
+        if preference_key == 'language':
+            user.preferred_language = preference_value
+        elif preference_key == 'theme':
+            user.theme_preference = preference_value
+        elif preference_key == 'notifications':
+            user.notifications_enabled = preference_value
+        # Add more preferences as needed
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'{preference_key} preference updated successfully',
+            'preference': {
+                'key': preference_key,
+                'value': preference_value
+            }
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@citizen_bp.route('/api/user/preferences', methods=['GET'])
+def get_user_preferences():
+    """Get all user preferences"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
+        
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        
+        preferences = {
+            'language': user.preferred_language or 'en',
+            'theme': getattr(user, 'theme_preference', 'light'),
+            'notifications': getattr(user, 'notifications_enabled', True)
+        }
+        
+        return jsonify({
+            'success': True,
+            'preferences': preferences
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ============================================
+# PROFILE MANAGEMENT ENDPOINTS
+# ============================================
+
+@citizen_bp.route('/api/citizen/profile', methods=['GET'])
+def get_user_profile():
+    """Get user profile information"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
+        
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        
+        profile = {
+            'id': user.id,
+            'full_name': user.full_name,
+            'email': user.email,
+            'phone': user.phone,
+            'user_type': user.user_type,
+            'date_of_birth': user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else None,
+            'preferred_language': user.preferred_language or 'en',
+            'state': user.state,
+            'city': user.city,
+            'ward': user.ward,
+            'locality': user.locality,
+            'alerts_enabled': user.alerts_enabled,
+            'is_verified': user.is_verified,
+            'account_created': user.account_created.isoformat(),
+            'last_login': user.last_login.isoformat() if user.last_login else None,
+            'aadhaar_consent': user.aadhaar_consent
+        }
+        
+        return jsonify({
+            'success': True,
+            'profile': profile
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@citizen_bp.route('/api/citizen/profile', methods=['PUT'])
+def update_user_profile():
+    """Update user profile information"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
+        
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        
+        data = request.get_json()
+        
+        # Update allowed fields
+        if 'full_name' in data:
+            user.full_name = data['full_name']
+        if 'phone' in data:
+            # Check if phone already exists for another user
+            existing = User.query.filter_by(phone=data['phone']).first()
+            if existing and existing.id != user_id:
+                return jsonify({'success': False, 'message': 'Phone number already in use'}), 400
+            user.phone = data['phone']
+        if 'locality' in data:
+            user.locality = data['locality']
+        if 'state' in data:
+            user.state = data['state']
+        if 'city' in data:
+            user.city = data['city']
+        if 'ward' in data:
+            user.ward = data['ward']
+        if 'date_of_birth' in data:
+            try:
+                user.date_of_birth = datetime.strptime(data['date_of_birth'], '%Y-%m-%d').date() if data['date_of_birth'] else None
+            except ValueError:
+                pass
+        if 'alerts_enabled' in data:
+            user.alerts_enabled = data['alerts_enabled']
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Profile updated successfully',
+            'profile': {
+                'id': user.id,
+                'full_name': user.full_name,
+                'email': user.email,
+                'phone': user.phone,
+                'locality': user.locality,
+                'state': user.state,
+                'city': user.city,
+                'ward': user.ward,
+                'alerts_enabled': user.alerts_enabled
+            }
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@citizen_bp.route('/api/citizen/profile/connections', methods=['GET'])
+def get_profile_connections():
+    """Get user's utility connections"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
+        
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        
+        connections = []
+        
+        # Electricity connection
+        if user.electricity_provider_id:
+            vendor = Vendor.query.get(user.electricity_provider_id)
+            connections.append({
+                'utility': 'Electricity',
+                'provider': vendor.name if vendor else 'Unknown',
+                'status': 'Active',
+                'statusClass': 'badge-success'
+            })
+        
+        # Water connection
+        if user.water_provider_id:
+            vendor = Vendor.query.get(user.water_provider_id)
+            connections.append({
+                'utility': 'Water',
+                'provider': vendor.name if vendor else 'Unknown',
+                'status': 'Active',
+                'statusClass': 'badge-success'
+            })
+        
+        # Gas connection
+        if user.gas_provider_id:
+            vendor = Vendor.query.get(user.gas_provider_id)
+            connections.append({
+                'utility': 'Gas',
+                'provider': vendor.name if vendor else 'Unknown',
+                'status': 'Active',
+                'statusClass': 'badge-success'
+            })
+        
+        return jsonify({
+            'success': True,
+            'connections': connections,
+            'total_connections': len(connections)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500

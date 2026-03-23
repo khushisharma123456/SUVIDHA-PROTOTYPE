@@ -1,0 +1,164 @@
+<!-- Language Selector Widget -->
+<div class="language-selector-widget" ng-click-outside="dm.closeLanguageMenu()">
+  <button class="language-toggle-btn" ng-click="dm.toggleLanguageMenu()" title="Change Language">
+    <i class="fas fa-globe"></i>
+    <span class="current-language">{{ dm.getCurrentLanguageLabel() }}</span>
+    <i class="fas fa-chevron-down"></i>
+  </button>
+
+  <div class="language-dropdown" ng-show="dm.showLanguageMenu">
+    <div class="language-menu">
+      <h4 class="language-menu-title">{{ 'header.language' | translate }}</h4>
+      
+      <button 
+        class="language-option" 
+        ng-repeat="lang in dm.availableLanguages"
+        ng-class="{active: dm.currentLanguage === lang.code}"
+        ng-click="dm.switchLanguage(lang.code)"
+        title="{{ lang.name }}">
+        <span class="lang-flag">{{ lang.flag }}</span>
+        <span class="lang-name">{{ lang.name }}</span>
+        <i class="fas fa-check" ng-show="dm.currentLanguage === lang.code"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style scoped>
+.language-selector-widget {
+  position: relative;
+  display: inline-block;
+}
+
+.language-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.language-toggle-btn:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.language-toggle-btn i {
+  font-size: 0.9rem;
+}
+
+.current-language {
+  min-width: 80px;
+  text-align: left;
+}
+
+.language-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 220px;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.language-menu {
+  padding: 1rem;
+}
+
+.language-menu-title {
+  margin: 0;
+  padding: 0 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.25rem 0;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #374151;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.language-option:hover {
+  background: #f9fafb;
+}
+
+.language-option.active {
+  background: #f0f9ff;
+  color: #1d70b8;
+  font-weight: 600;
+}
+
+.lang-flag {
+  font-size: 1.2rem;
+  min-width: 1.5rem;
+}
+
+.lang-name {
+  flex: 1;
+}
+
+.language-option i {
+  font-size: 0.8rem;
+  color: #1d70b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .language-dropdown {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 16px 16px 0 0;
+    max-width: none;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
+</style>

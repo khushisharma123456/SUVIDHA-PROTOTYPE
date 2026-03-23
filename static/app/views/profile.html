@@ -1,4 +1,4 @@
-<div class="main-content">
+<div class="main-content" ng-controller="ProfileController as vm">
     <div class="dashboard-container">
 
         <!-- HERO STRIP -->
@@ -79,10 +79,18 @@
 
         <!-- ═══════════════════════════ PROFILE TAB ═══════════════════════════ -->
         <div ng-show="vm.settingsTab === 'profile'">
-            <h2 class="settings-section-title"><span class="icon">👤</span> Personal Information</h2>
-            <p class="settings-section-desc">Your profile details are sourced from your registered account</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 class="settings-section-title"><span class="icon">👤</span> Personal Information</h2>
+                    <p class="settings-section-desc">{{ vm.editMode ? 'Edit your profile information' : 'Your profile details are sourced from your registered account' }}</p>
+                </div>
+                <button ng-if="!vm.editMode" ng-click="vm.editMode = true" style="padding: 0.6rem 1.2rem; background: #1D70B8; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    ✏️ Edit
+                </button>
+            </div>
 
-            <div class="form-display-grid">
+            <!-- VIEW MODE -->
+            <div ng-if="!vm.editMode" class="form-display-grid">
                 <div class="form-display-row">
                     <div class="form-display-label">Full Name</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.fullName}">
@@ -107,14 +115,63 @@
                         {{vm.user.ward || 'Not assigned'}}
                     </div>
                 </div>
+                <div class="form-display-row">
+                    <div class="form-display-label">City</div>
+                    <div class="form-display-value" ng-class="{'empty': !vm.user.city}">
+                        {{vm.user.city || 'Not assigned'}}
+                    </div>
+                </div>
+                <div class="form-display-row">
+                    <div class="form-display-label">State</div>
+                    <div class="form-display-value" ng-class="{'empty': !vm.user.state}">
+                        {{vm.user.state || 'Not assigned'}}
+                    </div>
+                </div>
                 <div class="form-display-row full-width">
                     <div class="form-display-label">Address</div>
                     <div class="form-display-value" ng-class="{'empty': !vm.user.address}">
                         {{vm.user.address || 'No address on file'}}
                     </div>
-                    <div class="form-display-hint">
-                        ℹ️ Managed from your official registration. Contact support to update.
+                </div>
+            </div>
+
+            <!-- EDIT MODE -->
+            <div ng-if="vm.editMode" style="background: #F9FAFB; padding: 1.5rem; border-radius: 12px; border: 1px solid #E5E7EB;">
+                <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Full Name *</label>
+                    <input ng-model="vm.user.fullName" type="text" placeholder="Enter your full name" style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 1rem;">
+                </div>
+                <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Phone Number *</label>
+                    <input ng-model="vm.user.phone" type="tel" placeholder="Enter your phone number" style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 1rem;">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+                    <div>
+                        <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">City *</label>
+                        <input ng-model="vm.user.city" type="text" placeholder="City" style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 1rem;">
                     </div>
+                    <div>
+                        <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">State *</label>
+                        <input ng-model="vm.user.state" type="text" placeholder="State" style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 1rem;">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Ward *</label>
+                        <input ng-model="vm.user.ward" type="text" placeholder="Ward" style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 1rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Locality / Area *</label>
+                        <input ng-model="vm.user.address" type="text" placeholder="Locality" style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 1rem;">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button ng-click="vm.updateProfile()" ng-disabled="vm.saving" style="padding: 0.75rem 1.5rem; background: #1D70B8; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; flex: 1;">
+                        {{ vm.saving ? '💾 Saving...' : '✓ Save Changes' }}
+                    </button>
+                    <button ng-click="vm.cancelEdit()" ng-disabled="vm.saving" style="padding: 0.75rem 1.5rem; background: white; color: #374151; border: 1px solid #D1D5DB; border-radius: 8px; cursor: pointer; font-weight: 500; flex: 1;">
+                        Cancel
+                    </button>
                 </div>
             </div>
 
@@ -123,7 +180,17 @@
             <h2 class="settings-section-title" style="margin-top: 0.5rem;"><span class="icon">🔗</span> Utility Connections</h2>
             <p class="settings-section-desc">Your linked utility service accounts</p>
 
-            <div class="connection-grid">
+            <div ng-if="vm.loadingConnections" style="text-align: center; padding: 2rem;">
+                <div style="color: #6B7280; font-size: 0.95rem;">Loading connections...</div>
+            </div>
+
+            <div ng-if="!vm.loadingConnections && vm.connections.length === 0" style="padding: 2rem; background: #F9FAFB; border-radius: 12px; text-align: center; color: #6B7280;">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔌</div>
+                <div style="font-weight: 500;">No utility connections yet</div>
+                <div style="font-size: 0.9rem; margin-top: 0.5rem;">Link your utility accounts to track consumption and bills</div>
+            </div>
+
+            <div class="connection-grid" ng-if="!vm.loadingConnections && vm.connections.length > 0">
                 <div class="connection-card" ng-repeat="connection in vm.connections">
                     <div class="connection-icon" ng-class="connection.utility.toLowerCase()">
                         <span ng-if="connection.utility === 'Electricity'">⚡</span>
@@ -131,10 +198,10 @@
                         <span ng-if="connection.utility === 'Gas'">🔥</span>
                     </div>
                     <div class="connection-details">
-                        <div class="conn-label">{{connection.utility}} {{connection.label}}</div>
-                        <div class="conn-number">{{connection.number}}</div>
+                        <div class="conn-label">{{connection.utility}}</div>
+                        <div class="conn-provider">{{connection.provider}}</div>
                     </div>
-                    <span class="connection-status-pill">{{connection.status}}</span>
+                    <span class="connection-status-pill" ng-class="{'badge-success': connection.status === 'Active', 'badge-inactive': connection.status !== 'Active'}">{{connection.status}}</span>
                 </div>
             </div>
         </div>
