@@ -27,7 +27,7 @@
                     return self.translationsPromise;
                 }
 
-                self.translationsPromise = $http.get('/static/translations.json')
+                self.translationsPromise = $http.get('/static/translations-multilingual.json')
                     .then(function (response) {
                         self.translations = response.data;
                         console.log('Translations loaded:', Object.keys(self.translations));
@@ -35,8 +35,19 @@
                         return self.translations;
                     })
                     .catch(function (error) {
-                        console.error('Could not load translations:', error);
-                        return {};
+                        console.error('Could not load translations-multilingual.json, falling back to translations.json:', error);
+                        // Fallback to original translations file
+                        return $http.get('/static/translations.json')
+                            .then(function (response) {
+                                self.translations = response.data;
+                                console.log('Fallback translations loaded');
+                                $rootScope.$broadcast('translationsLoaded');
+                                return self.translations;
+                            })
+                            .catch(function (fallbackError) {
+                                console.error('Could not load translations:', fallbackError);
+                                return {};
+                            });
                     });
 
                 return self.translationsPromise;
@@ -66,6 +77,10 @@
             self.setLanguage = function (lang) {
                 self.currentLang = lang;
                 $rootScope.$broadcast('languageChanged', lang);
+            };
+
+            self.getCurrentLanguage = function () {
+                return self.currentLang;
             };
 
             self.getLanguage = function () {

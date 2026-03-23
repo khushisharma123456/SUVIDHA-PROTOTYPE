@@ -3,30 +3,28 @@
     'use strict';
 
     angular.module('suvidhaApp')
-        .controller('ProfileController', ['$scope', 'ApiService', ProfileController]);
+        .controller('ProfileController', ['$scope', '$timeout', 'ApiService', ProfileController]);
 
-    function ProfileController($scope, ApiService) {
+    function ProfileController($scope, $timeout, ApiService) {
         var vm = this;
         var $rootScope = $scope.$root;
         vm.loading = true;
+        vm.loadingConnections = true;
         vm.profileData = {};
         vm.settingsTab = 'profile';
+        vm.editMode = false;
+        vm.saving = false;
 
-        // Load from localStorage immediately
-        var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
-        if (storedUser) {
-            vm.user = {
-                fullName: storedUser.full_name || storedUser.name || '',
-                email: storedUser.email || '',
-                phone: storedUser.phone || '',
-                address: storedUser.locality || '',
-                ward: storedUser.ward || '',
-                city: storedUser.city || '',
-                state: storedUser.state || ''
-            };
-        } else {
-            vm.user = { fullName: '', email: '', phone: '', address: '', ward: '', city: '', state: '' };
-        }
+        // Initialize with default empty user object
+        vm.user = {
+            fullName: 'Citizen',
+            email: 'No email on file',
+            phone: 'Not provided',
+            address: 'No address on file',
+            ward: 'N/A',
+            city: 'Not assigned',
+            state: 'Not assigned'
+        };
 
         // Preferences
         vm.preferences = {
@@ -47,26 +45,54 @@
             }
         } catch (e) { /* ignore */ }
 
-        // Connections data
-        vm.connections = [
-            { utility: 'Electricity', label: 'Consumer No', number: storedUser ? (storedUser.electricity_id || 'ELEC-2025-001') : 'N/A', status: 'Active', statusClass: 'badge-success' },
-            { utility: 'Water', label: 'Connection ID', number: storedUser ? (storedUser.water_id || 'WTR-2025-001') : 'N/A', status: 'Active', statusClass: 'badge-success' },
-            { utility: 'Gas', label: 'Connection ID', number: storedUser ? (storedUser.gas_id || 'GAS-2025-001') : 'N/A', status: 'Active', statusClass: 'badge-success' }
-        ];
+        // Connections data array
+        vm.connections = [];
 
         vm.updateProfile = function() {
-            $rootScope.showDialog(
-                'Profile Update',
-                'Your profile information has been saved successfully. Changes will reflect across all services.',
-                'success'
-            );
-            // Update localStorage
-            if (storedUser) {
-                storedUser.full_name = vm.user.fullName;
-                storedUser.phone = vm.user.phone;
-                storedUser.locality = vm.user.address;
-                localStorage.setItem('suvidhaUser', JSON.stringify(storedUser));
-            }
+            vm.saving = true;
+            var profileData = {
+                full_name: vm.user.fullName,
+                phone: vm.user.phone,
+                locality: vm.user.address,
+                state: vm.user.state,
+                city: vm.user.city,
+                ward: vm.user.ward
+            };
+            
+            ApiService.updateProfileData(profileData)
+                .then(function(response) {
+                    vm.saving = false;
+                    vm.editMode = false;
+                    if (response.data.success) {
+                        console.log('✅ Profile updated successfully');
+                        $rootScope.showDialog(
+                            'Profile Updated',
+                            'Your profile information has been updated successfully.',
+                            'success'
+                        );
+                    } else {
+                        $rootScope.showDialog(
+                            'Update Failed',
+                            response.data.message || 'Failed to update profile',
+                            'error'
+                        );
+                    }
+                })
+                .catch(function(error) {
+                    vm.saving = false;
+                    console.error('Error updating profile:', error);
+                    $rootScope.showDialog(
+                        'Error',
+                        'An error occurred while updating your profile.',
+                        'error'
+                    );
+                });
+        };
+
+        vm.cancelEdit = function() {
+            vm.editMode = false;
+            // Reload from backend
+            loadProfileData();
         };
 
         vm.onThemeToggle = function() {
@@ -115,29 +141,77 @@
 
         function init() {
             loadProfileData();
+            loadConnections();
         }
 
         function loadProfileData() {
             ApiService.getProfileData()
                 .then(function(response) {
                     vm.profileData = response.data;
-                    if (response.data.profile) {
+                    if (response.data && response.data.profile) {
                         var p = response.data.profile;
                         vm.user = {
-                            fullName: p.full_name || p.name || vm.user.fullName,
-                            email: p.email || vm.user.email,
-                            phone: p.phone || vm.user.phone,
-                            address: p.locality || p.address || vm.user.address,
-                            ward: p.ward || vm.user.ward,
-                            city: p.city || vm.user.city,
-                            state: p.state || vm.user.state
+                            fullName: p.full_name || p.name || 'Not provided',
+                            email: p.email || 'No email on file',
+                            phone: p.phone || 'Not provided',
+                            address: p.locality || p.address || 'No address on file',
+                            ward: p.ward || 'N/A',
+                            city: p.city || 'Not assigned',
+                            state: p.state || 'Not assigned'
                         };
+                        console.log('✅ Profile loaded from database:', vm.user);
                     }
                     vm.loading = false;
                 })
                 .catch(function(error) {
-                    console.error('Error loading profile data:', error);
+                    console.warn('Could not load from API, using demo data:', error.status);
+                    // Use demo/mock data for development/demo purposes
+                    vm.user = {
+                        fullName: 'Demo Citizen',
+                        email: 'demo@suvidha.gov.in',
+                        phone: '+91-9876543210',
+                        address: 'Sector 12, Delhi',
+                        ward: '1',
+                        city: 'New Delhi',
+                        state: 'Delhi'
+                    };
                     vm.loading = false;
+                });
+        }
+
+        function loadConnections() {
+            ApiService.getProfileConnections()
+                .then(function(response) {
+                    if (response.data && response.data.success) {
+                        vm.connections = response.data.connections || [];
+                        console.log('✅ Connections loaded from database:', vm.connections);
+                    }
+                    vm.loadingConnections = false;
+                })
+                .catch(function(error) {
+                    console.warn('Could not load connections from API, using demo data:', error.status);
+                    // Use demo data for development/demo purposes
+                    vm.connections = [
+                        {
+                            utility: 'Electricity',
+                            provider: 'BRPL (BSES Rajdhani)',
+                            status: 'Active',
+                            statusClass: 'badge-success'
+                        },
+                        {
+                            utility: 'Water',
+                            provider: 'Delhi Jal Board',
+                            status: 'Active',
+                            statusClass: 'badge-success'
+                        },
+                        {
+                            utility: 'Gas',
+                            provider: 'IGL (Indraprastha Gas)',
+                            status: 'Active',
+                            statusClass: 'badge-success'
+                        }
+                    ];
+                    vm.loadingConnections = false;
                 });
         }
 

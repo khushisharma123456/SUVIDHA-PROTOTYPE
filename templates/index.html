@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suvidha - Citizen Portal</title>
-    <link rel="stylesheet" href="/static/css/style.css?v=4">
+    <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/voice-nav.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -140,13 +140,6 @@
     </style>
 </head>
 <body>
-    <script>
-        // Apply saved theme immediately to prevent flash
-        try {
-            var p = JSON.parse(localStorage.getItem('suvidhaPreferences'));
-            if (p && (p.professionalTheme || p.theme === 'professional')) document.body.classList.add('professional-theme');
-        } catch(e) {}
-    </script>
     <!-- Mobile Header -->
     <div class="mobile-header">
         <img src="/static/images/suvidha%20Logo.jpg" alt="Suvidha">
@@ -255,7 +248,7 @@
             localStorage.setItem('authToken', 'flask-session-auth');
         }
     </script>
-    <script src="/static/app/app.js?v=4"></script>
+    <script src="/static/app/app.js"></script>
     <script src="/static/app/services/auth.service.js"></script>
     <script src="/static/app/services/api.service.js"></script>
     <script src="/static/app/services/translation.service.js"></script>
@@ -269,7 +262,7 @@
     <script src="/static/app/controllers/insights.controller.js"></script>
     <script src="/static/app/controllers/wallet.controller.js"></script>
     <script src="/static/app/controllers/simulator.controller.js"></script>
-    <script src="/static/app/controllers/profile.controller.js?v=4"></script>
+    <script src="/static/app/controllers/profile.controller.js"></script>
     <script src="/static/js/voice-nav.js"></script>
 </body>
 </html>

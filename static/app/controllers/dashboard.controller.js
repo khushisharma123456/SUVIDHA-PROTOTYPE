@@ -3,14 +3,56 @@
     'use strict';
 
     angular.module('suvidhaApp')
-        .controller('DashboardController', ['$scope', '$timeout', 'ApiService', DashboardController]);
+        .controller('DashboardController', ['$scope', '$timeout', 'ApiService', 'TranslationService', DashboardController]);
 
-    function DashboardController($scope, $timeout, ApiService) {
+    function DashboardController($scope, $timeout, ApiService, TranslationService) {
         var vm = this;
         var $rootScope = $scope.$root;
         vm.loading = true;
         vm.userData = {};
         vm.userLocation = null;
+
+        // ===== LANGUAGE SELECTOR FUNCTIONALITY =====
+        vm.currentLanguage = TranslationService.getCurrentLanguage() || 'en';
+        vm.showLanguageMenu = false;
+        vm.availableLanguages = [
+            { code: 'en', name: 'English', flag: '🇬🇧' },
+            { code: 'hi', name: 'हिन्दी (Hindi)', flag: '🇮🇳' },
+            { code: 'ta', name: 'தமிழ் (Tamil)', flag: '🇮🇳' },
+            { code: 'mr', name: 'मराठी (Marathi)', flag: '🇮🇳' }
+        ];
+
+        vm.getCurrentLanguageLabel = function() {
+            var lang = vm.availableLanguages.find(function(l) {
+                return l.code === vm.currentLanguage;
+            });
+            return lang ? lang.name : 'English';
+        };
+
+        vm.switchLanguage = function(langCode) {
+            vm.currentLanguage = langCode;
+            TranslationService.setLanguage(langCode);
+            vm.showLanguageMenu = false;
+            // Persist language preference
+            if ($rootScope.currentUser && $rootScope.currentUser.id) {
+                ApiService.updateUserPreference('language', langCode).then(function() {
+                    console.log('Language preference saved:', langCode);
+                });
+            }
+        };
+
+        vm.toggleLanguageMenu = function() {
+            vm.showLanguageMenu = !vm.showLanguageMenu;
+        };
+
+        vm.closeLanguageMenu = function() {
+            vm.showLanguageMenu = false;
+        };
+
+        // Listen for language changes from translation service
+        $scope.$on('languageChanged', function(event, newLanguage) {
+            vm.currentLanguage = newLanguage;
+        });
         
         // ===== Utility Consumption Section =====
         vm.selectedUtility = 'electricity';
