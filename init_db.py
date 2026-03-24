@@ -44,8 +44,12 @@ def delete_old_db():
     """Delete existing database file"""
     db_path = os.path.join('instance', 'suvidha.db')
     if os.path.exists(db_path):
-        os.remove(db_path)
-        print("✗ Deleted old database")
+        try:
+            os.remove(db_path)
+            print("✗ Deleted old database")
+        except PermissionError as e:
+            # If the DB file is in use (e.g., app server running), log and continue
+            print(f"⚠ Could not delete {db_path}: {e}")
     else:
         print("  No existing database found")
 
@@ -79,13 +83,31 @@ def seed_vendors():
     ]
     
     vendors = []
+    new_vendors = []
     for name, stype, desc, contact, website, coverage in vendors_data:
-        v = Vendor(name=name, service_type=stype, description=desc,
-                   contact=contact, website=website, coverage_areas=coverage)
-        vendors.append(v)
-    db.session.add_all(vendors)
-    db.session.commit()
-    print(f"✓ Created {len(vendors)} vendors")
+        # Reuse existing vendor with same name if present to avoid UNIQUE violations
+        existing = Vendor.query.filter_by(name=name).first()
+        if existing:
+            vendors.append(existing)
+        else:
+            v = Vendor(
+                name=name,
+                service_type=stype,
+                description=desc,
+                contact=contact,
+                website=website,
+                coverage_areas=coverage,
+            )
+            vendors.append(v)
+            new_vendors.append(v)
+
+    if new_vendors:
+        db.session.add_all(new_vendors)
+        db.session.commit()
+        print(f"✓ Created {len(new_vendors)} vendors (total now {Vendor.query.count()})")
+    else:
+        print(f"  Vendors already exist (total {Vendor.query.count()}), skipping creation")
+
     return vendors
 
 

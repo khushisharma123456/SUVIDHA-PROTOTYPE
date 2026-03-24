@@ -274,15 +274,10 @@ app.controller('DashboardController', ['$scope', '$location', '$rootScope', 'Fon
             console.error('Dashboard load error:', err);
             $scope.error = 'Could not load dashboard data. Please try again.';
             $scope.loading = false;
-            // Fallback mock data for offline/demo
-            $scope.user = { name: 'Senior Citizen', initials: 'SC', phone: '' };
-            $scope.bills = [
-                { id: 1, type: 'Electricity', amount: 1250, dueDate: '15 Feb 2026', status: 'unpaid' },
-                { id: 2, type: 'Water', amount: 450, dueDate: '20 Feb 2026', status: 'unpaid' },
-                { id: 3, type: 'Gas', amount: 800, dueDate: '25 Feb 2026', status: 'paid' }
-            ];
-            $scope.totalPendingAmount = 1700;
-            $scope.pendingBillsCount = 2;
+            // If not authenticated, send back to main login so no mock data is shown
+            if (err && err.status === 401) {
+                window.location.href = '/login';
+            }
         });
 
         // Load area updates from senior updates endpoint
@@ -294,12 +289,9 @@ app.controller('DashboardController', ['$scope', '$location', '$rootScope', 'Fon
                     return { icon: icons[u.type] || '📌', text: u.title };
                 });
             }
-        }, function() {
-            $scope.areaUpdates = [
-                { icon: '💧', text: 'Water supply normal tomorrow' },
-                { icon: '⚡', text: 'No planned outages this week' },
-                { icon: '🔧', text: 'Road work on Main Street' }
-            ];
+        }, function(err) {
+            console.error('Senior updates load error:', err);
+            // Leave areaUpdates empty on error so we don't show hardcoded values
         });
     }
 
@@ -626,53 +618,99 @@ app.controller('BillsController', ['$scope', '$location', '$rootScope', 'FontSiz
     $scope.$on('fontSizeChanged', function(event, newSize) {
         $scope.currentFontSize = newSize;
     });
-    
+
+    // User info for sidebar
+    $scope.user = $rootScope.user || { name: 'Senior Citizen', initials: 'SC' };
+
     $scope.bills = [];
+    $scope.totalDue = 0;
     $scope.loading = true;
+
+    function recomputeTotal() {
+        $scope.totalDue = $scope.bills
+            .filter(function (b) { return b.status === 'unpaid'; })
+            .reduce(function (sum, b) { return sum + (b.amount || 0); }, 0);
+    }
 
     // Load bills from backend
     ApiService.getBills().then(function(data) {
         if (data.success && data.bills) {
             $scope.bills = data.bills.map(function(b) {
+                var rawStatus = b.status || 'pending';
+                var uiStatus = (rawStatus === 'paid') ? 'paid' : 'unpaid';
+                var units = '';
+                if (b.consumption !== undefined && b.consumption !== null) {
+                    units = b.consumption + (b.consumption_unit ? ' ' + b.consumption_unit : '');
+                }
                 return {
                     id: b.id,
                     type: (b.utility_type || 'Utility').charAt(0).toUpperCase() + (b.utility_type || 'utility').slice(1),
                     amount: b.amount || 0,
                     dueDate: b.due_date ? new Date(b.due_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A',
-                    status: b.status || 'pending',
-                    provider: b.provider || 'Municipal Corporation'
+                    status: uiStatus,
+                    units: units
                 };
             });
+            recomputeTotal();
         }
         $scope.loading = false;
-    }, function() {
-        // Fallback mock data
-        $scope.bills = [
-            { id: 1, type: 'Electricity', amount: 1250, dueDate: '15 Feb 2026', status: 'unpaid', provider: 'DM Water Supply' },
-            { id: 2, type: 'Water', amount: 450, dueDate: '20 Feb 2026', status: 'unpaid', provider: 'Municipal Corporation' },
-            { id: 3, type: 'Gas', amount: 800, dueDate: '25 Feb 2026', status: 'paid', provider: 'Gas Authority' }
-        ];
+    }, function(err) {
+        console.error('Bills load error:', err);
         $scope.loading = false;
+        if (err && err.status === 401) {
+            window.location.href = '/login';
+        }
     });
 
-    $scope.selectedBill = null;
-    $scope.showBillDetails = false;
-
-    $scope.viewBillDetails = function (billId) {
-        $scope.selectedBill = $scope.bills.find(function (b) { return b.id === billId; });
-        $scope.showBillDetails = true;
-    };
-
-    $scope.payBill = function (billId) {
-        $scope.selectedBill = $scope.bills.find(function (b) { return b.id === billId; });
-        if ($scope.selectedBill && $scope.selectedBill.status === 'unpaid') {
-            $location.path('/pay');
+    $scope.payBill = function (bill) {
+        if (!bill || bill.status === 'paid') return;
+        if (!confirm('Pay ' + bill.type + ' bill of ₹' + bill.amount + '?\n\nYou can always cancel if you change your mind.')) {
+            return;
         }
+        ApiService.payBill(bill.id, 'upi').then(function(data) {
+            if (data.success) {
+                bill.status = 'paid';
+            }
+            recomputeTotal();
+            alert('✓ Payment Successful!\n\n' + bill.type + ' bill: ₹' + bill.amount + '\n\nReceipt sent to your phone.');
+        }, function(err) {
+            console.error('Bill payment error:', err);
+            alert('There was a problem processing your payment. Please try again.');
+        });
     };
 
-    $scope.downloadBill = function (billId) {
-        // In production, this would trigger a PDF download
-        alert('Downloading bill #' + billId + '...');
+    $scope.payAll = function () {
+        var unpaid = $scope.bills.filter(function (b) { return b.status === 'unpaid'; });
+        if (!unpaid.length) return;
+        if (!confirm('Pay all bills totaling ₹' + $scope.totalDue + '?\n\nTake your time to decide.')) {
+            return;
+        }
+        var remaining = unpaid.length;
+        unpaid.forEach(function (bill) {
+            ApiService.payBill(bill.id, 'upi').then(function(data) {
+                if (data.success) {
+                    bill.status = 'paid';
+                }
+            }, function(err) {
+                console.error('Bill payment error for bill', bill.id, err);
+            }).finally(function () {
+                remaining--;
+                if (remaining === 0) {
+                    recomputeTotal();
+                    alert('✓ All Bills Paid Successfully!\n\nTotal: ₹' + $scope.totalDue + '\nReceipts sent to your phone.');
+                }
+            });
+        });
+    };
+
+    // Simple logout for sidebar
+    $scope.logout = function () {
+        if (!confirm('Are you sure you want to logout?')) return;
+        localStorage.removeItem('suvidhaUser');
+        localStorage.removeItem('user_id');
+        ApiService.logout().finally(function () {
+            window.location.href = '/login';
+        });
     };
 }]);
 
@@ -691,88 +729,98 @@ app.controller('PayController', ['$scope', '$location', '$rootScope', 'FontSizeS
     $scope.$on('fontSizeChanged', function(event, newSize) {
         $scope.currentFontSize = newSize;
     });
-    
+
+    // User info for sidebar
+    $scope.user = $rootScope.user || { name: 'Senior Citizen', initials: 'SC' };
+
     $scope.bills = [];
+    $scope.totalAmount = 0;
     $scope.loading = true;
 
-    // Load unpaid bills from backend
-    ApiService.getBills({ status: 'pending' }).then(function(data) {
-        if (data.success && data.bills) {
-            $scope.bills = data.bills.map(function(b) {
-                return {
-                    id: b.id,
-                    type: (b.utility_type || 'Utility').charAt(0).toUpperCase() + (b.utility_type || 'utility').slice(1),
-                    amount: b.amount || 0,
-                    dueDate: b.due_date ? new Date(b.due_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A',
-                    status: b.status || 'pending'
-                };
-            });
-        }
-        // Also load overdue bills
-        return ApiService.getBills({ status: 'overdue' });
-    }).then(function(data) {
-        if (data && data.success && data.bills) {
-            data.bills.forEach(function(b) {
-                $scope.bills.push({
-                    id: b.id,
-                    type: (b.utility_type || 'Utility').charAt(0).toUpperCase() + (b.utility_type || 'utility').slice(1),
-                    amount: b.amount || 0,
-                    dueDate: b.due_date ? new Date(b.due_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A',
-                    status: b.status || 'overdue'
-                });
-            });
-        }
-        $scope.loading = false;
-    }, function() {
-        $scope.bills = [
-            { id: 1, type: 'Electricity', amount: 1250, dueDate: '15 Feb 2026', status: 'unpaid' },
-            { id: 2, type: 'Water', amount: 450, dueDate: '20 Feb 2026', status: 'unpaid' }
-        ];
-        $scope.loading = false;
-    });
-
     $scope.paymentMethods = [
-        { id: 'upi', name: 'UPI Payment', icon: '📱', description: 'Pay with Google Pay, PhonePe, or UPI app' },
-        { id: 'card', name: 'Debit/Credit Card', icon: '💳', description: 'Visa, Mastercard, or RuPay' },
-        { id: 'netbanking', name: 'Net Banking', icon: '🏦', description: 'Direct bank transfer' },
-        { id: 'cash', name: 'Pay at Center', icon: '🏪', description: 'Visit our service center' }
+        { id: 'upi', name: 'UPI Payment', icon: '📱', desc: 'Pay using Google Pay, PhonePe' },
+        { id: 'card', name: 'Debit/Credit Card', icon: '💳', desc: 'Use your bank card' },
+        { id: 'netbanking', name: 'Net Banking', icon: '🏦', desc: 'Pay through your bank' },
+        { id: 'cash', name: 'Pay at Center', icon: '🏪', desc: 'Visit nearby center' }
     ];
 
-    $scope.selectedBill = null;
     $scope.selectedMethod = null;
-    $scope.paymentStep = 1; // 1: Select Bill, 2: Select Method, 3: Confirm
 
-    $scope.selectBill = function (billId) {
-        $scope.selectedBill = $scope.bills.find(function (b) { return b.id === billId; });
-        if ($scope.selectedBill && $scope.selectedBill.status === 'unpaid') {
-            $scope.paymentStep = 2;
+    function loadBills() {
+        var collected = [];
+        ApiService.getBills({ status: 'pending' }).then(function(data) {
+            if (data.success && data.bills) {
+                data.bills.forEach(function(b) {
+                    collected.push({
+                        id: b.id,
+                        type: (b.utility_type || 'Utility').charAt(0).toUpperCase() + (b.utility_type || 'utility').slice(1),
+                        amount: b.amount || 0
+                    });
+                });
+            }
+            return ApiService.getBills({ status: 'overdue' });
+        }).then(function(data) {
+            if (data && data.success && data.bills) {
+                data.bills.forEach(function(b) {
+                    collected.push({
+                        id: b.id,
+                        type: (b.utility_type || 'Utility').charAt(0).toUpperCase() + (b.utility_type || 'utility').slice(1),
+                        amount: b.amount || 0
+                    });
+                });
+            }
+            $scope.bills = collected;
+            $scope.totalAmount = collected.reduce(function(sum, b) { return sum + (b.amount || 0); }, 0);
+            $scope.loading = false;
+        }, function(err) {
+            console.error('Pay page bills load error:', err);
+            $scope.loading = false;
+            if (err && err.status === 401) {
+                window.location.href = '/login';
+            }
+        });
+    }
+
+    loadBills();
+
+    $scope.selectMethod = function (methodId) {
+        $scope.selectedMethod = methodId;
+    };
+
+    $scope.proceedPayment = function () {
+        if (!$scope.selectedMethod) {
+            alert('Please select how you want to pay.');
+            return;
         }
-    };
+        if (!$scope.bills.length || !$scope.totalAmount) {
+            alert('No pending bills to pay.');
+            return;
+        }
+        var method = $scope.paymentMethods.find(function (m) { return m.id === $scope.selectedMethod; });
+        if (!method) {
+            alert('Please select a valid payment method.');
+            return;
+        }
+        if (!confirm('Confirm payment of ₹' + $scope.totalAmount + ' using ' + method.name + '?\n\nTake your time to decide.')) {
+            return;
+        }
 
-    $scope.selectPaymentMethod = function (method) {
-        $scope.selectedMethod = method;
-        $scope.paymentStep = 3;
-    };
-
-    $scope.confirmPayment = function () {
-        if ($scope.selectedBill && $scope.selectedMethod) {
-            ApiService.payBill($scope.selectedBill.id, $scope.selectedMethod.id).then(function(data) {
+        var remaining = $scope.bills.length;
+        $scope.bills.forEach(function (bill) {
+            ApiService.payBill(bill.id, $scope.selectedMethod).then(function(data) {
                 if (data.success) {
-                    $scope.selectedBill.status = 'paid';
+                    bill.status = 'paid';
                 }
-                alert('Payment of ₹' + $scope.selectedBill.amount + ' confirmed for ' + $scope.selectedBill.type + ' via ' + $scope.selectedMethod.name);
-                $location.path('/');
-            }, function() {
-                // Fallback: mark as paid locally
-                $scope.selectedBill.status = 'paid';
-                alert('Payment of ₹' + $scope.selectedBill.amount + ' confirmed for ' + $scope.selectedBill.type + ' via ' + $scope.selectedMethod.name);
-                $location.path('/');
+            }, function(err) {
+                console.error('Payment error for bill', bill.id, err);
+            }).finally(function () {
+                remaining--;
+                if (remaining === 0) {
+                    alert('✓ Payment Successful!\n\nAmount: ₹' + $scope.totalAmount + '\nMethod: ' + method.name + '\n\nReceipt sent to your phone.');
+                    $location.path('/');
+                }
             });
-        }
-    };
-
-    $scope.cancelPayment = function () {
-        $location.path('/bills');
+        });
     };
 }]);
 

@@ -7,7 +7,8 @@
     <title>Pay Bills | Suvidha - Easy View</title>
     <link rel="stylesheet" href="../../css/senior-style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-    <script src="../app.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    <script src="/SeniorCitizen/app/app.js"></script>
     <style>
         .sc-content {
             padding: 2rem 2.5rem;
@@ -267,51 +268,23 @@
             </div>
             <div class="amount-section">
                 <h4>💰 Bill Summary</h4>
-                <div class="amount-row"><span>Electricity Bill</span><span>₹1,250</span></div>
-                <div class="amount-row"><span>Water Bill</span><span>₹450</span></div>
-                <div class="amount-row"><span>Total Amount</span><span>₹1,700</span></div>
+                <div class="amount-row" ng-repeat="bill in bills">
+                    <span>{{bill.type}} Bill</span>
+                    <span>₹{{bill.amount}}</span>
+                </div>
+                <div class="amount-row">
+                    <span>Total Amount</span>
+                    <span>₹{{totalAmount}}</span>
+                </div>
             </div>
             <button class="proceed-btn" ng-click="proceedPayment()" ng-disabled="!selectedMethod">
-                {{selectedMethod ? '✓ Pay ₹1,700 Now' : 'Select a payment method first'}}
+                {{selectedMethod ? ('✓ Pay ₹' + totalAmount + ' Now') : 'Select a payment method first'}}
             </button>
             <div class="reassurance">🤝 You can always go back. Nothing will happen until you confirm.</div>
         </div>
     </main>
     <button class="help-btn-fixed"><span class="help-icon">?</span><span>Need Help?</span></button>
-    <script>
-        var app = angular.module('seniorApp', []);
-        app.controller('PayController', ['$scope', function ($scope) {
-            // Load user from localStorage
-            var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
-            var userName = 'Guest User';
-            var userInitials = 'GU';
-            
-            if (storedUser) {
-                userName = storedUser.full_name || storedUser.name || 'Guest User';
-                var nameParts = userName.split(' ');
-                userInitials = nameParts.length >= 2 
-                    ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
-                    : userName.substring(0, 2).toUpperCase();
-            }
-            
-            $scope.user = { name: userName, initials: userInitials };
-            $scope.paymentMethods = [
-                { id: 'upi', name: 'UPI Payment', icon: '📱', desc: 'Pay using Google Pay, PhonePe' },
-                { id: 'card', name: 'Debit/Credit Card', icon: '💳', desc: 'Use your bank card' },
-                { id: 'netbanking', name: 'Net Banking', icon: '🏦', desc: 'Pay through your bank' },
-                { id: 'cash', name: 'Pay at Center', icon: '🏪', desc: 'Visit nearby center' }
-            ];
-            $scope.selectedMethod = null;
-            $scope.selectMethod = function (methodId) { $scope.selectedMethod = methodId; };
-            $scope.proceedPayment = function () {
-                if (!$scope.selectedMethod) { alert('Please select how you want to pay.'); return; }
-                var method = $scope.paymentMethods.find(function (m) { return m.id === $scope.selectedMethod; });
-                if (confirm('Confirm payment of ₹1,700 using ' + method.name + '?\n\nTake your time to decide.')) {
-                    alert('✓ Payment Successful!\n\nAmount: ₹1,700\nMethod: ' + method.name + '\n\nReceipt sent to your phone.\nThank you!');
-                }
-            };
-        }]);
-    </script>
+    <!-- AngularJS app and PayController are loaded from shared senior app.js -->
 </body>
 
 </html>

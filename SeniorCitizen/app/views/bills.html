@@ -7,7 +7,8 @@
     <title>My Bills | Suvidha - Easy View</title>
     <link rel="stylesheet" href="../../css/senior-style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-    <script src="../app.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    <script src="/SeniorCitizen/app/app.js"></script>
     <style>
         .sc-content {
             padding: 2rem 2.5rem;
@@ -125,7 +126,6 @@
             color: var(--gov-gray-400);
             margin-top: 0.25rem;
         }
-
         .bill-right {
             display: flex;
             align-items: center;
@@ -169,63 +169,6 @@
 
         .pay-btn {
             padding: 1rem 2rem;
-            background: var(--gov-success);
-            color: white;
-            border: none;
-            border-radius: var(--radius-lg);
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .pay-btn:hover {
-            background: #2f855a;
-            transform: translateY(-2px);
-        }
-
-        /* Inline help tooltip */
-        .help-tooltip {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: var(--gov-gray-100);
-            border: 1px solid var(--gov-gray-200);
-            border-radius: 50%;
-            color: var(--gov-gray-500);
-            font-size: 0.85rem;
-            cursor: help;
-        }
-
-        .help-tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .tooltip-text {
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            bottom: 100%;
-            right: 0;
-            background: var(--gov-gray-800);
-            color: white;
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-md);
-            font-size: 0.85rem;
-            font-weight: 400;
-            white-space: nowrap;
-            margin-bottom: 0.5rem;
-            transition: all 0.2s;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .tooltip-text::after {
-            content: '';
             position: absolute;
             top: 100%;
             right: 10px;
@@ -389,7 +332,7 @@
                         <div class="bill-details">
                             <h4>{{bill.type}} Bill</h4>
                             <p class="bill-due-date">📅 Due by: {{bill.dueDate}}</p>
-                            <p class="bill-units">Units: {{bill.units}}</p>
+                            <p class="bill-units" ng-if="bill.units">Units: {{bill.units}}</p>
                         </div>
                     </div>
                     <div class="bill-right">
@@ -433,63 +376,7 @@
         <span>Need Help?</span>
     </button>
 
-    <script>
-        var app = angular.module('seniorApp', []);
-
-        app.controller('BillsController', ['$scope', function ($scope) {
-            // Load user from localStorage
-            var storedUser = JSON.parse(localStorage.getItem('suvidhaUser') || 'null');
-            var userName = 'Guest User';
-            var userInitials = 'GU';
-            
-            if (storedUser) {
-                userName = storedUser.full_name || storedUser.name || 'Guest User';
-                var nameParts = userName.split(' ');
-                userInitials = nameParts.length >= 2 
-                    ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
-                    : userName.substring(0, 2).toUpperCase();
-            }
-            
-            $scope.user = {
-                name: userName,
-                initials: userInitials
-            };
-
-            $scope.bills = [
-                { id: 1, type: 'Electricity', amount: 1250, units: '156 kWh', dueDate: '15 Feb 2026', status: 'unpaid' },
-                { id: 2, type: 'Water', amount: 450, units: '12,000 L', dueDate: '20 Feb 2026', status: 'unpaid' },
-                { id: 3, type: 'Gas', amount: 800, units: '8 kg', dueDate: '25 Feb 2026', status: 'paid' }
-            ];
-
-            $scope.totalDue = $scope.bills
-                .filter(function (b) { return b.status === 'unpaid'; })
-                .reduce(function (sum, b) { return sum + b.amount; }, 0);
-
-            $scope.payBill = function (bill) {
-                if (confirm('Pay ' + bill.type + ' bill of ₹' + bill.amount + '?\n\nYou can always cancel if you change your mind.')) {
-                    alert('✓ Payment Successful!\n\n' +
-                        bill.type + ' bill: ₹' + bill.amount + '\n\n' +
-                        'Receipt sent to your phone.\nThank you!');
-                    bill.status = 'paid';
-                    $scope.totalDue -= bill.amount;
-                }
-            };
-
-            $scope.payAll = function () {
-                if (confirm('Pay all bills totaling ₹' + $scope.totalDue + '?\n\nTake your time to decide.')) {
-                    alert('✓ All Bills Paid Successfully!\n\n' +
-                        'Total: ₹' + $scope.totalDue + '\n\n' +
-                        'Receipts sent to your phone.\nYou\'re all set!');
-                }
-            };
-
-            $scope.logout = function () {
-                if (confirm('Are you sure you want to logout?')) {
-                    alert('Logged out successfully.');
-                }
-            };
-        }]);
-    </script>
+    <!-- AngularJS app and BillsController are loaded from shared senior app.js -->
 </body>
 
 </html>
