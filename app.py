@@ -144,6 +144,19 @@ def login_page():
 def signup_page():
     return render_template('signup.html')
 
+
+@app.route('/GovOfficials-Admin/app/views/dashboard.html')
+def gov_official_dashboard_dashboard():
+    """Secure entry point for Government Official admin dashboard.
+
+    This ensures the dashboard is served via the backend and only
+    accessible after a successful official login (session-based).
+    """
+    if 'admin_id' not in session:
+        return redirect('/login')
+    # Serve the existing AngularJS dashboard HTML from the admin bundle
+    return send_from_directory('GovOfficials-Admin/app/views', 'dashboard.html')
+
 @app.route('/waste-worker')
 @app.route('/govWaste-worker/')
 def waste_worker_portal():
