@@ -36,19 +36,11 @@
             --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
-        /* Reset */
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        html {
-            font-size: 16px;
-            scroll-behavior: smooth;
-        }
+        /* Reset */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { font-size: 16px; scroll-behavior: smooth; }
 
         body {
             font-family: var(--font-primary);
@@ -60,655 +52,855 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             min-height: 100vh;
-        }
-
-        [ng-cloak] {
-            display: none !important;
-        }
-
-        /* Landing Page Styles */
-        .landing-page {
-            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 0;
+            justify-content: center;
+            padding: 1.5rem;
         }
 
-        .landing-content {
+        /* Dark overlay over the background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0,30,60,0.72) 0%, rgba(0,60,30,0.60) 100%);
+            z-index: 0;
+        }
+
+        [ng-cloak] { display: none !important; }
+
+        /* ── Main Card ── */
+        .landing-card {
+            position: relative;
+            z-index: 1;
             width: 100%;
-            max-width: 900px;
+            max-width: 860px;
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 24px;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.12);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 2rem 1.5rem 1.5rem;
-            text-align: center;
         }
 
-        /* Logo Section */
-        .landing-header {
-            margin-bottom: 1rem;
-        }
-
-        .landing-logo {
+        /* ── Card Header Band ── */
+        .card-header-band {
+            background: linear-gradient(135deg, #004d1a 0%, #00703C 55%, #1D70B8 100%);
+            padding: 2rem 2.5rem 1.75rem;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            justify-content: center;
+            justify-content: space-between;
+            gap: 1.5rem;
         }
 
-        .landing-logo .logo-img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            border-radius: 8px;
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .landing-logo .logo-fallback {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #00A651, #00703C);
+        .brand-logo {
+            width: 58px;
+            height: 58px;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.35);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
         }
 
-        .landing-logo .logo-text {
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
             font-family: var(--font-heading);
             font-size: 2rem;
-            font-weight: 700;
-            color: #00703C;
+            font-weight: 800;
+            color: #fff;
             letter-spacing: 0.5px;
+            line-height: 1;
         }
 
-        /* Welcome Section */
-        .landing-welcome {
-            margin-bottom: 1.5rem;
+        .brand-subtitle {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 3px;
         }
 
-        .welcome-title {
+        .header-trust {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            padding: 0.4rem 1rem;
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .header-trust i { font-size: 0.9rem; color: #7dffad; }
+
+        /* ── Card Body ── */
+        .card-body {
+            padding: 2rem 2.5rem;
+        }
+
+        /* Hero Text */
+        .hero-text {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .hero-title {
             font-family: var(--font-heading);
-            font-size: 2.25rem;
+            font-size: 1.85rem;
             font-weight: 700;
             color: var(--gray-900);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
-        .welcome-tagline {
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: var(--gray-700);
-            margin-bottom: 0.75rem;
-        }
-
-        .welcome-description {
+        .hero-tagline {
             font-size: 1rem;
             color: var(--gray-600);
-            line-height: 1.6;
+            max-width: 520px;
+            margin: 0 auto;
         }
 
-        /* Auth Buttons */
-        .landing-auth-buttons {
+        /* ── Auth Buttons ── */
+        .auth-row {
             display: flex;
             gap: 1rem;
+            justify-content: center;
             margin-bottom: 2rem;
         }
 
         .auth-btn {
-            padding: 0.875rem 2.5rem;
+            padding: 0.85rem 2.75rem;
             font-size: 1rem;
             font-weight: 600;
-            border-radius: 30px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             border: 2px solid transparent;
-            min-width: 140px;
+            min-width: 148px;
+            font-family: var(--font-primary);
         }
 
         .auth-btn.login-btn {
-            background: white;
+            background: #fff;
             color: #00703C;
             border-color: #00703C;
         }
 
         .auth-btn.login-btn:hover {
-            background: #f0fff4;
+            background: #f0fff8;
+            box-shadow: 0 6px 18px rgba(0,112,60,0.22);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 112, 60, 0.2);
         }
 
         .auth-btn.signup-btn {
             background: linear-gradient(135deg, #00A651, #00703C);
-            color: white;
-            border-color: transparent;
+            color: #fff;
         }
 
         .auth-btn.signup-btn:hover {
-            background: linear-gradient(135deg, #00b85c, #008048);
+            background: linear-gradient(135deg, #00c060, #008048);
+            box-shadow: 0 6px 18px rgba(0,112,60,0.32);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 112, 60, 0.3);
         }
 
-        /* Utility Cards */
-        .utility-cards {
+        /* ── Section Divider ── */
+        .section-divider {
             display: flex;
+            align-items: center;
             gap: 1rem;
             margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            justify-content: center;
         }
 
-        .utility-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 16px;
-            padding: 1rem;
-            width: 110px;
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        .section-divider span {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            white-space: nowrap;
+        }
+
+        /* ── Utility Strip ── */
+        .utility-strip {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            cursor: pointer;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-bottom: 2rem;
         }
 
-        .utility-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-        }
-
-        .utility-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 12px;
+        .utility-chip {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.6rem;
+            background: var(--gray-50);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 50px;
+            padding: 0.5rem 1.1rem;
+            cursor: default;
+            transition: all 0.2s ease;
+        }
+
+        .utility-chip:hover {
+            border-color: #00703C;
+            background: #f0fff8;
+            transform: translateY(-1px);
+        }
+
+        .utility-chip-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .utility-icon img {
+        .utility-chip-icon img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 12px;
         }
 
-        .utility-icon i {
-            font-size: 2rem;
-        }
-
-        .utility-icon.waste {
-            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-        }
-
-        .utility-icon.waste i {
-            color: #43a047;
-        }
-
-        .utility-icon.water {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-        }
-
-        .utility-icon.water i {
-            color: #1e88e5;
-        }
-
-        .utility-icon.electricity {
-            background: linear-gradient(135deg, #fffde7, #fff9c4);
-        }
-
-        .utility-icon.electricity i {
-            color: #fbc02d;
-        }
-
-        .utility-icon.gas {
-            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-        }
-
-        .utility-icon.gas i {
-            color: #fb8c00;
-        }
-
-        .utility-label {
-            font-size: 0.9rem;
+        .utility-chip-label {
+            font-size: 0.88rem;
             font-weight: 600;
             color: var(--gray-700);
         }
 
-        /* Trust Section */
-        .trust-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .trust-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #00703C;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .trust-badge i {
-            font-size: 1.25rem;
-        }
-
-        .trust-text {
-            font-size: 0.9rem;
-            color: var(--gray-600);
-        }
-
-        .trust-text strong {
-            color: var(--gray-800);
-        }
-
-        /* Role Cards */
-        .role-cards {
+        /* ── Role Grid ── */
+        .role-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
-            width: 100%;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0;
         }
 
         .role-card {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 250, 255, 0.95) 100%);
+            background: #fff;
+            border: 1.5px solid var(--gray-200);
             border-radius: 16px;
-            padding: 0.75rem;
+            padding: 1.25rem 0.75rem 1rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
+            gap: 0.6rem;
             cursor: pointer;
-            border: 2px solid transparent;
+            transition: all 0.25s ease;
         }
 
         .role-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
             border-color: var(--primary-blue);
+            box-shadow: 0 8px 28px rgba(29,112,184,0.15);
+            transform: translateY(-4px);
         }
 
-        .role-header {
-            background: linear-gradient(135deg, #e3f2fd, #f5f5f5);
-            color: var(--gray-700);
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
+        .role-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 1px;
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
         }
 
-        .role-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .role-badge.citizen  { background: #e8f5e9; color: #2e7d32; }
+        .role-badge.senior   { background: #fce4ec; color: #c2185b; }
+        .role-badge.official { background: #e3f2fd; color: #1565c0; }
+        .role-badge.worker   { background: #fff3e0; color: #e65100; }
+
+        .role-avatar {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
             overflow: hidden;
+            border: 3px solid var(--gray-100);
         }
 
-        .role-image img {
+        .role-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 12px;
         }
 
-        .role-image i {
-            font-size: 2.5rem;
-        }
-
-        .role-image.citizens {
-            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-        }
-
-        .role-image.citizens i {
-            color: #43a047;
-        }
-
-        .role-image.seniors {
-            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
-        }
-
-        .role-image.seniors i {
-            color: #e91e63;
-        }
-
-        .role-image.officials {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-        }
-
-        .role-image.officials i {
-            color: #1e88e5;
-        }
-
-        .role-image.kiosk {
-            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-        }
-
-        .role-image.kiosk i {
-            color: #ff9800;
-        }
-
-        .role-title {
-            font-size: 0.85rem;
+        .role-name {
+            font-size: 0.88rem;
             font-weight: 700;
             color: var(--gray-800);
+            text-align: center;
         }
 
-        .role-description {
-            font-size: 0.7rem;
+        .role-desc {
+            font-size: 0.72rem;
             color: var(--gray-500);
             text-align: center;
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
-        /* Footer */
-        .landing-footer {
+        .role-arrow {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--gray-100);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            width: 100%;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            transition: all 0.2s ease;
+        }
+
+        .role-card:hover .role-arrow {
+            background: var(--primary-blue);
+            color: #fff;
+        }
+
+        /* ── Card Footer ── */
+        .card-footer {
+            border-top: 1px solid var(--gray-200);
+            padding: 1rem 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .footer-links {
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            gap: 1.25rem;
         }
 
         .footer-link {
-            font-size: 0.85rem;
-            color: var(--gray-600);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .footer-link:hover {
-            color: var(--primary-blue);
-        }
-
-        .footer-divider {
-            color: var(--gray-400);
             font-size: 0.8rem;
+            color: var(--gray-500);
+            text-decoration: none;
+            transition: color 0.2s;
         }
 
-        /* Language Selector */
-        .language-selector-floating {
+        .footer-link:hover { color: var(--primary-blue); }
+
+        .footer-copy {
+            font-size: 0.78rem;
+            color: var(--gray-400);
+        }
+
+        /* ── Language Dropdown ── */
+        .lang-dropdown-wrap {
             position: fixed;
             bottom: 1.5rem;
             right: 1.5rem;
-            display: flex;
-            gap: 0.5rem;
-            background: white;
-            padding: 0.5rem;
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             z-index: 100;
         }
 
-        .language-selector-floating .lang-btn {
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border: none;
-            border-radius: 20px;
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #fff;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 50px;
+            padding: 0.55rem 1.2rem;
             cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            font-family: var(--font-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray-700);
             transition: all 0.2s ease;
-            background: transparent;
-            color: var(--gray-600);
         }
 
-        .language-selector-floating .lang-btn.active {
-            background: var(--primary-blue);
-            color: white;
+        .lang-toggle:hover { border-color: var(--primary-blue); box-shadow: 0 6px 24px rgba(0,0,0,0.18); }
+
+        .lang-toggle i { font-size: 1rem; color: var(--primary-blue); }
+        .lang-toggle .chevron { font-size: 0.7rem; color: var(--gray-400); transition: transform 0.2s; }
+        .lang-dropdown-wrap.open .lang-toggle .chevron { transform: rotate(180deg); }
+
+        .lang-menu {
+            position: absolute;
+            bottom: calc(100% + 0.5rem);
+            right: 0;
+            background: #fff;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+            width: 260px;
+            max-height: 380px;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+            padding: 0.5rem 0;
         }
 
-        .language-selector-floating .lang-btn:hover:not(.active) {
-            background: var(--gray-100);
+        .lang-dropdown-wrap.open .lang-menu { display: flex; }
+
+        .lang-menu-header {
+            padding: 0.65rem 1rem 0.5rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--gray-400);
+            border-bottom: 1px solid var(--gray-100);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .welcome-title {
-                font-size: 1.75rem;
-            }
+        .lang-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            border: none;
+            background: none;
+            width: 100%;
+            font-family: var(--font-primary);
+            text-align: left;
+        }
 
-            .welcome-tagline {
-                font-size: 1.1rem;
-            }
+        .lang-option:hover { background: var(--gray-50); }
+        .lang-option.active { background: #f0f9ff; }
 
-            .role-cards {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
+        .lang-option-left {
+            display: flex;
+            flex-direction: column;
+        }
 
-            .role-image {
-                width: 65px;
-                height: 65px;
-            }
+        .lang-option-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
 
-            .utility-card {
-                width: 90px;
-                padding: 0.75rem;
-            }
+        .lang-option-native {
+            font-size: 0.78rem;
+            color: var(--gray-500);
+        }
 
-            .utility-icon {
-                width: 55px;
-                height: 55px;
-            }
+        .lang-option .check-icon {
+            color: var(--primary-blue);
+            font-size: 0.85rem;
+            opacity: 0;
+        }
+
+        .lang-option.active .check-icon { opacity: 1; }
+
+        .lang-powered {
+            padding: 0.5rem 1rem;
+            font-size: 0.68rem;
+            color: var(--gray-400);
+            text-align: center;
+            border-top: 1px solid var(--gray-100);
+            margin-top: 0.25rem;
+        }
+
+        .lang-menu::-webkit-scrollbar { width: 4px; }
+        .lang-menu::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
+
+        /* Translation loading indicator */
+        .translating-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.15);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .translating-overlay.show { display: flex; }
+        .translating-spinner {
+            background: #fff;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .translating-spinner i { animation: spin 1s linear infinite; color: var(--primary-blue); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Responsive ── */
+        @media (max-width: 720px) {
+            body { padding: 1rem; align-items: flex-start; }
+            .card-header-band { padding: 1.5rem; }
+            .card-body { padding: 1.5rem; }
+            .card-footer { padding: 1rem 1.5rem; flex-direction: column; gap: 0.5rem; text-align: center; }
+            .role-grid { grid-template-columns: repeat(2, 1fr); }
+            .utility-strip { flex-wrap: wrap; }
+            .header-trust { display: none; }
+            .hero-title { font-size: 1.5rem; }
         }
 
         @media (max-width: 480px) {
-            .landing-logo .logo-text {
-                font-size: 1.5rem;
-            }
-
-            .welcome-title {
-                font-size: 1.5rem;
-            }
-
-            .utility-card {
-                width: 75px;
-                padding: 0.5rem;
-            }
-
-            .utility-icon {
-                width: 45px;
-                height: 45px;
-            }
-
-            .role-image {
-                width: 55px;
-                height: 55px;
-            }
+            .brand-name { font-size: 1.6rem; }
+            .role-avatar { width: 60px; height: 60px; }
+            .auth-btn { padding: 0.75rem 1.75rem; min-width: 120px; font-size: 0.92rem; }
         }
     </style>
 </head>
 
 <body>
-    <div class="landing-page">
-        <!-- Main Content -->
-        <div class="landing-content">
-            <!-- Logo & Title Section -->
-            <div class="landing-header">
-                <div class="landing-logo">
-                    <img src="/static/images/suvidha logo.jpg" alt="Suvidha" class="logo-img">
-                    <span class="logo-text">Suvidha</span>
+
+    <!-- Main Landing Card -->
+    <div class="landing-card">
+
+        <!-- ── Header Band ── -->
+        <div class="card-header-band">
+            <div class="brand-group">
+                <img src="/static/images/suvidha logo.jpg" alt="Suvidha" class="brand-logo">
+                <div class="brand-text">
+                    <span class="brand-name">Suvidha</span>
+                    <span class="brand-subtitle">Smart City Services</span>
                 </div>
             </div>
-
-            <!-- Welcome Section -->
-            <div class="landing-welcome">
-                <h1 class="welcome-title">Welcome to Suvidha</h1>
-                <p class="welcome-tagline">Smart Cities, Efficiently Managed.</p>
-                <p class="welcome-description">
-                    Integrated platform for real-time management of waste,<br>
-                    water, electricity, gas, and civic services.
-                </p>
-            </div>
-
-            <!-- Auth Buttons -->
-            <div class="landing-auth-buttons">
-                <button class="auth-btn login-btn" onclick="window.location.href='/login'">
-                    Log In
-                </button>
-                <button class="auth-btn signup-btn" onclick="window.location.href='/signup'">
-                    Sign Up
-                </button>
-            </div>
-
-            <!-- Utility Cards -->
-            <div class="utility-cards">
-                <div class="utility-card">
-                    <div class="utility-icon waste">
-                        <img src="/static/images/waste.jpg" alt="Waste">
-                    </div>
-                    <span class="utility-label">Waste</span>
-                </div>
-                <div class="utility-card">
-                    <div class="utility-icon water">
-                        <img src="/static/images/waterlanding.jpg" alt="Water">
-                    </div>
-                    <span class="utility-label">Water</span>
-                </div>
-                <div class="utility-card">
-                    <div class="utility-icon electricity">
-                        <img src="/static/images/electricity.jpg" alt="Electricity">
-                    </div>
-                    <span class="utility-label">Electricity</span>
-                </div>
-                <div class="utility-card">
-                    <div class="utility-icon gas">
-                        <img src="/static/images/gaslanding.jpg" alt="Gas">
-                    </div>
-                    <span class="utility-label">Gas</span>
-                </div>
-            </div>
-
-            <!-- Trust Badge -->
-            <div class="trust-section">
-                <div class="trust-badge">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Secure & Verified</span>
-                </div>
-                <p class="trust-text">Trusted by over <strong>150,000+</strong> users</p>
-            </div>
-
-            <!-- Role Selection Cards -->
-            <div class="role-cards">
-                <div class="role-card" ng-click="selectRole('citizen')">
-                    <div class="role-header">Citizens</div>
-                    <div class="role-image citizens">
-                        <img src="/static/images/citizens.jpg" alt="Citizens">
-                    </div>
-                    <div class="role-title">Citizens</div>
-                    <div class="role-description">Convenient access<br>to city services</div>
-                </div>
-                <div class="role-card" ng-click="selectRole('senior')">
-                    <div class="role-header">Senior Citizens</div>
-                    <div class="role-image seniors">
-                        <img src="/static/images/seniorcitizen.jpg" alt="Senior Citizens">
-                    </div>
-                    <div class="role-title">Senior Citizens</div>
-                    <div class="role-description">Simplified, accessible<br>tools for seniors</div>
-                </div>
-                <div class="role-card" ng-click="selectRole('official')">
-                    <div class="role-header">Government Officials</div>
-                    <div class="role-image officials">
-                        <img src="/static/images/govOfficials.jpg" alt="Government Officials">
-                    </div>
-                    <div class="role-title">Government Officials</div>
-                    <div class="role-description">Real-time monitoring<br>for city management</div>
-                </div>
-                <div class="role-card" ng-click="selectRole('worker')">
-                    <div class="role-header">Field Workers</div>
-                    <div class="role-image kiosk">
-                        <img src="/static/images/kioskMode.jpg" alt="Field Workers">
-                    </div>
-                    <div class="role-title">Field Workers</div>
-                    <div class="role-description">Field operations &<br>meter submissions</div>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="landing-footer">
-                <div class="footer-links">
-                    <a href="#" class="footer-link">Privacy</a>
-                    <span class="footer-divider">|</span>
-                    <a href="#" class="footer-link">Terms</a>
-                    <span class="footer-divider">|</span>
-                    <a href="#" class="footer-link">About Us</a>
-                </div>
-                <div class="footer-links">
-                    <a href="#" class="footer-link">Contact</a>
-                    <span class="footer-divider">|</span>
-                    <a href="#" class="footer-link">Support</a>
-                </div>
+            <div class="header-trust">
+                <i class="fas fa-shield-alt"></i>
+                Trusted by 150,000+ users
             </div>
         </div>
 
-        <!-- Language Selector -->
-        <div class="language-selector-floating">
-            <button class="lang-btn" ng-class="{active: currentLang === 'en'}" ng-click="setLanguage('en')">EN</button>
-            <button class="lang-btn" ng-class="{active: currentLang === 'hi'}"
-                ng-click="setLanguage('hi')">हिंदी</button>
+        <!-- ── Card Body ── -->
+        <div class="card-body">
+
+            <!-- Hero Text -->
+            <div class="hero-text">
+                <h1 class="hero-title">Welcome to Suvidha</h1>
+                <p class="hero-tagline">Integrated real-time management of waste, water, electricity, gas, and civic services.</p>
+            </div>
+
+            <!-- Auth Buttons -->
+            <div class="auth-row">
+                <button class="auth-btn login-btn" onclick="window.location.href='/login'">
+                    <i class="fas fa-sign-in-alt" style="margin-right:6px;"></i>Log In
+                </button>
+                <button class="auth-btn signup-btn" onclick="window.location.href='/signup'">
+                    <i class="fas fa-user-plus" style="margin-right:6px;"></i>Sign Up
+                </button>
+            </div>
+
+            <!-- Utility Strip -->
+            <div class="section-divider"><span>Services Covered</span></div>
+            <div class="utility-strip">
+                <div class="utility-chip">
+                    <div class="utility-chip-icon"><img src="/static/images/waste.jpg" alt="Waste"></div>
+                    <span class="utility-chip-label">Waste</span>
+                </div>
+                <div class="utility-chip">
+                    <div class="utility-chip-icon"><img src="/static/images/waterlanding.jpg" alt="Water"></div>
+                    <span class="utility-chip-label">Water</span>
+                </div>
+                <div class="utility-chip">
+                    <div class="utility-chip-icon"><img src="/static/images/electricity.jpg" alt="Electricity"></div>
+                    <span class="utility-chip-label">Electricity</span>
+                </div>
+                <div class="utility-chip">
+                    <div class="utility-chip-icon"><img src="/static/images/gaslanding.jpg" alt="Gas"></div>
+                    <span class="utility-chip-label">Gas</span>
+                </div>
+            </div>
+
+            <!-- Role Grid -->
+            <div class="section-divider"><span>Who Are You?</span></div>
+            <div class="role-grid">
+                <div class="role-card" onclick="window.location.href='/login'">
+                    <span class="role-badge citizen">Citizens</span>
+                    <div class="role-avatar"><img src="/static/images/citizens.jpg" alt="Citizens"></div>
+                    <div class="role-name">Citizens</div>
+                    <div class="role-desc">Convenient access<br>to city services</div>
+                    <div class="role-arrow"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div class="role-card" onclick="window.location.href='/login'">
+                    <span class="role-badge senior">Senior Citizens</span>
+                    <div class="role-avatar"><img src="/static/images/seniorcitizen.jpg" alt="Senior Citizens"></div>
+                    <div class="role-name">Senior Citizens</div>
+                    <div class="role-desc">Simplified, accessible<br>tools for seniors</div>
+                    <div class="role-arrow"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div class="role-card" onclick="window.location.href='/login'">
+                    <span class="role-badge official">Gov. Officials</span>
+                    <div class="role-avatar"><img src="/static/images/govOfficials.jpg" alt="Government Officials"></div>
+                    <div class="role-name">Government Officials</div>
+                    <div class="role-desc">Real-time monitoring<br>for city management</div>
+                    <div class="role-arrow"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div class="role-card" onclick="window.location.href='/login'">
+                    <span class="role-badge worker">Field Workers</span>
+                    <div class="role-avatar"><img src="/static/images/kioskMode.jpg" alt="Field Workers"></div>
+                    <div class="role-name">Field Workers</div>
+                    <div class="role-desc">Field operations &amp;<br>meter submissions</div>
+                    <div class="role-arrow"><i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+
+        </div><!-- /card-body -->
+
+        <!-- ── Card Footer ── -->
+        <div class="card-footer">
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy</a>
+                <a href="#" class="footer-link">Terms</a>
+                <a href="#" class="footer-link">About Us</a>
+                <a href="#" class="footer-link">Contact</a>
+                <a href="#" class="footer-link">Support</a>
+            </div>
+            <span class="footer-copy">&copy; 2026 Suvidha. All rights reserved.</span>
+        </div>
+
+    </div><!-- /landing-card -->
+
+    <!-- Loading Overlay -->
+    <div class="translating-overlay" id="transOverlay">
+        <div class="translating-spinner">
+            <i class="fas fa-spinner"></i>
+            <span id="transMsg">Translating...</span>
+        </div>
+    </div>
+
+    <!-- Language Dropdown -->
+    <div class="lang-dropdown-wrap" id="langWrap">
+        <button class="lang-toggle" id="langToggle">
+            <i class="fas fa-globe"></i>
+            <span id="langLabel">English</span>
+            <i class="fas fa-chevron-up chevron"></i>
+        </button>
+        <div class="lang-menu" id="langMenu">
+            <div class="lang-menu-header">Select Language</div>
+            <!-- options injected by JS -->
+            <div class="lang-powered">Powered by AI4Bharat IndicTrans2</div>
         </div>
     </div>
 
     <script>
-        // AngularJS App for Landing Page
-        angular.module('landingApp', [])
-            .controller('LandingController', ['$scope', '$window', function ($scope, $window) {
-                $scope.currentLang = 'en';
+    (function() {
+        // ── Language definitions ──
+        const LANGUAGES = [
+            { code: 'en', name: 'English',    native: 'English' },
+            { code: 'hi', name: 'Hindi',      native: 'हिन्दी' },
+            { code: 'ta', name: 'Tamil',      native: 'தமிழ்' },
+            { code: 'te', name: 'Telugu',     native: 'తెలుగు' },
+            { code: 'bn', name: 'Bengali',    native: 'বাংলা' },
+            { code: 'mr', name: 'Marathi',    native: 'मराठी' },
+            { code: 'gu', name: 'Gujarati',   native: 'ગુજરાતી' },
+            { code: 'kn', name: 'Kannada',    native: 'ಕನ್ನಡ' },
+            { code: 'ml', name: 'Malayalam',  native: 'മലയാളം' },
+            { code: 'pa', name: 'Punjabi',    native: 'ਪੰਜਾਬੀ' },
+            { code: 'or', name: 'Odia',       native: 'ଓଡ଼ିଆ' },
+            { code: 'as', name: 'Assamese',   native: 'অসমীয়া' },
+            { code: 'ur', name: 'Urdu',       native: 'اردو' }
+        ];
 
-                $scope.goToLogin = function () {
-                    $window.location.href = '/login';
-                };
+        let translations = {};
+        let currentLang = 'en';
 
-                $scope.goToSignup = function () {
-                    $window.location.href = '/signup';
-                };
+        // ── Load pre-translated JSON ──
+        fetch('/static/landing-translations.json')
+            .then(r => r.json())
+            .then(data => {
+                translations = data;
+                buildMenu();
+                // Restore saved preference
+                const saved = localStorage.getItem('suvidha_lang');
+                if (saved && translations[saved]) {
+                    switchLanguage(saved, false);
+                }
+            })
+            .catch(() => buildMenu());
 
-                $scope.selectRole = function (role) {
-                    switch (role) {
-                        case 'citizen':
-                            $window.location.href = '/login';
-                            break;
-                        case 'senior':
-                            $window.location.href = '/login';
-                            break;
-                        case 'official':
-                            $window.location.href = '/login';
-                            break;
-                        case 'worker':
-                            $window.location.href = '/login';
-                            break;
-                    }
-                };
+        // ── Build dropdown options ──
+        function buildMenu() {
+            const menu = document.getElementById('langMenu');
+            const powered = menu.querySelector('.lang-powered');
+            LANGUAGES.forEach(lang => {
+                const btn = document.createElement('button');
+                btn.className = 'lang-option' + (lang.code === currentLang ? ' active' : '');
+                btn.dataset.lang = lang.code;
+                btn.innerHTML =
+                    '<div class="lang-option-left">' +
+                        '<span class="lang-option-name">' + lang.name + '</span>' +
+                        '<span class="lang-option-native">' + lang.native + '</span>' +
+                    '</div>' +
+                    '<i class="fas fa-check check-icon"></i>';
+                btn.addEventListener('click', function() { switchLanguage(lang.code, true); });
+                menu.insertBefore(btn, powered);
+            });
+        }
 
-                $scope.setLanguage = function (lang) {
-                    $scope.currentLang = lang;
-                    // You can add translation logic here
-                };
-            }]);
+        // ── Toggle dropdown ──
+        const wrap = document.getElementById('langWrap');
+        document.getElementById('langToggle').addEventListener('click', function(e) {
+            e.stopPropagation();
+            wrap.classList.toggle('open');
+        });
+        document.addEventListener('click', function() { wrap.classList.remove('open'); });
+        document.getElementById('langMenu').addEventListener('click', function(e) { e.stopPropagation(); });
+
+        // ── Switch language ──
+        function switchLanguage(code, animate) {
+            if (code === currentLang) { wrap.classList.remove('open'); return; }
+
+            const t = translations[code];
+            if (!t) {
+                // Fallback: try IndicTrans2 API
+                translateViaAPI(code);
+                return;
+            }
+
+            if (animate) showOverlay(getLangName(code));
+            setTimeout(function() {
+                applyTranslations(t);
+                currentLang = code;
+                localStorage.setItem('suvidha_lang', code);
+                updateDropdownUI(code);
+                if (animate) hideOverlay();
+            }, animate ? 350 : 0);
+        }
+
+        // ── Apply translation strings to DOM ──
+        function applyTranslations(t) {
+            setText('.brand-subtitle', t.brand_subtitle);
+            setText('.header-trust span, .header-trust', t.trust_badge, true);
+            setText('.hero-title', t.hero_title);
+            setText('.hero-tagline', t.hero_tagline);
+
+            // Auth buttons (keep icons)
+            setBtn('.login-btn', 'fa-sign-in-alt', t.login);
+            setBtn('.signup-btn', 'fa-user-plus', t.signup);
+
+            // Section dividers
+            var dividers = document.querySelectorAll('.section-divider span');
+            if (dividers[0]) dividers[0].textContent = t.services_covered;
+            if (dividers[1]) dividers[1].textContent = t.who_are_you;
+
+            // Utility chips
+            var chips = document.querySelectorAll('.utility-chip-label');
+            var utils = [t.waste, t.water, t.electricity, t.gas];
+            chips.forEach(function(el, i) { if (utils[i]) el.textContent = utils[i]; });
+
+            // Role cards
+            var cards = document.querySelectorAll('.role-card');
+            var roles = [
+                { badge: t.citizens, name: t.citizens, desc: t.citizen_desc },
+                { badge: t.senior_citizens, name: t.senior_citizens, desc: t.senior_desc },
+                { badge: t.gov_officials, name: t.gov_officials_full, desc: t.gov_desc },
+                { badge: t.field_workers, name: t.field_workers, desc: t.field_desc }
+            ];
+            cards.forEach(function(card, i) {
+                if (!roles[i]) return;
+                var badge = card.querySelector('.role-badge');
+                var name = card.querySelector('.role-name');
+                var desc = card.querySelector('.role-desc');
+                if (badge) badge.textContent = roles[i].badge;
+                if (name) name.textContent = roles[i].name;
+                if (desc) desc.innerHTML = roles[i].desc;
+            });
+
+            // Footer
+            var footerLinks = document.querySelectorAll('.footer-link');
+            var footerTexts = [t.privacy, t.terms, t.about_us, t.contact, t.support];
+            footerLinks.forEach(function(el, i) { if (footerTexts[i]) el.textContent = footerTexts[i]; });
+
+            var copy = document.querySelector('.footer-copy');
+            if (copy) copy.textContent = t.copyright;
+
+            // Language menu header
+            var menuHeader = document.querySelector('.lang-menu-header');
+            if (menuHeader) menuHeader.textContent = t.select_language;
+
+            var powered = document.querySelector('.lang-powered');
+            if (powered) powered.textContent = t.powered_by;
+
+            // Set HTML dir for RTL languages
+            document.documentElement.dir = (currentLang === 'ur') ? 'rtl' : 'ltr';
+        }
+
+        function setText(sel, val, isHeaderTrust) {
+            if (isHeaderTrust) {
+                var el = document.querySelector('.header-trust');
+                if (el) el.innerHTML = '<i class="fas fa-shield-alt"></i> ' + val;
+                return;
+            }
+            var el = document.querySelector(sel);
+            if (el) el.textContent = val;
+        }
+
+        function setBtn(sel, icon, text) {
+            var el = document.querySelector(sel);
+            if (el) el.innerHTML = '<i class="fas ' + icon + '" style="margin-right:6px;"></i>' + text;
+        }
+
+        function updateDropdownUI(code) {
+            document.getElementById('langLabel').textContent = getLangName(code);
+            document.querySelectorAll('.lang-option').forEach(function(opt) {
+                opt.classList.toggle('active', opt.dataset.lang === code);
+            });
+            wrap.classList.remove('open');
+        }
+
+        function getLangName(code) {
+            var l = LANGUAGES.find(function(x) { return x.code === code; });
+            return l ? l.name : 'English';
+        }
+
+        // ── IndicTrans2 API fallback ──
+        function translateViaAPI(targetLang) {
+            showOverlay(getLangName(targetLang));
+            var enT = translations['en'];
+            if (!enT) { hideOverlay(); return; }
+
+            var keys = Object.keys(enT);
+            var texts = keys.map(function(k) { return enT[k]; });
+
+            fetch('/api/translate/indictrans2', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ texts: texts, target_lang: targetLang, source_lang: 'en' })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success && data.translations) {
+                    var newT = {};
+                    keys.forEach(function(k, i) { newT[k] = data.translations[i] || enT[k]; });
+                    translations[targetLang] = newT;
+                    applyTranslations(newT);
+                    currentLang = targetLang;
+                    localStorage.setItem('suvidha_lang', targetLang);
+                    updateDropdownUI(targetLang);
+                }
+                hideOverlay();
+            })
+            .catch(function() { hideOverlay(); });
+        }
+
+        function showOverlay(langName) {
+            document.getElementById('transMsg').textContent = 'Translating to ' + langName + '...';
+            document.getElementById('transOverlay').classList.add('show');
+        }
+        function hideOverlay() {
+            document.getElementById('transOverlay').classList.remove('show');
+        }
+    })();
     </script>
-</body>
 
+</body>
 </html>

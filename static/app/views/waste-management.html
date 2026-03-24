@@ -1,10 +1,10 @@
-﻿<div class="main-content">
+﻿<div class="main-content" auto-translate>
     <div class="dashboard-container">
 
         <!-- Loading State -->
         <div class="loading-spinner" ng-show="vm.loading">
             <div class="spinner"></div>
-            <p>Loading waste data...</p>
+            <p>{{ 'waste.loading' | translate }}</p>
         </div>
 
         <!-- Main Content -->
@@ -13,33 +13,33 @@
             <!-- SECTION 1: HERO STRIP -->
             <div class="wm-hero-strip">
                 <div class="wm-hero-left">
-                    <div class="wm-hero-eyebrow">&#9851; Waste Management</div>
-                    <div class="wm-hero-name">Welcome, {{vm.userData.username || 'Citizen'}}</div>
+                    <div class="wm-hero-eyebrow">&#9851; {{ 'waste.title' | translate }}</div>
+                    <div class="wm-hero-name">{{ 'waste.welcome' | translate }}, {{vm.userData.username || 'Citizen'}}</div>
                     <div class="wm-hero-sub">Kailash Colony &middot; Ward 54E &middot; New Delhi</div>
                 </div>
                 <div class="wm-hero-stats">
                     <div class="wm-hero-stat">
                         <div class="wm-hero-stat-val">{{vm.wasteStatus.lastPickup || 'Today'}}</div>
-                        <div class="wm-hero-stat-lbl">Last Pickup</div>
+                        <div class="wm-hero-stat-lbl">{{ 'waste.last_pickup' | translate }}</div>
                     </div>
                     <div class="wm-hero-stat-div"></div>
                     <div class="wm-hero-stat">
-                        <div class="wm-hero-stat-val wm-stat-green">&#10003; On Schedule</div>
-                        <div class="wm-hero-stat-lbl">Collection Status</div>
+                        <div class="wm-hero-stat-val wm-stat-green">&#10003; {{ 'waste.on_schedule' | translate }}</div>
+                        <div class="wm-hero-stat-lbl">{{ 'waste.collection_status' | translate }}</div>
                     </div>
                     <div class="wm-hero-stat-div"></div>
                     <div class="wm-hero-stat">
                         <div class="wm-hero-stat-val">{{vm.wasteStatus.nextScheduledPickup || 'Tomorrow'}}</div>
-                        <div class="wm-hero-stat-lbl">Next Pickup</div>
+                        <div class="wm-hero-stat-lbl">{{ 'waste.next_pickup' | translate }}</div>
                     </div>
                     <div class="wm-hero-stat-div"></div>
                     <div class="wm-hero-stat">
                         <div class="wm-hero-stat-val wm-stat-gold">+{{vm.wasteStatus.pointsEarned || 50}} pts</div>
-                        <div class="wm-hero-stat-lbl">Earned Today</div>
+                        <div class="wm-hero-stat-lbl">{{ 'waste.earned_today' | translate }}</div>
                     </div>
                 </div>
                 <div class="wm-hero-right">
-                    <button class="wm-hero-btn" ng-click="vm.showReportForm = !vm.showReportForm">&#128680; Report Issue</button>
+                    <button class="wm-hero-btn" ng-click="vm.showReportForm = !vm.showReportForm">&#128680; {{ 'waste.report_issue' | translate }}</button>
                 </div>
             </div>
 
@@ -48,31 +48,31 @@
                 <div class="wm-quick-card wm-qc-report" ng-click="vm.showReportForm = !vm.showReportForm">
                     <div class="wm-qc-icon">&#128680;</div>
                     <div class="wm-qc-body">
-                        <div class="wm-qc-title">Report Issue</div>
-                        <div class="wm-qc-sub">Missed pickup or overflow?</div>
+                        <div class="wm-qc-title">{{ 'waste.report_issue' | translate }}</div>
+                        <div class="wm-qc-sub">{{ 'waste.report_issue_sub' | translate }}</div>
                     </div>
                     <div class="wm-qc-arrow">&#8594;</div>
                 </div>
                 <div class="wm-quick-card wm-qc-ai" ng-click="vm.showAiWasteHelper = !vm.showAiWasteHelper">
                     <div class="wm-qc-icon">&#129302;</div>
                     <div class="wm-qc-body">
-                        <div class="wm-qc-title">Swachh Bandhu</div>
-                        <div class="wm-qc-sub">Identify waste with AI</div>
+                        <div class="wm-qc-title">{{ 'waste.ai_helper' | translate }}</div>
+                        <div class="wm-qc-sub">{{ 'waste.ai_helper_sub' | translate }}</div>
                     </div>
                     <div class="wm-qc-arrow">&#8594;</div>
                 </div>
                 <div class="wm-quick-card wm-qc-guide" ng-click="vm.showWasteGuide = true">
                     <div class="wm-qc-icon">&#128161;</div>
                     <div class="wm-qc-body">
-                        <div class="wm-qc-title">Waste Guide</div>
-                        <div class="wm-qc-sub">Learn proper segregation</div>
+                        <div class="wm-qc-title">{{ 'waste.waste_guide' | translate }}</div>
+                        <div class="wm-qc-sub">{{ 'waste.waste_guide_sub' | translate }}</div>
                     </div>
                     <div class="wm-qc-arrow">&#8594;</div>
                 </div>
                 <div class="wm-quick-card wm-qc-pts">
                     <div class="wm-qc-icon">&#11088;</div>
                     <div class="wm-qc-body">
-                        <div class="wm-qc-title">Green Points</div>
+                        <div class="wm-qc-title">{{ 'waste.green_points' | translate }}</div>
                         <div class="wm-qc-sub">1,240 pts accumulated</div>
                     </div>
                     <div class="wm-qc-arrow">&#8594;</div>
@@ -85,8 +85,8 @@
                 <!-- Left: Live Tracking Card -->
                 <div class="wm-card wm-tracking-card">
                     <div class="wm-card-title">
-                        &#128205; Live Collection Tracking
-                        <span class="wm-card-badge wm-badge-live">&#9679; Live</span>
+                        &#128205; {{ 'waste.live_collection_tracking' | translate }}
+                        <span class="wm-card-badge wm-badge-live">&#9679; {{ 'waste.live' | translate }}</span>
                     </div>
                     <div class="wm-tracking-body">
                         <div class="wm-map-area">
@@ -96,33 +96,33 @@
                             <div class="wm-truck-header">
                                 <div>
                                     <div class="wm-truck-id">Truck {{vm.liveServiceData.truckId || 'WCV-042'}}</div>
-                                    <div class="wm-truck-sub">Municipal Waste Collection</div>
+                                    <div class="wm-truck-sub">{{ 'waste.municipal_collection' | translate }}</div>
                                 </div>
                                 <span class="wm-status-pill wm-pill-blue">{{vm.liveServiceData.truckStatus || 'En Route'}}</span>
                             </div>
                             <div class="wm-truck-rows">
                                 <div class="wm-truck-row">
-                                    <span><i data-lucide="map" style="width:14px;height:14px;"></i> Distance</span>
+                                    <span><i data-lucide="map" style="width:14px;height:14px;"></i> {{ 'waste.distance' | translate }}</span>
                                     <strong>{{vm.liveServiceData.distance || '1.2 km'}}</strong>
                                 </div>
                                 <div class="wm-truck-row">
-                                    <span><i data-lucide="clock" style="width:14px;height:14px;"></i> ETA</span>
+                                    <span><i data-lucide="clock" style="width:14px;height:14px;"></i> {{ 'waste.eta' | translate }}</span>
                                     <strong>{{vm.liveServiceData.eta || '18 mins'}}</strong>
                                 </div>
                                 <div class="wm-truck-row">
-                                    <span><i data-lucide="user" style="width:14px;height:14px;"></i> Driver</span>
+                                    <span><i data-lucide="user" style="width:14px;height:14px;"></i> {{ 'waste.driver' | translate }}</span>
                                     <strong>{{vm.liveServiceData.driverName || 'Ravi Kumar'}}</strong>
                                 </div>
                                 <div class="wm-truck-row">
-                                    <span><i data-lucide="battery-charging" style="width:14px;height:14px;"></i> Capacity</span>
+                                    <span><i data-lucide="battery-charging" style="width:14px;height:14px;"></i> {{ 'waste.capacity' | translate }}</span>
                                     <strong>{{vm.liveServiceData.capacity || '68%'}}</strong>
                                 </div>
                             </div>
                             <button class="wm-validate-btn" disabled>
                                 <i data-lucide="check-circle" style="width:15px;height:15px;"></i>
-                                Validate Collection
+                                {{ 'waste.validate_collection' | translate }}
                             </button>
-                            <p class="wm-validate-note">Auto-validated when driver confirms</p>
+                            <p class="wm-validate-note">{{ 'waste.auto_validated_note' | translate }}</p>
                         </div>
                     </div>
                 </div>
@@ -130,8 +130,8 @@
                 <!-- Right: Weekly Impact Panel -->
                 <div class="wm-card wm-impact-panel">
                     <div class="wm-card-title">
-                        &#127758; Your Weekly Impact
-                        <span class="wm-card-badge wm-badge-green">This Week</span>
+                        &#127758; {{ 'waste.weekly_impact' | translate }}
+                        <span class="wm-card-badge wm-badge-green">{{ 'waste.this_week' | translate }}</span>
                     </div>
                     <div class="wm-impact-desc">
                         Your waste was transported to <strong>Okhla Waste-to-Energy Plant</strong>.
@@ -141,21 +141,21 @@
                         <div class="wm-impact-metric">
                             <div class="wm-metric-circle wm-mc-yellow">&#9889;</div>
                             <div class="wm-metric-val">45 kWh</div>
-                            <div class="wm-metric-lbl">Energy Generated</div>
+                            <div class="wm-metric-lbl">{{ 'waste.energy_generated' | translate }}</div>
                         </div>
                         <div class="wm-impact-metric">
                             <div class="wm-metric-circle wm-mc-green">&#127793;</div>
                             <div class="wm-metric-val">12 kg</div>
-                            <div class="wm-metric-lbl">Compost Created</div>
+                            <div class="wm-metric-lbl">{{ 'waste.compost_created' | translate }}</div>
                         </div>
                         <div class="wm-impact-metric">
                             <div class="wm-metric-circle wm-mc-gold">&#11088;</div>
                             <div class="wm-metric-val">+5 pts</div>
-                            <div class="wm-metric-lbl">Bonus Awarded</div>
+                            <div class="wm-metric-lbl">{{ 'waste.bonus_awarded' | translate }}</div>
                         </div>
                     </div>
                     <div class="wm-score-row">
-                        <div class="wm-score-label">Segregation Score</div>
+                        <div class="wm-score-label">{{ 'waste.segregation_score' | translate }}</div>
                         <div class="wm-score-bar-wrap">
                             <div class="wm-score-bar"><div class="wm-score-fill" style="width:92%;"></div></div>
                             <span class="wm-score-pct">92%</span>

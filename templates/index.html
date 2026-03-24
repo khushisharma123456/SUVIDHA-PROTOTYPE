@@ -137,9 +137,51 @@
             .sidebar.mobile-open { transform: translateX(0); }
             .main-wrapper { margin-left: 0 !important; padding-top: 56px; }
         }
+
+        /* ── Global Language Dropdown ── */
+        .global-lang-wrap { position: fixed; top: 12px; right: 16px; z-index: 998; font-family: 'Inter', -apple-system, sans-serif; }
+        .global-lang-toggle { display: flex; align-items: center; gap: .45rem; padding: .5rem .9rem; border-radius: 10px; border: 2px solid #e5e7eb; background: rgba(255,255,255,.94); backdrop-filter: blur(8px); cursor: pointer; font-size: .82rem; font-weight: 600; color: #374151; transition: all .25s ease; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+        .global-lang-toggle:hover { border-color: #00703C; color: #00703C; }
+        .global-lang-toggle i.arrow-icon { transition: transform .25s ease; font-size: .6rem; }
+        .global-lang-toggle.open i.arrow-icon { transform: rotate(180deg); }
+        .global-lang-menu { position: absolute; top: calc(100% + .45rem); right: 0; min-width: 210px; max-height: 370px; overflow-y: auto; background: rgba(255,255,255,.98); backdrop-filter: blur(12px); border: 1.5px solid #e5e7eb; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.12); padding: .35rem; }
+        .global-lang-menu .lang-item { display: flex; align-items: center; gap: .55rem; padding: .55rem .75rem; border-radius: 8px; cursor: pointer; font-size: .82rem; color: #374151; transition: background .15s ease; border: none; background: none; width: 100%; text-align: left; font-family: inherit; }
+        .global-lang-menu .lang-item:hover { background: #f3f4f6; }
+        .global-lang-menu .lang-item.active { background: linear-gradient(135deg, rgba(0,166,81,.08), rgba(0,112,60,.08)); color: #00703C; font-weight: 600; }
+        .global-lang-menu .lang-item .lang-flag { font-size: 1.1rem; }
+        .global-lang-menu .lang-item .lang-native { font-weight: 600; }
+        .global-lang-menu .lang-item .lang-en { color: #9ca3af; font-size: .72rem; margin-left: auto; }
+        .global-lang-menu .lang-item .check-icon { color: #00703C; margin-left: .2rem; font-size: .7rem; }
+        .global-lang-powered { text-align: center; padding: .5rem; font-size: .65rem; color: #9ca3af; border-top: 1px solid #f3f4f6; margin-top: .25rem; }
+        .global-lang-spinner-overlay { position: fixed; inset: 0; background: rgba(255,255,255,.5); backdrop-filter: blur(3px); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .global-lang-spinner-overlay .spinner { width: 36px; height: 36px; border: 3px solid #e5e7eb; border-top-color: #00703C; border-radius: 50%; animation: glspin .7s linear infinite; }
+        @keyframes glspin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+            .global-lang-wrap { top: 10px; right: 60px; }
+            .global-lang-toggle span.lang-label { display: none; }
+            .global-lang-toggle { padding: .5rem .65rem; }
+        }
     </style>
 </head>
 <body>
+    <!-- Global Language Dropdown -->
+    <div class="global-lang-wrap" ng-click-outside="closeGlobalLangMenu()">
+        <button class="global-lang-toggle" ng-class="{'open': showLangMenu}" ng-click="toggleGlobalLangMenu($event)">
+            <i class="fas fa-globe"></i>
+            <span class="lang-label">{{ getGlobalLangLabel() }}</span>
+            <i class="fas fa-chevron-down arrow-icon"></i>
+        </button>
+        <div class="global-lang-menu" ng-show="showLangMenu" ng-click="$event.stopPropagation()">
+            <button class="lang-item" ng-repeat="lang in globalLanguages" ng-class="{'active': currentLang === lang.code}" ng-click="switchGlobalLanguage(lang.code)">
+                <span class="lang-flag">{{ lang.flag }}</span>
+                <span class="lang-native">{{ lang.native }}</span>
+                <span class="lang-en">{{ lang.en }}</span>
+                <i class="fas fa-check check-icon" ng-show="currentLang === lang.code"></i>
+            </button>
+            <div class="global-lang-powered">Powered by AI4Bharat IndicTrans2</div>
+        </div>
+    </div>
+
     <!-- Mobile Header -->
     <div class="mobile-header">
         <img src="/static/images/suvidha%20Logo.jpg" alt="Suvidha">
@@ -252,6 +294,8 @@
     <script src="/static/app/services/auth.service.js"></script>
     <script src="/static/app/services/api.service.js"></script>
     <script src="/static/app/services/translation.service.js"></script>
+    <script src="/static/app/directives/click-outside.directive.js"></script>
+    <script src="/static/app/directives/auto-translate.directive.js"></script>
     <script src="/static/app/controllers/auth.controller.js"></script>
     <script src="/static/app/controllers/dashboard.controller.js"></script>
     <script src="/static/app/controllers/utilities.controller.js"></script>

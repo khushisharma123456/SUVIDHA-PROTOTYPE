@@ -4,6 +4,7 @@ flask-cors
 werkzeug>=2.0.0
 nyckel
 requests
+python-dotenv
 Pillow>=9.0.0
 imagehash>=4.3.0
 fastapi

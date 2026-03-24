@@ -2,6 +2,8 @@ from flask import Flask, render_template, session, request, jsonify, send_from_d
 from flask_cors import CORS
 import os
 import secrets
+from dotenv import load_dotenv
+load_dotenv()
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 # import nyckel  # Commented out - not required for citizen dashboard
@@ -77,9 +79,9 @@ app.register_blueprint(citizen_bp)
 try:
     with app.app_context():
         db.create_all()
-        print("✓ Database tables created")
+        print("[OK] Database tables created")
 except Exception as e:
-    print(f"✗ Error creating tables: {e}")
+    print(f"[ERR] Error creating tables: {e}")
 
 # Initialize vendors on first request (lazy loading)
 @app.before_request
@@ -114,9 +116,9 @@ def init_vendors():
                     db.session.add(vendor)
                 
                 db.session.commit()
-                print("✓ Vendors initialized")
+                print("[OK] Vendors initialized")
         except Exception as e:
-            print(f"⚠ Vendors init error: {e}")
+            print(f"[WARN] Vendors init error: {e}")
         finally:
             app._vendors_initialized = True
 
@@ -125,7 +127,7 @@ def init_vendors():
 # ============================================
 @app.route('/')
 def landing():
-    return render_template('index.html')
+    return render_template('landing.html')
 
 @app.route('/app')
 def citizen_app():
@@ -2822,6 +2824,102 @@ def api_verify_image():
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ===== AI4Bharat IndicTrans2 Translation API =====
+
+INDICTRANS2_LANG_MAP = {
+    'hi': 'hin_Deva', 'ta': 'tam_Taml', 'te': 'tel_Telu', 'bn': 'ben_Beng',
+    'mr': 'mar_Deva', 'gu': 'guj_Gujr', 'kn': 'kan_Knda', 'ml': 'mal_Mlym',
+    'pa': 'pan_Guru', 'or': 'ory_Orya', 'as': 'asm_Beng', 'ur': 'urd_Arab',
+}
+
+# MyMemory uses ISO 639-1 codes directly (hi, ta, te, bn, mr, etc.)
+
+def _translate_via_indictrans2(text, src_code, tgt_code, headers):
+    """Try IndicTrans2 via HuggingFace router."""
+    api_urls = [
+        'https://router.huggingface.co/hf-inference/models/ai4bharat/indictrans2-en-indic-1B',
+        'https://router.huggingface.co/models/ai4bharat/indictrans2-en-indic-1B'
+    ]
+    payload = {
+        'inputs': text,
+        'parameters': {'src_lang': src_code, 'tgt_lang': tgt_code}
+    }
+
+    for api_url in api_urls:
+        resp = requests.post(api_url, headers=headers, json=payload, timeout=20)
+        if resp.status_code != 200:
+            continue
+
+        result = resp.json()
+        translated = None
+        if isinstance(result, list) and len(result) > 0 and isinstance(result[0], dict):
+            translated = result[0].get('translation_text')
+        elif isinstance(result, dict) and 'translation_text' in result:
+            translated = result['translation_text']
+
+        # Some HF responses may echo input text unchanged; treat that as a miss.
+        if translated and translated.strip() and translated.strip().lower() != text.strip().lower():
+            return translated
+    return None
+
+def _translate_via_mymemory(text, target_lang):
+    """Fallback: MyMemory free translation API."""
+    resp = requests.get(
+        'https://api.mymemory.translated.net/get',
+        params={'q': text, 'langpair': f'en|{target_lang}'},
+        timeout=15
+    )
+    if resp.status_code == 200:
+        data = resp.json()
+        translated = data.get('responseData', {}).get('translatedText', '')
+        if translated and translated.lower() != text.lower():
+            return translated
+    return None
+
+@app.route('/api/translate/indictrans2', methods=['POST'])
+def translate_indictrans2():
+    """Translate text using IndicTrans2 (HuggingFace) with MyMemory fallback."""
+    data = request.get_json()
+    if not data or not data.get('texts') or not data.get('target_lang'):
+        return jsonify({'success': False, 'error': 'texts (list) and target_lang required'}), 400
+
+    texts = data['texts']
+    target_lang = data['target_lang']
+    source_lang = data.get('source_lang', 'en')
+
+    src_code = INDICTRANS2_LANG_MAP.get(source_lang, 'eng_Latn') if source_lang != 'en' else 'eng_Latn'
+    tgt_code = INDICTRANS2_LANG_MAP.get(target_lang)
+    if not tgt_code:
+        return jsonify({'success': False, 'error': f'Unsupported target language: {target_lang}'}), 400
+
+    hf_token = os.environ.get('HF_API_TOKEN', '')
+    hf_headers = {'Content-Type': 'application/json'}
+    if hf_token:
+        hf_headers['Authorization'] = f'Bearer {hf_token}'
+
+    translated = []
+    try:
+        for text in texts:
+            result = None
+            # Try IndicTrans2 first (only if HF token is available)
+            if hf_token:
+                try:
+                    result = _translate_via_indictrans2(text, src_code, tgt_code, hf_headers)
+                except Exception:
+                    pass
+            # Fallback to MyMemory
+            if not result:
+                try:
+                    result = _translate_via_mymemory(text, target_lang)
+                except Exception:
+                    pass
+            translated.append(result if result else text)
+
+        return jsonify({'success': True, 'translations': translated, 'source': source_lang, 'target': target_lang})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 # ===== SERVER-SIDE TRANSLATIONS API =====

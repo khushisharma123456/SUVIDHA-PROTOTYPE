@@ -77,11 +77,59 @@
             // $locationProvider.html5Mode(true);
         }])
         .run(['$rootScope', '$location', '$sce', 'AuthService', 'TranslationService', function($rootScope, $location, $sce, AuthService, TranslationService) {
-            // Initialize translation service — load translations.json
-            TranslationService.init();
+            // Initialize translation service — load translations-multilingual.json
+            TranslationService.initAsync();
 
-            // Set current language (for backward compatibility)
-            $rootScope.currentLang = 'en';
+            // Set current language (restore from localStorage)
+            var savedLang = localStorage.getItem('suvidha_lang') || 'en';
+            $rootScope.currentLang = savedLang;
+            TranslationService.setLanguage(savedLang);
+
+            // --- Global Language Selector ---
+            $rootScope.showLangMenu = false;
+            $rootScope.globalLanguages = [
+                { code: 'en', native: 'English', en: 'English', flag: '🇬🇧' },
+                { code: 'hi', native: 'हिन्दी', en: 'Hindi', flag: '🇮🇳' },
+                { code: 'ta', native: 'தமிழ்', en: 'Tamil', flag: '🇮🇳' },
+                { code: 'te', native: 'తెలుగు', en: 'Telugu', flag: '🇮🇳' },
+                { code: 'bn', native: 'বাংলা', en: 'Bengali', flag: '🇮🇳' },
+                { code: 'mr', native: 'मराठी', en: 'Marathi', flag: '🇮🇳' },
+                { code: 'gu', native: 'ગુજરાતી', en: 'Gujarati', flag: '🇮🇳' },
+                { code: 'kn', native: 'ಕನ್ನಡ', en: 'Kannada', flag: '🇮🇳' },
+                { code: 'ml', native: 'മലയാളം', en: 'Malayalam', flag: '🇮🇳' },
+                { code: 'pa', native: 'ਪੰਜਾਬੀ', en: 'Punjabi', flag: '🇮🇳' },
+                { code: 'or', native: 'ଓଡ଼ିଆ', en: 'Odia', flag: '🇮🇳' },
+                { code: 'ur', native: 'اردو', en: 'Urdu', flag: '🇵🇰' }
+            ];
+
+            $rootScope.getGlobalLangLabel = function() {
+                var lang = $rootScope.globalLanguages.find(function(l) { return l.code === $rootScope.currentLang; });
+                return lang ? lang.native : 'English';
+            };
+
+            $rootScope.toggleGlobalLangMenu = function($event) {
+                if ($event) $event.stopPropagation();
+                $rootScope.showLangMenu = !$rootScope.showLangMenu;
+            };
+
+            $rootScope.closeGlobalLangMenu = function() {
+                $rootScope.showLangMenu = false;
+            };
+
+            $rootScope.switchGlobalLanguage = function(langCode) {
+                $rootScope.currentLang = langCode;
+                $rootScope.showLangMenu = false;
+                localStorage.setItem('suvidha_lang', langCode);
+                TranslationService.setLanguage(langCode);
+                // Set RTL for Urdu
+                document.documentElement.dir = langCode === 'ur' ? 'rtl' : 'ltr';
+                // If translation data missing for this language, call IndicTrans2 API
+                TranslationService.ensureLanguage(langCode);
+            };
+
+            $rootScope.$on('languageChanged', function(event, newLang) {
+                $rootScope.currentLang = newLang;
+            });
 
             // --- User name for sidebar ---
             $rootScope.loadUserName = function() {

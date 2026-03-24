@@ -551,6 +551,28 @@
             .role-select-card { padding: 0.75rem; }
             .role-select-card i.role-icon { font-size: 1.4rem; }
         }
+
+        /* ── Language Dropdown ── */
+        .lang-dropdown-wrap{position:fixed;top:1rem;right:1rem;z-index:9999;font-family:var(--font-primary)}
+        .lang-toggle{display:flex;align-items:center;gap:.45rem;padding:.5rem .9rem;border-radius:10px;border:2px solid var(--gray-200);background:rgba(255,255,255,.92);backdrop-filter:blur(8px);cursor:pointer;font-size:.82rem;font-weight:600;color:var(--gray-700);transition:all .25s ease;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+        .lang-toggle:hover{border-color:var(--primary-green);color:var(--primary-green)}
+        .lang-toggle .arrow{transition:transform .25s ease;font-size:.6rem}
+        .lang-toggle.open .arrow{transform:rotate(180deg)}
+        .lang-menu{position:absolute;top:calc(100% + .45rem);right:0;min-width:200px;max-height:340px;overflow-y:auto;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border:1.5px solid var(--gray-200);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.12);padding:.35rem;display:none;animation:menuFade .2s ease}
+        .lang-menu.show{display:block}
+        @keyframes menuFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+        .lang-option{display:flex;align-items:center;gap:.55rem;padding:.55rem .75rem;border-radius:8px;cursor:pointer;font-size:.82rem;color:var(--gray-700);transition:background .15s ease}
+        .lang-option:hover{background:var(--gray-100)}
+        .lang-option.active{background:linear-gradient(135deg,rgba(0,166,81,.08),rgba(0,112,60,.08));color:var(--primary-green);font-weight:600}
+        .lang-option .lang-native{font-weight:600}
+        .lang-option .lang-en{color:var(--gray-400);font-size:.72rem;margin-left:auto}
+        .lang-powered{text-align:center;padding:.5rem;font-size:.65rem;color:var(--gray-400);border-top:1px solid var(--gray-100);margin-top:.25rem}
+        .translating-overlay{position:fixed;inset:0;background:rgba(255,255,255,.6);backdrop-filter:blur(3px);z-index:10000;display:none;align-items:center;justify-content:center}
+        .translating-overlay.show{display:flex}
+        .translating-overlay .spinner{width:36px;height:36px;border:3px solid var(--gray-200);border-top-color:var(--primary-green);border-radius:50%;animation:spin .7s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        [dir="rtl"] .lang-dropdown-wrap{right:auto;left:1rem}
+        [dir="rtl"] .lang-menu{right:auto;left:0}
     </style>
 </head>
 
@@ -954,6 +976,17 @@
         </div>
     </div>
 
+    <!-- Language Dropdown -->
+    <div class="lang-dropdown-wrap" id="langDropdown">
+        <button class="lang-toggle" id="langToggle" onclick="toggleLangMenu()">
+            <i class="fas fa-globe"></i>
+            <span id="langLabel">English</span>
+            <i class="fas fa-chevron-down arrow"></i>
+        </button>
+        <div class="lang-menu" id="langMenu"></div>
+    </div>
+    <div class="translating-overlay" id="translatingOverlay"><div class="spinner"></div></div>
+
     <script>
         let currentStep = 1;
         let selectedRole = null;
@@ -1175,6 +1208,248 @@
             document.getElementById('errorMsg').classList.remove('show');
             document.getElementById('successMsg').classList.remove('show');
         }
+    </script>
+
+    <!-- IndicTrans2 Language Engine -->
+    <script>
+    (function(){
+        const LANGS=[
+            {code:'en',native:'English',en:'English'},
+            {code:'hi',native:'हिन्दी',en:'Hindi'},
+            {code:'ta',native:'தமிழ்',en:'Tamil'},
+            {code:'te',native:'తెలుగు',en:'Telugu'},
+            {code:'bn',native:'বাংলা',en:'Bengali'},
+            {code:'mr',native:'मराठी',en:'Marathi'},
+            {code:'gu',native:'ગુજરાતી',en:'Gujarati'},
+            {code:'kn',native:'ಕನ್ನಡ',en:'Kannada'},
+            {code:'ml',native:'മലയാളം',en:'Malayalam'},
+            {code:'pa',native:'ਪੰਜਾਬੀ',en:'Punjabi'},
+            {code:'or',native:'ଓଡ଼ିଆ',en:'Odia'},
+            {code:'ur',native:'اردو',en:'Urdu'}
+        ];
+        let TR={}, currentLang='en';
+
+        fetch('/static/auth-translations.json').then(r=>r.json()).then(d=>{TR=d;init();}).catch(()=>init());
+
+        function init(){
+            buildMenu();
+            const saved=localStorage.getItem('suvidha_lang')||'en';
+            switchLang(saved,false);
+        }
+
+        function buildMenu(){
+            const menu=document.getElementById('langMenu');
+            let html='';
+            LANGS.forEach(l=>{
+                html+=`<div class="lang-option" data-lang="${l.code}" onclick="switchLangFromMenu('${l.code}')">
+                    <span class="lang-native">${l.native}</span>
+                    <span class="lang-en">${l.en}</span></div>`;
+            });
+            html+='<div class="lang-powered" id="langPowered">Powered by AI4Bharat IndicTrans2</div>';
+            menu.innerHTML=html;
+        }
+
+        function applyTranslations(lang){
+            const t=TR[lang]; if(!t) return;
+            const s=(sel,key)=>{const el=document.querySelector(sel);if(el&&t[key])el.textContent=t[key];};
+            const p=(sel,key)=>{const el=document.querySelector(sel);if(el&&t[key])el.placeholder=t[key];};
+            const sAll=(sel,key)=>{document.querySelectorAll(sel).forEach(el=>{if(t[key])el.textContent=t[key];});};
+
+            /* Card header */
+            s('.card-title','create_your_account');
+            s('.card-subtitle','join_suvidha');
+
+            /* Progress step labels */
+            const stepKeys=['step_role','step_personal','step_contact','step_details','step_security'];
+            stepKeys.forEach((key,i)=>{
+                const lbl=document.querySelector('#dot-'+(i+1)+' .step-label');
+                if(lbl&&t[key])lbl.textContent=t[key];
+            });
+
+            /* Step 1: Role Selection */
+            s('#step-1 .section-title','select_your_role');
+            s('#step-1 .section-desc','choose_role_desc');
+            s('#rc-citizen .role-name','general_citizen');
+            s('#rc-citizen .role-desc','citizen_signup_desc');
+            s('#rc-senior .role-name','senior_citizen');
+            s('#rc-senior .role-desc','senior_signup_desc');
+            s('#rc-agent .role-name','field_agent');
+            s('#rc-agent .role-desc','agent_signup_desc');
+            s('#rc-official .role-name','govt_official');
+            s('#rc-official .role-desc','official_signup_desc');
+
+            /* Step 2: Personal Info */
+            s('#step-2 .section-title','personal_info');
+            s('#step-2 .section-desc','tell_us');
+
+            /* Step 2 labels - use data attributes or position-based */
+            const step2Labels=document.querySelectorAll('#step-2 > .form-group > label, #step-2 > .form-row .form-group > label');
+            const step2Map=[{k:'full_name'},{k:'date_of_birth'},{k:'gender'},{k:'preferred_language'}];
+            step2Labels.forEach((lbl,i)=>{
+                if(step2Map[i]&&t[step2Map[i].k]){
+                    const req=lbl.querySelector('.required');
+                    lbl.textContent=t[step2Map[i].k];
+                    if(req){lbl.appendChild(document.createTextNode(' '));lbl.appendChild(req);}
+                }
+            });
+            p('#fullName','enter_full_name');
+
+            /* Gender radio labels */
+            const genderLabels=document.querySelectorAll('#step-2 .radio-option');
+            const genderKeys=['male','female','other'];
+            genderLabels.forEach((lbl,i)=>{
+                const inp=lbl.querySelector('input');
+                if(inp&&t[genderKeys[i]]){lbl.textContent='';lbl.appendChild(inp);lbl.appendChild(document.createTextNode(' '+t[genderKeys[i]]));}
+            });
+
+            /* Employee fields */
+            const empLabels=document.querySelectorAll('#empFields .form-group label');
+            const empMap=['employee_id','department','designation'];
+            empLabels.forEach((lbl,i)=>{
+                if(t[empMap[i]]){
+                    const req=lbl.querySelector('.required');
+                    lbl.textContent=t[empMap[i]];
+                    if(req){lbl.appendChild(document.createTextNode(' '));lbl.appendChild(req);}
+                }
+            });
+            p('#employeeId','enter_employee_id');
+
+            /* Step 3: Contact */
+            s('#step-3 .section-title','contact_info');
+            s('#step-3 .section-desc','contact_desc');
+            const step3Labels=document.querySelectorAll('#step-3 > .form-group > label, #step-3 > .form-row .form-group > label');
+            const step3Map=['email_address','phone_number','address','state','city','ward','locality'];
+            step3Labels.forEach((lbl,i)=>{
+                if(t[step3Map[i]]){
+                    const req=lbl.querySelector('.required');
+                    lbl.textContent=t[step3Map[i]];
+                    if(req){lbl.appendChild(document.createTextNode(' '));lbl.appendChild(req);}
+                }
+            });
+            p('#email','enter_email');
+            p('#phone','enter_phone');
+            p('#address','enter_address');
+            p('#locality','enter_locality');
+
+            /* OTP helper */
+            const otpHelper=document.querySelector('#step-3 .form-helper');
+            if(otpHelper&&t['otp_helper'])otpHelper.textContent=t['otp_helper'];
+
+            /* Select default options */
+            const selectMap={
+                'state':'select_state','city':'select_city','ward':'select_ward'
+            };
+            Object.entries(selectMap).forEach(([id,key])=>{
+                const sel=document.getElementById(id);
+                if(sel&&sel.options[0]&&t[key])sel.options[0].textContent=t[key];
+            });
+
+            /* Step 4: Govt ID */
+            s('#step-4 .section-title','govt_id_services');
+            s('#step-4 .section-desc','link_identity');
+            const step4Labels=document.querySelectorAll('#step-4 > .form-group > label');
+            const step4Map=['aadhaar_number',null,'electricity_provider','water_provider','gas_service','upload_photo'];
+            step4Labels.forEach((lbl,i)=>{
+                if(step4Map[i]&&t[step4Map[i]])lbl.textContent=t[step4Map[i]];
+            });
+            /* Aadhaar helper & consent */
+            const aadhaarHelpers=document.querySelectorAll('#step-4 .form-helper');
+            if(aadhaarHelpers[0]&&t['aadhaar_helper'])aadhaarHelpers[0].textContent=t['aadhaar_helper'];
+            const consentLabel=document.querySelector('#aadhaarConsent');
+            if(consentLabel&&consentLabel.parentElement&&t['aadhaar_consent']){
+                const pl=consentLabel.parentElement;
+                const inp=pl.querySelector('input');
+                pl.textContent='';pl.appendChild(inp);pl.appendChild(document.createTextNode(' '+t['aadhaar_consent']));
+            }
+            /* Utility provider default options */
+            ['electricityProvider','waterProvider','gasProvider'].forEach(id=>{
+                const sel=document.getElementById(id);
+                if(sel&&sel.options[0]&&t['select_provider'])sel.options[0].textContent=t['select_provider'];
+            });
+
+            /* Step 5: Security */
+            s('#step-5 .section-title','security_setup');
+            s('#step-5 .section-desc','security_desc');
+            const step5Labels=document.querySelectorAll('#step-5 > .form-group > label');
+            if(step5Labels[0]&&t['password']){const r=step5Labels[0].querySelector('.required');step5Labels[0].textContent=t['password'];if(r){step5Labels[0].appendChild(document.createTextNode(' '));step5Labels[0].appendChild(r);}}
+            if(step5Labels[1]&&t['confirm_password']){const r=step5Labels[1].querySelector('.required');step5Labels[1].textContent=t['confirm_password'];if(r){step5Labels[1].appendChild(document.createTextNode(' '));step5Labels[1].appendChild(r);}}
+            p('#password','create_password');
+            p('#confirmPassword','reenter_password');
+            const toggleSpan=document.querySelector('.toggle-row span');
+            if(toggleSpan&&t['enable_alerts'])toggleSpan.textContent=t['enable_alerts'];
+
+            /* Buttons */
+            document.querySelectorAll('.btn-primary').forEach(btn=>{
+                if(btn.id==='submitBtn'&&!btn.disabled&&t['create_my_account'])btn.textContent=t['create_my_account'];
+                else if(btn.id==='step1Next'&&t['continue'])btn.textContent=t['continue'];
+                else if(!btn.id&&t['continue'])btn.textContent=t['continue'];
+            });
+            document.querySelectorAll('.btn-secondary').forEach(btn=>{
+                if(t['back'])btn.textContent=t['back'];
+            });
+
+            /* Links */
+            const linksDiv=document.querySelector('.links');
+            if(linksDiv&&t['already_have_account']&&t['log_in_link']){
+                const a=linksDiv.querySelector('a');
+                linksDiv.textContent=t['already_have_account']+' ';
+                if(a){a.textContent=t['log_in_link'];linksDiv.appendChild(a);}
+            }
+
+            /* Back to Home */
+            document.querySelectorAll('.back-home a').forEach(a=>{
+                if(t['back_to_home']){const ico=a.querySelector('i');a.textContent='';if(ico)a.appendChild(ico);a.appendChild(document.createTextNode(' '+t['back_to_home']));}
+            });
+
+            /* RTL for Urdu */
+            document.documentElement.dir=lang==='ur'?'rtl':'ltr';
+
+            /* Dropdown label */
+            const li=LANGS.find(l=>l.code===lang);
+            if(li)document.getElementById('langLabel').textContent=li.native;
+            document.querySelectorAll('.lang-option').forEach(o=>o.classList.toggle('active',o.dataset.lang===lang));
+            if(t['powered_by']){const pw=document.getElementById('langPowered');if(pw)pw.textContent=t['powered_by'];}
+        }
+
+        window.switchLangFromMenu=function(lang){
+            document.getElementById('langMenu').classList.remove('show');
+            document.getElementById('langToggle').classList.remove('open');
+            switchLang(lang,true);
+        };
+
+        function switchLang(lang,save){
+            currentLang=lang;
+            if(save)localStorage.setItem('suvidha_lang',lang);
+            if(TR[lang]){applyTranslations(lang);return;}
+            /* Fallback: IndicTrans2 API */
+            const overlay=document.getElementById('translatingOverlay');
+            overlay.classList.add('show');
+            const enT=TR['en']||{};
+            const texts=Object.values(enT);
+            fetch('/api/translate/indictrans2',{
+                method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({texts:texts,target_lang:lang,source_lang:'en'})
+            }).then(r=>r.json()).then(d=>{
+                if(d.success){
+                    const keys=Object.keys(enT);const built={};
+                    d.translations.forEach((t,i)=>built[keys[i]]=t);
+                    TR[lang]=built;applyTranslations(lang);
+                }
+                overlay.classList.remove('show');
+            }).catch(()=>overlay.classList.remove('show'));
+        }
+
+        window.toggleLangMenu=function(){
+            const m=document.getElementById('langMenu'),b=document.getElementById('langToggle');
+            m.classList.toggle('show');b.classList.toggle('open');
+        };
+        document.addEventListener('click',function(e){
+            if(!document.getElementById('langDropdown').contains(e.target)){
+                document.getElementById('langMenu').classList.remove('show');
+                document.getElementById('langToggle').classList.remove('open');
+            }
+        });
+    })();
     </script>
 </body>
 </html>

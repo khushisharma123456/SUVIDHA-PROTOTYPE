@@ -1,28 +1,28 @@
-<div class="main-content">
+<div class="main-content" auto-translate>
     <div class="dashboard-container">
 
         <!-- HERO STRIP -->
         <div class="cm-hero-strip">
             <div class="cm-hero-left">
-                <div class="cm-hero-eyebrow">&#127968; Community Hub</div>
-                <div class="cm-hero-name">Welcome, {{vm.citizenName || 'Citizen'}}</div>
+                <div class="cm-hero-eyebrow">&#127968; {{ 'community.title' | translate }}</div>
+                <div class="cm-hero-name">{{ 'community.welcome' | translate }}, {{vm.citizenName || 'Citizen'}}</div>
                 <div class="cm-hero-sub">{{vm.selectedWard || 'Kailash Colony'}} &middot; Ward 54E &middot; New Delhi</div>
             </div>
             <div class="cm-hero-selectors">
                 <div class="cm-selector-group">
-                    <label><i data-lucide="globe" style="width:12px;height:12px;"></i> State</label>
+                    <label><i data-lucide="globe" style="width:12px;height:12px;"></i> {{ 'community.state' | translate }}</label>
                     <select ng-model="vm.selectedState" ng-change="vm.onStateChange()" class="cm-select">
                         <option ng-repeat="s in vm.stateList" value="{{s}}">{{s}}</option>
                     </select>
                 </div>
                 <div class="cm-selector-group">
-                    <label><i data-lucide="building" style="width:12px;height:12px;"></i> City</label>
+                    <label><i data-lucide="building" style="width:12px;height:12px;"></i> {{ 'community.city' | translate }}</label>
                     <select ng-model="vm.selectedCity" ng-change="vm.onCityChange()" class="cm-select">
                         <option ng-repeat="c in vm.cityList" value="{{c}}">{{c}}</option>
                     </select>
                 </div>
                 <div class="cm-selector-group">
-                    <label><i data-lucide="map-pin" style="width:12px;height:12px;"></i> Ward</label>
+                    <label><i data-lucide="map-pin" style="width:12px;height:12px;"></i> {{ 'community.ward' | translate }}</label>
                     <select ng-model="vm.selectedWard" ng-change="vm.loadWardData()" class="cm-select">
                         <option ng-repeat="w in vm.wardList" value="{{w.value}}">{{w.label}}</option>
                     </select>
@@ -30,16 +30,16 @@
             </div>
             <div class="cm-hero-utility">
                 <button class="cm-util-btn cm-util-elec" ng-class="{'active': vm.selectedUtility === 'electricity'}" ng-click="vm.selectUtility('electricity')">
-                    <i data-lucide="zap" style="width:14px;height:14px;"></i> Electricity
+                    <i data-lucide="zap" style="width:14px;height:14px;"></i> {{ 'community.electricity' | translate }}
                 </button>
                 <button class="cm-util-btn cm-util-water" ng-class="{'active': vm.selectedUtility === 'water'}" ng-click="vm.selectUtility('water')">
-                    <i data-lucide="droplet" style="width:14px;height:14px;"></i> Water
+                    <i data-lucide="droplet" style="width:14px;height:14px;"></i> {{ 'community.water' | translate }}
                 </button>
                 <button class="cm-util-btn cm-util-gas" ng-class="{'active': vm.selectedUtility === 'gas'}" ng-click="vm.selectUtility('gas')">
-                    <i data-lucide="flame" style="width:14px;height:14px;"></i> Gas
+                    <i data-lucide="flame" style="width:14px;height:14px;"></i> {{ 'community.gas' | translate }}
                 </button>
                 <button class="cm-util-btn cm-util-waste" ng-class="{'active': vm.selectedUtility === 'waste'}" ng-click="vm.selectUtility('waste')">
-                    <i data-lucide="trash-2" style="width:14px;height:14px;"></i> Waste
+                    <i data-lucide="trash-2" style="width:14px;height:14px;"></i> {{ 'community.waste' | translate }}
                 </button>
             </div>
         </div>
@@ -49,32 +49,32 @@
             <div class="cm-tab-card" ng-class="{active: vm.activeSection === 'overview'}" ng-click="vm.showSection('overview')">
                 <div class="cm-tab-icon">&#128202;</div>
                 <div class="cm-tab-body">
-                    <div class="cm-tab-title">Overview</div>
-                    <div class="cm-tab-sub">Savings &amp; rankings</div>
+                    <div class="cm-tab-title">{{ 'community.overview' | translate }}</div>
+                    <div class="cm-tab-sub">{{ 'community.overview_sub' | translate }}</div>
                 </div>
                 <div class="cm-tab-arrow">&#8594;</div>
             </div>
             <div class="cm-tab-card" ng-class="{active: vm.activeSection === 'challenges'}" ng-click="vm.showSection('challenges')">
                 <div class="cm-tab-icon">&#127942;</div>
                 <div class="cm-tab-body">
-                    <div class="cm-tab-title">Civic Challenges</div>
-                    <div class="cm-tab-sub">Earn points &amp; compete</div>
+                    <div class="cm-tab-title">{{ 'community.civic_challenges' | translate }}</div>
+                    <div class="cm-tab-sub">{{ 'community.civic_challenges_sub' | translate }}</div>
                 </div>
                 <div class="cm-tab-arrow">&#8594;</div>
             </div>
             <div class="cm-tab-card" ng-class="{active: vm.activeSection === 'advisories'}" ng-click="vm.showSection('advisories')">
                 <div class="cm-tab-icon">&#128226;</div>
                 <div class="cm-tab-body">
-                    <div class="cm-tab-title">Advisories</div>
-                    <div class="cm-tab-sub">Alerts &amp; outages</div>
+                    <div class="cm-tab-title">{{ 'community.advisories' | translate }}</div>
+                    <div class="cm-tab-sub">{{ 'community.advisories_sub' | translate }}</div>
                 </div>
                 <div class="cm-tab-arrow">&#8594;</div>
             </div>
             <div class="cm-tab-card" ng-class="{active: vm.activeSection === 'insights'}" ng-click="vm.showSection('insights')">
                 <div class="cm-tab-icon">&#128269;</div>
                 <div class="cm-tab-body">
-                    <div class="cm-tab-title">Ward Insights</div>
-                    <div class="cm-tab-sub">Performance &amp; impact</div>
+                    <div class="cm-tab-title">{{ 'community.ward_insights' | translate }}</div>
+                    <div class="cm-tab-sub">{{ 'community.ward_insights_sub' | translate }}</div>
                 </div>
                 <div class="cm-tab-arrow">&#8594;</div>
             </div>

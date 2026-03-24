@@ -1,32 +1,32 @@
-<div class="main-content">
+<div class="main-content" auto-translate>
     <div class="dashboard-container">
 
         <!-- HERO STRIP -->
         <div class="rc-hero-strip">
             <div class="rc-hero-left">
-                <div class="rc-hero-eyebrow">&#129531; Records &amp; Billing</div>
+                <div class="rc-hero-eyebrow">&#129531; {{ 'records.title' | translate }}</div>
                 <div class="rc-hero-name">Welcome, {{vm.userData.username || 'Citizen'}}</div>
                 <div class="rc-hero-sub">Your complete billing history &amp; payment records</div>
             </div>
             <div class="rc-hero-stats">
                 <div class="rc-hero-stat">
                     <div class="rc-hero-stat-val">{{vm.stats.totalBills}}</div>
-                    <div class="rc-hero-stat-lbl">Total Bills</div>
+                    <div class="rc-hero-stat-lbl">{{ 'records.total_bills' | translate }}</div>
                 </div>
                 <div class="rc-hero-stat-div"></div>
                 <div class="rc-hero-stat">
                     <div class="rc-hero-stat-val">{{vm.stats.totalAmount}}</div>
-                    <div class="rc-hero-stat-lbl">Total Paid</div>
+                    <div class="rc-hero-stat-lbl">{{ 'records.total_paid' | translate }}</div>
                 </div>
                 <div class="rc-hero-stat-div"></div>
                 <div class="rc-hero-stat">
                     <div class="rc-hero-stat-val">{{vm.stats.avgMonthly}}</div>
-                    <div class="rc-hero-stat-lbl">Avg Monthly</div>
+                    <div class="rc-hero-stat-lbl">{{ 'records.avg_monthly' | translate }}</div>
                 </div>
                 <div class="rc-hero-stat-div"></div>
                 <div class="rc-hero-stat">
                     <div class="rc-hero-stat-val rc-stat-amber">{{vm.stats.pending}}</div>
-                    <div class="rc-hero-stat-lbl">Pending Bills</div>
+                    <div class="rc-hero-stat-lbl">{{ 'records.pending_bills' | translate }}</div>
                 </div>
             </div>
         </div>
@@ -36,32 +36,32 @@
             <div class="rc-quick-card" ng-click="vm.downloadCSV()">
                 <div class="rc-qc-icon rc-qc-csv">&#128229;</div>
                 <div class="rc-qc-body">
-                    <div class="rc-qc-title">Download CSV</div>
-                    <div class="rc-qc-sub">Export full records</div>
+                    <div class="rc-qc-title">{{ 'records.download_csv' | translate }}</div>
+                    <div class="rc-qc-sub">{{ 'records.download_csv_sub' | translate }}</div>
                 </div>
                 <div class="rc-qc-arrow">&#8594;</div>
             </div>
             <div class="rc-quick-card" ng-click="vm.exportPDF()">
                 <div class="rc-qc-icon rc-qc-pdf">&#128196;</div>
                 <div class="rc-qc-body">
-                    <div class="rc-qc-title">Export PDF</div>
-                    <div class="rc-qc-sub">Printable statement</div>
+                    <div class="rc-qc-title">{{ 'records.export_pdf' | translate }}</div>
+                    <div class="rc-qc-sub">{{ 'records.export_pdf_sub' | translate }}</div>
                 </div>
                 <div class="rc-qc-arrow">&#8594;</div>
             </div>
             <div class="rc-quick-card rc-qc-pay-card" ng-click="vm.openPayBillDialog()">
                 <div class="rc-qc-icon rc-qc-payment">&#128179;</div>
                 <div class="rc-qc-body">
-                    <div class="rc-qc-title">Pay Bill</div>
-                    <div class="rc-qc-sub">Settle pending dues</div>
+                    <div class="rc-qc-title">{{ 'records.pay_bill' | translate }}</div>
+                    <div class="rc-qc-sub">{{ 'records.pay_bill_sub' | translate }}</div>
                 </div>
                 <div class="rc-qc-arrow">&#8594;</div>
             </div>
             <div class="rc-quick-card" ng-click="vm.clearAllFilters()">
                 <div class="rc-qc-icon rc-qc-reset">&#128260;</div>
                 <div class="rc-qc-body">
-                    <div class="rc-qc-title">Reset Filters</div>
-                    <div class="rc-qc-sub">Show all records</div>
+                    <div class="rc-qc-title">{{ 'records.reset_filters' | translate }}</div>
+                    <div class="rc-qc-sub">{{ 'records.reset_filters_sub' | translate }}</div>
                 </div>
                 <div class="rc-qc-arrow">&#8594;</div>
             </div>
@@ -72,16 +72,16 @@
             <div class="rc-tab-card" ng-class="{active: vm.viewMode === 'table'}" ng-click="vm.setViewMode('table')">
                 <div class="rc-tab-icon">&#128202;</div>
                 <div class="rc-tab-body">
-                    <div class="rc-tab-title">Table View</div>
-                    <div class="rc-tab-sub">Sortable rows &amp; columns</div>
+                    <div class="rc-tab-title">{{ 'records.table_view' | translate }}</div>
+                    <div class="rc-tab-sub">{{ 'records.table_view_sub' | translate }}</div>
                 </div>
                 <div class="rc-tab-arrow">&#8594;</div>
             </div>
             <div class="rc-tab-card" ng-class="{active: vm.viewMode === 'cards'}" ng-click="vm.setViewMode('cards')">
                 <div class="rc-tab-icon">&#128193;</div>
                 <div class="rc-tab-body">
-                    <div class="rc-tab-title">Card View</div>
-                    <div class="rc-tab-sub">Visual card layout</div>
+                    <div class="rc-tab-title">{{ 'records.card_view' | translate }}</div>
+                    <div class="rc-tab-sub">{{ 'records.card_view_sub' | translate }}</div>
                 </div>
                 <div class="rc-tab-arrow">&#8594;</div>
             </div>
@@ -90,12 +90,12 @@
     <!-- Filter and Search Controls -->
     <div class="records-controls-card enhanced-card">
         <div class="card-header-with-actions" style="margin-bottom: 1rem;">
-            <h3><span class="icon">🔍</span> Filter & Search</h3>
+            <h3><span class="icon">🔍</span> {{ 'records.filter_search' | translate }}</h3>
         </div>
         <div class="controls-row">
             <div class="search-box">
                 <i data-lucide="search"></i>
-                <input type="text" placeholder="Search by Bill ID or Date" class="form-control enhanced"
+                <input type="text" placeholder="{{ 'records.search_placeholder' | translate }}" class="form-control enhanced"
                     ng-model="vm.searchQuery" ng-change="vm.filterRecords()">
             </div>
 
@@ -106,10 +106,10 @@
                         Utility
                     </label>
                     <select class="form-control enhanced" ng-model="vm.utilityFilter" ng-change="vm.filterRecords()">
-                        <option value="">All Utilities</option>
-                        <option value="electricity">Electricity</option>
-                        <option value="water">Water</option>
-                        <option value="gas">Gas</option>
+                        <option value="">{{ 'records.all_utilities' | translate }}</option>
+                        <option value="electricity">{{ 'records.electricity' | translate }}</option>
+                        <option value="water">{{ 'records.water' | translate }}</option>
+                        <option value="gas">{{ 'records.gas' | translate }}</option>
                     </select>
                 </div>
 
@@ -119,11 +119,11 @@
                         Period
                     </label>
                     <select class="form-control enhanced" ng-model="vm.periodFilter" ng-change="vm.filterRecords()">
-                        <option value="all">All Time</option>
-                        <option value="3months">Last 3 Months</option>
-                        <option value="6months">Last 6 Months</option>
-                        <option value="1year">Last Year</option>
-                        <option value="custom">Custom Range</option>
+                        <option value="all">{{ 'records.all_time' | translate }}</option>
+                        <option value="3months">{{ 'records.last_3_months' | translate }}</option>
+                        <option value="6months">{{ 'records.last_6_months' | translate }}</option>
+                        <option value="1year">{{ 'records.last_year' | translate }}</option>
+                        <option value="custom">{{ 'records.custom_range' | translate }}</option>
                     </select>
                 </div>
 
@@ -133,17 +133,17 @@
                         Status
                     </label>
                     <select class="form-control enhanced" ng-model="vm.statusFilter" ng-change="vm.filterRecords()">
-                        <option value="">All Status</option>
-                        <option value="paid">Paid</option>
-                        <option value="pending">Pending</option>
-                        <option value="overdue">Overdue</option>
+                        <option value="">{{ 'records.all_status' | translate }}</option>
+                        <option value="paid">{{ 'records.paid' | translate }}</option>
+                        <option value="pending">{{ 'records.pending' | translate }}</option>
+                        <option value="overdue">{{ 'records.overdue' | translate }}</option>
                     </select>
                 </div>
             </div>
         </div>
 
         <div class="active-filters" ng-if="vm.hasActiveFilters()">
-            <span class="filter-label">Active Filters:</span>
+            <span class="filter-label">{{ 'records.active_filters' | translate }}</span>
             <span class="filter-tag" ng-if="vm.utilityFilter">
                 {{vm.utilityFilter}}
                 <button ng-click="vm.clearFilter('utility')">×</button>
@@ -158,7 +158,7 @@
             </span>
             <button class="clear-all-btn" ng-click="vm.clearAllFilters()">
                 <i data-lucide="x"></i>
-                Clear All
+                {{ 'records.clear_all' | translate }}
             </button>
         </div>
     </div>
@@ -168,7 +168,7 @@
         <div class="table-header">
             <h3>
                 <span class="icon">&#128203;</span>
-                Billing Records
+                {{ 'records.billing_records' | translate }}
             </h3>
         </div>
 
@@ -178,24 +178,24 @@
                 <thead>
                     <tr>
                         <th ng-click="vm.sortBy('date')" class="sortable">
-                            Date
+                            {{ 'records.date' | translate }}
                             <i data-lucide="chevron-up" ng-if="vm.sortColumn === 'date' && vm.sortReverse"></i>
                             <i data-lucide="chevron-down" ng-if="vm.sortColumn === 'date' && !vm.sortReverse"></i>
                         </th>
-                        <th>Utility</th>
-                        <th>Bill ID</th>
+                        <th>{{ 'records.utility' | translate }}</th>
+                        <th>{{ 'records.bill_id' | translate }}</th>
                         <th ng-click="vm.sortBy('reading')" class="sortable">
-                            Reading
+                            {{ 'records.reading' | translate }}
                             <i data-lucide="chevron-up" ng-if="vm.sortColumn === 'reading' && vm.sortReverse"></i>
                             <i data-lucide="chevron-down" ng-if="vm.sortColumn === 'reading' && !vm.sortReverse"></i>
                         </th>
                         <th ng-click="vm.sortBy('amount')" class="sortable">
-                            Amount
+                            {{ 'records.amount' | translate }}
                             <i data-lucide="chevron-up" ng-if="vm.sortColumn === 'amount' && vm.sortReverse"></i>
                             <i data-lucide="chevron-down" ng-if="vm.sortColumn === 'amount' && !vm.sortReverse"></i>
                         </th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th>{{ 'records.status' | translate }}</th>
+                        <th>{{ 'records.action' | translate }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -251,9 +251,9 @@
             <!-- Empty State -->
             <div class="empty-state" ng-if="vm.filteredRecords.length === 0">
                 <i data-lucide="inbox"></i>
-                <p>No Records Found</p>
+                <p>{{ 'records.no_records' | translate }}</p>
                 <button class="btn btn-secondary" ng-click="vm.clearAllFilters()">
-                    Clear Filters
+                    {{ 'records.clear_filters' | translate }}
                 </button>
             </div>
         </div>
@@ -273,26 +273,26 @@
                 </div>
                 <div class="record-card-body">
                     <div class="record-detail">
-                        <span class="detail-label">Bill ID</span>
+                        <span class="detail-label">{{ 'records.bill_id' | translate }}</span>
                         <span class="detail-value" ng-bind="record.billId"></span>
                     </div>
                     <div class="record-detail">
-                        <span class="detail-label">Date</span>
+                        <span class="detail-label">{{ 'records.date' | translate }}</span>
                         <span class="detail-value" ng-bind="record.date"></span>
                     </div>
                     <div class="record-detail">
-                        <span class="detail-label">Reading</span>
+                        <span class="detail-label">{{ 'records.reading' | translate }}</span>
                         <span class="detail-value" ng-bind="record.reading"></span>
                     </div>
                     <div class="record-detail highlight">
-                        <span class="detail-label">Amount</span>
+                        <span class="detail-label">{{ 'records.amount' | translate }}</span>
                         <span class="detail-value amount">₹<span ng-bind="record.amount"></span></span>
                     </div>
                 </div>
                 <div class="record-card-footer">
                     <button class="btn btn-secondary btn-sm" ng-click="vm.viewDocument(record)">
                         <i data-lucide="eye"></i>
-                        View Bill
+                        {{ 'records.view_bill' | translate }}
                     </button>
                     <button class="btn-icon-small" ng-click="vm.downloadBill(record)" title="Download">
                         <i data-lucide="download"></i>
@@ -310,9 +310,9 @@
             <!-- Empty State -->
             <div class="empty-state full-width" ng-if="vm.filteredRecords.length === 0">
                 <i data-lucide="inbox"></i>
-                <p>No Records Found</p>
+                <p>{{ 'records.no_records' | translate }}</p>
                 <button class="btn btn-secondary" ng-click="vm.clearAllFilters()">
-                    Clear Filters
+                    {{ 'records.clear_filters' | translate }}
                 </button>
             </div>
         </div>
@@ -333,7 +333,7 @@
             </div>
         </div>
 
-        <p class="source-note">All data is sourced from official meter readings and validated billing records</p>
+        <p class="source-note">{{ 'records.source_note' | translate }}</p>
     </div>
 
     </div><!-- /dashboard-container -->
@@ -345,7 +345,7 @@
             <div class="modal-header">
                 <div class="modal-header-left">
                     <div class="modal-header-icon"><i data-lucide="credit-card"></i></div>
-                    <h2 class="modal-title">Pay Bill</h2>
+                    <h2 class="modal-title">{{ 'records.pay_bill' | translate }}</h2>
                 </div>
                 <button class="modal-close" ng-click="vm.closePayBillDialog()"><i data-lucide="x"></i></button>
             </div>
@@ -356,7 +356,7 @@
                     <p class="pay-bill-due">Due: {{vm.payBillData.dueDate}}</p>
                 </div>
                 <div class="form-group">
-                    <label>Payment Method</label>
+                    <label>{{ 'records.payment_method' | translate }}</label>
                     <select class="form-control" ng-model="vm.payMethod">
                         <option value="upi">UPI / BHIM</option>
                         <option value="netbanking">Net Banking</option>
@@ -367,9 +367,9 @@
             <div class="modal-footer" style="padding:1rem 1.5rem; border-top:1px solid #e5e7eb; display:flex; gap:0.75rem;">
                 <button class="btn-primary" style="flex:1;" ng-click="vm.confirmPayBill()" ng-disabled="vm.payBillProcessing">
                     <i data-lucide="check-circle" style="width:16px;height:16px;"></i>
-                    {{vm.payBillProcessing ? 'Processing...' : 'Confirm Payment'}}
+                    {{vm.payBillProcessing ? ('records.processing' | translate) : ('records.confirm_payment' | translate)}}
                 </button>
-                <button class="btn-secondary" ng-click="vm.closePayBillDialog()">Cancel</button>
+                <button class="btn-secondary" ng-click="vm.closePayBillDialog()">{{ 'records.cancel' | translate }}</button>
             </div>
         </div>
     </div>
@@ -381,7 +381,7 @@
             <div class="waste-guide-header">
                 <h2>
                     <i data-lucide="file-text"></i>
-                    Bill Details & Meter Photos
+                    {{ 'records.bill_details' | translate }}
                 </h2>
                 <button ng-click="vm.closeBillModal()">
                     <i data-lucide="x"></i>
@@ -400,7 +400,7 @@
 
                 <!-- Bill Details -->
                 <div style="margin-bottom:2rem;">
-                    <h4 style="margin:0 0 1rem 0; font-size:0.95rem; font-weight:600; color:#111827;">Bill Information</h4>
+                    <h4 style="margin:0 0 1rem 0; font-size:0.95rem; font-weight:600; color:#111827;">{{ 'records.bill_information' | translate }}</h4>
                     <div style="display:flex; flex-direction:column; gap:0.75rem;">
                         <div
                             style="display:flex; justify-content:space-between; padding:0.75rem 1rem; background:#f9fafb; border-radius:10px;">
@@ -444,9 +444,9 @@
                 <div style="margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:1px solid #e5e7eb;">
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
                         <div style="font-size: 1.5rem;">📷</div>
-                        <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #111827;">Worker Meter Photos</h4>
+                        <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #111827;">{{ 'records.worker_meter_photos' | translate }}</h4>
                     </div>
-                    <p style="margin: 0 0 1rem 0; font-size: 0.8rem; color: #6b7280;">Official photos captured by the municipal meter reader</p>
+                    <p style="margin: 0 0 1rem 0; font-size: 0.8rem; color: #6b7280;">{{ 'records.meter_reader_note' | translate }}</p>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
                         <!-- Photo Placeholder 1 -->
                         <div style="aspect-ratio: 1; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border: 2px dashed #d1d5db; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem; color: #6b7280; padding: 1rem; text-align: center;">

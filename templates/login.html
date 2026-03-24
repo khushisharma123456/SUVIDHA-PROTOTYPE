@@ -410,6 +410,28 @@
             .role-card { padding: 1rem 0.75rem; }
             .role-card .role-icon { font-size: 1.5rem; }
         }
+
+        /* ── Language Dropdown ── */
+        .lang-dropdown-wrap{position:fixed;top:1rem;right:1rem;z-index:9999;font-family:var(--font-primary)}
+        .lang-toggle{display:flex;align-items:center;gap:.45rem;padding:.5rem .9rem;border-radius:10px;border:2px solid var(--gray-200);background:rgba(255,255,255,.92);backdrop-filter:blur(8px);cursor:pointer;font-size:.82rem;font-weight:600;color:var(--gray-700);transition:all .25s ease;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+        .lang-toggle:hover{border-color:var(--primary-green);color:var(--primary-green)}
+        .lang-toggle .arrow{transition:transform .25s ease;font-size:.6rem}
+        .lang-toggle.open .arrow{transform:rotate(180deg)}
+        .lang-menu{position:absolute;top:calc(100% + .45rem);right:0;min-width:200px;max-height:340px;overflow-y:auto;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border:1.5px solid var(--gray-200);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.12);padding:.35rem;display:none;animation:menuFade .2s ease}
+        .lang-menu.show{display:block}
+        @keyframes menuFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+        .lang-option{display:flex;align-items:center;gap:.55rem;padding:.55rem .75rem;border-radius:8px;cursor:pointer;font-size:.82rem;color:var(--gray-700);transition:background .15s ease}
+        .lang-option:hover{background:var(--gray-100)}
+        .lang-option.active{background:linear-gradient(135deg,rgba(0,166,81,.08),rgba(0,112,60,.08));color:var(--primary-green);font-weight:600}
+        .lang-option .lang-native{font-weight:600}
+        .lang-option .lang-en{color:var(--gray-400);font-size:.72rem;margin-left:auto}
+        .lang-powered{text-align:center;padding:.5rem;font-size:.65rem;color:var(--gray-400);border-top:1px solid var(--gray-100);margin-top:.25rem}
+        .translating-overlay{position:fixed;inset:0;background:rgba(255,255,255,.6);backdrop-filter:blur(3px);z-index:10000;display:none;align-items:center;justify-content:center}
+        .translating-overlay.show{display:flex}
+        .translating-overlay .spinner{width:36px;height:36px;border:3px solid var(--gray-200);border-top-color:var(--primary-green);border-radius:50%;animation:spin .7s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        [dir="rtl"] .lang-dropdown-wrap{right:auto;left:1rem}
+        [dir="rtl"] .lang-menu{right:auto;left:0}
     </style>
 </head>
 
@@ -543,6 +565,17 @@
         </div>
     </div>
 
+    <!-- Language Dropdown -->
+    <div class="lang-dropdown-wrap" id="langDropdown">
+        <button class="lang-toggle" id="langToggle" onclick="toggleLangMenu()">
+            <i class="fas fa-globe"></i>
+            <span id="langLabel">English</span>
+            <i class="fas fa-chevron-down arrow"></i>
+        </button>
+        <div class="lang-menu" id="langMenu"></div>
+    </div>
+    <div class="translating-overlay" id="translatingOverlay"><div class="spinner"></div></div>
+
     <script>
         let selectedRoleValue = null;
 
@@ -674,6 +707,165 @@
             el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 5000);
         }
+    </script>
+
+    <!-- IndicTrans2 Language Engine -->
+    <script>
+    (function(){
+        const LANGS=[
+            {code:'en',native:'English',en:'English'},
+            {code:'hi',native:'हिन्दी',en:'Hindi'},
+            {code:'ta',native:'தமிழ்',en:'Tamil'},
+            {code:'te',native:'తెలుగు',en:'Telugu'},
+            {code:'bn',native:'বাংলা',en:'Bengali'},
+            {code:'mr',native:'मराठी',en:'Marathi'},
+            {code:'gu',native:'ગુજરાતી',en:'Gujarati'},
+            {code:'kn',native:'ಕನ್ನಡ',en:'Kannada'},
+            {code:'ml',native:'മലയാളം',en:'Malayalam'},
+            {code:'pa',native:'ਪੰਜਾਬੀ',en:'Punjabi'},
+            {code:'or',native:'ଓଡ଼ିଆ',en:'Odia'},
+            {code:'ur',native:'اردو',en:'Urdu'}
+        ];
+        let TR={}, currentLang='en';
+
+        fetch('/static/auth-translations.json').then(r=>r.json()).then(d=>{TR=d;init();}).catch(()=>init());
+
+        function init(){
+            buildMenu();
+            const saved=localStorage.getItem('suvidha_lang')||'en';
+            switchLang(saved,false);
+        }
+
+        function buildMenu(){
+            const menu=document.getElementById('langMenu');
+            let html='';
+            LANGS.forEach(l=>{
+                html+=`<div class="lang-option" data-lang="${l.code}" onclick="switchLangFromMenu('${l.code}')">
+                    <span class="lang-native">${l.native}</span>
+                    <span class="lang-en">${l.en}</span></div>`;
+            });
+            html+='<div class="lang-powered" id="langPowered">Powered by AI4Bharat IndicTrans2</div>';
+            menu.innerHTML=html;
+        }
+
+        function applyTranslations(lang){
+            const t=TR[lang]; if(!t) return;
+            const s=(sel,key)=>{const el=document.querySelector(sel);if(el&&t[key])el.textContent=t[key];};
+            const p=(sel,key)=>{const el=document.querySelector(sel);if(el&&t[key])el.placeholder=t[key];};
+
+            /* Role selection */
+            s('.card-title','welcome_back');
+            s('.card-subtitle','select_role_login');
+            s('#card-citizen .role-name','general_citizen');
+            s('#card-citizen .role-desc','citizen_login_desc');
+            s('#card-senior .role-name','senior_citizen');
+            s('#card-senior .role-desc','senior_login_desc');
+            s('#card-agent .role-name','field_agent');
+            s('#card-agent .role-desc','agent_login_desc');
+            s('#card-official .role-name','govt_official');
+            s('#card-official .role-desc','official_login_desc');
+
+            /* Banners */
+            const bannerMap={citizen:'logging_in_citizen',senior:'logging_in_senior',agent:'logging_in_agent',official:'logging_in_official'};
+            Object.entries(bannerMap).forEach(([role,key])=>{
+                const b=document.getElementById('banner-'+role);
+                if(b&&t[key]){const icon=b.querySelector('i');b.textContent='';if(icon)b.appendChild(icon);b.appendChild(document.createTextNode(' '+t[key]));}
+            });
+
+            /* Form labels & placeholders */
+            const idLabel=document.getElementById('identifierLabel');
+            const idInput=document.getElementById('identifier');
+            if(selectedRoleValue==='agent'||selectedRoleValue==='official'){
+                if(idLabel&&t['employee_id_email'])idLabel.textContent=t['employee_id_email'];
+                if(idInput&&t[selectedRoleValue==='agent'?'enter_emp_id':'enter_official_id'])idInput.placeholder=t[selectedRoleValue==='agent'?'enter_emp_id':'enter_official_id'];
+            }else{
+                if(idLabel&&t['email_or_phone'])idLabel.textContent=t['email_or_phone'];
+                if(idInput&&t['enter_email_phone'])idInput.placeholder=t['enter_email_phone'];
+            }
+
+            /* Department */
+            const deptLabel=document.querySelector('#deptGroup label');
+            if(deptLabel&&t['department'])deptLabel.textContent=t['department'];
+            const deptSelect=document.getElementById('department');
+            if(deptSelect&&deptSelect.options[0]&&t['select_department'])deptSelect.options[0].textContent=t['select_department'];
+
+            /* Password */
+            const pwLabel=document.querySelectorAll('.form-group label');
+            pwLabel.forEach(l=>{if(l.id!=='identifierLabel'&&!l.closest('#deptGroup'))if(t['password'])l.textContent=t['password'];});
+            p('#password','enter_password');
+
+            /* Buttons & links */
+            const btn=document.getElementById('loginBtn');
+            if(btn&&!btn.disabled&&t['log_in'])btn.textContent=t['log_in'];
+
+            const links=document.querySelectorAll('.links a');
+            if(links[0]&&t['forgot_password'])links[0].textContent=t['forgot_password'];
+            if(links[1]&&t['create_account'])links[1].textContent=t['create_account'];
+
+            const changeBtn=document.querySelector('.change-role');
+            if(changeBtn&&t['change_role']){const ico=changeBtn.querySelector('i');changeBtn.textContent='';if(ico)changeBtn.appendChild(ico);changeBtn.appendChild(document.createTextNode(' '+t['change_role']));}
+
+            /* Back to Home */
+            document.querySelectorAll('.back-home a').forEach(a=>{
+                if(t['back_to_home']){const ico=a.querySelector('i');a.textContent='';if(ico)a.appendChild(ico);a.appendChild(document.createTextNode(' '+t['back_to_home']));}
+            });
+
+            /* RTL for Urdu */
+            document.documentElement.dir=lang==='ur'?'rtl':'ltr';
+
+            /* Dropdown label */
+            const li=LANGS.find(l=>l.code===lang);
+            if(li)document.getElementById('langLabel').textContent=li.native;
+            document.querySelectorAll('.lang-option').forEach(o=>o.classList.toggle('active',o.dataset.lang===lang));
+            if(t['powered_by']){const pw=document.getElementById('langPowered');if(pw)pw.textContent=t['powered_by'];}
+        }
+
+        window.switchLangFromMenu=function(lang){
+            document.getElementById('langMenu').classList.remove('show');
+            document.getElementById('langToggle').classList.remove('open');
+            switchLang(lang,true);
+        };
+
+        function switchLang(lang,save){
+            currentLang=lang;
+            if(save)localStorage.setItem('suvidha_lang',lang);
+            if(TR[lang]){applyTranslations(lang);return;}
+            /* Fallback: IndicTrans2 API */
+            const overlay=document.getElementById('translatingOverlay');
+            overlay.classList.add('show');
+            const enT=TR['en']||{};
+            const texts=Object.values(enT);
+            fetch('/api/translate/indictrans2',{
+                method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({texts:texts,target_lang:lang,source_lang:'en'})
+            }).then(r=>r.json()).then(d=>{
+                if(d.success){
+                    const keys=Object.keys(enT);const built={};
+                    d.translations.forEach((t,i)=>built[keys[i]]=t);
+                    TR[lang]=built;applyTranslations(lang);
+                }
+                overlay.classList.remove('show');
+            }).catch(()=>overlay.classList.remove('show'));
+        }
+
+        window.toggleLangMenu=function(){
+            const m=document.getElementById('langMenu'),b=document.getElementById('langToggle');
+            m.classList.toggle('show');b.classList.toggle('open');
+        };
+        document.addEventListener('click',function(e){
+            if(!document.getElementById('langDropdown').contains(e.target)){
+                document.getElementById('langMenu').classList.remove('show');
+                document.getElementById('langToggle').classList.remove('open');
+            }
+        });
+
+        /* Re-apply translations whenever selectRole changes the form */
+        const origSelectRole=window.selectRole;
+        window.selectRole=function(role){
+            origSelectRole(role);
+            setTimeout(()=>applyTranslations(currentLang),250);
+        };
+    })();
     </script>
 </body>
 </html>
