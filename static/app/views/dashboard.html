@@ -431,55 +431,6 @@
                 <p class="db-welcome-sub">{{vm.userState || 'Your Ward'}} &middot; {{'db_smart_city_services' | translate}}</p>
             </div>
             <div class="db-welcome-icons">
-                <!-- Language Selector -->
-                <div class="language-selector-wrapper" style="position: relative;">
-                    <button class="header-icon-btn language-selector-btn" ng-click="vm.toggleLanguageMenu()" title="Change Language" style="display: flex; align-items: center; gap: 6px;">
-                        <i data-lucide="globe"></i>
-                        <span style="font-size: 12px; font-weight: 600; max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{vm.getCurrentLanguageLabel()}}</span>
-                    </button>
-                    <!-- Language Dropdown Menu -->
-                    <div class="language-dropdown" ng-show="vm.showLanguageMenu" ng-click="$event.stopPropagation()" style="
-                        position: absolute;
-                        top: 100%;
-                        right: 0;
-                        background: white;
-                        border: 1px solid #e5e7eb;
-                        border-radius: 8px;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                        min-width: 180px;
-                        z-index: 1000;
-                        margin-top: 8px;
-                    ">
-                        <div style="padding: 8px 0;">
-                            <div ng-repeat="lang in vm.availableLanguages" 
-                                ng-click="vm.switchLanguage(lang.code)"
-                                style="
-                                    padding: 10px 16px;
-                                    cursor: pointer;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 10px;
-                                    border-left: 3px solid transparent;
-                                    font-size: 14px;
-                                    transition: all 0.2s;
-                                "
-                                ng-class="vm.currentLanguage === lang.code ? 'language-active' : 'language-item'"
-                                ng-mouseenter="$event.target.style.backgroundColor = '#f3f4f6'"
-                                ng-mouseleave="$event.target.style.backgroundColor = 'transparent'">
-                                <span style="font-size: 18px;">{{lang.flag}}</span>
-                                <span style="flex: 1;">{{lang.name}}</span>
-                                <i data-lucide="check" ng-if="vm.currentLanguage === lang.code" style="width: 16px; height: 16px; color: #10b981;"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <style>
-                    .language-active {
-                        background-color: #f0f9ff !important;
-                        border-left-color: #0ea5e9 !important;
-                    }
-                </style>
-                
                 <button class="header-icon-btn" ng-click="vm.openServiceStatusDialog()" title="Service Requests">
                     <i data-lucide="wrench"></i>
                     <span class="header-icon-badge" ng-show="(vm.userData.reports.open||0)+(vm.userData.reports.in_progress||0)>0">{{(vm.userData.reports.open||0)+(vm.userData.reports.in_progress||0)}}</span>

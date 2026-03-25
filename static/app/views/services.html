@@ -8,49 +8,6 @@
                 <div class="sv-hero-sub">{{'svc_hero_sub' | translate}}</div>
             </div>
 
-            <!-- Language Picker -->
-            <div style="position: relative; margin-left: auto; margin-right: 1.5rem; align-self: center;" ng-click="$event.stopPropagation()">
-                <button ng-click="vm.toggleLanguageMenu()" style="
-                    display: flex; align-items: center; gap: 8px;
-                    padding: 0.5rem 1rem; border-radius: 10px;
-                    border: 1px solid rgba(255,255,255,0.3);
-                    background: rgba(255,255,255,0.15);
-                    color: white; cursor: pointer;
-                    font-size: 0.85rem; font-weight: 600;
-                    backdrop-filter: blur(4px);
-                    transition: all 0.2s;
-                " title="Change Language">
-                    <i data-lucide="globe" style="width: 16px; height: 16px;"></i>
-                    <span>{{vm.getCurrentLanguageLabel()}}</span>
-                    <span style="font-size: 0.6rem; transition: transform 0.2s;" ng-style="{'transform': vm.showLanguageMenu ? 'rotate(180deg)' : 'rotate(0deg)'}">&#9660;</span>
-                </button>
-                <div ng-show="vm.showLanguageMenu" style="
-                    position: absolute; top: 100%; right: 0;
-                    background: white; border: 1px solid #e5e7eb;
-                    border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-                    min-width: 190px; z-index: 1000; margin-top: 8px;
-                    max-height: 360px; overflow-y: auto;
-                ">
-                    <div style="padding: 6px 0;">
-                        <div ng-repeat="lang in vm.availableLanguages"
-                            ng-click="vm.switchLanguage(lang.code)"
-                            style="
-                                padding: 9px 16px; cursor: pointer;
-                                display: flex; align-items: center; gap: 10px;
-                                font-size: 0.88rem; transition: all 0.15s;
-                                border-left: 3px solid transparent;
-                            "
-                            ng-style="vm.currentLanguage === lang.code ? {'background': '#f0fdf4', 'border-left-color': '#10b981', 'font-weight': '700'} : {}"
-                            ng-mouseenter="$event.target.style.backgroundColor = vm.currentLanguage === lang.code ? '#f0fdf4' : '#f9fafb'"
-                            ng-mouseleave="$event.target.style.backgroundColor = vm.currentLanguage === lang.code ? '#f0fdf4' : 'transparent'">
-                            <span style="font-size: 1.1rem;">{{lang.flag}}</span>
-                            <span style="flex: 1; color: #111827;">{{lang.name}}</span>
-                            <i data-lucide="check" ng-if="vm.currentLanguage === lang.code" style="width: 15px; height: 15px; color: #10b981;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="sv-hero-stats">
                 <div class="sv-hero-stat">
                     <div class="sv-hero-stat-val">{{vm.stats.activeRequests || 2}}</div>
